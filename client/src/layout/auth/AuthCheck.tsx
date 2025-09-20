@@ -3,7 +3,11 @@ import { Navigate } from "react-router";
 import Cookies from "js-cookie";
 
 function hasUserSession(): boolean {
-    return !!Cookies.get("auth_token");
+    const token = Cookies.get('user_session');
+
+    if (!token) return false;
+
+    return true;
 }
 
 type Props = {
