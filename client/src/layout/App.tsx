@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Toaster } from "sonner";
 
 export default function App() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const handleSidebarHover = (isHovering: boolean) => {
         setIsSidebarOpen(isHovering);

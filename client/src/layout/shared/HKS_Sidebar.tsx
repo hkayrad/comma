@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail, SidebarSeparator } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@/components/ui/sidebar";
 import { Auth } from "@/lib/api"
 import { Home, LogOut, ScrollText, TurkishLira, User } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
@@ -22,8 +22,8 @@ export default function HKS_Sidebar({ onMouseOver, onMouseOut }: { onMouseOver: 
             icon: Home,
         },
         {
-            title: "Kesilen Faturalar",
-            url: "/kesilen_faturalar",
+            title: "Borç Bilgileri",
+            url: "/borc_bilgileri",
             icon: ScrollText,
         },
         {

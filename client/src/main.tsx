@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')!).render(
         </RequireAuth>
       }>
         <Route index element={<Dashboard />} />
-        <Route path="kesilen_faturalar" element={<Debts />} />
+        <Route path="borc_bilgileri" element={<Debts />} />
         <Route path="odemeler" element={<Payments />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Route>

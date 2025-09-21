@@ -7,6 +7,7 @@ import { Logger } from './utils/logger';
 import AuthController from "./controllers/AuthController";
 import CustomersController from "./controllers/CustomersController";
 import DebtsController from "./controllers/DebtsController";
+import PaymentsController from './controllers/PaymentsController';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use(AuthController);
 app.use(CustomersController);
 app.use(DebtsController);
+app.use(PaymentsController)
 
 const listenPort = process.env.SERVER_PORT || (() => { throw new Error("SERVER_PORT not defined"); })();
 app.listen(listenPort, () => {

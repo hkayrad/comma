@@ -1,8 +1,8 @@
 import { pool } from "../utils/db/pool";
-import { ApiResponse } from "../utils";
+import { ApiResponse, Logger } from "../utils";
 
 export class CustomersService {
-    static async GetAll(req: any, res: any) {
+    static async GetAll() {
         let conn;
 
         try {
@@ -52,7 +52,7 @@ export class CustomersService {
         }
     }
 
-    static async GetCustomerNamesAndIds(req: any, res: any) {
+    static async GetCustomerNamesAndIds() {
         let conn;
 
         try {
@@ -71,6 +71,107 @@ export class CustomersService {
         } catch (error) {
             console.error('Error fetching customer names and IDs:', error);
             return ApiResponse.error("Error fetching customer names and IDs");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async Create(customer: any) {
+        let conn;
+
+        try {
+            const { name, phone, is_company, tax_number, email, address } = customer;
+
+            if (!name) {
+                return ApiResponse.error("Name is required");
+            }
+
+            const query = `
+            INSERT INTO customers (name, phone, is_company, tax_number, email, address)
+            VALUES (?, ?, ?, ?, ?, ?) RETURNING id
+            `;
+
+            conn = await pool.getConnection();
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, email || null, address || null]);
+            Logger.log('Customer creation result:', result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("Failed to create customer");
+
+            return ApiResponse.success({ id: result.insertId }, "Customer created successfully");
+
+        } catch (error) {
+            console.error('Error creating customer:', error);
+            return ApiResponse.error("Error creating customer");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async Delete(id: string) {
+        let conn;
+
+        try {
+            if (!id) {
+                return ApiResponse.error("Customer ID is required");
+            }
+
+            const query = `
+            DELETE FROM customers WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+            const result = await conn.query(query, [id]);
+            Logger.log('Customer deletion result:', result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("No customer found with the given ID");
+
+            return ApiResponse.success(null, "Customer deleted successfully");
+
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            return ApiResponse.error("Error deleting customer");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async Update(customer: any) {
+        let conn;
+
+        try {
+            const { id, name, phone, is_company, tax_number, email, address } = customer;
+
+            if (!id) {
+                return ApiResponse.error("Customer ID is required");
+            }
+
+            if (!name) {
+                return ApiResponse.error("Name is required");
+            }
+
+            Logger.log('Updating customer with data:', customer);
+
+            const query = `
+            UPDATE customers 
+            SET name = ?, phone = ?, is_company = ?, tax_number = ?, email = ?, address = ?
+            WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+            const result = await conn.query(query, [name, phone || null, is_company || false, tax_number || null, email || null, address || null, id]);
+            Logger.log('Customer update result:', result);
+
+            if (result.affectedRows === 0) {
+                return ApiResponse.error("No customer found with the given ID");
+            }
+
+            return ApiResponse.success(null, "Customer updated successfully");
+
+        } catch (error) {
+            console.error('Error updating customer:', error);
+            return ApiResponse.error("Error updating customer");
         } finally {
             if (conn) conn.release();
         }
