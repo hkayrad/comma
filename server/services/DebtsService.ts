@@ -17,7 +17,7 @@ export class DebtsService {
                 END as is_fully_paid
             FROM debts d
             JOIN customers c ON d.customer_id = c.id
-            LEFT JOIN payments p ON d.invoice_no = p.invoice_no
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no AND d.customer_id = p.customer_id
             GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
             ORDER BY d.issue_date DESC
             `;
@@ -132,7 +132,7 @@ export class DebtsService {
                 END as is_fully_paid
             FROM debts d
             JOIN customers c ON d.customer_id = c.id
-            LEFT JOIN payments p ON d.invoice_no = p.invoice_no
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no AND d.customer_id = p.customer_id
             WHERE d.customer_id = ?
             GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
             HAVING is_fully_paid = false
