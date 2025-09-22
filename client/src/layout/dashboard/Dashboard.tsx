@@ -11,9 +11,10 @@ import { CustomersApi } from "@/lib/api";
 import type { CustomerDto } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState } from "@tanstack/react-table";
-import { ArrowUpDown, Check, Eye, FilterXIcon, Pencil, Plus, ReceiptTurkishLira, RefreshCcw, Trash2, TurkishLira } from "lucide-react";
+import { ArrowUpDown, Check, Eye, FilterXIcon, Paperclip, Pencil, Plus, ReceiptTurkishLira, RefreshCcw, Trash2, TurkishLira } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -49,6 +50,8 @@ export default function Dashboard() {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     const addForm = useForm<z.infer<typeof AddCustomerSchema>>({
         resolver: zodResolver(AddCustomerSchema),
@@ -263,7 +266,24 @@ export default function Dashboard() {
             accessorKey: "actions",
             header: () => <p className="select-none">Eylemler</p>,
             cell: ({ row }) => (
-                <div className="flex gap-2">
+                <div className="flex gap-1">
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="select-none"
+                                onClick={() => {
+                                    navigate(`/borc_dokumu/${row.original.id}`);
+                                }}
+                            >
+                                <Paperclip />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent vocab="tr" className="text-center">
+                            <p>Borç Dökümü Oluştur</p>
+                        </TooltipContent>
+                    </Tooltip>
                     <Dialog>
                         <Tooltip disableHoverableContent>
                             <DialogTrigger asChild>
@@ -769,7 +789,7 @@ export default function Dashboard() {
                         {table.getHeaderGroups().map(headerGroup => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map(header => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className={header.id === "actions" ? "w-[180px]" : ""}>
                                         {header.isPlaceholder ? null : flexRender(
                                             header.column.columnDef.header,
                                             header.getContext()

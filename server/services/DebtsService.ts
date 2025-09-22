@@ -7,8 +7,19 @@ export class DebtsService {
 
         try {
             const query = `
-            SELECT d.*, c.name AS customer_name FROM debts d
-            JOIN customers c ON d.customer_id = c.id ORDER BY d.issue_date DESC
+            SELECT 
+                d.*, 
+                c.name AS customer_name ,
+                COALESCE(SUM(p.amount), 0) as total_paid,
+                CASE 
+                    WHEN COALESCE(SUM(p.amount), 0) >= (d.amount + d.vat) THEN true 
+                    ELSE false 
+                END as is_fully_paid
+            FROM debts d
+            JOIN customers c ON d.customer_id = c.id
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no
+            GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
+            ORDER BY d.issue_date DESC
             `;
 
             conn = await pool.getConnection();
@@ -22,6 +33,207 @@ export class DebtsService {
         } catch (error) {
             console.error('Error fetching debts:', error);
             return ApiResponse.error("Error fetching debts");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async GetById(id: string) {
+        let conn;
+
+        try {
+            const query = `
+            SELECT 
+                d.*, 
+                c.name AS customer_name,
+                COALESCE(SUM(p.amount), 0) as total_paid,
+                CASE 
+                    WHEN COALESCE(SUM(p.amount), 0) >= (d.amount + d.vat) THEN true 
+                    ELSE false 
+                END as is_fully_paid
+            FROM debts d
+            JOIN customers c ON d.customer_id = c.id
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no AND d.customer_id = p.customer_id
+            WHERE d.id = ?
+            GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
+            `;
+
+            conn = await pool.getConnection();
+            const rows = await conn.query(query, [id]);
+
+            if (rows.length === 0)
+                return ApiResponse.error("Debt not found");
+
+            return ApiResponse.success(rows[0], "Debt retrieved successfully");
+
+        } catch (error) {
+            console.error('Error fetching debt:', error);
+            return ApiResponse.error("Error fetching debt");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async GetByInvoiceNo(invoiceNo: string) {
+        let conn;
+
+        try {
+            const query = `
+            SELECT 
+                d.*, 
+                c.name AS customer_name,
+                COALESCE(SUM(p.amount), 0) as total_paid,
+                CASE 
+                    WHEN COALESCE(SUM(p.amount), 0) >= (d.amount + d.vat) THEN true 
+                    ELSE false 
+                END as is_fully_paid
+            FROM debts d
+            JOIN customers c ON d.customer_id = c.id
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no AND d.customer_id = p.customer_id
+            WHERE d.invoice_no = ?
+            GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
+            `;
+
+            conn = await pool.getConnection();
+            const rows = await conn.query(query, [invoiceNo]);
+
+            if (rows.length === 0)
+                return ApiResponse.error("Debt not found");
+
+            return ApiResponse.success(rows, "Debt retrieved successfully");
+
+        } catch (error) {
+            console.error('Error fetching debt by invoice:', error);
+            return ApiResponse.error("Error fetching debt by invoice");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async GetUnpaidByCustomer(customerId: string) {
+        let conn;
+
+        try {
+            const query = `
+            SELECT 
+                d.id,
+                d.invoice_no,
+                d.amount,
+                d.vat,
+                d.description,
+                d.issue_date,
+                c.name AS customer_name,
+                COALESCE(SUM(p.amount), 0) as total_paid,
+                (d.amount + d.vat) as debt_amount,
+                (d.amount + d.vat - COALESCE(SUM(p.amount), 0)) as remaining_amount,
+                CASE 
+                    WHEN COALESCE(SUM(p.amount), 0) >= (d.amount + d.vat) THEN true 
+                    ELSE false 
+                END as is_fully_paid
+            FROM debts d
+            JOIN customers c ON d.customer_id = c.id
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no
+            WHERE d.customer_id = ?
+            GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
+            HAVING is_fully_paid = false
+            ORDER BY d.issue_date ASC
+            `;
+
+            conn = await pool.getConnection();
+            const rows = await conn.query(query, [customerId]);
+
+            if (rows.length === 0)
+                return ApiResponse.success(null, "No unpaid debts found for this customer");
+
+            // Calculate totals
+            const totalDebtAmount = rows.reduce((sum: number, debt: any) => sum + parseFloat(debt.debt_amount), 0);
+            const totalPaidAmount = rows.reduce((sum: number, debt: any) => sum + parseFloat(debt.total_paid), 0);
+            const totalRemainingAmount = rows.reduce((sum: number, debt: any) => sum + parseFloat(debt.remaining_amount), 0);
+
+            const result = {
+                customer_name: rows[0].customer_name,
+                unpaid_debts: rows,
+                summary: {
+                    total_debt_amount: totalDebtAmount,
+                    total_paid_amount: totalPaidAmount,
+                    total_remaining_amount: totalRemainingAmount,
+                    unpaid_invoice_count: rows.length
+                }
+            };
+
+            return ApiResponse.success(result, "Unpaid debts retrieved successfully");
+
+        } catch (error) {
+            console.error('Error fetching unpaid debts:', error);
+            return ApiResponse.error("Error fetching unpaid debts");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async GetAllUnpaidDebts() {
+        let conn;
+
+        try {
+            const query = `
+            SELECT 
+                d.id,
+                d.customer_id,
+                d.invoice_no,
+                d.amount as debt_amount,
+                d.vat,
+                d.description,
+                d.issue_date,
+                c.name AS customer_name,
+                COALESCE(SUM(p.amount), 0) as total_paid,
+                (d.amount - COALESCE(SUM(p.amount), 0)) as remaining_amount,
+                CASE 
+                    WHEN COALESCE(SUM(p.amount), 0) >= d.amount THEN true 
+                    ELSE false 
+                END as is_fully_paid
+            FROM debts d
+            JOIN customers c ON d.customer_id = c.id
+            LEFT JOIN payments p ON d.invoice_no = p.invoice_no
+            GROUP BY d.id, d.customer_id, d.amount, d.invoice_no, d.vat, d.description, d.issue_date, c.name
+            HAVING is_fully_paid = false
+            ORDER BY c.name ASC, d.issue_date ASC
+            `;
+
+            conn = await pool.getConnection();
+            const rows = await conn.query(query);
+
+            if (rows.length === 0)
+                return ApiResponse.success([], "No unpaid debts found");
+
+            // Group by customer
+            const groupedByCustomer = rows.reduce((acc: any, debt: any) => {
+                const customerId = debt.customer_id;
+                if (!acc[customerId]) {
+                    acc[customerId] = {
+                        customer_id: customerId,
+                        customer_name: debt.customer_name,
+                        unpaid_debts: [],
+                        total_debt_amount: 0,
+                        total_paid_amount: 0,
+                        total_remaining_amount: 0
+                    };
+                }
+
+                acc[customerId].unpaid_debts.push(debt);
+                acc[customerId].total_debt_amount += debt.debt_amount;
+                acc[customerId].total_paid_amount += debt.total_paid;
+                acc[customerId].total_remaining_amount += debt.remaining_amount;
+
+                return acc;
+            }, {});
+
+            const result = Object.values(groupedByCustomer);
+
+            return ApiResponse.success(result, "All unpaid debts retrieved successfully");
+
+        } catch (error) {
+            console.error('Error fetching all unpaid debts:', error);
+            return ApiResponse.error("Error fetching all unpaid debts");
         } finally {
             if (conn) conn.release();
         }
@@ -44,7 +256,7 @@ export class DebtsService {
             `;
 
             conn = await pool.getConnection();
-            
+
             const result = await conn.query(query, [
                 customer_id,
                 amount,

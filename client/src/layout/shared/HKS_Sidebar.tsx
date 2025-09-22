@@ -34,7 +34,7 @@ export default function HKS_Sidebar({ onMouseOver, onMouseOut }: { onMouseOver: 
     ]
 
     return (
-        <Sidebar variant="inset" collapsible="icon" onPointerEnter={onMouseOver} onPointerLeave={onMouseOut}>
+        <Sidebar className="no-print" variant="inset" collapsible="icon" onPointerEnter={onMouseOver} onPointerLeave={onMouseOut}>
             <SidebarContent>
                 <SidebarGroup>
                     {/* <SidebarGroupLabel>HKS-IO</SidebarGroupLabel> */}

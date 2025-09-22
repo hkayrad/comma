@@ -17,8 +17,6 @@ export class PaymentsApi {
 
     static async Create(payment: PaymentDto) {
         try {
-            console.log(payment);
-            
             const response = await instance.post('/payments', payment);
 
             if (response.status !== 200)

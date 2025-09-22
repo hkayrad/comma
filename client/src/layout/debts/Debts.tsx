@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DebtDto } from "@/lib/types";
 import { tr } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
 
 type DebtInfo = {
     id: string;
@@ -32,6 +33,8 @@ type DebtInfo = {
     currency: string;
     description?: string;
     issue_date: Date;
+    total_paid: string;
+    is_fully_paid: boolean;
 }
 
 const DebtSchema = z.object({
@@ -235,6 +238,35 @@ export default function Debts() {
                 const totalDebt = parseFloat(row.original.amount) + parseFloat(row.original.vat);
                 const formatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalDebt);
                 return formatted;
+            }
+        },
+        {
+            accessorKey: "total_paid",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className="select-none"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Ödenen Tutar
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => {
+                const formatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(row.original.total_paid));
+                return <p className="select-none">{formatted}</p>;
+            }
+        },
+        {
+            accessorKey: "is_fully_paid",
+            header: () => <p className="select-none">Tamamlandı</p>,
+            cell: ({ row }) => {
+                return <p className="select-none">{row.original.is_fully_paid ? 
+                    <Badge variant="default" className="bg-green-600">Tamamlandı</Badge> : 
+                    <Badge variant="destructive" className="bg-red-600">Beklemede</Badge>
+                    }</p>;
             }
         },
         {
@@ -851,7 +883,7 @@ export default function Debts() {
                         {table.getHeaderGroups().map(headerGroup => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map(header => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className={header.id === "actions" ? "w-[180px]" : ""}>
                                         {header.isPlaceholder ? null : flexRender(
                                             header.column.columnDef.header,
                                             header.getContext()
