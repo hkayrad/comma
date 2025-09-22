@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState } from "@tanstack/react-table";
 import { format } from "date-fns/format";
+import { tr } from "date-fns/locale";
 import { ArrowUpDown, CalendarIcon, Check, ChevronsUpDown, FilterXIcon, Pencil, Plus, RefreshCcw, Trash2, TurkishLira } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -183,7 +184,7 @@ export default function Payments() {
         editForm.setValue("customer_id", payment?.customer_id || "");
         editForm.setValue("amount", payment?.amount.toString() || "0");
         editForm.setValue("invoice_no", payment?.invoice_no || "");
-        editForm.setValue("payment_date", payment!.payment_date);
+        editForm.setValue("payment_date", new Date(payment!.payment_date));
         editForm.setValue("payment_note", payment?.payment_note || "");
         editForm.setValue("payment_method", payment?.payment_method || "");
 
@@ -498,7 +499,7 @@ export default function Payments() {
                                                         )}
                                                     >
                                                         {field.value ? (
-                                                            format(field.value, "PPP")
+                                                            format(field.value, "PPP", { locale: tr })
                                                         ) : (
                                                             <span>Bir tarih seçin</span>
                                                         )}
@@ -760,7 +761,7 @@ export default function Payments() {
                                                             )}
                                                         >
                                                             {field.value ? (
-                                                                format(field.value, "PPP")
+                                                                format(field.value, "PPP", { locale: tr })
                                                             ) : (
                                                                 <span>Bir tarih seçin</span>
                                                             )}

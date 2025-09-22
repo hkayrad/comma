@@ -20,6 +20,7 @@ import { format } from "date-fns/format";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DebtDto } from "@/lib/types";
+import { tr } from "date-fns/locale";
 
 type DebtInfo = {
     id: string;
@@ -505,7 +506,7 @@ export default function Debts() {
                                                         )}
                                                     >
                                                         {field.value ? (
-                                                            format(field.value, "PPP")
+                                                            format(field.value, "PPP", { locale: tr })
                                                         ) : (
                                                             <span>Bir tarih seçin</span>
                                                         )}
@@ -758,7 +759,7 @@ export default function Debts() {
                                                             )}
                                                         >
                                                             {field.value ? (
-                                                                format(field.value, "PPP")
+                                                                format(field.value, "PPP", { locale: tr })
                                                             ) : (
                                                                 <span>Bir tarih seçin</span>
                                                             )}

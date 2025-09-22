@@ -8,6 +8,7 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { tr } from "react-day-picker/locale"
 
 function Calendar({
   className,
@@ -35,9 +36,10 @@ function Calendar({
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          date.toLocaleString('tr', { month: "long" }),
         ...formatters,
       }}
+      locale={tr}
       classNames={{
         root: cn("w-fit", defaultClassNames.root),
         months: cn(
