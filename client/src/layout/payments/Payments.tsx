@@ -33,16 +33,16 @@ type PaymentInfo = {
     customer_id: string;
     invoice_no?: string;
     amount: string;
-    payment_date: string;
+    payment_date: Date;
     payment_note?: string;
     payment_method: string;
-    created_at: string;
+    created_at: Date;
 }
 
 const PaymentSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçimi zorunludur."),
     amount: z.string().min(1, "Tutar zorunludur."),
-    payment_date: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Geçersiz tarih formatı" }),
+    payment_date: z.date().refine((date) => !isNaN(date.getTime()), { message: "Geçersiz tarih formatı" }),
     invoice_no: z.string().optional(),
     payment_note: z.string().optional(),
     payment_method: z.string().min(1, "Ödeme yöntemi seçimi zorunludur."),
@@ -64,7 +64,7 @@ export default function Payments() {
             customer_id: "",
             amount: "0",
             invoice_no: "",
-            payment_date: new Date().toISOString(),
+            payment_date: new Date(),
             payment_note: "",
             payment_method: "",
         },
@@ -76,7 +76,7 @@ export default function Payments() {
             customer_id: "",
             amount: "0",
             invoice_no: "",
-            payment_date: new Date().toISOString(),
+            payment_date: new Date(),
             payment_note: "",
             payment_method: "bank_transfer",
         },
@@ -117,7 +117,7 @@ export default function Payments() {
             customer_id: values.customer_id,
             amount: parseFloat(values.amount),
             invoice_no: values.invoice_no || "",
-            payment_date: new Date(values.payment_date).toISOString(),
+            payment_date: new Date(values.payment_date.setHours(12)),
             payment_note: values.payment_note || "",
             payment_method: values.payment_method,
         }
@@ -158,7 +158,7 @@ export default function Payments() {
             customer_id: values.customer_id,
             amount: parseFloat(values.amount),
             invoice_no: values.invoice_no,
-            payment_date: new Date(values.payment_date).toISOString(),
+            payment_date: new Date(values.payment_date.setHours(12)),
             payment_note: values.payment_note,
             payment_method: values.payment_method,
         }
@@ -183,7 +183,7 @@ export default function Payments() {
         editForm.setValue("customer_id", payment?.customer_id || "");
         editForm.setValue("amount", payment?.amount.toString() || "0");
         editForm.setValue("invoice_no", payment?.invoice_no || "");
-        editForm.setValue("payment_date", payment?.payment_date || new Date().toISOString());
+        editForm.setValue("payment_date", payment!.payment_date);
         editForm.setValue("payment_note", payment?.payment_note || "");
         editForm.setValue("payment_method", payment?.payment_method || "");
 
@@ -372,216 +372,216 @@ export default function Payments() {
     return (
         <div className="space-y-4 px-8 py-4">
             <Dialog open={isEditDialogOpen} onOpenChange={closeEditDialog}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Ödeme Bilgilerini Düzenle</DialogTitle>
-                            <DialogDescription>
-                                Bu ödeme kaydını düzenlemek için aşağıdaki alanları güncelleyin.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <Form {...editForm}>
-                            <form onSubmit={() => { }} className="space-y-4">
-                                <FormField
-                                    control={editForm.control}
-                                    name="customer_id"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel className="gap-1">Müşteri <span className="text-red-500">*</span></FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant="outline"
-                                                            role="combobox"
-                                                            className={cn(
-                                                                "justify-between overflow-hidden w-[462px]",
-                                                                !field.value && "text-muted-foreground"
-                                                            )}
-                                                        >
-                                                            <p className="truncate text-left">
-                                                                {field.value
-                                                                    ? customers.find(
-                                                                        (customer) => customer.id === field.value
-                                                                    )?.name
-                                                                    : "Müşteri seçin..."}
-                                                            </p>
-                                                            <ChevronsUpDown className="opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-full p-0">
-                                                    <CommandPrimitive>
-                                                        <CommandInput
-                                                            placeholder="Ara..."
-                                                            className="h-9 w-full overflow-hidden max-w-[462px]"
-                                                        />
-                                                        <CommandList>
-                                                            <CommandEmpty>Müşteri bulunamadı.</CommandEmpty>
-                                                            <CommandGroup>
-                                                                {customers.map((customer) => (
-                                                                    <CommandItem
-                                                                        value={customer.name}
-                                                                        key={customer.id}
-                                                                        onSelect={() => {
-                                                                            addForm.setValue("customer_id", customer.id)
-                                                                        }}
-                                                                    >
-                                                                        {customer.name}
-                                                                        <Check
-                                                                            className={cn(
-                                                                                "ml-auto",
-                                                                                customer.id === field.value
-                                                                                    ? "opacity-100"
-                                                                                    : "opacity-0"
-                                                                            )}
-                                                                        />
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </CommandList>
-                                                    </CommandPrimitive>
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormDescription className="text-xs">
-                                                Bu, gösterge panelinde kullanılacak müşteri adıdır.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editForm.control}
-                                    name="amount"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col w-[462px]">
-                                            <FormLabel className="gap-1">Tutar <span className="text-red-500">*</span></FormLabel>
-                                            <FormControl>
-                                                <Input type="number" className="truncate" placeholder="0.00" {...field} />
-                                            </FormControl>
-                                            <FormDescription className="text-xs">
-                                                Ödeme tutarını girin.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editForm.control}
-                                    name="invoice_no"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col w-[462px]">
-                                            <FormLabel className="gap-1">Fatura No </FormLabel>
-                                            <FormControl>
-                                                <Input type="text" className="truncate" placeholder="Fatura No" {...field} />
-                                            </FormControl>
-                                            <FormDescription className="text-xs">
-                                                Fatura numarasını girin.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editForm.control}
-                                    name="payment_date"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col w-[462px]">
-                                            <FormLabel className="gap-1">Kesim Tarihi <span className="text-red-500">*</span></FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={cn(
-                                                                "w-full pl-3 text-left font-normal",
-                                                                !field.value && "text-muted-foreground"
-                                                            )}
-                                                        >
-                                                            {field.value ? (
-                                                                format(field.value, "PPP")
-                                                            ) : (
-                                                                <span>Bir tarih seçin</span>
-                                                            )}
-                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar
-                                                        mode="single"
-                                                        selected={field.value as any}
-                                                        onSelect={field.onChange}
-                                                        disabled={(date: Date) =>
-                                                            date > new Date() || date < new Date("1900-01-01")
-                                                        }
-                                                        captionLayout="dropdown"
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormDescription className="text-xs">
-                                                Ödeme tarihini seçin.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editForm.control}
-                                    name="payment_note"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col w-[462px]">
-                                            <FormLabel>Açıklama</FormLabel>
-                                            <FormControl>
-                                                <Input type="text" className="truncate" placeholder="Açıklama girin" {...field} />
-                                            </FormControl>
-                                            <FormDescription className="text-xs">
-                                                Ödeme ile ilgili ek açıklamalar (varsa).
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={editForm.control}
-                                    name="payment_method"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <Select onValueChange={(value) => {
-                                                field.onChange(value)
-                                            }} defaultValue={field.value}>
-                                                <FormLabel className="gap-1">Ödeme Yöntemi <span className="text-red-500">*</span></FormLabel>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Ödeme Bilgilerini Düzenle</DialogTitle>
+                        <DialogDescription>
+                            Bu ödeme kaydını düzenlemek için aşağıdaki alanları güncelleyin.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Form {...editForm}>
+                        <form onSubmit={() => { }} className="space-y-4">
+                            <FormField
+                                control={editForm.control}
+                                name="customer_id"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="gap-1">Müşteri <span className="text-red-500">*</span></FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
                                                 <FormControl>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Ödeme Yöntemi Seçin" />
-                                                    </SelectTrigger>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className={cn(
+                                                            "justify-between overflow-hidden w-[462px]",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        <p className="truncate text-left">
+                                                            {field.value
+                                                                ? customers.find(
+                                                                    (customer) => customer.id === field.value
+                                                                )?.name
+                                                                : "Müşteri seçin..."}
+                                                        </p>
+                                                        <ChevronsUpDown className="opacity-50" />
+                                                    </Button>
                                                 </FormControl>
-                                                <SelectContent>
-                                                    <SelectGroup>
-                                                        <SelectLabel>Ödeme Yöntemi</SelectLabel>
-                                                        <SelectItem value="bank_transfer">Havale</SelectItem>
-                                                        <SelectItem value="cash">Nakit</SelectItem>
-                                                        <SelectItem value="credit_card">Kredi Kartı</SelectItem>
-                                                        <SelectItem value="check">Çek</SelectItem>
-                                                    </SelectGroup>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormDescription className="text-xs">
-                                                Ödeme yöntemini seçin.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </form>
-                        </Form>
-                        <DialogFooter className="flex items-center w-[462px]">
-                            <DialogClose asChild>
-                                <Button variant="destructive" onClick={() => editForm.reset()}>İptal</Button>
-                            </DialogClose>
-                            <Button variant="default" className="bg-green-600" onClick={() => handleEditPayment()}>Ödemeyi Kaydet</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-full p-0">
+                                                <CommandPrimitive>
+                                                    <CommandInput
+                                                        placeholder="Ara..."
+                                                        className="h-9 w-full overflow-hidden max-w-[462px]"
+                                                    />
+                                                    <CommandList>
+                                                        <CommandEmpty>Müşteri bulunamadı.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {customers.map((customer) => (
+                                                                <CommandItem
+                                                                    value={customer.name}
+                                                                    key={customer.id}
+                                                                    onSelect={() => {
+                                                                        addForm.setValue("customer_id", customer.id)
+                                                                    }}
+                                                                >
+                                                                    {customer.name}
+                                                                    <Check
+                                                                        className={cn(
+                                                                            "ml-auto",
+                                                                            customer.id === field.value
+                                                                                ? "opacity-100"
+                                                                                : "opacity-0"
+                                                                        )}
+                                                                    />
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </CommandPrimitive>
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormDescription className="text-xs">
+                                            Bu, gösterge panelinde kullanılacak müşteri adıdır.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="amount"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col w-[462px]">
+                                        <FormLabel className="gap-1">Tutar <span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Input type="number" className="truncate" placeholder="0.00" {...field} />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Ödeme tutarını girin.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="invoice_no"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col w-[462px]">
+                                        <FormLabel className="gap-1">Fatura No </FormLabel>
+                                        <FormControl>
+                                            <Input type="text" className="truncate" placeholder="Fatura No" {...field} />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Fatura numarasını girin.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="payment_date"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col w-[462px]">
+                                        <FormLabel className="gap-1">Kesim Tarihi <span className="text-red-500">*</span></FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            format(field.value, "PPP")
+                                                        ) : (
+                                                            <span>Bir tarih seçin</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value as any}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date: Date) =>
+                                                        date > new Date() || date < new Date("1900-01-01")
+                                                    }
+                                                    captionLayout="dropdown"
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormDescription className="text-xs">
+                                            Ödeme tarihini seçin.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="payment_note"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col w-[462px]">
+                                        <FormLabel>Açıklama</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" className="truncate" placeholder="Açıklama girin" {...field} />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Ödeme ile ilgili ek açıklamalar (varsa).
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={editForm.control}
+                                name="payment_method"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <Select onValueChange={(value) => {
+                                            field.onChange(value)
+                                        }} defaultValue={field.value}>
+                                            <FormLabel className="gap-1">Ödeme Yöntemi <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Ödeme Yöntemi Seçin" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Ödeme Yöntemi</SelectLabel>
+                                                    <SelectItem value="bank_transfer">Havale</SelectItem>
+                                                    <SelectItem value="cash">Nakit</SelectItem>
+                                                    <SelectItem value="credit_card">Kredi Kartı</SelectItem>
+                                                    <SelectItem value="check">Çek</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription className="text-xs">
+                                            Ödeme yöntemini seçin.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </form>
+                    </Form>
+                    <DialogFooter className="flex items-center w-[462px]">
+                        <DialogClose asChild>
+                            <Button variant="destructive" onClick={() => editForm.reset()}>İptal</Button>
+                        </DialogClose>
+                        <Button variant="default" className="bg-green-600" onClick={() => handleEditPayment()}>Ödemeyi Kaydet</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <div className="mb-12 flex justify-between items-center">
                 <h1 className="text-4xl font-bold">Ödeme Bilgileri</h1>
                 <Card className="w-72">
@@ -905,7 +905,7 @@ export default function Payments() {
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    Previous
+                    Önceki
                 </Button>
                 <Button
                     variant="outline"
@@ -914,7 +914,7 @@ export default function Payments() {
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    Next
+                    Sonraki
                 </Button>
             </div>
         </div>

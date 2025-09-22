@@ -808,7 +808,7 @@ export default function Dashboard() {
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    Previous
+                    Önceki
                 </Button>
                 <Button
                     variant="outline"
@@ -817,7 +817,7 @@ export default function Dashboard() {
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    Next
+                    Sonraki
                 </Button>
             </div>
         </div >

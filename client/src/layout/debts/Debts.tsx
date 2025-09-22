@@ -30,7 +30,7 @@ type DebtInfo = {
     vat: string;
     currency: string;
     description?: string;
-    issue_date: string;
+    issue_date: Date;
 }
 
 const DebtSchema = z.object({
@@ -39,7 +39,7 @@ const DebtSchema = z.object({
     invoice_no: z.string().optional(),
     vat: z.string().min(0, { message: "KDV negatif olamaz" }),
     description: z.string().optional(),
-    issue_date: z.string().refine((date) => !isNaN(Date.parse(date)), { message: "Geçersiz tarih formatı" })
+    issue_date: z.date().refine((date) => !isNaN(date.getTime()), { message: "Geçersiz tarih formatı" })
 })
 
 
@@ -63,7 +63,7 @@ export default function Debts() {
             invoice_no: "",
             vat: "0",
             description: "",
-            issue_date: new Date().toISOString(),
+            issue_date: new Date(),
         },
     })
 
@@ -75,7 +75,7 @@ export default function Debts() {
             invoice_no: "",
             vat: "0",
             description: "",
-            issue_date: new Date().toISOString(),
+            issue_date: new Date(),
         },
     })
 
@@ -116,7 +116,7 @@ export default function Debts() {
             invoice_no: values.invoice_no || undefined,
             vat: parseFloat(values.vat),
             description: values.description || undefined,
-            issue_date: new Date(values.issue_date).toISOString(),
+            issue_date: new Date(values.issue_date.setHours(12)),
         }
 
         const response = await DebtsApi.Create(debt);
@@ -157,7 +157,7 @@ export default function Debts() {
             invoice_no: values.invoice_no || "",
             vat: parseFloat(values.vat),
             description: values.description || "",
-            issue_date: new Date(values.issue_date).toISOString(),
+            issue_date: new Date(values.issue_date.setHours(12)), // to avoid timezone issues
         }
 
         const response = await DebtsApi.Update(debt);
@@ -182,7 +182,7 @@ export default function Debts() {
         editForm.setValue("invoice_no", debt?.invoice_no || "");
         editForm.setValue("vat", debt?.vat || "0");
         editForm.setValue("description", debt?.description || "");
-        editForm.setValue("issue_date", debt?.issue_date || "");
+        editForm.setValue("issue_date", new Date(debt!.issue_date));
 
         setIsEditDialogOpen(true);
     }
@@ -769,7 +769,7 @@ export default function Debts() {
                                                 <PopoverContent className="w-auto p-0" align="start">
                                                     <Calendar
                                                         mode="single"
-                                                        selected={field.value as any}
+                                                        selected={new Date(field.value)}
                                                         onSelect={field.onChange}
                                                         disabled={(date: Date) =>
                                                             date > new Date() || date < new Date("1900-01-01")
@@ -889,7 +889,7 @@ export default function Debts() {
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    Previous
+                    Önceki
                 </Button>
                 <Button
                     variant="outline"
@@ -898,7 +898,7 @@ export default function Debts() {
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    Next
+                    Sonraki
                 </Button>
             </div>
         </div>

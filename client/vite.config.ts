@@ -7,8 +7,8 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: "localhost",
-    port: 4000
+    host: "https://io.orhandogan.com.tr",
+    port: 443
   },
   resolve: {
     alias: {

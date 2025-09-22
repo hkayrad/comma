@@ -15,7 +15,7 @@ export type DebtDto = {
     invoice_no?: string;
     vat: number;
     description?: string;
-    issue_date: string;
+    issue_date: Date;
 }
 
 export type PaymentDto = {
@@ -23,7 +23,7 @@ export type PaymentDto = {
     customer_id: string;
     invoice_no?: string;
     amount: number;
-    payment_date: string;
+    payment_date: Date;
     payment_note?: string;
     payment_method?: string;
 }
