@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:4000",
+    origin: process.env.CLIENT_URL,
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -34,4 +34,5 @@ app.listen(listenPort, () => {
     Logger.log(`JWT_ISSUER: ${process.env.JWT_ISSUER}`);
     Logger.log(`JWT_AUDIENCE: ${process.env.JWT_AUDIENCE}`);
     Logger.log(`JWT_EXPIRES_IN: ${process.env.JWT_EXPIRES_IN}h`);
+    Logger.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 });
