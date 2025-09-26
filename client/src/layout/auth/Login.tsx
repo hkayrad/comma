@@ -52,7 +52,6 @@ export default function Login() {
 
     return (
         <>
-            <Toaster richColors />
             <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2">
                 <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
                     <img src="/hks-logo.png" className="w-64 lg:w-96 saturate-0 brightness-0 invert" />

@@ -17,36 +17,20 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get('/payments', async (req, res) => {
-    const response = await PaymentsService.GetAll();
-    res.json(response);
-});
-
 router.post('/payments', async (req, res) => {
     const payment = req.body;
     const response = await PaymentsService.Create(payment);
     res.json(response);
 });
 
-router.delete('/payments/:id', async (req, res) => {
-    const { id } = req.params;
-    if (!id) {
-        return res.status(400).json({ success: false, message: "Payment ID is required" });
-    }
-
-    const response = await PaymentsService.Delete(id);
+router.get('/payments', async (req, res) => {
+    const response = await PaymentsService.GetAll();
     res.json(response);
 });
 
-router.put('/payments/:id', async (req, res) => {
-    const { id } = req.params;
-    const payment = req.body;
-
-    if (!id) {
-        return res.status(400).json({ success: false, message: "Payment ID is required" });
-    }
-
-    const response = await PaymentsService.Update(payment);
+router.delete('/payments/:id', async (req, res) => {
+    const paymentId = req.params.id;
+    const response = await PaymentsService.Delete(paymentId);
     res.json(response);
 });
 
