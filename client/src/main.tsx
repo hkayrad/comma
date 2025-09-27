@@ -8,6 +8,7 @@ import Dashboard from './layout/dashboard/Dashboard';
 import { Toaster } from 'sonner';
 import Debts from './layout/debts/Debts';
 import Payments from './layout/payments/Payments';
+import CustomerStatement from './layout/dashboard/components/CustomerStatement';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
         <Route index element={<Dashboard />} />
         <Route path="borc_bilgileri" element={<Debts />} />
         <Route path="odemeler" element={<Payments />} />
+  <Route path="borc_dokumu/:customerId" element={<CustomerStatement />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Route>
     </Routes>

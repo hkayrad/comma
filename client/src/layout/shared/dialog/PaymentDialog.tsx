@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDialog } from "@/contexts/DialogContext"
 import { CustomerApi, PaymentApi } from "@/lib/api"
-import type { CustomerIdName } from "@/lib/types"
+import type { CustomerIdName, PaymentDto } from "@/lib/types"
 import { cn, sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -19,6 +19,10 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
 
+type Props = {
+    payment?: PaymentDto
+}
+
 const PaymentFormSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçilmesi zorunludur"),
     amount: z.number({ error: "Geçersiz tutar" }).min(0.01, "Tutar en az 0.01 olmalıdır"),
@@ -28,7 +32,8 @@ const PaymentFormSchema = z.object({
     payment_note: z.string().max(500, "Açıklama en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
 })
 
-export default function PaymentDialog() {
+export default function PaymentDialog(props: Props) {
+    const { payment } = props;
     const { closeDialog } = useDialog();
     const [customerIdAndNames, setCustomerIdAndNames] = useState<CustomerIdName[]>([]);
     const [isCustomerSelectOpen, setIsCustomerSelectOpen] = useState(false);
@@ -36,11 +41,12 @@ export default function PaymentDialog() {
     const form = useForm<z.infer<typeof PaymentFormSchema>>({
         resolver: zodResolver(PaymentFormSchema),
         defaultValues: {
-            customer_id: "",
-            amount: "" as unknown as number,
-            payment_date: new Date(),
-            payment_method: "bank_transfer",
-            payment_note: "",
+            customer_id: payment?.customer_id || "",
+            amount: payment?.amount ? Number(payment.amount) : 0,
+            payment_date: payment?.payment_date ? new Date(payment.payment_date) : new Date(),
+            payment_method: payment?.payment_method || "bank_transfer",
+            invoice_no: payment?.invoice_no || "",
+            payment_note: payment?.payment_note || "",
         }
     })
 
@@ -62,16 +68,22 @@ export default function PaymentDialog() {
     }
 
     const onSubmit = (data: z.infer<typeof PaymentFormSchema>) => {
-        const promise = PaymentApi.Create(data);
+        let promise;
+
+        if (payment)
+            promise = PaymentApi.Update(payment.id!, data);
+        else
+            promise = PaymentApi.Create(data);
+
         toast.promise(promise, {
-            loading: "Borç ekleniyor...",
+            loading: payment ? "Ödeme güncelleniyor..." : "Ödeme ekleniyor...",
             success: () => {
                 form.reset();
                 closeDialog();
                 sendRefreshEvent();
-                return "Ödeme başarıyla eklendi"
+                return payment ? "Ödeme başarıyla güncellendi" : "Ödeme başarıyla eklendi"
             },
-            error: "Ödeme eklenirken hata oluştu"
+            error: payment ? "Ödeme güncellenirken hata oluştu" : "Ödeme eklenirken hata oluştu"
         });
     }
 
@@ -226,7 +238,7 @@ export default function PaymentDialog() {
                         <FormItem>
                             <FormLabel className="flex gap-1">Ödeme Yöntemi <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <RadioGroup className="flex gap-8" defaultValue="bank_transfer" onValueChange={field.onChange}>
+                                <RadioGroup className="flex gap-8" value={field.value} onValueChange={field.onChange}>
                                     <div className="flex gap-2 items-center">
                                         <RadioGroupItem value="bank_transfer" id="bank_transfer" />
                                         <label htmlFor="bank_transfer" className="cursor-pointer select-none">Havale</label>
@@ -282,7 +294,9 @@ export default function PaymentDialog() {
                 />
                 <div className="flex justify-end gap-2 col-span-2">
                     <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">Ödemeyi Ekle</Button>
+                    <Button type="submit" className="bg-green-600">
+                        {payment ? "Ödemeyi Güncelle" : "Ödeme Ekle"}
+                    </Button>
                 </div>
             </form>
         </Form>

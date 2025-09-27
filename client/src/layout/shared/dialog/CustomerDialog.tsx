@@ -4,11 +4,16 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDialog } from "@/contexts/DialogContext"
 import { CustomerApi } from "@/lib/api"
+import type { CustomerDto } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
+
+type Props = {
+    customer?: CustomerDto
+}
 
 const CustomerFormSchema = z.object({
     name: z.string().min(2, "Müşteri adı en az 2 karakter olmalıdır").max(255, "Müşteri adı en fazla 255 karakter olmalıdır"),
@@ -19,18 +24,23 @@ const CustomerFormSchema = z.object({
     is_company: z.boolean(),
 })
 
-export default function CustomerDialog() {
+export default function CustomerDialog(props: Props) {
+    const { customer } = props;
+
     const { closeDialog } = useDialog();
+
+    console.log(Number(customer?.is_company) === 1);
+    
 
     const form = useForm<z.infer<typeof CustomerFormSchema>>({
         resolver: zodResolver(CustomerFormSchema),
         defaultValues: {
-            name: "",
-            phone: "",
-            email: "",
-            tax_number: "",
-            address: "",
-            is_company: true,
+            name: customer?.name || "",
+            phone: customer?.phone || "",
+            email: customer?.email || "",
+            tax_number: customer?.tax_number || "",
+            address: customer?.address || "",
+            is_company: customer ? (Number(customer.is_company) === 1) : true,
         }
     })
 
@@ -41,16 +51,22 @@ export default function CustomerDialog() {
     }
 
     const onSubmit = (data: z.infer<typeof CustomerFormSchema>) => {
-        const promise = CustomerApi.Create(data);
+        let promise;
+
+        if (customer)
+            promise = CustomerApi.Update(customer.id!, data);
+        else
+            promise = CustomerApi.Create(data);
+
         toast.promise(promise, {
-            loading: "Müşteri ekleniyor...",
+            loading: customer ? "Müşteri güncelleniyor..." : "Müşteri ekleniyor...",
             success: () => {
                 form.reset();
                 closeDialog();
                 sendRefreshEvent();
-                return "Müşteri başarıyla eklendi"
+                return customer ? "Müşteri başarıyla güncellendi" : "Müşteri başarıyla eklendi"
             },
-            error: "Müşteri eklenirken hata oluştu"
+            error: customer ? "Müşteri güncellenirken hata oluştu" : "Müşteri eklenirken hata oluştu"
         });
     }
 
@@ -80,7 +96,7 @@ export default function CustomerDialog() {
                         <FormItem>
                             <FormLabel className="flex gap-1">Müşteri Türü <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <RadioGroup className="flex gap-8" defaultValue="true" onValueChange={(value) => field.onChange(value === "true")}>
+                                <RadioGroup className="flex gap-8" value={String(field.value)} onValueChange={(value) => field.onChange(value === "true")}>
                                     <div className="flex gap-2 items-center">
                                         <RadioGroupItem value="true" id="company" />
                                         <label htmlFor="company" className="cursor-pointer select-none">Şirket</label>
@@ -164,7 +180,9 @@ export default function CustomerDialog() {
                 />
                 <div className="flex justify-end gap-2 col-span-2">
                     <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">Müşteriyi Ekle</Button>
+                    <Button type="submit" className="bg-green-600">
+                        {customer ? "Müşteriyi Güncelle" : "Müşteri Ekle"}
+                    </Button>
                 </div>
             </form>
         </Form>

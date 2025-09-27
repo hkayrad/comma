@@ -28,8 +28,21 @@ router.get('/customers', async (req, res) => {
     res.json(response);
 });
 
+router.get('/customers/:id/statement', async (req, res) => {
+    const { id } = req.params;
+    const response = await CustomersService.GetStatement(id);
+    res.json(response);
+});
+
 router.get('/customers/id-name', async (req, res) => {
     const response = await CustomersService.GetIdAndName();
+    res.json(response);
+});
+
+router.put('/customers/:id', async (req, res) => {
+    const { id } = req.params;
+    const customer = req.body;
+    const response = await CustomersService.Update(id, customer);
     res.json(response);
 });
 

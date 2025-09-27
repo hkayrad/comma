@@ -39,6 +39,16 @@ export default defineConfig([
 ])
 ```
 
+## PDF Dışa Aktarım
+
+Müşteri borç dökümü sayfasında (Customer Statement) sağ üstteki "PDF Dışa Aktar" butonu ile ilgili müşterinin borç ve ödeme tablosu jsPDF + autotable kullanılarak indirilebilir.
+
+Kullanılan paketler:
+- jspdf
+- jspdf-autotable
+
+Gerektiğinde özelleştirme için `src/lib/pdf.ts` dosyasını düzenleyebilirsiniz.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js

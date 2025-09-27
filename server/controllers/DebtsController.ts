@@ -33,6 +33,13 @@ router.get('/debts', async (req, res) => {
     res.json(response);
 });
 
+router.put('/debts/:id', async (req, res) => {
+    const { id } = req.params;
+    const debt = req.body;
+    const response = await DebtsService.Update(id, debt);
+    res.json(response);
+});
+
 router.delete('/debts/:id', async (req, res) => {
     const { id } = req.params;
     const response = await DebtsService.Delete(id);

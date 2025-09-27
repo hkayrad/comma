@@ -51,6 +51,22 @@ export class DebtApi {
         }
     }
 
+    static async Update(id: string, data: DebtDto): Promise<string | null> {
+        try {
+            const { data: response } = await instance.put<ApiResponse<null>>(`/debts/${id}`, data);
+
+            if (response.status === 200) {
+                return Promise.resolve(response.data);
+            }
+
+            Logger.error('Error updating debt:', response.message);
+            return Promise.reject(response.message || "Borç güncellenirken hata oluştu");
+        }
+        catch (error) {
+            return Promise.reject("Borç güncellenirken hata oluştu");
+        }
+    }
+
     static async Delete(id: string): Promise<boolean> {
         try {
             const { data: response } = await instance.delete<ApiResponse<null>>(`/debts/${id}`);

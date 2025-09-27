@@ -2,12 +2,14 @@ import type { DebtDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { copyToClipboard, notImplemented, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { DebtApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
 import HKS_Table from "@/layout/shared/table/HKS_Table";
+import DebtDialog from "@/layout/shared/dialog/DebtDialog";
+import { useDialog } from "@/contexts/DialogContext";
 
 type Props = {
     data: DebtDto[];
@@ -15,6 +17,8 @@ type Props = {
 
 export default function DebtTable(props: Props) {
     const { data } = props;
+
+    const { openDialog } = useDialog();
 
     const handleDelete = (id: string) => {
         const promise = DebtApi.Delete(id);
@@ -25,6 +29,25 @@ export default function DebtTable(props: Props) {
                 return "Borç başarıyla silindi"
             },
             error: "Borç silinirken hata oluştu"
+        });
+    }
+
+    const onEdit = (debtId: string) => {
+        const debt = data.find(d => d.id === debtId);
+
+        if (!debt) {
+            toast.error("Borç bulunamadı");
+            return;
+        }
+
+        openDialog({
+            title: "Borç Düzenle",
+            description: "Borç bilgilerini düzenleyin",
+            size: "3xl",
+            content: (
+                <DebtDialog debt={debt} />
+            ),
+            showCloseButton: true,
         });
     }
 
@@ -181,7 +204,7 @@ export default function DebtTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={notImplemented}
+                                onClick={() => onEdit(row.original.id!)}
                             >
                                 <Pencil />
                             </Button>

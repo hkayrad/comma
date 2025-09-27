@@ -2,13 +2,15 @@ import type { PaymentDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { copyToClipboard, notImplemented, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PaymentApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
 import HKS_Table from "@/layout/shared/table/HKS_Table";
 import { Badge } from "@/components/ui/badge";
+import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
+import { useDialog } from "@/contexts/DialogContext";
 
 type Props = {
     data: PaymentDto[];
@@ -16,6 +18,8 @@ type Props = {
 
 export default function PaymentTable(props: Props) {
     const { data } = props;
+
+    const { openDialog } = useDialog();
 
     const handleDelete = (id: string) => {
         const promise = PaymentApi.Delete(id);
@@ -26,6 +30,25 @@ export default function PaymentTable(props: Props) {
                 return "Ödeme başarıyla silindi"
             },
             error: "Ödeme silinirken hata oluştu"
+        });
+    }
+
+    const onEdit = (paymentId: string) => {
+        const payment = data.find(p => p.id === paymentId);
+
+        if (!payment) {
+            toast.error("Ödeme bulunamadı");
+            return;
+        }
+
+        openDialog({
+            title: "Ödeme Düzenle",
+            description: "Ödeme bilgilerini düzenleyin",
+            size: "3xl",
+            content: (
+                <PaymentDialog payment={payment} />
+            ),
+            showCloseButton: true,
         });
     }
 
@@ -94,17 +117,17 @@ export default function PaymentTable(props: Props) {
             cell: ({ row }) => {
                 switch (row.getValue("payment_method")) {
                     case "cash":
-                        return <Badge 
-                        className="bg-green-100 text-green-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Nakit")}
+                        return <Badge
+                            className="bg-green-100 text-green-800 select-none hover:cursor-copy"
+                            onClick={() => copyToClipboard("Nakit")}
                         >Nakit</Badge>;
                     case "bank_transfer":
                         return <Badge className="bg-blue-100 text-blue-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Havale")}
+                            onClick={() => copyToClipboard("Havale")}
                         >Havale</Badge>;
                     case "check":
                         return <Badge className="bg-yellow-100 text-yellow-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Çek")}
+                            onClick={() => copyToClipboard("Çek")}
                         >Çek</Badge>;
                 }
             }
@@ -181,7 +204,7 @@ export default function PaymentTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={notImplemented}
+                                onClick={() => onEdit(row.original.id!)}
                             >
                                 <Pencil />
                             </Button>

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useDialog } from "@/contexts/DialogContext"
 import { CustomerApi, DebtApi } from "@/lib/api"
-import type { CustomerIdName } from "@/lib/types"
+import type { CustomerIdName, DebtDto } from "@/lib/types"
 import { cn, sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,6 +18,10 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
 
+type Props = {
+    debt?: DebtDto
+}
+
 const DebtFormSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçilmesi zorunludur"),
     amount: z.number({ error: "Geçersiz tutar" }).min(0.01, "Tutar en az 0.01 olmalıdır"),
@@ -27,7 +31,8 @@ const DebtFormSchema = z.object({
     description: z.string().max(500, "Açıklama en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
 })
 
-export default function DebtDialog() {
+export default function DebtDialog(props: Props) {
+    const { debt } = props;
     const { closeDialog } = useDialog();
     const [customerIdAndNames, setCustomerIdAndNames] = useState<CustomerIdName[]>([]);
     const [isCustomerSelectOpen, setIsCustomerSelectOpen] = useState(false);
@@ -35,11 +40,12 @@ export default function DebtDialog() {
     const form = useForm<z.infer<typeof DebtFormSchema>>({
         resolver: zodResolver(DebtFormSchema),
         defaultValues: {
-            customer_id: "",
-            amount: "" as unknown as number,
-            vat: 0,
-            description: "",
-            issue_date: new Date(),
+            customer_id: debt?.customer_id || "",
+            amount: debt?.amount ? Number(debt.amount) : 0,
+            vat: debt?.vat ? Number(debt.vat) : 0,
+            issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
+            invoice_no: debt?.invoice_no || "",
+            description: debt?.description || "",
         }
     })
 
@@ -67,16 +73,22 @@ export default function DebtDialog() {
     }
 
     const onSubmit = (data: z.infer<typeof DebtFormSchema>) => {
-        const promise = DebtApi.Create(data);
+        let promise;
+
+        if (debt)
+            promise = DebtApi.Update(debt.id!, data);
+        else
+            promise = DebtApi.Create(data);
+
         toast.promise(promise, {
-            loading: "Borç ekleniyor...",
+            loading: debt ? "Borç güncelleniyor..." : "Borç ekleniyor...",
             success: () => {
                 form.reset();
                 closeDialog();
                 sendRefreshEvent();
-                return "Borç başarıyla eklendi"
+                return debt ? "Borç başarıyla güncellendi" : "Borç başarıyla eklendi"
             },
-            error: "Borç eklenirken hata oluştu"
+            error: (debt ? "Borç güncellenirken hata oluştu" : "Borç eklenirken hata oluştu")
         });
     }
 
@@ -287,7 +299,9 @@ export default function DebtDialog() {
                 />
                 <div className="flex justify-end gap-2 col-span-2">
                     <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">Borcu Ekle</Button>
+                    <Button type="submit" className="bg-green-600">
+                        {debt ? "Borcu Güncelle" : "Borç Ekle"}
+                    </Button>
                 </div>
             </form>
         </Form>

@@ -39,7 +39,7 @@ export type PaymentDto = {
     customer_id: UUID;
     amount: number;
     payment_method: 'cash' | 'bank_transfer' | 'check';
-    description?: string;
+    payment_note?: string;
     invoice_no?: string;
     payment_date: Date;
     created_at?: Date;
@@ -52,4 +52,10 @@ export type Totals = {
     total_debts: number;
     total_payments: number;
     remaining_debt: number;
+}
+
+export type CustomerStatement = {
+    customer: CustomerDto;
+    debts: DebtDto[];
+    payments: PaymentDto[];
 }

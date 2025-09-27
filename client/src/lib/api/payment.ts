@@ -35,6 +35,22 @@ export class PaymentApi {
         }
     }
 
+    static async Update(id: string, data: PaymentDto): Promise<string | null> {
+        try {
+            const { data: response } = await instance.put<ApiResponse<UUID>>(`/payments/${id}`, data);
+
+            if (response.status === 200) {
+                return Promise.resolve(response.data);
+            }
+
+            Logger.error('Error updating payment:', response.message);
+            return Promise.reject(response.message || "Ödeme güncellenirken hata oluştu");
+        }
+        catch (error) {
+            return Promise.reject("Ödeme güncellenirken hata oluştu");
+        }
+    }
+
     static async Delete(id: UUID): Promise<boolean> {
         try {
             const { data: response } = await instance.delete<ApiResponse<null>>(`/payments/${id}`);

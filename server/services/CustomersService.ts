@@ -80,6 +80,95 @@ export class CustomersService {
         }
     }
 
+    static async GetStatement(customerId: string) {
+        let conn;
+
+        try {
+            if (!customerId) {
+                return ApiResponse.error("Customer ID is required");
+            }
+
+            conn = await pool.getConnection();
+
+            // Get customer base info with aggregates
+            const customerQuery = `
+            SELECT
+                c.*,
+                COALESCE(debt_summary.total_debt, 0) AS total_debt,
+                COALESCE(payment_summary.total_payments, 0) AS total_payments,
+                (COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0)) AS remaining_debt
+            FROM customers c
+            LEFT JOIN (
+                SELECT 
+                    customer_id,
+                    SUM(amount + COALESCE(vat, 0)) AS total_debt
+                FROM debts
+                GROUP BY customer_id
+            ) debt_summary ON c.id = debt_summary.customer_id
+            LEFT JOIN (
+                SELECT 
+                    customer_id,
+                    SUM(amount) AS total_payments
+                FROM payments
+                GROUP BY customer_id
+            ) payment_summary ON c.id = payment_summary.customer_id
+            WHERE c.id = ?
+            `;
+
+            const customerResult = await conn.query(customerQuery, [customerId]);
+            if (customerResult.length === 0) {
+                return ApiResponse.error("Customer not found");
+            }
+
+            const debtsQuery = `
+            SELECT 
+                d.id,
+                d.invoice_no,
+                d.amount,
+                d.vat,
+                (d.amount + d.vat) AS total_amount,
+                d.description,
+                d.issue_date,
+                d.created_at
+            FROM debts d
+            WHERE d.customer_id = ?
+            ORDER BY d.issue_date DESC, d.created_at DESC
+            `;
+
+            const paymentsQuery = `
+            SELECT 
+                p.id,
+                p.invoice_no,
+                p.amount,
+                p.payment_method,
+                p.payment_note,
+                p.payment_date,
+                p.created_at
+            FROM payments p
+            WHERE p.customer_id = ?
+            ORDER BY p.payment_date DESC, p.created_at DESC
+            `;
+
+            const [debtsResult, paymentsResult] = await Promise.all([
+                conn.query(debtsQuery, [customerId]),
+                conn.query(paymentsQuery, [customerId])
+            ]);
+
+            const response = {
+                customer: customerResult[0],
+                debts: debtsResult,
+                payments: paymentsResult
+            };
+
+            return ApiResponse.success(response, "Customer statement retrieved successfully");
+        } catch (error) {
+            Logger.error("Failed to retrieve customer statement:", error);
+            return ApiResponse.error("Failed to retrieve customer statement");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
     static async GetIdAndName() {
         let conn;
 
@@ -102,6 +191,44 @@ export class CustomersService {
         } catch (error) {
             Logger.error('Error retrieving customers:', error);
             return ApiResponse.error("Error retrieving customers");
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async Update(id: string, customer: any) {
+        let conn;
+
+        try {
+            if (!id) {
+                return ApiResponse.error("Customer ID is required");
+            }
+            
+            const { name, phone, is_company, tax_number, email, address } = customer;
+
+            if (!name || is_company === undefined || is_company === null) {
+                return ApiResponse.error("Name and customer type are required");
+            }
+
+            const query = `
+            UPDATE customers 
+            SET name = ?, phone = ?, is_company = ?, tax_number = ?, email = ?, address = ?
+            WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, email || null, address || null, id]);
+            Logger.info("Customer update result:", result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("Failed to update customer or customer not found");
+
+            return ApiResponse.success(result[0], "Customer updated successfully");
+
+        } catch (error) {
+            Logger.error('Error updating customer:', error);
+            return ApiResponse.error("Error updating customer");
         } finally {
             if (conn) conn.release();
         }

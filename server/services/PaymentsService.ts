@@ -73,6 +73,56 @@ export class PaymentsService {
         }
     }
 
+    static async Update(paymentId: string, payment: any) {
+        let conn;
+
+        try {
+            if (!paymentId) {
+                Logger.log("Missing payment ID");
+                return ApiResponse.error("Missing payment ID");
+            }
+
+            const { customer_id, amount, invoice_no, payment_date, payment_note, payment_method } = payment;
+
+            if (!customer_id || !amount || !payment_date || !payment_method) {
+                Logger.log("Missing required fields:", { customer_id, amount, payment_date, payment_method });
+                return ApiResponse.error("Missing required fields");
+            }
+
+            Logger.log("Updating payment with ID:", paymentId);
+            const query = `
+            UPDATE payments
+            SET customer_id = ?, amount = ?, invoice_no = ?, payment_note = ?, payment_date = ?, payment_method = ?
+            WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query, [
+                customer_id,
+                amount,
+                invoice_no || null,
+                payment_note || null,
+                payment_date,
+                payment_method,
+                paymentId
+            ]);
+            Logger.info("Payment update result:", result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("No payment found with the provided ID");
+
+            return ApiResponse.success(result[0], "Payment updated successfully");
+        } catch (error) {
+            Logger.error("Failed to update payment:", error);
+            return ApiResponse.error("Failed to update payment");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+
     static async Delete(paymentId: string) {
         let conn;
 

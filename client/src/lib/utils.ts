@@ -23,3 +23,21 @@ export function copyToClipboard(text: string) {
 export function sendRefreshEvent() {
   window.dispatchEvent(new Event("global:refresh"));
 }
+
+
+export function formatCurrency(amount?: number) {
+  if (!amount) return "0,00 ₺";
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency: 'TRY'
+  }).format(amount);
+};
+
+export function formatDate(date?: Date) {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString('tr-TR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};

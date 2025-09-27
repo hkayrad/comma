@@ -41,7 +41,9 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
-    "zod": "^4.1.9"
+    "zod": "^4.1.9",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",

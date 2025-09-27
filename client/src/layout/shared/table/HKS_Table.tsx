@@ -1,8 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Logger } from "@/lib/utils/logger";
 import HKS_Table_Pagination from "./HKS_Table_Pagination";
 import HKS_Table_Actions from "./HKS_Table_Actions";
 
@@ -17,42 +15,12 @@ export default function HKS_Table(props: Props) {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-
-    useEffect(() => {
-        Logger.debug("Table - Row Selection: ", rowSelection);
-    }, [rowSelection]);
 
     const table = useReactTable({
         data,
-        columns: [
-            {
-                id: "select",
-                header: ({ table }) => (
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
-                        }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                        aria-label="Select all"
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                ),
-                enableSorting: false,
-                enableHiding: false,
-            },
-            ...columns
-        ],
+        columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
-        onRowSelectionChange: setRowSelection,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -60,7 +28,6 @@ export default function HKS_Table(props: Props) {
         state: {
             sorting,
             columnFilters,
-            rowSelection
         }
     });
 
@@ -74,7 +41,7 @@ export default function HKS_Table(props: Props) {
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className={`${header.id === "actions" || header.id === "has_debt" ? "w-48" : ""}`}>
+                                        <TableHead key={header.id} className={`${header.id === "actions" && "w-48"} ${header.id === "has_debt" && "w-32"} ${header.id === "is_company" && "w-32"}`}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(

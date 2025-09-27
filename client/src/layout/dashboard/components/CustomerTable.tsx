@@ -3,12 +3,16 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Info, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { copyToClipboard, notImplemented, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
+import { useNavigate } from "react-router";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { CustomerApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
 import HKS_Table from "@/layout/shared/table/HKS_Table";
+import { useDialog } from "@/contexts/DialogContext";
+import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
+import CustomerDetails from "./CustomerDetails";
 
 type Props = {
     data: CustomerDto[];
@@ -16,6 +20,9 @@ type Props = {
 
 export default function CustomerTable(props: Props) {
     const { data } = props;
+
+    const { openDialog } = useDialog();
+    const navigate = useNavigate();
 
     const handleDelete = (id: string) => {
         const promise = CustomerApi.Delete(id);
@@ -26,6 +33,44 @@ export default function CustomerTable(props: Props) {
                 return "Müşteri başarıyla silindi"
             },
             error: "Müşteri silinirken hata oluştu"
+        });
+    }
+
+    const onEdit = (customerId: string) => {
+        const customer = data.find(c => c.id === customerId);
+
+        if (!customer) {
+            toast.error("Müşteri bulunamadı");
+            return;
+        }
+
+        openDialog({
+            title: "Müşteri Düzenle",
+            description: "Müşteri bilgilerini düzenleyin",
+            size: "3xl",
+            content: (
+                <CustomerDialog customer={customer} />
+            ),
+            showCloseButton: true,
+        });
+    }
+
+    const onDetails = (customerId: string) => {
+        const customer = data.find(c => c.id === customerId);
+
+        if (!customer) {
+            toast.error("Müşteri bulunamadı");
+            return;
+        }
+
+        openDialog({
+            title: `Müşteri Bilgileri`,
+            description: `${customer.is_company ? "Vergi No" : "TC Kimlik No"}: ${customer.tax_number || "-"}`,
+            size: "3xl",
+            content: (
+                <CustomerDetails customer={customer} />
+            ),
+            showCloseButton: true,
         });
     }
 
@@ -54,6 +99,20 @@ export default function CustomerTable(props: Props) {
                     {row.getValue("name")}
                 </p>
             )
+        },
+        {
+            accessorKey: "is_company",
+            header: "Tür",
+            cell: ({ row }) => {
+                const isCompany = row.getValue("is_company");
+                return isCompany ?
+                    <Badge className="bg-violet-100 text-violet-800 select-none hover:cursor-copy"
+                        onClick={() => copyToClipboard("Şirket")}
+                    >Şirket</Badge> :
+                    <Badge className="bg-orange-100 text-orange-800 select-none hover:cursor-copy"
+                        onClick={() => copyToClipboard("Birey")}
+                    >Birey</Badge>
+            }
         },
         {
             accessorKey: "tax_number",
@@ -172,7 +231,7 @@ export default function CustomerTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={notImplemented}
+                                onClick={() => navigate(`/borc_dokumu/${row.original.id}`)}
                             >
                                 <Paperclip />
                             </Button>
@@ -186,7 +245,7 @@ export default function CustomerTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={notImplemented}
+                                onClick={() => onDetails(row.original.id!)}
                             >
                                 <Info />
                             </Button>
@@ -200,7 +259,7 @@ export default function CustomerTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={notImplemented}
+                                onClick={() => onEdit(row.original.id!)}
                             >
                                 <Pencil />
                             </Button>

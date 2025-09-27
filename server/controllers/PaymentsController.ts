@@ -28,6 +28,13 @@ router.get('/payments', async (req, res) => {
     res.json(response);
 });
 
+router.put('/payments/:id', async (req, res) => {
+    const { id } = req.params;
+    const payment = req.body;
+    const response = await PaymentsService.Update(id, payment);
+    res.json(response);
+});
+
 router.delete('/payments/:id', async (req, res) => {
     const paymentId = req.params.id;
     const response = await PaymentsService.Delete(paymentId);
