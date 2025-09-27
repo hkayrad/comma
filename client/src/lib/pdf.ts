@@ -167,13 +167,12 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
     autoTable(doc, {
         startY: afterDebtsY,
         margin: { left: MARGIN_LEFT, right: MARGIN_RIGHT },
-        head: [['Tarih', 'Ödeme No', 'Tutar', 'Yöntem', 'Not']],
+        head: [['Tarih', 'Fatura No', 'Tutar', 'Yöntem']],
         body: statement.payments.map(p => [
             format(new Date(p.payment_date), 'dd.MM.yyyy'),
             p.invoice_no || '-',
             formatCurrency(p.amount),
-            p.payment_method === 'cash' ? 'Nakit' : p.payment_method === 'bank_transfer' ? 'Havale' : p.payment_method === 'check' ? 'Çek' : p.payment_method,
-            p.payment_note || '-'
+            p.payment_method === 'cash' ? 'Nakit' : p.payment_method === 'bank_transfer' ? 'Havale' : p.payment_method === 'check' ? 'Çek' : p.payment_method
         ]),
         styles: { fontSize: 8, font: "Lexend-Regular" },
         headStyles: { fillColor: [32, 45, 96] },

@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL || (() => { throw new Error("CLIENT_URL not defined"); })(),
     credentials: true
 }));
 app.use(bodyParser.json());

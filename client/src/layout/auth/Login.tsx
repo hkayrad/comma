@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     username: z.string().max(20, { error: "Kullanıcı adı en fazla 20 karakter olabilir." }),

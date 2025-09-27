@@ -171,16 +171,15 @@ export default function CustomerStatement() {
                                 <thead className='bg-muted sticky top-0'>
                                     <tr className='text-left'>
                                         <th className='py-2 px-3 font-medium'>Tarih</th>
-                                        <th className='py-2 px-3 font-medium'>Ödeme No</th>
+                                        <th className='py-2 px-3 font-medium'>Fatura No</th>
                                         <th className='py-2 px-3 font-medium'>Tutar</th>
                                         <th className='py-2 px-3 font-medium'>Yöntem</th>
-                                        <th className='py-2 px-3 font-medium'>Not</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {payments.length === 0 && (
                                         <tr>
-                                            <td colSpan={5} className='py-4 px-3 text-center text-muted-foreground'>Ödeme bulunamadı</td>
+                                            <td colSpan={4} className='py-4 px-3 text-center text-muted-foreground'>Ödeme bulunamadı</td>
                                         </tr>
                                     )}
                                     {payments.map((p: PaymentDto) => (
@@ -193,7 +192,6 @@ export default function CustomerStatement() {
                                                     p.payment_method === 'bank_transfer' ? 'Havale' :
                                                         p.payment_method === 'check' ? 'Çek' : p.payment_method
                                             }</td>
-                                            <td className='py-1.5 px-3 max-w-[160px] truncate' title={p.payment_note || ''}>{p.payment_note || '-'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
