@@ -33,6 +33,7 @@ function Calendar({
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
       )}
+      timeZone="UTC"
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>

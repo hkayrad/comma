@@ -1,17 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@/components/ui/sidebar";
 import { Auth } from "@/lib/api"
 import { Home, LogOut, ScrollText, TurkishLira, User } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
+import { toast } from "sonner";
 
-export default function HKS_Sidebar({ onMouseOver, onMouseOut }: { onMouseOver: () => void, onMouseOut: () => void }) {
+export default function HKS_Sidebar({ handleSidebarHover }: { handleSidebarHover: (isHovering: boolean) => void }) {
     const navigate = useNavigate();
     const user = Auth.GetCurrentUser();
 
     const handleLogout = async () => {
-        const response = await Auth.Logout();
-        if (response)
-            navigate("/login");
+        const promise = Auth.Logout();
+        toast.promise(promise, {
+            loading: "Çıkış yapılıyor...",
+            success: () => {
+                navigate("/login");
+                return "Çıkış başarılı!";
+            },
+            error: "Çıkış yapılırken bir hata oluştu"
+        });
     }
 
     // Menu items.
@@ -27,17 +34,16 @@ export default function HKS_Sidebar({ onMouseOver, onMouseOut }: { onMouseOver: 
             icon: ScrollText,
         },
         {
-            title: "Ödemeler",
+            title: "Ödeme Bilgileri",
             url: "/odemeler",
             icon: TurkishLira,
         },
     ]
 
     return (
-        <Sidebar className="no-print" variant="inset" collapsible="icon" onPointerEnter={onMouseOver} onPointerLeave={onMouseOut}>
+        <Sidebar className="no-print" variant="inset" collapsible="icon" onPointerEnter={() => handleSidebarHover(true)} onPointerLeave={() => handleSidebarHover(false)}>
             <SidebarContent>
                 <SidebarGroup>
-                    {/* <SidebarGroupLabel>HKS-IO</SidebarGroupLabel> */}
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
@@ -55,24 +61,26 @@ export default function HKS_Sidebar({ onMouseOver, onMouseOut }: { onMouseOver: 
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <SidebarMenu>
-                    <span className="text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0 group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0 w-full whitespace-nowrap overflow-hidden">Giriş Yapılan Kullanıcı</span>
-                    <SidebarMenuItem>
-                        <Button variant="ghost" className="h-8 !p-2 w-full flex justify-start">
-                            <User />
-                            <span className="text-sm overflow-hidden">{user?.username}</span>
-                        </Button>
-                    </SidebarMenuItem>
-                    <SidebarSeparator className="group-data-[collapsible=icon]:!w-4 transition-all !w-11/12 !mb-2"/>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Button variant="outline" className="flex justify-start !p-2 overflow-hidden transition-all text-red-500 hover:bg-red-500 hover:!text-white" onClick={handleLogout}>
-                                <LogOut />
-                                <span>Çıkış Yap</span>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Kullanıcı</SidebarGroupLabel>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <Button variant="ghost" className="h-8 !p-2 w-full flex justify-start">
+                                <User />
+                                <span className="text-sm overflow-hidden">{user?.username}</span>
                             </Button>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                        </SidebarMenuItem>
+                        <SidebarSeparator className="group-data-[collapsible=icon]:!w-4 transition-all !w-11/12 !mb-2" />
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <Button variant="outline" className="flex justify-start !p-2 overflow-hidden transition-all text-red-500 hover:bg-red-500 hover:!text-white" onClick={handleLogout}>
+                                    <LogOut />
+                                    <span>Çıkış Yap</span>
+                                </Button>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroup>
             </SidebarFooter>
         </Sidebar>
     )

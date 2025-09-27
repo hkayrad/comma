@@ -1,4 +1,4 @@
 export * from "./auth";
-export * from "./customers";
-export * from "./debts";
-export * from "./payments";
+export * from "./customer";
+export * from "./debt";
+export * from "./payment";

@@ -1,29 +1,61 @@
+export type ApiResponse<T> = {
+    status: number;
+    data: T | null;
+    message: string;
+}
+
+export type UUID = string;
+
 export type CustomerDto = {
-    id?: string;
+    id?: UUID;
     name: string;
     phone?: string;
-    is_company: number;
+    is_company: boolean;
     tax_number?: string;
     email?: string;
     address?: string;
+    total_debt?: number;
+    total_payments?: number;
+    remaining_debt?: number;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
 export type DebtDto = {
-    id?: string;
-    customer_id: string;
-    amount: number;
+    id?: UUID;
+    customer_id: UUID;
     invoice_no?: string;
+    amount: number;
     vat: number;
+    total_amount?: string;
     description?: string;
     issue_date: Date;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
 export type PaymentDto = {
-    id?: string;
-    customer_id: string;
-    invoice_no?: string;
+    id?: UUID;
+    customer_id: UUID;
     amount: number;
-    payment_date: Date;
+    payment_method: 'cash' | 'bank_transfer' | 'check';
     payment_note?: string;
-    payment_method?: string;
+    invoice_no?: string;
+    payment_date: Date;
+    created_at?: Date;
+    updated_at?: Date;
+}
+
+export type CustomerIdName = { id: UUID, name: string };
+
+export type Totals = {
+    total_debts: number;
+    total_payments: number;
+    remaining_debt: number;
+}
+
+export type CustomerStatement = {
+    customer: CustomerDto;
+    debts: DebtDto[];
+    payments: PaymentDto[];
 }
