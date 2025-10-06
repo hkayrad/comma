@@ -19,7 +19,8 @@ const CustomerFormSchema = z.object({
     name: z.string().min(2, "Müşteri adı en az 2 karakter olmalıdır").max(255, "Müşteri adı en fazla 255 karakter olmalıdır"),
     phone: z.string().min(5, "Telefon numarası en az 5 karakter olmalıdır").max(20, "Telefon numarası en fazla 20 karakter olmalıdır").optional().or(z.literal("")),
     email: z.email({ message: "Geçersiz e-posta adresi" }).optional().or(z.literal("")),
-    tax_number: z.string().min(5, "Vergi numarası en az 5 karakter olmalıdır").max(11, "Vergi numarası en fazla  karakter olmalıdır").optional().or(z.literal("")),
+    tax_number: z.string().min(5, "Vergi numarası en az 5 karakter olmalıdır").max(11, "Vergi numarası en fazla 11 karakter olmalıdır").optional().or(z.literal("")),
+    tax_office: z.string().min(2, "Vergi dairesi en az 2 karakter olmalıdır").max(100, "Vergi dairesi en fazla 100 karakter olmalıdır").optional().or(z.literal("")),
     address: z.string().min(5, "Adres en az 5 karakter olmalıdır").max(500, "Adres en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
     is_company: z.boolean(),
 })
@@ -30,7 +31,7 @@ export default function CustomerDialog(props: Props) {
     const { closeDialog } = useDialog();
 
     console.log(Number(customer?.is_company) === 1);
-    
+
 
     const form = useForm<z.infer<typeof CustomerFormSchema>>({
         resolver: zodResolver(CustomerFormSchema),
@@ -39,6 +40,7 @@ export default function CustomerDialog(props: Props) {
             phone: customer?.phone || "",
             email: customer?.email || "",
             tax_number: customer?.tax_number || "",
+            tax_office: customer?.tax_office || "",
             address: customer?.address || "",
             is_company: customer ? (Number(customer.is_company) === 1) : true,
         }
@@ -114,6 +116,25 @@ export default function CustomerDialog(props: Props) {
                         </FormItem>
                     )}
                 />
+                {
+                    form.watch("is_company") &&
+                    <FormField
+                        control={form.control}
+                        name="tax_office"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Vergi Dairesi</FormLabel>
+                                <FormControl>
+                                    <Input type="text" placeholder="Eskişehir" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                    Müşterinin vergi dairesi.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                }
                 <FormField
                     control={form.control}
                     name="tax_number"

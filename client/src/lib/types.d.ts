@@ -12,6 +12,7 @@ export type CustomerDto = {
     phone?: string;
     is_company: boolean;
     tax_number?: string;
+    tax_office?: string;
     email?: string;
     address?: string;
     total_debt?: number;

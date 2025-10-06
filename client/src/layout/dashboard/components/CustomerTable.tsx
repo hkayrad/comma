@@ -65,7 +65,7 @@ export default function CustomerTable(props: Props) {
 
         openDialog({
             title: `Müşteri Bilgileri`,
-            description: `${customer.is_company ? "Vergi No" : "TC Kimlik No"}: ${customer.tax_number || "-"}`,
+            description: `${customer.is_company ? "Vergi No" : "TC Kimlik No"}: ${customer.tax_number || "-"} | Vergi Dairesi: ${customer.tax_office || "-"}`,
             size: "3xl",
             content: (
                 <CustomerDetails customer={customer} />
@@ -113,6 +113,18 @@ export default function CustomerTable(props: Props) {
                         onClick={() => copyToClipboard("Birey")}
                     >Birey</Badge>
             }
+        },
+        {
+            accessorKey: "tax_office",
+            header: "Vergi Dairesi",
+            cell: ({ row }) => (
+                <p
+                    className="select-none hover:cursor-copy"
+                    onClick={() => copyToClipboard(row.getValue("tax_office") || "-")}
+                >
+                    {row.getValue("tax_office") || "-"}
+                </p>
+            )
         },
         {
             accessorKey: "tax_number",
