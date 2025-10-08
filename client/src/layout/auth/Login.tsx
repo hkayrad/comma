@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Auth } from "@/lib/api";
 import { useState } from "react";
@@ -18,6 +18,7 @@ const formSchema = z.object({
 
 export default function Login() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -39,15 +40,26 @@ export default function Login() {
             return;
         }
 
+        setLoading(true);
         const response = Auth.Login(username, password);
-        toast.promise(response, {
-            loading: "Giriş yapılıyor...",
-            success: () => {
-                navigate("/");
-                return "Giriş başarılı!";
-            },
-            error: "Giriş başarısız, lütfen bilgilerinizi kontrol edin"
-        });
+        const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
+        setTimeout(() => {
+            toast.promise(response, {
+                loading: "Giriş yapılıyor...",
+                success: () => {
+                    setLoading(false);
+                    navigate("/");
+                    return "Giriş başarılı!";
+                },
+                error: () => {
+                    setLoading(false);
+                    return "Giriş başarısız, lütfen bilgilerinizi kontrol edin"
+                }
+            })
+        },
+            timeout
+        );
+
     };
 
     return (
@@ -89,7 +101,15 @@ export default function Login() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" variant="default" className="mx-auto">Giriş Yap</Button>
+                            <Button type="submit" variant="default" className="mx-auto" disabled={loading}>
+                                {loading ?
+                                    <>
+                                        <Loader className="mr-2 h-4 w-4 animate-spin" />Giriş Yapılıyor...
+                                    </> :
+                                    <>
+                                        <LogIn className="mr-2 h-4 w-4" />Giriş Yap
+                                    </>}
+                            </Button>
                         </form>
                     </Form>
                 </div>
