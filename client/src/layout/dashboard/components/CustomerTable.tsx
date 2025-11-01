@@ -1,6 +1,6 @@
 import type { CustomerDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Info, Paperclip, Pencil, Trash2 } from "lucide-react";
+import { Info, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
@@ -9,10 +9,13 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { toast } from "sonner";
 import { CustomerApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
-import HKS_Table from "@/layout/shared/table/HKS_Table";
+import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/DialogContext";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
 import CustomerDetails from "./CustomerDetails";
+import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
+import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
+import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 
 type Props = {
     data: CustomerDto[];
@@ -82,23 +85,17 @@ export default function CustomerTable(props: Props) {
         },
         {
             accessorKey: "name",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    İsim
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+            header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
+            cell: ({ row, column }) => (
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger className="text-left">
+                        <ClickToCopyText value={row.getValue(column.id) || "-"} column={column} />
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                        {row.getValue(column.id) || "-"}
+                    </TooltipContent>
+                </Tooltip>
             ),
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("name"))}
-                >
-                    {row.getValue("name")}
-                </p>
-            )
         },
         {
             accessorKey: "is_company",
@@ -117,101 +114,27 @@ export default function CustomerTable(props: Props) {
         {
             accessorKey: "tax_office",
             header: "Vergi Dairesi",
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("tax_office") || "-")}
-                >
-                    {row.getValue("tax_office") || "-"}
-                </p>
-            )
+            cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "tax_number",
             header: "Vergi No",
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("tax_number") || "-")}
-                >
-                    {row.getValue("tax_number") || "-"}
-                </p>
-            )
+            cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "total_debt",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Toplam Borç
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const value = parseFloat(row.getValue("total_debt"));
-                const formatted = value.toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                });
-                return <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(formatted)}
-                >
-                    {formatted}
-                </p>
-            }
+            header: ({ column }) => <SortableColumnHeader column={column} title="Toplam Borç" />,
+            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
         },
         {
             accessorKey: "total_payments",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Ödenen
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const value = parseFloat(row.getValue("total_payments"));
-                const formatted = value.toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                });
-                return <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(formatted)}
-                >
-                    {formatted}
-                </p>
-            }
+            header: ({ column }) => <SortableColumnHeader column={column} title="Toplam Ödeme" />,
+            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
         },
         {
             accessorKey: "remaining_debt",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Kalan Borç
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const value = parseFloat(row.getValue("remaining_debt"));
-                const formatted = value.toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                });
-                return <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(formatted)}
-                >
-                    {formatted}
-                </p>
-            }
+            header: ({ column }) => <SortableColumnHeader column={column} title="Kalan Borç" />,
+            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
         },
         {
             id: "has_debt",
@@ -318,6 +241,6 @@ export default function CustomerTable(props: Props) {
     ];
 
     return (
-        <HKS_Table data={data} columns={CustomerTableColumns} searchColumn="name" />
+        <HksTable data={data} columns={CustomerTableColumns} searchColumn="name" />
     )
 }

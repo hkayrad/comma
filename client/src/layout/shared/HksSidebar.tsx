@@ -5,7 +5,7 @@ import { Home, LogOut, ScrollText, TurkishLira, User } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 
-export default function HKS_Sidebar({ handleSidebarHover }: { handleSidebarHover: (isHovering: boolean) => void }) {
+export default function HksSidebar({ handleSidebarHover }: { handleSidebarHover: (isHovering: boolean) => void }) {
     const navigate = useNavigate();
     const user = Auth.GetCurrentUser();
 
@@ -61,7 +61,7 @@ export default function HKS_Sidebar({ handleSidebarHover }: { handleSidebarHover
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <SidebarGroup>
+                <SidebarGroup className="!px-0">
                     <SidebarGroupLabel>Kullanıcı</SidebarGroupLabel>
                     <SidebarMenu>
                         <SidebarMenuItem>

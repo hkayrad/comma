@@ -11,7 +11,7 @@ type Props = {
     searchColumn: string;
 }
 
-export default function HKS_Table_Header(props: Props) {
+export default function HksTableHeader(props: Props) {
     const { table, searchColumn } = props;
 
     const onFilterReset = () => {

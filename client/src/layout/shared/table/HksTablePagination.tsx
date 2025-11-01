@@ -6,7 +6,7 @@ type Props = {
     table: Table<any>;
 }
 
-export default function HKS_Table_Pagination(props: Props) {
+export default function HksTablePagination(props: Props) {
     const { table } = props;
     
     return (
