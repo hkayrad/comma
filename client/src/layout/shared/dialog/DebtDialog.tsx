@@ -1,25 +1,24 @@
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useDialog } from "@/contexts/DialogContext"
-import { CustomerApi, DebtApi } from "@/lib/api"
+import { PayableCustomerApi, PayableDebtApi, ReceivableCustomerApi, ReceivableDebtApi } from "@/lib/api"
 import type { CustomerIdName, DebtDto } from "@/lib/types"
-import { cn, sendRefreshEvent } from "@/lib/utils"
+import { sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { tr } from "date-fns/locale"
-import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react"
+import { ReceiptText, TextInitial, TurkishLira } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
+import CustomerSelect from "./components/CustomerSelect"
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
+import DateSelect from "./components/DateSelect"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 type Props = {
-    debt?: DebtDto
+    debt?: DebtDto,
+    type?: "receivable" | "payable",
 }
 
 const DebtFormSchema = z.object({
@@ -32,10 +31,12 @@ const DebtFormSchema = z.object({
 })
 
 export default function DebtDialog(props: Props) {
-    const { debt } = props;
+    const { debt, type = "receivable" } = props;
     const { closeDialog } = useDialog();
     const [customerIdAndNames, setCustomerIdAndNames] = useState<CustomerIdName[]>([]);
-    const [isCustomerSelectOpen, setIsCustomerSelectOpen] = useState(false);
+
+    const DEBT_API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
+    const CUSTOMER_API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
     const form = useForm<z.infer<typeof DebtFormSchema>>({
         resolver: zodResolver(DebtFormSchema),
@@ -51,7 +52,7 @@ export default function DebtDialog(props: Props) {
 
     const handleFetchCustomerIdAndNames = async () => {
         try {
-            const response = await CustomerApi.GetIdAndName();
+            const response = await CUSTOMER_API.GetIdAndName();
             Logger.debug("Fetched customer ID and names:", response);
             if (response)
                 setCustomerIdAndNames(response);
@@ -76,9 +77,9 @@ export default function DebtDialog(props: Props) {
         let promise;
 
         if (debt)
-            promise = DebtApi.Update(debt.id!, data);
+            promise = DEBT_API.Update(debt.id!, data);
         else
-            promise = DebtApi.Create(data);
+            promise = DEBT_API.Create(data);
 
         toast.promise(promise, {
             loading: debt ? "Borç güncelleniyor..." : "Borç ekleniyor...",
@@ -99,72 +100,11 @@ export default function DebtDialog(props: Props) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-8">
-                <FormField
-                    control={form.control}
-                    name="customer_id"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                            <FormLabel>Müşteri <span className="text-red-500">*</span></FormLabel>
-                            <Popover open={isCustomerSelectOpen} onOpenChange={setIsCustomerSelectOpen}>
-                                <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            className={cn(
-                                                "w-full justify-between",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                        >
-                                            {field.value
-                                                ? customerIdAndNames.find(
-                                                    (customer) => customer.id === field.value
-                                                )?.name
-                                                : "Müşteri seçin"}
-                                            <ChevronsUpDown className="opacity-50" />
-                                        </Button>
-                                    </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[200px] p-0">
-                                    <Command>
-                                        <CommandInput
-                                            placeholder="Ara..."
-                                            className="h-9"
-                                        />
-                                        <CommandList>
-                                            <CommandEmpty>Müşteri bulunamadı.</CommandEmpty>
-                                            <CommandGroup>
-                                                {customerIdAndNames.map((customer) => (
-                                                    <CommandItem
-                                                        value={customer.name}
-                                                        key={customer.id}
-                                                        onSelect={() => {
-                                                            form.setValue("customer_id", customer.id);
-                                                            setIsCustomerSelectOpen(false);
-                                                        }}
-                                                    >
-                                                        {customer.name}
-                                                        <Check
-                                                            className={cn(
-                                                                "ml-auto",
-                                                                customer.id === field.value
-                                                                    ? "opacity-100"
-                                                                    : "opacity-0"
-                                                            )}
-                                                        />
-                                                    </CommandItem>
-                                                ))}
-                                            </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                </PopoverContent>
-                            </Popover>
-                            <FormDescription>
-                                Borçlu müşteri.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                <CustomerSelect
+                    type={type}
+                    form={form}
+                    customerIdAndNames={customerIdAndNames}
+                    addNewCustomer
                 />
                 <FormField
                     control={form.control}
@@ -172,37 +112,7 @@ export default function DebtDialog(props: Props) {
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
                             <FormLabel>Kesim Tarihi <span className="text-red-500">*</span></FormLabel>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <FormControl>
-                                        <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-full pl-3 text-left font-normal",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                        >
-                                            {field.value ? (
-                                                format(field.value, "PPP", { locale: tr })
-                                            ) : (
-                                                <span>Bir tarih seçin</span>
-                                            )}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                        </Button>
-                                    </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) =>
-                                            date > new Date() || date < new Date("1900-01-01")
-                                        }
-                                        captionLayout="dropdown"
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                            <DateSelect field={field} />
                             <FormDescription>
                                 Borç kesim tarihi.
                             </FormDescription>
@@ -217,17 +127,22 @@ export default function DebtDialog(props: Props) {
                         <FormItem>
                             <FormLabel className="flex gap-1">Tutar <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    step="0.01"
-                                    {...field}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        const num = value === "" ? "" : parseFloat(value);
-                                        field.onChange(Number.isNaN(num) ? undefined : num);
-                                    }}
-                                />
+                                <InputGroup>
+                                    <InputGroupInput
+                                        type="number"
+                                        placeholder="0.00"
+                                        step="0.01"
+                                        {...field}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            const num = value === "" ? "" : parseFloat(value);
+                                            field.onChange(Number.isNaN(num) ? undefined : num);
+                                        }}
+                                    />
+                                    <InputGroupAddon>
+                                        <TurkishLira />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Borç tutarı.
@@ -244,18 +159,35 @@ export default function DebtDialog(props: Props) {
                             <FormLabel className="flex gap-1">KDV <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
                                 <div className="flex items-center gap-1">
-                                    <Input
-                                        type="number"
-                                        placeholder="0.00"
-                                        step="0.01"
-                                        {...field}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            const num = value === "" ? "" : parseFloat(value);
-                                            field.onChange(Number.isNaN(num) ? undefined : num);
-                                        }}
-                                    />
-                                    <Button variant="outline" onClick={handleVatButtonClick}>%20</Button>
+                                    <InputGroup>
+                                        <InputGroupInput
+                                            type="number"
+                                            placeholder="0.00"
+                                            step="0.01"
+                                            {...field}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                const num = value === "" ? "" : parseFloat(value);
+                                                field.onChange(Number.isNaN(num) ? undefined : num);
+                                            }}
+                                        />
+                                        <InputGroupAddon>
+                                            <TurkishLira />
+                                        </InputGroupAddon>
+                                        <InputGroupAddon align="inline-end">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <InputGroupButton size="xs" onClick={handleVatButtonClick}>
+                                                        %20
+                                                    </InputGroupButton>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Tutarın %20'sini KDV olarak ayarla</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </InputGroupAddon>
+
+                                    </InputGroup>
                                 </div>
                             </FormControl>
                             <FormDescription>
@@ -272,7 +204,12 @@ export default function DebtDialog(props: Props) {
                         <FormItem>
                             <FormLabel className="flex gap-1">Fatura No</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="Fatura No" {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="Fatura No" {...field} />
+                                    <InputGroupAddon>
+                                        <ReceiptText />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Fatura numarası (varsa).
@@ -288,7 +225,12 @@ export default function DebtDialog(props: Props) {
                         <FormItem>
                             <FormLabel className="flex gap-1">Açıklama</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="Açıklama" {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="Açıklama" {...field} />
+                                    <InputGroupAddon>
+                                        <TextInitial />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Belirtmek istediğiniz ek bilgiler (varsa).

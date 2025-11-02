@@ -1,37 +1,43 @@
 import { useEffect, useState } from "react";
 import type { DebtDto } from "@/lib/types";
-import { DebtApi } from "@/lib/api";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import DebtTable from "./components/DebtTable";
 import OverviewCards from "../shared/OverviewCards";
 
-export default function Debts() {
+type Props = {
+    type: 'receivable' | 'payable';
+}
+
+export default function Debts(props: Props) {
+    const { type } = props;
     const [debts, setDebts] = useState<DebtDto[]>([]);
 
-    const fetchDebts = async () => {
-        const response = await DebtApi.GetAll();
-        if (response)
-            setDebts(response);
-    }
-
-    const handleRefresh = () => {
-        fetchDebts();
-    }
-
     useEffect(() => {
+        const fetchDebts = async () => {
+            const API = type === 'payable' ? PayableDebtApi : ReceivableDebtApi;
+            const response = await API.GetAll();
+            if (response)
+                setDebts(response);
+        }
+
+        const handleRefresh = () => {
+            fetchDebts();
+        }
+
         handleRefresh();
         window.addEventListener("global:refresh", handleRefresh);
         return () => {
             window.removeEventListener("global:refresh", handleRefresh);
         }
-    }, [])
+    }, [type])
 
     return (
         <div className="py-4 px-8 space-y-8">
             <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold">Borç Bilgileri</h1>
-                <OverviewCards />
+                <h1 className="text-4xl font-bold">{type === 'receivable' ? 'Alacaklar' : 'Verecekler'}</h1>
+                <OverviewCards type={type} />
             </div>
-            <DebtTable data={debts} />
+            <DebtTable data={debts} type={type} />
         </div>
     )
 }

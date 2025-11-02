@@ -1,28 +1,35 @@
 import type { PaymentDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { PaymentApi } from "@/lib/api";
+import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
-import HKS_Table from "@/layout/shared/table/HKS_Table";
+import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
 import { useDialog } from "@/contexts/DialogContext";
+import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
+import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
+import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
+import ClickToCopyText from "@/layout/shared/ClickToCopyText";
+import { formattedNumber } from "@/lib/utils/table";
 
 type Props = {
     data: PaymentDto[];
+    type: 'receivable' | 'payable';
 }
 
 export default function PaymentTable(props: Props) {
-    const { data } = props;
+    const { data, type } = props;
 
     const { openDialog } = useDialog();
 
     const handleDelete = (id: string) => {
-        const promise = PaymentApi.Delete(id);
+        const API = type === 'payable' ? PayablePaymentApi : ReceivablePaymentApi;
+        const promise = API.Delete(id);
         toast.promise(promise, {
             loading: "Ödeme siliniyor...",
             success: () => {
@@ -46,7 +53,7 @@ export default function PaymentTable(props: Props) {
             description: "Ödeme bilgilerini düzenleyin",
             size: "3xl",
             content: (
-                <PaymentDialog payment={payment} />
+                <PaymentDialog payment={payment} type={type} />
             ),
             showCloseButton: true,
         });
@@ -60,60 +67,27 @@ export default function PaymentTable(props: Props) {
         },
         {
             accessorKey: "customer_name",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Müşteri
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+            header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
+            cell: ({ row, column }) => (
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger className="text-left flex">
+                        <ClickToCopyText value={row.getValue(column.id) || "-"} column={column} />
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                        {row.getValue(column.id) || "-"}
+                    </TooltipContent>
+                </Tooltip>
             ),
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("customer_name"))}
-                >
-                    {row.getValue("customer_name")}
-                </p>
-            )
         },
         {
             accessorKey: "amount",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Ödeme Miktarı
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const value = parseFloat(row.getValue("amount"));
-                const formatted = value.toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                });
-                return <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(formatted)}
-                >
-                    {formatted}
-                </p>
-            }
+            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Miktarı" />,
+            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
+            sortingFn: formattedNumber,
         },
         {
             accessorKey: "payment_method",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Ödeme Yöntemi
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
+            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Yöntemi" />,
             cell: ({ row }) => {
                 switch (row.getValue("payment_method")) {
                     case "cash":
@@ -134,65 +108,18 @@ export default function PaymentTable(props: Props) {
         },
         {
             accessorKey: "payment_date",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Ödeme Tarihi
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const date = new Date(row.getValue("payment_date"));
-                const formatted = date.toLocaleDateString("tr-TR");
-                return <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(formatted)}
-                >
-                    {formatted}
-                </p>
-            }
+            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Tarihi" />,
+            cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
         },
         {
             accessorKey: "invoice_no",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Fatura No
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("invoice_no") || "-")}
-                >
-                    {row.getValue("invoice_no") || "-"}
-                </p>
-            )
+            header: ({ column }) => <SortableColumnHeader column={column} title="Fatura No" />,
+            cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "description",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Açıklama
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            ),
-            cell: ({ row }) => (
-                <p
-                    className="select-none hover:cursor-copy"
-                    onClick={() => copyToClipboard(row.getValue("description") || "-")}
-                >
-                    {row.getValue("description") || "-"}
-                </p>
-            )
+            header: ({ column }) => <SortableColumnHeader column={column} title="Açıklama" />,
+            cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             id: "actions",
@@ -251,6 +178,6 @@ export default function PaymentTable(props: Props) {
     ];
 
     return (
-        <HKS_Table data={data} columns={PaymentTableColumns} searchColumn="customer_name" />
+        <HksTable data={data} columns={PaymentTableColumns} searchColumn="customer_name" />
     )
 }

@@ -1,18 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDialog } from "@/contexts/DialogContext"
-import { CustomerApi } from "@/lib/api"
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api"
 import type { CustomerDto } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Hash, IdCard, Landmark, Mail, MapPinHouse, Phone } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
 
 type Props = {
-    customer?: CustomerDto
+    customer?: CustomerDto,
+    type?: "receivable" | "payable",
 }
 
 const CustomerFormSchema = z.object({
@@ -26,12 +28,11 @@ const CustomerFormSchema = z.object({
 })
 
 export default function CustomerDialog(props: Props) {
-    const { customer } = props;
+    const { customer, type = "receivable" } = props;
+
+    const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
     const { closeDialog } = useDialog();
-
-    console.log(Number(customer?.is_company) === 1);
-
 
     const form = useForm<z.infer<typeof CustomerFormSchema>>({
         resolver: zodResolver(CustomerFormSchema),
@@ -56,9 +57,9 @@ export default function CustomerDialog(props: Props) {
         let promise;
 
         if (customer)
-            promise = CustomerApi.Update(customer.id!, data);
+            promise = API.Update(customer.id!, data);
         else
-            promise = CustomerApi.Create(data);
+            promise = API.Create(data);
 
         toast.promise(promise, {
             loading: customer ? "Müşteri güncelleniyor..." : "Müşteri ekleniyor...",
@@ -82,7 +83,12 @@ export default function CustomerDialog(props: Props) {
                         <FormItem>
                             <FormLabel className="flex gap-1">Müşteri Adı <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="ABC Ltd. Şti." {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="ABC Ltd. Şti." {...field} />
+                                    <InputGroupAddon>
+                                        <IdCard />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Şirket veya birey adı.
@@ -125,7 +131,12 @@ export default function CustomerDialog(props: Props) {
                             <FormItem>
                                 <FormLabel>Vergi Dairesi</FormLabel>
                                 <FormControl>
-                                    <Input type="text" placeholder="Eskişehir" {...field} />
+                                    <InputGroup>
+                                        <InputGroupInput type="text" placeholder="Eskişehir" {...field} />
+                                        <InputGroupAddon>
+                                            <Landmark />
+                                        </InputGroupAddon>
+                                    </InputGroup>
                                 </FormControl>
                                 <FormDescription>
                                     Müşterinin vergi dairesi.
@@ -142,7 +153,12 @@ export default function CustomerDialog(props: Props) {
                         <FormItem>
                             <FormLabel>{form.watch("is_company") ? "Vergi No" : "TC Kimlik No"}</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder={form.watch("is_company") ? "1234567890" : "12345678901"} {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder={form.watch("is_company") ? "1234567890" : "12345678901"} {...field} />
+                                    <InputGroupAddon>
+                                        <Hash />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Müşteri {form.watch("is_company") ? "vergi" : "TC Kimlik"} numarası.
@@ -158,7 +174,12 @@ export default function CustomerDialog(props: Props) {
                         <FormItem>
                             <FormLabel>İletişim Telefon Numarası</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="+90 555 555 55 55" {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="+90 555 555 55 55" {...field} />
+                                    <InputGroupAddon>
+                                        <Phone />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Müşterinin telefon numarası.
@@ -174,7 +195,12 @@ export default function CustomerDialog(props: Props) {
                         <FormItem>
                             <FormLabel>İletişim E-posta Adresi</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="ornek@sirket.com" {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="ornek@sirket.com" {...field} />
+                                    <InputGroupAddon>
+                                        <Mail />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Müşterinin e-posta adresi.
@@ -190,7 +216,12 @@ export default function CustomerDialog(props: Props) {
                         <FormItem>
                             <FormLabel>Adresi</FormLabel>
                             <FormControl>
-                                <Input type="text" placeholder="Örnek Mah. No:1 D:5" {...field} />
+                                <InputGroup>
+                                    <InputGroupInput type="text" placeholder="Örnek Mah. No:1 D:5" {...field} />
+                                    <InputGroupAddon>
+                                        <MapPinHouse />
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </FormControl>
                             <FormDescription>
                                 Müşterinin adresi.

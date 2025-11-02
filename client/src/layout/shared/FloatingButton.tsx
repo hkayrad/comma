@@ -6,17 +6,18 @@ import CustomerDialog from "./dialog/CustomerDialog";
 import DebtDialog from "./dialog/DebtDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentDialog from "./dialog/PaymentDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel,  DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function FloatingButton() {
     const { openDialog } = useDialog();
 
-    const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleFloatingMenu = () => {
-        setIsFloatingMenuOpen(!isFloatingMenuOpen);
+        setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleAddCustomer = () => {
+    const handleAddReceivableCustomer = () => {
         toggleFloatingMenu();
         openDialog({
             title: "Müşteri Ekle",
@@ -29,7 +30,7 @@ export default function FloatingButton() {
         });
     }
 
-    const handleAddDebt = () => {
+    const handleAddReceivableDebt = () => {
         toggleFloatingMenu();
         openDialog({
             title: "Borç Ekle",
@@ -42,7 +43,7 @@ export default function FloatingButton() {
         });
     }
 
-    const handleAddPayment = () => {
+    const handleAddReceivablePayment = () => {
         toggleFloatingMenu();
         openDialog({
             title: "Ödeme Ekle",
@@ -55,75 +56,101 @@ export default function FloatingButton() {
         });
     }
 
+    const handleAddPayableCustomer = () => {
+        toggleFloatingMenu();
+        openDialog({
+            title: "Müşteri Ekle",
+            description: "Yeni müşteri ekleyin",
+            size: "3xl",
+            content: (
+                <CustomerDialog type="payable" />
+            ),
+            showCloseButton: true,
+        });
+    }
+
+    const handleAddPayableDebt = () => {
+        toggleFloatingMenu();
+        openDialog({
+            title: "Borç Ekle",
+            description: "Yeni borç ekleyin",
+            size: "3xl",
+            content: (
+                <DebtDialog type="payable" />
+            ),
+            showCloseButton: true,
+        });
+    }
+
+    const handleAddPayablePayment = () => {
+        toggleFloatingMenu();
+        openDialog({
+            title: "Ödeme Ekle",
+            description: "Yeni ödeme ekleyin",
+            size: "3xl",
+            content: (
+                <PaymentDialog type="payable" />
+            ),
+            showCloseButton: true,
+        });
+    }
+
     return (
         <>
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button
-                        onClick={handleAddPayment}
-                        className={`fixed bottom-40 right-4 z-50 transition-all duration-300 ease ${isFloatingMenuOpen
-                            ? 'translate-x-0 opacity-100 scale-100 delay-225'
-                            : 'translate-x-[200px] opacity-0 scale-95 pointer-events-none delay-75'
-                            }`}
-                    >
-                        <Banknote />
-                        Ödeme Ekle
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    Yeni bir ödeme ekle
-                </TooltipContent>
-            </Tooltip >
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button
-                        onClick={handleAddDebt}
-                        className={`fixed bottom-28 right-4 z-50 transition-all duration-300 ease ${isFloatingMenuOpen
-                            ? 'translate-x-0 opacity-100 scale-100 delay-150'
-                            : 'translate-x-[200px] opacity-0 scale-95 pointer-events-none delay-150'
-                            }`}
-                    >
-                        <ReceiptTurkishLira />
-                        Borç Ekle
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    Yeni bir borç ekle
-                </TooltipContent>
-            </Tooltip >
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button
-                        onClick={handleAddCustomer}
-                        className={`fixed bottom-16 right-4 z-50 transition-all duration-300 ease ${isFloatingMenuOpen
-                            ? 'translate-x-0 opacity-100 scale-100 delay-75'
-                            : 'translate-x-[200px] opacity-0 scale-95 pointer-events-none delay-225'
-                            }`}
-                    >
-                        <UserPlus2Icon />
-                        Müşteri Ekle
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    Yeni bir müşteri ekle
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button
-                        onClick={toggleFloatingMenu}
-                        size="icon"
-                        className="fixed bottom-4 right-4 z-50"
-                    >
-                        <Plus
-                            className={`transition-transform duration-300 ease scale-125 ${isFloatingMenuOpen ? 'rotate-45' : 'rotate-0'}`}
-                        />
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    İşlem menüsünü {isFloatingMenuOpen ? 'kapat' : 'aç'}
-                </TooltipContent>
-            </Tooltip>
+            <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                size="icon"
+                                className="fixed bottom-4 right-4 z-50"
+                            >
+                                <Plus className={`transition-transform duration-300 ease ${isMenuOpen ? `-rotate-45` : `rotate-0`}`}/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        İşlem menüsünü aç
+                    </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent
+                    className="w-fit"
+                    side="left"
+                    align="end"
+                    sideOffset={4}
+                >
+                    <DropdownMenuGroup>
+                        <DropdownMenuLabel>Alacak Eylemleri</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleAddReceivableCustomer}>
+                            <UserPlus2Icon className="mr-2 h-4 w-4" />
+                            Müşteri Ekle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleAddReceivableDebt}>
+                            <ReceiptTurkishLira className="mr-2 h-4 w-4" />
+                            Borç Ekle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleAddReceivablePayment}>
+                            <Banknote className="mr-2 h-4 w-4" />
+                            Ödeme Ekle
+                        </DropdownMenuItem>
+                        <DropdownMenuLabel className="mt-2">Verecek Eylemleri</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleAddPayableCustomer}>
+                            <UserPlus2Icon className="mr-2 h-4 w-4" />
+                            Müşteri Ekle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleAddPayableDebt}>
+                            <ReceiptTurkishLira className="mr-2 h-4 w-4" />
+                            Borç Ekle
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleAddPayablePayment}>
+                            <Banknote className="mr-2 h-4 w-4" />
+                            Ödeme Ekle
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </>
     );
 }

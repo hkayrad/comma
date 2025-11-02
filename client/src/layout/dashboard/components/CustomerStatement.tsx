@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { CustomerApi } from '@/lib/api';
+import { PayableCustomerApi, ReceivableCustomerApi } from '@/lib/api';
 import type { CustomerStatement as CustomerStatementType, DebtDto, PaymentDto } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileDown, Loader2 } from 'lucide-react';
@@ -9,9 +9,16 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import { exportCustomerStatementPDF } from '@/lib/pdf';
 
-export default function CustomerStatement() {
+type Props = {
+    type: 'receivable' | 'payable';
+}
+
+export default function CustomerStatement(props: Props) {
+    const { type } = props;
     const { customerId } = useParams();
     const navigate = useNavigate();
+
+    const API = type === 'payable' ? PayableCustomerApi : ReceivableCustomerApi;
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<CustomerStatementType | null>(null);
@@ -20,7 +27,7 @@ export default function CustomerStatement() {
     useEffect(() => {
         if (!customerId) return;
         setLoading(true);
-        CustomerApi.GetStatement(customerId)
+        API.GetStatement(customerId)
             .then(res => setData(res))
             .catch(() => toast.error('Borç dökümü getirilirken hata oluştu'))
             .finally(() => setLoading(false));

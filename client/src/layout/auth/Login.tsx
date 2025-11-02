@@ -64,7 +64,7 @@ export default function Login() {
 
     return (
         <>
-            <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2">
+            <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-black selection:text-white">
                 <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
                     <img src="/hks-logo.png" className="w-64 lg:w-96 saturate-0 brightness-0 invert" />
                 </div>
@@ -94,7 +94,7 @@ export default function Login() {
                                         <FormControl>
                                             <div className="flex gap-2">
                                                 <Input placeholder="********" type={isPasswordVisible ? "text" : "password"} {...field} />
-                                                <Button type="button" variant="outline" onClick={togglePasswordVisibility}>{isPasswordVisible ? <EyeOff /> : <Eye />}</Button>
+                                                <Button type="button" variant="outline" size="icon" onClick={togglePasswordVisibility}>{isPasswordVisible ? <EyeOff /> : <Eye />}</Button>
                                             </div>
                                         </FormControl>
                                         <FormMessage />

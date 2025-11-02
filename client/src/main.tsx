@@ -12,7 +12,7 @@ import CustomerStatement from './layout/dashboard/components/CustomerStatement';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <Toaster richColors position="top-right" className="select-none" duration={1500} />
+    <Toaster richColors closeButton position="top-right" className="select-none" duration={1000} />
     <Routes>
       <Route path="/login" element={
         <RequireNoAuth>
@@ -26,9 +26,16 @@ createRoot(document.getElementById('root')!).render(
         </RequireAuth>
       }>
         <Route index element={<Dashboard />} />
-        <Route path="borc_bilgileri" element={<Debts />} />
-        <Route path="odemeler" element={<Payments />} />
-  <Route path="borc_dokumu/:customerId" element={<CustomerStatement />} />
+        <Route path="alacaklar">
+          <Route path="borclar" element={<Debts type='receivable' />} />
+          <Route path="odemeler" element={<Payments type='receivable' />} />
+          <Route path="borc_dokumu/:customerId" element={<CustomerStatement type='receivable' />} />
+        </Route>
+        <Route path="verecekler">
+          <Route path="borclar" element={<Debts type='payable' />} />
+          <Route path="odemeler" element={<Payments type='payable' />} />
+          <Route path="borc_dokumu/:customerId" element={<CustomerStatement type='payable' />} />
+        </Route>
         <Route path="*" element={<div>404 Not Found</div>} />
       </Route>
     </Routes>

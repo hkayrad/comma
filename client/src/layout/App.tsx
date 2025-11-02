@@ -1,23 +1,24 @@
-import { Outlet } from "react-router";
-import HKS_Sidebar from "./shared/HKS_Sidebar";
+import { Outlet, useLocation } from "react-router";
+import HksSidebar from "./shared/HksSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useState } from "react";
 import { DialogProvider } from "@/contexts/DialogContext";
 import FloatingButton from "./shared/FloatingButton";
+import { useEffect } from "react";
+import { sendRefreshEvent } from "@/lib/utils";
 
 export default function App() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const location = useLocation();
 
-    const handleSidebarHover = (isHovering: boolean) => {
-        setIsSidebarOpen(isHovering);
-    }
+    useEffect(() => {
+        sendRefreshEvent()
+    }, [location]);
 
     return (
-        <div>
+        <div className="selection:bg-black selection:text-white">
             <DialogProvider>
                 <FloatingButton />
-                <SidebarProvider open={isSidebarOpen}>
-                    <HKS_Sidebar handleSidebarHover={handleSidebarHover} />
+                <SidebarProvider defaultOpen={false}>
+                    <HksSidebar />
                     <SidebarInset className="p-2 !m-2">
                         <Outlet />
                     </SidebarInset>

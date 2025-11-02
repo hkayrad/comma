@@ -1,0 +1,169 @@
+import { pool } from "../../utils/db/pool";
+import { ApiResponse, Logger } from "../../utils";
+
+export default class PayableDebtsService {
+    static async Create(debt: any) {
+        let conn;
+
+        try {
+            const { customer_id, amount, vat, issue_date, invoice_no, description } = debt;
+
+            if (!customer_id || amount === undefined || amount === null || !issue_date || vat === undefined || vat === null) {
+                return ApiResponse.error("Customer, amount, issue date, and VAT are required");
+            }
+
+            const query = `
+            INSERT INTO payable_debts (customer_id, amount, vat, issue_date, invoice_no, description)
+            VALUES (?, ?, ?, ?, ?, ?) RETURNING id
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description]);
+            Logger.info("Debt creation result:", result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("Failed to create debt");
+
+            return ApiResponse.success(result[0].id, "Debt created successfully");
+        } catch (error) {
+            Logger.error("Failed to create debt:", error);
+            return ApiResponse.error("Failed to create debt");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+
+    static async GetAll() {
+        let conn;
+
+        try {
+            const query = `
+            SELECT 
+                d.*,
+                (d.amount + d.vat) AS total_amount,
+                c.name AS customer_name, 
+                c.tax_number AS customer_tax_number
+            FROM payable_debts d
+            JOIN payable_customers c ON d.customer_id = c.id
+            ORDER BY d.issue_date DESC
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query);
+            Logger.info("Retrieved payable_debts:", result);
+
+            return ApiResponse.success(result, "Debts retrieved successfully");
+        } catch (error) {
+            Logger.error("Failed to retrieve payable_debts:", error);
+            return ApiResponse.error("Failed to retrieve payable_debts");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+
+    static async GetTotals() {
+        let conn;
+
+        try {
+            const query = `
+            SELECT
+                COALESCE((SELECT SUM(amount + vat) FROM payable_debts), 0) AS total_debts,
+                COALESCE((SELECT SUM(amount) FROM payable_payments), 0) AS total_payments,
+                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments), 0)), 0) AS remaining_debt
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query);
+            Logger.info("Retrieved total debt:", result);
+
+            if (result.length === 0)
+                return ApiResponse.error("No debt data found");
+
+            return ApiResponse.success(result[0], "Total debt retrieved successfully");
+        } catch (error) {
+            Logger.error("Failed to retrieve total debt:", error);
+            return ApiResponse.error("Failed to retrieve total debt");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+
+    static async Update(id: string, debt: any) {
+        let conn;
+
+        try {
+            if (!id) {
+                return ApiResponse.error("Debt ID is required");
+            }
+
+            const { customer_id, amount, vat, issue_date, invoice_no, description } = debt;
+
+            if (!customer_id || amount === undefined || amount === null || !issue_date || vat === undefined || vat === null) {
+                return ApiResponse.error("Customer, amount, issue date, and VAT are required");
+            }
+
+            const query = `
+            UPDATE payable_debts 
+            SET customer_id = ?, amount = ?, vat = ?, issue_date = ?, invoice_no = ?, description = ?
+            WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description, id]);
+            Logger.info("Debt update result:", result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("No debt found with the provided ID");
+
+            return ApiResponse.success(result[0], "Debt updated successfully");
+        } catch (error) {
+            Logger.error("Failed to update debt:", error);
+            return ApiResponse.error("Failed to update debt");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+
+    static async Delete(id: string) {
+        let conn;
+
+        try {
+            if (!id) {
+                return ApiResponse.error("Debt ID is required");
+            }
+
+            const query = `
+            DELETE FROM payable_debts WHERE id = ?
+            `;
+
+            conn = await pool.getConnection();
+
+            const result = await conn.query(query, [id]);
+            Logger.info("Debt deletion result:", result);
+
+            if (result.affectedRows === 0)
+                return ApiResponse.error("No debt found with the provided ID");
+
+            return ApiResponse.success(null, "Debt deleted successfully");
+        } catch (error) {
+            Logger.error("Failed to delete debt:", error);
+            return ApiResponse.error("Failed to delete debt");
+        } finally {
+            if (conn) {
+                conn.release();
+            }
+        }
+    }
+}
