@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { PaymentApi } from "@/lib/api";
+import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
@@ -15,18 +15,21 @@ import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
+import { formattedNumber } from "@/lib/utils/table";
 
 type Props = {
     data: PaymentDto[];
+    type: 'receivable' | 'payable';
 }
 
 export default function PaymentTable(props: Props) {
-    const { data } = props;
+    const { data, type } = props;
 
     const { openDialog } = useDialog();
 
     const handleDelete = (id: string) => {
-        const promise = PaymentApi.Delete(id);
+        const API = type === 'payable' ? PayablePaymentApi : ReceivablePaymentApi;
+        const promise = API.Delete(id);
         toast.promise(promise, {
             loading: "Ödeme siliniyor...",
             success: () => {
@@ -50,7 +53,7 @@ export default function PaymentTable(props: Props) {
             description: "Ödeme bilgilerini düzenleyin",
             size: "3xl",
             content: (
-                <PaymentDialog payment={payment} />
+                <PaymentDialog payment={payment} type={type} />
             ),
             showCloseButton: true,
         });
@@ -67,7 +70,7 @@ export default function PaymentTable(props: Props) {
             header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
-                    <TooltipTrigger className="text-left">
+                    <TooltipTrigger className="text-left flex">
                         <ClickToCopyText value={row.getValue(column.id) || "-"} column={column} />
                     </TooltipTrigger>
                     <TooltipContent side="right">
@@ -80,6 +83,7 @@ export default function PaymentTable(props: Props) {
             accessorKey: "amount",
             header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Miktarı" />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
+            sortingFn: formattedNumber,
         },
         {
             accessorKey: "payment_method",

@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { sendRefreshEvent } from "@/lib/utils";
 import type { Table } from "@tanstack/react-table";
-import { ArrowUpDown, FilterX, RefreshCcw } from "lucide-react";
+import { ArrowUpDown, FilterX, RefreshCw, Search } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -13,6 +15,8 @@ type Props = {
 
 export default function HksTableHeader(props: Props) {
     const { table, searchColumn } = props;
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const onFilterReset = () => {
         table.resetColumnFilters();
@@ -25,55 +29,75 @@ export default function HksTableHeader(props: Props) {
     }
 
     const onRefresh = () => {
+        setIsRefreshing(true);
         sendRefreshEvent();
-        toast.info("Tablo yenileniyor...");
+        toast.promise(
+            new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    setIsRefreshing(false);
+                    resolve();
+                }, 500);
+            }),
+            {
+                loading: "Tablo yenileniyor...",
+                success: "Tablo başarıyla yenilendi!",
+                error: "Tablo yenileme başarısız oldu."
+            }
+        );
     }
 
     return (
         <div className="flex items-center py-4 gap-2">
-            <Input
-                placeholder="İsim ile Müşteri Ara..."
-                value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
-                onChange={(event) =>
-                    table.getColumn(searchColumn)?.setFilterValue(event.target.value)
-                }
-                className="max-w-2xs select-none"
-            />
+            <InputGroup className="max-w-2xs">
+                <InputGroupInput
+                    placeholder="İsim ile Müşteri Ara..."
+                    value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn(searchColumn)?.setFilterValue(event.target.value)
+                    }
+                    className="select-none"
+                />
+                <InputGroupAddon>
+                    <Search />
+                </InputGroupAddon>
+            </InputGroup>
+            <ButtonGroup>
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="select-none"
+                            onClick={onFilterReset}
+                        >
+                            <FilterX />
+                            Filtreleri Temizle
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Tüm filtreleri kaldır
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="select-none"
+                            onClick={onSortReset}
+                        >
+                            <ArrowUpDown />
+                            Sıralamayı Sıfırla
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Tüm sıralamaları kaldır
+                    </TooltipContent>
+                </Tooltip>
+            </ButtonGroup>
             <Tooltip disableHoverableContent>
                 <TooltipTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className="select-none"
-                        onClick={onFilterReset}
-                    >
-                        <FilterX />
-                        Filtreleri Temizle
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                    Tüm filtreleri kaldır
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className="select-none"
-                        onClick={onSortReset}
-                    >
-                        <ArrowUpDown />
-                        Sıralamayı Sıfırla
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                    Tüm sıralamaları kaldır
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button className="ml-auto select-none" onClick={onRefresh}>
-                        <RefreshCcw />
-                        Yenile
+                    <Button className="ml-auto select-none" disabled={isRefreshing} onClick={onRefresh}>
+                        <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
+                        {isRefreshing ? "Yenileniyor..." : "Yenile"}
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent side="left">

@@ -1,6 +1,6 @@
 import express from 'express';
-import { CustomersService } from '../services/CustomersService';
-import verifyUser from '../utils/verifyUser';
+import ReceivableCustomersService from '../../services/Receivable/CustomersService';
+import verifyUser from '../../utils/verifyUser';
 
 const router = express.Router();
 
@@ -19,36 +19,36 @@ router.use((req, res, next) => {
 
 router.post('/customers', async (req, res) => {
     const customer = req.body;
-    const response = await CustomersService.Create(customer);
+    const response = await ReceivableCustomersService.Create(customer);
     res.json(response);
 });
 
 router.get('/customers', async (req, res) => {
-    const response = await CustomersService.GetAll();
+    const response = await ReceivableCustomersService.GetAll();
     res.json(response);
 });
 
 router.get('/customers/:id/statement', async (req, res) => {
     const { id } = req.params;
-    const response = await CustomersService.GetStatement(id);
+    const response = await ReceivableCustomersService.GetStatement(id);
     res.json(response);
 });
 
 router.get('/customers/id-name', async (req, res) => {
-    const response = await CustomersService.GetIdAndName();
+    const response = await ReceivableCustomersService.GetIdAndName();
     res.json(response);
 });
 
 router.put('/customers/:id', async (req, res) => {
     const { id } = req.params;
     const customer = req.body;
-    const response = await CustomersService.Update(id, customer);
+    const response = await ReceivableCustomersService.Update(id, customer);
     res.json(response);
 });
 
 router.delete('/customers/:id', async (req, res) => {
     const { id } = req.params;
-    const response = await CustomersService.Delete(id);
+    const response = await ReceivableCustomersService.Delete(id);
     res.json(response);
 });
 

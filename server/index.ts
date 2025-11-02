@@ -5,9 +5,12 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { Logger } from './utils/logger';
 import AuthController from "./controllers/AuthController";
-import CustomersController from "./controllers/CustomersController";
-import DebtsController from "./controllers/DebtsController";
-import PaymentsController from './controllers/PaymentsController';
+import ReceivableCustomersController from "./controllers/Receivable/CustomersController";
+import ReceivableDebtsController from "./controllers/Receivable/DebtsController";
+import ReceivablePaymentsController from './controllers/Receivable/PaymentsController';
+import PayableCustomersController from './controllers/Payable/CustomersController';
+import PayableDebtsController from './controllers/Payable/DebtsController';
+import PayablePaymentsController from './controllers/Payable/PaymentsController';
 
 dotenv.config();
 
@@ -21,9 +24,14 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use(AuthController);
-app.use(CustomersController);
-app.use(DebtsController);
-app.use(PaymentsController)
+
+app.use("/receivable", ReceivableCustomersController);
+app.use("/receivable", ReceivableDebtsController);
+app.use("/receivable", ReceivablePaymentsController);
+
+app.use("/payable", PayableCustomersController);
+app.use("/payable", PayableDebtsController);
+app.use("/payable", PayablePaymentsController);
 
 const listenPort = process.env.SERVER_PORT || (() => { throw new Error("SERVER_PORT not defined"); })();
 app.listen(listenPort, () => {

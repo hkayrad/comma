@@ -1,7 +1,7 @@
-import { pool } from "../utils/db/pool";
-import { ApiResponse, Logger } from "../utils";
+import { pool } from "../../utils/db/pool";
+import { ApiResponse, Logger } from "../../utils";
 
-export class CustomersService {
+export default class ReceivableCustomersService {
     static async Create(customer: any) {
         let conn;
 
@@ -13,7 +13,7 @@ export class CustomersService {
             }
 
             const query = `
-            INSERT INTO customers (name, phone, is_company, tax_number, tax_office, email, address)
+            INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, email, address)
             VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
@@ -45,19 +45,19 @@ export class CustomersService {
                 COALESCE(debt_summary.total_debt, 0) AS total_debt,
                 COALESCE(payment_summary.total_payments, 0) AS total_payments,
                 (COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0)) AS remaining_debt
-            FROM customers c
+            FROM receivable_customers c
             LEFT JOIN (
                 SELECT 
                     customer_id,
                     SUM(amount + COALESCE(vat, 0)) AS total_debt
-                FROM debts
+                FROM receivable_debts
                 GROUP BY customer_id
             ) debt_summary ON c.id = debt_summary.customer_id
             LEFT JOIN (
                 SELECT 
                     customer_id,
                     SUM(amount) AS total_payments
-                FROM payments
+                FROM receivable_payments
                 GROUP BY customer_id
             ) payment_summary ON c.id = payment_summary.customer_id
             ORDER BY c.created_at DESC
@@ -66,15 +66,15 @@ export class CustomersService {
             conn = await pool.getConnection();
 
             const result = await conn.query(query);
-            Logger.info("Retrieved customers:", result);
+            Logger.info("Retrieved receivable_customers:", result);
 
             if (result.length === 0)
-                return ApiResponse.error("No customers found");
+                return ApiResponse.error("No receivable_customers found");
 
             return ApiResponse.success(result, "Customers retrieved successfully");
         } catch (error) {
-            Logger.error("Failed to retrieve customers:", error);
-            return ApiResponse.error("Failed to retrieve customers");
+            Logger.error("Failed to retrieve receivable_customers:", error);
+            return ApiResponse.error("Failed to retrieve receivable_customers");
         } finally {
             if (conn) conn.release();
         }
@@ -97,19 +97,19 @@ export class CustomersService {
                 COALESCE(debt_summary.total_debt, 0) AS total_debt,
                 COALESCE(payment_summary.total_payments, 0) AS total_payments,
                 (COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0)) AS remaining_debt
-            FROM customers c
+            FROM receivable_customers c
             LEFT JOIN (
                 SELECT 
                     customer_id,
                     SUM(amount + COALESCE(vat, 0)) AS total_debt
-                FROM debts
+                FROM receivable_debts
                 GROUP BY customer_id
             ) debt_summary ON c.id = debt_summary.customer_id
             LEFT JOIN (
                 SELECT 
                     customer_id,
                     SUM(amount) AS total_payments
-                FROM payments
+                FROM receivable_payments
                 GROUP BY customer_id
             ) payment_summary ON c.id = payment_summary.customer_id
             WHERE c.id = ?
@@ -130,7 +130,7 @@ export class CustomersService {
                 d.description,
                 d.issue_date,
                 d.created_at
-            FROM debts d
+            FROM receivable_debts d
             WHERE d.customer_id = ?
             ORDER BY d.issue_date DESC, d.created_at DESC
             `;
@@ -144,7 +144,7 @@ export class CustomersService {
                 p.payment_note,
                 p.payment_date,
                 p.created_at
-            FROM payments p
+            FROM receivable_payments p
             WHERE p.customer_id = ?
             ORDER BY p.payment_date DESC, p.created_at DESC
             `;
@@ -174,23 +174,23 @@ export class CustomersService {
 
         try {
             const query = `
-            SELECT id, name FROM customers
+            SELECT id, name FROM receivable_customers
             `;
 
             conn = await pool.getConnection();
 
             const result = await conn.query(query);
-            Logger.info("Retrieved customers:", result);
+            Logger.info("Retrieved receivable_customers:", result);
 
 
             if (result.length === 0)
-                return ApiResponse.error("No customers found");
+                return ApiResponse.error("No receivable_customers found");
 
             return ApiResponse.success(result, "Customers retrieved successfully");
 
         } catch (error) {
-            Logger.error('Error retrieving customers:', error);
-            return ApiResponse.error("Error retrieving customers");
+            Logger.error('Error retrieving receivable_customers:', error);
+            return ApiResponse.error("Error retrieving receivable_customers");
         } finally {
             if (conn) conn.release();
         }
@@ -211,7 +211,7 @@ export class CustomersService {
             }
 
             const query = `
-            UPDATE customers 
+            UPDATE receivable_customers 
             SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, email = ?, address = ?
             WHERE id = ?
             `;
@@ -243,7 +243,7 @@ export class CustomersService {
             }
 
             const query = `
-            DELETE FROM customers WHERE id = ?
+            DELETE FROM receivable_customers WHERE id = ?
             `;
 
             conn = await pool.getConnection();

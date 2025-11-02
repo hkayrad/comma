@@ -1,7 +1,7 @@
-import { pool } from "../utils/db/pool";
-import { ApiResponse, Logger } from "../utils";
+import { pool } from "../../utils/db/pool";
+import { ApiResponse, Logger } from "../../utils";
 
-export class DebtsService {
+export default class ReceivableDebtsService {
     static async Create(debt: any) {
         let conn;
 
@@ -13,7 +13,7 @@ export class DebtsService {
             }
 
             const query = `
-            INSERT INTO debts (customer_id, amount, vat, issue_date, invoice_no, description)
+            INSERT INTO receivable_debts (customer_id, amount, vat, issue_date, invoice_no, description)
             VALUES (?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
@@ -46,20 +46,20 @@ export class DebtsService {
                 (d.amount + d.vat) AS total_amount,
                 c.name AS customer_name, 
                 c.tax_number AS customer_tax_number
-            FROM debts d
-            JOIN customers c ON d.customer_id = c.id
+            FROM receivable_debts d
+            JOIN receivable_customers c ON d.customer_id = c.id
             ORDER BY d.issue_date DESC
             `;
 
             conn = await pool.getConnection();
 
             const result = await conn.query(query);
-            Logger.info("Retrieved debts:", result);
+            Logger.info("Retrieved receivable_debts:", result);
 
             return ApiResponse.success(result, "Debts retrieved successfully");
         } catch (error) {
-            Logger.error("Failed to retrieve debts:", error);
-            return ApiResponse.error("Failed to retrieve debts");
+            Logger.error("Failed to retrieve receivable_debts:", error);
+            return ApiResponse.error("Failed to retrieve receivable_debts");
         } finally {
             if (conn) {
                 conn.release();
@@ -73,9 +73,9 @@ export class DebtsService {
         try {
             const query = `
             SELECT
-                COALESCE((SELECT SUM(amount + vat) FROM debts), 0) AS total_debts,
-                COALESCE((SELECT SUM(amount) FROM payments), 0) AS total_payments,
-                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM debts), 0) - COALESCE((SELECT SUM(amount) FROM payments), 0)), 0) AS remaining_debt
+                COALESCE((SELECT SUM(amount + vat) FROM receivable_debts), 0) AS total_debts,
+                COALESCE((SELECT SUM(amount) FROM receivable_payments), 0) AS total_payments,
+                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM receivable_debts), 0) - COALESCE((SELECT SUM(amount) FROM receivable_payments), 0)), 0) AS remaining_debt
             `;
 
             conn = await pool.getConnection();
@@ -112,7 +112,7 @@ export class DebtsService {
             }
 
             const query = `
-            UPDATE debts 
+            UPDATE receivable_debts 
             SET customer_id = ?, amount = ?, vat = ?, issue_date = ?, invoice_no = ?, description = ?
             WHERE id = ?
             `;
@@ -145,7 +145,7 @@ export class DebtsService {
             }
 
             const query = `
-            DELETE FROM debts WHERE id = ?
+            DELETE FROM receivable_debts WHERE id = ?
             `;
 
             conn = await pool.getConnection();

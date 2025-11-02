@@ -1,6 +1,6 @@
 import express from 'express';
-import verifyUser from '../utils/verifyUser';
-import { DebtsService } from '../services/DebtsService';
+import verifyUser from '../../utils/verifyUser';
+import ReceivableDebtsService from '../../services/Receivable/DebtsService';
 
 const router = express.Router();
 
@@ -19,30 +19,30 @@ router.use((req, res, next) => {
 
 router.post('/debts', async (req, res) => {
     const debt = req.body;
-    const response = await DebtsService.Create(debt);
+    const response = await ReceivableDebtsService.Create(debt);
     res.json(response);
 });
 
 router.get('/debts/totals', async (req, res) => {
-    const response = await DebtsService.GetTotals();
+    const response = await ReceivableDebtsService.GetTotals();
     res.json(response);
 });
 
 router.get('/debts', async (req, res) => {
-    const response = await DebtsService.GetAll();
+    const response = await ReceivableDebtsService.GetAll();
     res.json(response);
 });
 
 router.put('/debts/:id', async (req, res) => {
     const { id } = req.params;
     const debt = req.body;
-    const response = await DebtsService.Update(id, debt);
+    const response = await ReceivableDebtsService.Update(id, debt);
     res.json(response);
 });
 
 router.delete('/debts/:id', async (req, res) => {
     const { id } = req.params;
-    const response = await DebtsService.Delete(id);
+    const response = await ReceivableDebtsService.Delete(id);
     res.json(response);
 });
 

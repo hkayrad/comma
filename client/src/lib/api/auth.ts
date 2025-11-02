@@ -8,7 +8,8 @@ type Token = {
     iat: number,
     id: string,
     iss: string,
-    username: string
+    username: string,
+    role: string
 }
 
 export class Auth {
@@ -37,20 +38,20 @@ export class Auth {
             return Promise.reject(new Error("Logout failed"));
         }
     }
+}
 
+// Custom hook to get the current user
+export function useCurrentUser(): Token | null {
+    const token = Cookies.get('user_session');
 
-    static GetCurrentUser(): Token | null {
-        const token = Cookies.get('user_session');
+    const { decodedToken, isExpired } = useJwt(token || '');
 
-        if (!token) return null;
-
-        const { decodedToken, isExpired } = useJwt(token);
-
-        if (isExpired) {
+    if (!token || isExpired) {
+        if (token && isExpired) {
             Cookies.remove('user_session');
-            return null;
         }
-
-        return decodedToken as Token;
+        return null;
     }
+
+    return decodedToken as Token;
 }

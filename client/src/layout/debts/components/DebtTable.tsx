@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { DebtApi } from "@/lib/api";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { ColumnDef } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/shared/dialog/DebtDialog";
@@ -14,18 +14,21 @@ import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
+import { formattedNumber } from "@/lib/utils/table";
 
 type Props = {
     data: DebtDto[];
+    type: 'receivable' | 'payable';
 }
 
 export default function DebtTable(props: Props) {
-    const { data } = props;
+    const { data, type } = props;
 
     const { openDialog } = useDialog();
 
     const handleDelete = (id: string) => {
-        const promise = DebtApi.Delete(id);
+        const API = type === 'payable' ? PayableDebtApi : ReceivableDebtApi;
+        const promise = API.Delete(id);
         toast.promise(promise, {
             loading: "Borç siliniyor...",
             success: () => {
@@ -49,7 +52,7 @@ export default function DebtTable(props: Props) {
             description: "Borç bilgilerini düzenleyin",
             size: "3xl",
             content: (
-                <DebtDialog debt={debt} />
+                <DebtDialog debt={debt} type={type} />
             ),
             showCloseButton: true,
         });
@@ -66,7 +69,7 @@ export default function DebtTable(props: Props) {
             header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
-                    <TooltipTrigger className="text-left">
+                    <TooltipTrigger className="text-left flex">
                         <ClickToCopyText value={row.getValue(column.id) || "-"} column={column} />
                     </TooltipTrigger>
                     <TooltipContent side="right">
@@ -79,11 +82,13 @@ export default function DebtTable(props: Props) {
             accessorKey: "amount",
             header: ({ column }) => <SortableColumnHeader column={column} title="Tutar" />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
+            sortingFn: formattedNumber,
         },
         {
             accessorKey: "vat",
             header: ({ column }) => <SortableColumnHeader column={column} title="KDV" />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
+            sortingFn: formattedNumber,
         },
         {
             accessorKey: "issue_date",
@@ -94,6 +99,7 @@ export default function DebtTable(props: Props) {
             accessorKey: "total_amount",
             header: ({ column }) => <SortableColumnHeader column={column} title="Toplam" />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
+            sortingFn: formattedNumber,
         },
         {
             accessorKey: "invoice_no",

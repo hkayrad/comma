@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import type { Table } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -8,34 +9,34 @@ type Props = {
 
 export default function HksTablePagination(props: Props) {
     const { table } = props;
-    
+
     return (
-        <div className="flex items-center justify-end space-x-2 py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="select-none"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronLeft />
-                    Önceki
-                </Button>
-                <span className="text-sm">
-                    Sayfa
-                    <span className="font-medium mx-1">{table.getState().pagination.pageIndex + 1}</span>
-                    / {table.getPageCount()}
-                </span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="select-none"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Sonraki
-                    <ChevronRight />
-                </Button>
-            </div>
+        <ButtonGroup className="py-4 ml-auto">
+            <Button
+                variant="outline"
+                size="sm"
+                className="select-none"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+            >
+                <ChevronLeft />
+                Önceki
+            </Button>
+            <ButtonGroupText className="bg-white">
+                Sayfa
+                <span className="font-normal mx-0.5">{table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
+            </ButtonGroupText>
+            <Button
+                variant="outline"
+                size="sm"
+                className="select-none"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+            >
+                Sonraki
+                <ChevronRight />
+            </Button>
+        </ButtonGroup>
     )
 }
+

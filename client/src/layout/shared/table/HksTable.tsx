@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useState } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState } from "@tanstack/react-table";
 import HksTablePagination from "./HksTablePagination";
-import HKS_Table_Actions from "./HksTableHeader";
+import HksTableHeader from "./HksTableHeader";
 
 type Props = {
     data: any[];
@@ -33,7 +33,7 @@ export default function HksTable(props: Props) {
 
     return (
         <div>
-            <HKS_Table_Actions table={table} searchColumn={searchColumn} />
+            <HksTableHeader table={table} searchColumn={searchColumn} />
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader className="select-none">
@@ -45,6 +45,7 @@ export default function HksTable(props: Props) {
                                             key={header.id}
                                             className={`
                                                 ${(header.id === "name" || header.id === "customer_name") && "w-72"}
+                                                ${(header.id === "tax_office" && "w-48")}
                                                 ${header.id === "actions" && "w-fit"} 
                                                 ${(header.id === "has_debt" || header.id === "is_company") && "w-32"} 
                                                 `}
@@ -73,7 +74,10 @@ export default function HksTable(props: Props) {
                                         <TableCell
                                             key={cell.id}
                                             className={`
-                                            ${(cell.column.id === "name" || cell.column.id === "customer_name") && "w-72 overflow-hidden"}`}
+                                            ${(cell.column.id === "name" || cell.column.id === "customer_name") && "w-72 overflow-hidden"}
+                                            ${(cell.column.id === "tax_office" && "w-48 overflow-hidden")}
+                                            
+                                            `}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

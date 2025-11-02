@@ -1,26 +1,40 @@
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DebtApi } from "@/lib/api";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function OverviewCards() {
-    const [totals, setTotals] = useState<Totals | null>(null);
+type Props = {
+    type: "receivable" | "payable";
+}
+
+export default function OverviewCards(props: Props) {
+    const { type } = props;
+
+    const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
+    const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
     const [formattedTotals, setFormattedTotals] = useState({
         total_debts: "₺0",
         total_payments: "₺0",
         remaining_debt: "₺0"
     });
 
-    const fetchTotals = async () => {
-        const response = await DebtApi.GetTotals();
+    const fetchReceivableTotals = async () => {
+        const response = await ReceivableDebtApi.GetTotals();
         if (response)
-            setTotals(response);
+            setReceivableTotals(response);
+    }
+
+    const fetchPayableTotals = async () => {
+        const response = await PayableDebtApi.GetTotals();
+        if (response)
+            setPayableTotals(response);
     }
 
     const handleRefresh = () => {
-        fetchTotals();
+        fetchReceivableTotals();
+        fetchPayableTotals();
     }
 
     useEffect(() => {
@@ -32,23 +46,42 @@ export default function OverviewCards() {
     }, [])
 
     useEffect(() => {
-        if (totals) {
-            setFormattedTotals({
-                total_debts: Number(totals.total_debts || 0).toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                }),
-                total_payments: Number(totals.total_payments || 0).toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                }),
-                remaining_debt: Number(totals.remaining_debt || 0).toLocaleString("tr-TR", {
-                    style: "currency",
-                    currency: "TRY"
-                })
-            });
+        if (type === "receivable") {
+            if (receivableTotals) {
+                setFormattedTotals({
+                    total_debts: Number(receivableTotals.total_debts || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    }),
+                    total_payments: Number(receivableTotals.total_payments || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    }),
+                    remaining_debt: Number(receivableTotals.remaining_debt || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    })
+                });
+            }
+        } else if (type === "payable") {
+            if (payableTotals) {
+                setFormattedTotals({
+                    total_debts: Number(payableTotals.total_debts || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    }),
+                    total_payments: Number(payableTotals.total_payments || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    }),
+                    remaining_debt: Number(payableTotals.remaining_debt || 0).toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    })
+                });
+            }
         }
-    }, [totals])
+    }, [type, receivableTotals])
 
     return (
         <div className="ml-auto flex items-center gap-4">

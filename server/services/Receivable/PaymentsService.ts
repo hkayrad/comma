@@ -1,7 +1,7 @@
-import { pool } from "../utils/db/pool";
-import { ApiResponse, Logger } from "../utils";
+import { pool } from "../../utils/db/pool";
+import { ApiResponse, Logger } from "../../utils";
 
-export class PaymentsService {
+export default class ReceivablePaymentsService {
     static async Create(payment: any) {
         let conn;
 
@@ -15,7 +15,7 @@ export class PaymentsService {
 
             Logger.log("Creating payment with data:", payment);
             const query = `
-            INSERT INTO payments (customer_id, amount, invoice_no, payment_note, payment_date, payment_method)
+            INSERT INTO receivable_payments (customer_id, amount, invoice_no, payment_note, payment_date, payment_method)
             VALUES (?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
@@ -52,20 +52,20 @@ export class PaymentsService {
                 p.*,
                 c.name AS customer_name, 
                 c.tax_number AS customer_tax_number
-            FROM payments p
-            JOIN customers c ON p.customer_id = c.id
+            FROM receivable_payments p
+            JOIN receivable_customers c ON p.customer_id = c.id
             ORDER BY p.payment_date DESC
             `;
 
             conn = await pool.getConnection();
 
             const result = await conn.query(query);
-            Logger.info("Retrieved payments:", result);
+            Logger.info("Retrieved receivable_payments:", result);
 
             return ApiResponse.success(result, "Payments retrieved successfully");
         } catch (error) {
-            Logger.error("Failed to retrieve payments:", error);
-            return ApiResponse.error("Failed to retrieve payments");
+            Logger.error("Failed to retrieve receivable_payments:", error);
+            return ApiResponse.error("Failed to retrieve receivable_payments");
         } finally {
             if (conn) {
                 conn.release();
@@ -91,7 +91,7 @@ export class PaymentsService {
 
             Logger.log("Updating payment with ID:", paymentId);
             const query = `
-            UPDATE payments
+            UPDATE receivable_payments
             SET customer_id = ?, amount = ?, invoice_no = ?, payment_note = ?, payment_date = ?, payment_method = ?
             WHERE id = ?
             `;
@@ -133,7 +133,7 @@ export class PaymentsService {
             }
 
             Logger.log("Deleting payment with ID:", paymentId);
-            const query = `DELETE FROM payments WHERE id = ?`;
+            const query = `DELETE FROM receivable_payments WHERE id = ?`;
 
             conn = await pool.getConnection();
 
