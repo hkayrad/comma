@@ -1,7 +1,7 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Eye, EyeOff, Loader, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Auth } from "@/lib/api";
+import { AuthApi } from "@/lib/api";
 import { useState } from "react";
 import { Form } from "@/components/ui/form";
 import { z } from "zod";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
+import MaintenanceBanner from "../shared/MaintenanceBanner";
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 const formSchema = z.object({
     username: z.string().max(20, { error: "Kullanıcı adı en fazla 20 karakter olabilir." }),
@@ -27,6 +29,7 @@ export default function Login() {
         },
     });
     const navigate = useNavigate();
+    const { reloadConnection } = useWebSocket();
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -41,13 +44,14 @@ export default function Login() {
         }
 
         setLoading(true);
-        const response = Auth.Login(username, password);
+        const response = AuthApi.Login(username, password);
         const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
         setTimeout(() => {
             toast.promise(response, {
                 loading: "Giriş yapılıyor...",
                 success: () => {
                     setLoading(false);
+                    reloadConnection();
                     navigate("/");
                     return "Giriş başarılı!";
                 },
@@ -62,8 +66,22 @@ export default function Login() {
 
     };
 
+    console.log(import.meta.env);
+
+    //! DEBUG LOGIN
+    const adminLogin = async () => {
+        form.setValue("username", "hkayrad");
+        form.setValue("password", "Test1234");
+    };
+
+    const userLogin = async () => {
+        form.setValue("username", "test");
+        form.setValue("password", "Test1234");
+    };
+
     return (
         <>
+            <MaintenanceBanner />
             <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-black selection:text-white">
                 <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
                     <img src="/hks-logo.png" className="w-64 lg:w-96 saturate-0 brightness-0 invert" />
@@ -112,6 +130,13 @@ export default function Login() {
                             </Button>
                         </form>
                     </Form>
+                    {
+                        import.meta.env.VITE_NODE_ENV === "development" &&
+                        <div className="flex w-full justify-center gap-4 mt-8">
+                            <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900" size="sm" onClick={adminLogin}>Admin Hesabı Doldur</Button>
+                            <Button className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900" size="sm" onClick={userLogin}>Kullanıcı Hesabı Doldur</Button>
+                        </div>
+                    }
                 </div>
             </div>
         </>

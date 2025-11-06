@@ -240,8 +240,8 @@ export default function DebtDialog(props: Props) {
                     )}
                 />
                 <div className="flex justify-end gap-2 col-span-2">
-                    <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">
+                    <Button variant="ghost" onClick={onCancel}>İptal</Button>
+                    <Button type="submit" >
                         {debt ? "Borcu Güncelle" : "Borç Ekle"}
                     </Button>
                 </div>

@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { sendRefreshEvent } from "@/lib/utils";
 import type { Table } from "@tanstack/react-table";
-import { ArrowUpDown, FilterX, RefreshCw, Search } from "lucide-react";
+import { ArrowUpDown, Columns3Cog, FilterX, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -92,10 +93,39 @@ export default function HksTableHeader(props: Props) {
                         Tüm sıralamaları kaldır
                     </TooltipContent>
                 </Tooltip>
+                <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            <Columns3Cog />
+                            <span>Sütunları Göster/Gizle</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {table
+                            .getAllColumns()
+                            .filter(
+                                (column) => column.getCanHide()
+                            )
+                            .map((column) => {
+                                return (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) =>
+                                            column.toggleVisibility(!!value)
+                                        }
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                )
+                            })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </ButtonGroup>
             <Tooltip disableHoverableContent>
                 <TooltipTrigger asChild>
-                    <Button className="ml-auto select-none" disabled={isRefreshing} onClick={onRefresh}>
+                    <Button className=" ml-auto select-none" disabled={isRefreshing} onClick={onRefresh}>
                         <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
                         {isRefreshing ? "Yenileniyor..." : "Yenile"}
                     </Button>

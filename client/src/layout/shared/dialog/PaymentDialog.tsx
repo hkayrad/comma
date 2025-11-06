@@ -25,9 +25,9 @@ const PaymentFormSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçilmesi zorunludur"),
     amount: z.number({ error: "Geçersiz tutar" }).min(0.01, "Tutar en az 0.01 olmalıdır"),
     payment_date: z.date({ error: "Geçersiz tarih" }),
-    payment_method: z.enum(["cash", "bank_transfer", "check"], { error: "Geçersiz ödeme yöntemi" }),
+    payment_method: z.enum(["cash", "bank_transfer", "check", "card"], { error: "Geçersiz ödeme yöntemi" }),
     invoice_no: z.string().max(100, "Fatura numarası en fazla 100 karakter olmalıdır").optional().or(z.literal("")),
-    payment_note: z.string().max(500, "Açıklama en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
+    description: z.string().max(500, "Açıklama en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
 })
 
 export default function PaymentDialog(props: Props) {
@@ -46,7 +46,7 @@ export default function PaymentDialog(props: Props) {
             payment_date: payment?.payment_date ? new Date(payment.payment_date) : new Date(),
             payment_method: payment?.payment_method || "bank_transfer",
             invoice_no: payment?.invoice_no || "",
-            payment_note: payment?.payment_note || "",
+            description: payment?.description || "",
         }
     })
 
@@ -152,23 +152,24 @@ export default function PaymentDialog(props: Props) {
                         <FormItem>
                             <FormLabel className="flex gap-1">Ödeme Yöntemi <span className="text-red-500">*</span></FormLabel>
                             <FormControl>
-                                <RadioGroup className="flex gap-8" value={field.value} onValueChange={field.onChange}>
-                                    <div className="flex gap-2 items-center">
-                                        <RadioGroupItem value="bank_transfer" id="bank_transfer" />
-                                        <label htmlFor="bank_transfer" className="cursor-pointer select-none">Havale</label>
-                                    </div>
-                                    <div className="flex gap-2 items-center">
-                                        <RadioGroupItem value="cash" id="cash" />
-                                        <label htmlFor="cash" className="cursor-pointer select-none">Nakit</label>
-                                    </div>
-                                    <div className="flex gap-2 items-center">
-                                        <RadioGroupItem value="check" id="check" />
-                                        <label htmlFor="check" className="cursor-pointer select-none">Çek</label>
-                                    </div>
+                                <RadioGroup className="flex gap-6" value={field.value} onValueChange={field.onChange}>
+                                    {
+                                        PaymentFormSchema.shape.payment_method.options.map((method) => (
+                                            <div key={method} className="flex gap-2 items-center">
+                                                <RadioGroupItem value={method} id={method} />
+                                                <label htmlFor={method} className="cursor-pointer select-none">
+                                                    {method === "cash" ? "Nakit" :
+                                                        method === "bank_transfer" ? "Havale" :
+                                                            method === "card" ? "Kart" :
+                                                                method === "check" ? "Çek" : method}
+                                                </label>
+                                            </div>
+                                        ))
+                                    }
                                 </RadioGroup>
                             </FormControl>
                             <FormDescription>
-                                Müşteri türünü seçin.
+                                Ödeme türünü seçin.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -197,7 +198,7 @@ export default function PaymentDialog(props: Props) {
                 />
                 <FormField
                     control={form.control}
-                    name="payment_note"
+                    name="description"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className="flex gap-1">Açıklama</FormLabel>
@@ -217,8 +218,8 @@ export default function PaymentDialog(props: Props) {
                     )}
                 />
                 <div className="flex justify-end gap-2 col-span-2">
-                    <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">
+                    <Button variant="ghost" onClick={onCancel}>İptal</Button>
+                    <Button type="submit">
                         {payment ? "Ödemeyi Güncelle" : "Ödeme Ekle"}
                     </Button>
                 </div>

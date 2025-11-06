@@ -6,7 +6,7 @@ export default class PayablePaymentsService {
         let conn;
 
         try {
-            const { customer_id, amount, invoice_no, payment_date, payment_note, payment_method } = payment;
+            const { customer_id, amount, invoice_no, payment_date, description, payment_method } = payment;
 
             if (!customer_id || !amount || !payment_date || !payment_method) {
                 Logger.log("Missing required fields:", { customer_id, amount, payment_date, payment_method });
@@ -15,7 +15,7 @@ export default class PayablePaymentsService {
 
             Logger.log("Creating payment with data:", payment);
             const query = `
-            INSERT INTO payable_payments (customer_id, amount, invoice_no, payment_note, payment_date, payment_method)
+            INSERT INTO payable_payments (customer_id, amount, invoice_no, description, payment_date, payment_method)
             VALUES (?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
@@ -25,7 +25,7 @@ export default class PayablePaymentsService {
                 customer_id,
                 amount,
                 invoice_no || null,
-                payment_note || null,
+                description || null,
                 payment_date,
                 payment_method
             ]);
@@ -82,7 +82,7 @@ export default class PayablePaymentsService {
                 return ApiResponse.error("Missing payment ID");
             }
 
-            const { customer_id, amount, invoice_no, payment_date, payment_note, payment_method } = payment;
+            const { customer_id, amount, invoice_no, payment_date, description, payment_method } = payment;
 
             if (!customer_id || !amount || !payment_date || !payment_method) {
                 Logger.log("Missing required fields:", { customer_id, amount, payment_date, payment_method });
@@ -92,7 +92,7 @@ export default class PayablePaymentsService {
             Logger.log("Updating payment with ID:", paymentId);
             const query = `
             UPDATE payable_payments
-            SET customer_id = ?, amount = ?, invoice_no = ?, payment_note = ?, payment_date = ?, payment_method = ?
+            SET customer_id = ?, amount = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
             WHERE id = ?
             `;
 
@@ -102,7 +102,7 @@ export default class PayablePaymentsService {
                 customer_id,
                 amount,
                 invoice_no || null,
-                payment_note || null,
+                description || null,
                 payment_date,
                 payment_method,
                 paymentId

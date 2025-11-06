@@ -6,20 +6,20 @@ export default class PayableCustomersService {
         let conn;
 
         try {
-            const { name, phone, is_company, tax_number, tax_office, email, address } = customer;
+            const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
 
             if (!name || is_company === undefined || is_company === null) {
                 return ApiResponse.error("Name and customer type are required");
             }
 
             const query = `
-            INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, email, address)
-            VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, email || null, address || null]);
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null]);
             Logger.info("Customer creation result:", result);
 
             if (result.affectedRows === 0)
@@ -204,7 +204,7 @@ export default class PayableCustomersService {
                 return ApiResponse.error("Customer ID is required");
             }
 
-            const { name, phone, is_company, tax_number, tax_office, email, address } = customer;
+            const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
 
             if (!name || is_company === undefined || is_company === null) {
                 return ApiResponse.error("Name and customer type are required");
@@ -212,13 +212,13 @@ export default class PayableCustomersService {
 
             const query = `
             UPDATE payable_customers 
-            SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, email = ?, address = ?
+            SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
             WHERE id = ?
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, email || null, address || null, id]);
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, id]);
             Logger.info("Customer update result:", result);
 
             if (result.affectedRows === 0)

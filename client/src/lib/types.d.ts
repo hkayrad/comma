@@ -6,6 +6,11 @@ export type ApiResponse<T> = {
 
 export type UUID = string;
 
+export type ConfigDto = {
+    configKey: string;
+    configValue: string;
+}
+
 export type CustomerDto = {
     id?: UUID;
     name: string;
@@ -13,6 +18,7 @@ export type CustomerDto = {
     is_company: boolean;
     tax_number?: string;
     tax_office?: string;
+    mersis_no?: string;
     email?: string;
     address?: string;
     total_debt?: number;
@@ -39,8 +45,8 @@ export type PaymentDto = {
     id?: UUID;
     customer_id: UUID;
     amount: number;
-    payment_method: 'cash' | 'bank_transfer' | 'check';
-    payment_note?: string;
+    payment_method: 'cash' | 'bank_transfer' | 'check' | 'card';
+    description?: string;
     invoice_no?: string;
     payment_date: Date;
     created_at?: Date;

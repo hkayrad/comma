@@ -61,13 +61,14 @@ export default function PaymentTable(props: Props) {
 
     const PaymentTableColumns: ColumnDef<PaymentDto>[] = [
         {
-            id: "index",
-            header: "#",
+            id: "#",
+            header: ({ column }) => column.id,
             cell: ({ row }) => row.index + 1
         },
         {
             accessorKey: "customer_name",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
+            id: "Müşteri",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
                     <TooltipTrigger className="text-left flex">
@@ -81,15 +82,17 @@ export default function PaymentTable(props: Props) {
         },
         {
             accessorKey: "amount",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Miktarı" />,
+            id: "Ödeme Miktarı",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "payment_method",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Yöntemi" />,
-            cell: ({ row }) => {
-                switch (row.getValue("payment_method")) {
+            id: "Ödeme Yöntemi",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
+            cell: ({ row, column }) => {
+                switch (row.getValue(column.id)) {
                     case "cash":
                         return <Badge
                             className="bg-green-100 text-green-800 select-none hover:cursor-copy"
@@ -103,27 +106,34 @@ export default function PaymentTable(props: Props) {
                         return <Badge className="bg-yellow-100 text-yellow-800 select-none hover:cursor-copy"
                             onClick={() => copyToClipboard("Çek")}
                         >Çek</Badge>;
+                    case "card":
+                        return <Badge className="bg-purple-100 text-purple-800 select-none hover:cursor-copy"
+                            onClick={() => copyToClipboard("Kart")}
+                        >Kart</Badge>;
                 }
             }
         },
         {
             accessorKey: "payment_date",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Ödeme Tarihi" />,
+            id: "Ödeme Tarihi",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
         },
         {
             accessorKey: "invoice_no",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Fatura No" />,
+            id: "Fatura No",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "description",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Açıklama" />,
+            id: "Açıklama",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
-            id: "actions",
-            header: "İşlemler",
+            id: "İşlemler",
+            header: ({ column }) => column.id,
             cell: ({ row }) => (
                 <div className="flex gap-2">
                     <Tooltip disableHoverableContent>
@@ -178,6 +188,6 @@ export default function PaymentTable(props: Props) {
     ];
 
     return (
-        <HksTable data={data} columns={PaymentTableColumns} searchColumn="customer_name" />
+        <HksTable data={data} columns={PaymentTableColumns} searchColumn="Müşteri" />
     )
 }

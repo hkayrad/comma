@@ -7,7 +7,7 @@ import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api"
 import type { CustomerDto } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Hash, IdCard, Landmark, Mail, MapPinHouse, Phone } from "lucide-react"
+import { Archive, Hash, IdCard, Landmark, Mail, MapPinHouse, Phone } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
@@ -23,6 +23,7 @@ const CustomerFormSchema = z.object({
     email: z.email({ message: "Geçersiz e-posta adresi" }).optional().or(z.literal("")),
     tax_number: z.string().min(5, "Vergi numarası en az 5 karakter olmalıdır").max(11, "Vergi numarası en fazla 11 karakter olmalıdır").optional().or(z.literal("")),
     tax_office: z.string().min(2, "Vergi dairesi en az 2 karakter olmalıdır").max(100, "Vergi dairesi en fazla 100 karakter olmalıdır").optional().or(z.literal("")),
+    mersis_no: z.string().min(16, "MERSİS numarası en az 16 karakter olmalıdır").max(16, "MERSİS numarası en fazla 16 karakter olmalıdır").optional().or(z.literal("")),
     address: z.string().min(5, "Adres en az 5 karakter olmalıdır").max(500, "Adres en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
     is_company: z.boolean(),
 })
@@ -42,6 +43,7 @@ export default function CustomerDialog(props: Props) {
             email: customer?.email || "",
             tax_number: customer?.tax_number || "",
             tax_office: customer?.tax_office || "",
+            mersis_no: customer?.mersis_no || undefined,
             address: customer?.address || "",
             is_company: customer ? (Number(customer.is_company) === 1) : true,
         }
@@ -167,6 +169,30 @@ export default function CustomerDialog(props: Props) {
                         </FormItem>
                     )}
                 />
+                {
+                    form.watch("is_company") &&
+                    <FormField
+                        control={form.control}
+                        name="mersis_no"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>MERSİS No</FormLabel>
+                                <FormControl>
+                                    <InputGroup>
+                                        <InputGroupInput type="number" placeholder="1234567890123456" {...field} />
+                                        <InputGroupAddon>
+                                            <Archive />
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </FormControl>
+                                <FormDescription>
+                                    Müşterinin MERSİS numarası.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                }
                 <FormField
                     control={form.control}
                     name="phone"
@@ -231,8 +257,8 @@ export default function CustomerDialog(props: Props) {
                     )}
                 />
                 <div className="flex justify-end gap-2 col-span-2">
-                    <Button variant="destructive" onClick={onCancel}>İptal</Button>
-                    <Button type="submit" className="bg-green-600">
+                    <Button variant="ghost" onClick={onCancel}>İptal</Button>
+                    <Button type="submit">
                         {customer ? "Müşteriyi Güncelle" : "Müşteri Ekle"}
                     </Button>
                 </div>

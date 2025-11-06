@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import ColumnSortingArrow from "../ColumnSortingArrow";
+import ColumnSortingArrow from "../components/ColumnSortingArrow";
 import type { Column } from "@tanstack/react-table";
 
 type Props = {

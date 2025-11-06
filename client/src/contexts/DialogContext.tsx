@@ -93,7 +93,7 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                     )}
 
                     {config.content && (
-                        <div className="py-4">
+                        <div className="pt-4">
                             {config.content}
                         </div>
                     )}

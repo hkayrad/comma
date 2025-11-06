@@ -83,13 +83,14 @@ export default function CustomerTable(props: Props) {
 
     const CustomerTableColumns: ColumnDef<CustomerDto>[] = [
         {
-            id: "index",
-            header: "#",
+            id: "#",
+            header: ({ column }) => column.id,
             cell: ({ row }) => row.index + 1
         },
         {
             accessorKey: "name",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
+            id: "Müşteri",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
                     <TooltipTrigger className="text-left flex">
@@ -103,9 +104,10 @@ export default function CustomerTable(props: Props) {
         },
         {
             accessorKey: "is_company",
+            id: "Tür",
             header: "Tür",
-            cell: ({ row }) => {
-                const isCompany = row.getValue("is_company");
+            cell: ({ row, column }) => {
+                const isCompany = row.getValue(column.id);
                 return isCompany ?
                     <Badge className="bg-violet-100 text-violet-800 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard("Şirket")}
@@ -117,7 +119,8 @@ export default function CustomerTable(props: Props) {
         },
         {
             accessorKey: "tax_office",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Vergi Dairesi" />,
+            id: "Vergi Dairesi",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
                     <TooltipTrigger className="text-left flex">
@@ -131,32 +134,42 @@ export default function CustomerTable(props: Props) {
         },
         {
             accessorKey: "tax_number",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Vergi No / TCKN" />,
+            id: "Vergi No / TCKN",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
+            cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
+        },
+        {
+            accessorKey: "mersis_no",
+            id: "Mersis No",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "total_debt",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Toplam Borç" />,
+            id: "Toplam Borç",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "total_payments",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Ödenmiş Borç" />,
+            id: "Ödenmiş Borç",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "remaining_debt",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Kalan Borç" />,
+            id: "Kalan Borç",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
-            id: "has_debt",
+            id: "Borç Durumu",
             header: "Borç Durumu",
             cell: ({ row }) => {
-                const remaining_debt = parseFloat(row.getValue("remaining_debt"));
+                const remaining_debt = parseFloat(row.getValue("Kalan Borç"));
                 if (remaining_debt > 0)
                     return <Badge
                         className="bg-red-100 text-red-800 select-none hover:cursor-copy"
@@ -173,8 +186,8 @@ export default function CustomerTable(props: Props) {
             }
         },
         {
-            id: "actions",
-            header: "İşlemler",
+            id: "İşlemler",
+            header: ({ column }) => column.id,
             cell: ({ row }) => (
                 <div className="flex gap-2">
                     <Tooltip disableHoverableContent>
@@ -257,6 +270,6 @@ export default function CustomerTable(props: Props) {
     ];
 
     return (
-        <HksTable data={data} columns={CustomerTableColumns} searchColumn="name" />
+        <HksTable data={data} columns={CustomerTableColumns} searchColumn="Müşteri" />
     )
 }

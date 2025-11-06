@@ -9,21 +9,21 @@ export class Logger {
         }
     }
 
+    static log(message?: any, ...optionalParams: any[]) {
+        console.log("%c[LOG]: ", "color: #1890ff;", message, ...optionalParams);
+    }
+
     static error(message?: any, ...optionalParams: any[]) {
-        if (Logger.isDebug)
-            console.error("%c[ERROR]: ", "color: #ff4d4f;", message, ...optionalParams);
+        console.error("%c[ERROR]: ", "color: #ff4d4f;", message, ...optionalParams);
     }
 
     static warn(message?: any, ...optionalParams: any[]) {
-        if (Logger.isDebug) {
-            console.groupCollapsed("%c[WARN]: ", "color: #ff7300;", message, ...optionalParams);
-            console.trace();
-            console.groupEnd();
-        }
+        console.groupCollapsed("%c[WARN]: ", "color: #ff7300;", message, ...optionalParams);
+        console.trace();
+        console.groupEnd();
     }
 
     static table(tabularData?: any, properties?: string[]) {
-        if (Logger.isDebug)
-            console.table(tabularData, properties);
+        console.table(tabularData, properties);
     }
 }

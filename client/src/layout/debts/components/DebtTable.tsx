@@ -60,13 +60,14 @@ export default function DebtTable(props: Props) {
 
     const DebtTableColumns: ColumnDef<DebtDto>[] = [
         {
-            id: "index",
-            header: "#",
+            id: "#",
+            header: ({ column }) => column.id,
             cell: ({ row }) => row.index + 1
         },
         {
             accessorKey: "customer_name",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Müşteri" />,
+            id: "Müşteri",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => (
                 <Tooltip disableHoverableContent>
                     <TooltipTrigger className="text-left flex">
@@ -80,40 +81,46 @@ export default function DebtTable(props: Props) {
         },
         {
             accessorKey: "amount",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Tutar" />,
+            id: "Tutar",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "vat",
-            header: ({ column }) => <SortableColumnHeader column={column} title="KDV" />,
+            id: "KDV",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "issue_date",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Düzenlenme Tarihi" />,
+            id: "Düzenlenme Tarihi",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
         },
         {
             accessorKey: "total_amount",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Toplam" />,
+            id: "Toplam",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "invoice_no",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Fatura No" />,
+            id: "Fatura No",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
             accessorKey: "description",
-            header: ({ column }) => <SortableColumnHeader column={column} title="Açıklama" />,
+            id: "Açıklama",
+            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <ClickToCopyText value={row.getValue(column.id) || "-"} />,
         },
         {
-            id: "actions",
-            header: "İşlemler",
+            id: "İşlemler",
+            header: ({ column }) => column.id,
             cell: ({ row }) => (
                 <div className="flex gap-2">
                     <Tooltip disableHoverableContent>
@@ -168,6 +175,6 @@ export default function DebtTable(props: Props) {
     ];
 
     return (
-        <HksTable data={data} columns={DebtTableColumns} searchColumn="customer_name" />
+        <HksTable data={data} columns={DebtTableColumns} searchColumn="Müşteri" />
     )
 }

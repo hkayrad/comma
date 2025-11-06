@@ -1,8 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
-import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState } from "@tanstack/react-table";
-import HksTablePagination from "./HksTablePagination";
-import HksTableHeader from "./HksTableHeader";
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState } from "@tanstack/react-table";
+import HksTablePagination from "./components/HksTablePagination";
+import HksTableHeader from "./components/HksTableHeader";
 
 type Props = {
     data: any[];
@@ -15,12 +15,16 @@ export default function HksTable(props: Props) {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+        "Mersis No": false,
+    });
 
     const table = useReactTable({
         data,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
+        onColumnVisibilityChange: setColumnVisibility,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -28,6 +32,7 @@ export default function HksTable(props: Props) {
         state: {
             sorting,
             columnFilters,
+            columnVisibility,
         }
     });
 
@@ -38,16 +43,16 @@ export default function HksTable(props: Props) {
                 <Table>
                     <TableHeader className="select-none">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} className="hover:!bg-white">
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead
                                             key={header.id}
                                             className={`
-                                                ${(header.id === "name" || header.id === "customer_name") && "w-72"}
-                                                ${(header.id === "tax_office" && "w-48")}
-                                                ${header.id === "actions" && "w-fit"} 
-                                                ${(header.id === "has_debt" || header.id === "is_company") && "w-32"} 
+                                                ${(header.id === "Müşteri") && "w-64"}
+                                                ${(header.id === "Vergi Dairesi" && "w-36")}
+                                                ${header.id === "İşlemler" && "w-fit"} 
+                                                ${(header.id === "Borç Durumu" || header.id === "Tür") && "w-32"} 
                                                 `}
                                         >
                                             {header.isPlaceholder
@@ -74,8 +79,8 @@ export default function HksTable(props: Props) {
                                         <TableCell
                                             key={cell.id}
                                             className={`
-                                            ${(cell.column.id === "name" || cell.column.id === "customer_name") && "w-72 overflow-hidden"}
-                                            ${(cell.column.id === "tax_office" && "w-48 overflow-hidden")}
+                                            ${(cell.column.id === "Müşteri") && "w-64 overflow-hidden"}
+                                            ${(cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden")}
                                             
                                             `}
                                         >

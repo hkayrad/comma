@@ -1,10 +1,11 @@
 import { Outlet, useLocation } from "react-router";
-import HksSidebar from "./shared/HksSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DialogProvider } from "@/contexts/DialogContext";
 import FloatingButton from "./shared/FloatingButton";
 import { useEffect } from "react";
 import { sendRefreshEvent } from "@/lib/utils";
+import MaintenanceBanner from "./shared/MaintenanceBanner";
+import HksSidebar from "./shared/sidebar/HksSidebar";
 
 export default function App() {
     const location = useLocation();
@@ -20,6 +21,7 @@ export default function App() {
                 <SidebarProvider defaultOpen={false}>
                     <HksSidebar />
                     <SidebarInset className="p-2 !m-2">
+                        <MaintenanceBanner />
                         <Outlet />
                     </SidebarInset>
                 </SidebarProvider>

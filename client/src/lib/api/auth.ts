@@ -9,10 +9,10 @@ type Token = {
     id: string,
     iss: string,
     username: string,
-    role: string
+    role: number
 }
 
-export class Auth {
+export class AuthApi {
     static async Login(username: string, password: string) {
         try {
             const response = await instance.post('/login', { username, password });

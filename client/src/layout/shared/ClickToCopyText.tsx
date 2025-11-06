@@ -13,8 +13,8 @@ export default function ClickToCopyText(props: Props) {
     return (
         <p
             className={`select-none hover:cursor-copy
-                ${(column?.id === "name" || column?.id === "customer_name") && "w-72 text-ellipsis overflow-hidden"}
-                ${(column?.id === "tax_office" && "w-48 text-ellipsis overflow-hidden")}
+                ${column?.id === "Müşteri" && "w-64 text-ellipsis overflow-hidden"}
+                ${column?.id === "Vergi Dairesi" && "w-36 text-ellipsis overflow-hidden"}
                 ${className}
             `}
             onClick={() => copyToClipboard(value)}

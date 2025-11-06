@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export default function verifyUser(token: string) {
+export default function verifyUser(token: string): any | null {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET as jwt.Secret, {
             issuer: process.env.JWT_ISSUER,
