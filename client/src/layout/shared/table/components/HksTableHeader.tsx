@@ -48,7 +48,7 @@ export default function HksTableHeader(props: Props) {
     }
 
     return (
-        <div className="flex items-center py-4 gap-2">
+        <div className="flex items-center pb-4 gap-2">
             <InputGroup className="max-w-2xs">
                 <InputGroupInput
                     placeholder="İsim ile Müşteri Ara..."

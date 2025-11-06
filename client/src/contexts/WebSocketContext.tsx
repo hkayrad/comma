@@ -92,12 +92,15 @@ export const WebSocketProvider = ({ children, url }: WebSocketProviderProps) => 
         ws.current.onclose = () => {
             setIsConnected(false);
             Logger.log("WebSocket disconnected");
+            reconnectTimeout.current = setTimeout(() => {
+                Logger.log("Reconnecting WebSocket...");
+                connect();
+            }, 3000);
         };
 
         ws.current.onerror = () => {
             ws.current?.close();
             setIsConnected(false);
-            toast.error("WebSocket error");
         };
 
         ws.current.onmessage = (event) => {

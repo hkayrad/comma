@@ -195,7 +195,10 @@ export default function CustomerTable(props: Props) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => navigate(`${type === "receivable" ? "/alacaklar" : "/verecekler"}/borc_dokumu/${row.original.id}`)}
+                                onClick={() => {
+                                    sessionStorage.setItem("current_page", "Borç Dökümü");
+                                    navigate(`${type === "receivable" ? "/alacaklar" : "/verecekler"}/borc_dokumu/${row.original.id}`)
+                                }}
                             >
                                 <Paperclip />
                             </Button>

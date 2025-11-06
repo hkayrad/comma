@@ -14,13 +14,14 @@ import PayableCustomersController from './controllers/Payable/CustomersControlle
 import PayableDebtsController from './controllers/Payable/DebtsController';
 import PayablePaymentsController from './controllers/Payable/PaymentsController';
 import NotificationWebSocket from './utils/notificationWebSocket';
+import TcmbController from './controllers/TcmbController';
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
-const notificationWebSocket = new NotificationWebSocket(server);
+new NotificationWebSocket(server);
 
 app.use(cors({
     origin: process.env.CLIENT_URL || (() => { throw new Error("CLIENT_URL not defined"); })(),
@@ -31,6 +32,7 @@ app.use(cookieParser());
 
 app.use(AuthController);
 app.use("/config", ConfigController);
+app.use("/tcmb", TcmbController);
 
 app.use("/receivable", ReceivableCustomersController);
 app.use("/receivable", ReceivableDebtsController);

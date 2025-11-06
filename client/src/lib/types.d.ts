@@ -66,3 +66,25 @@ export type CustomerStatement = {
     debts: DebtDto[];
     payments: PaymentDto[];
 }
+
+export type ExchangeRates = {
+    date: string;
+    usd: {
+        forexBuying: string;
+        forexSelling: string;
+        banknoteBuying: string;
+        banknoteSelling: string;
+    };
+    eur: {
+        forexBuying: string;
+        forexSelling: string;
+        banknoteBuying: string;
+        banknoteSelling: string;
+    };
+    gbp: {
+        forexBuying: string;
+        forexSelling: string;
+        banknoteBuying: string;
+        banknoteSelling: string;
+    };
+}

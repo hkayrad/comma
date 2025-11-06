@@ -6,7 +6,7 @@ import CustomerDialog from "./dialog/CustomerDialog";
 import DebtDialog from "./dialog/DebtDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentDialog from "./dialog/PaymentDialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useLocation } from "react-router";
 
 export default function FloatingButton() {
@@ -117,42 +117,41 @@ export default function FloatingButton() {
                     </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent
-                    className="w-fit"
+                    className="w-fit !bg-transparent !p-0 !border-none !space-y-1 !shadow-none overflow-visible"
                     side="left"
                     align="end"
                     sideOffset={4}
                 >
                     {(location.pathname === "/" || location.pathname.startsWith("/alacaklar")) &&
-                        <DropdownMenuGroup>
+                        <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
                             <DropdownMenuLabel>Alacak Eylemleri</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleAddReceivableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
-                                Müşteri Ekle
+                                <span>Müşteri Ekle</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleAddReceivableDebt}>
                                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
-                                Borç Ekle
+                                <span>Borç Ekle</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleAddReceivablePayment}>
                                 <Banknote className="mr-2 h-4 w-4" />
-                                Ödeme Ekle
+                                <span>Ödeme Ekle</span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>}
-                    {location.pathname === "/" && <DropdownMenuSeparator />}
                     {(location.pathname === "/" || location.pathname.startsWith("/verecekler")) &&
-                        <DropdownMenuGroup>
+                        <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
                             <DropdownMenuLabel>Verecek Eylemleri</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleAddPayableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
-                                Müşteri Ekle
+                                <span>Müşteri Ekle</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleAddPayableDebt}>
                                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
-                                Borç Ekle
+                                <span>Borç Ekle</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={handleAddPayablePayment}>
                                 <Banknote className="mr-2 h-4 w-4" />
-                                Ödeme Ekle
+                                <span>Ödeme Ekle</span>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>}
                 </DropdownMenuContent>

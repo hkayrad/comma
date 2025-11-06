@@ -7,10 +7,12 @@ import { useEffect, useState } from "react";
 
 type Props = {
     type: "receivable" | "payable";
+    width?: "full" | "auto";
+    align?: "start" | "center" | "end" | "stretch";
 }
 
 export default function OverviewCards(props: Props) {
-    const { type } = props;
+    const { type, width = "full", align = "center" } = props;
 
     const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
     const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
@@ -84,10 +86,10 @@ export default function OverviewCards(props: Props) {
     }, [type, receivableTotals])
 
     return (
-        <div className="ml-auto flex items-center gap-4">
+        <div className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"}`}>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Toplam Borç</CardDescription>
+                    <CardDescription>Toplam {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
                     <CardTitle
                         className="text-2xl select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.total_debts)}
@@ -101,7 +103,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Ödenmiş Borç</CardDescription>
+                    <CardDescription>Ödenmiş {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
                     <CardTitle
                         className="text-2xl text-green-600 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.total_payments)}
@@ -115,7 +117,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Kalan Borç</CardDescription>
+                    <CardDescription>Kalan {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
                     <CardTitle
                         className="text-2xl text-red-500 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.remaining_debt)}

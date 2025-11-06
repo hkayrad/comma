@@ -34,7 +34,6 @@ export default function Debts(props: Props) {
     return (
         <div className="py-4 px-8 space-y-8">
             <div className="flex items-center gap-4">
-                <h1 className="text-4xl font-bold">{type === 'receivable' ? 'Alacaklar' : 'Verecekler'}</h1>
                 <OverviewCards type={type} />
             </div>
             <DebtTable data={debts} type={type} />

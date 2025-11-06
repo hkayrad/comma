@@ -1,0 +1,1 @@
+ws does not reconnect after server disconnect

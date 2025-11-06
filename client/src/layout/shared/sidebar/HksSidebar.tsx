@@ -44,7 +44,7 @@ export default function HksSidebar() {
         });
     }
 
-    const sidebarItems = {
+    const financialItems = {
         overview: {
             title: null,
             url: "",
@@ -99,7 +99,7 @@ export default function HksSidebar() {
             <SidebarContent>
                 <SidebarRail />
                 {
-                    Object.entries(sidebarItems).map(([key, group]) => (
+                    Object.entries(financialItems).map(([key, group]) => (
                         <SidebarGroup key={key}>
                             {
                                 group.title && (

@@ -141,7 +141,7 @@ export default class ReceivableCustomersService {
                 p.invoice_no,
                 p.amount,
                 p.payment_method,
-                p.payment_note,
+                p.description,
                 p.payment_date,
                 p.created_at
             FROM receivable_payments p

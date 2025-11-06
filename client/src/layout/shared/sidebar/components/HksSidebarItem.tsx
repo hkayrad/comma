@@ -18,7 +18,11 @@ export default function HksSidebarItem(props: Props) {
             <TooltipTrigger asChild>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                        <NavLink className="transition-all" to={group.url + item.url}>
+                        <NavLink
+                            className="transition-all"
+                            to={group.url + item.url}
+                            onClick={() => sessionStorage.setItem("current_page", item.title)}
+                        >
                             <item.icon />
                             <span className="select-none">{item.title}</span>
                         </NavLink>

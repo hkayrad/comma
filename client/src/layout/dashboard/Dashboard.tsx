@@ -4,6 +4,7 @@ import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api";
 import OverviewCards from "../shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 
 export default function Dashboard() {
     const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>([]);
@@ -43,13 +44,14 @@ export default function Dashboard() {
     return (
         <div className="py-4 px-8">
             <Tabs defaultValue="receivable" value={tabValue} onValueChange={handleTabChange} className="w-full space-y-6">
-                <div className="flex items-center gap-8">
-                    <h1 className="text-4xl font-bold">Genel Bakış</h1>
-                    <TabsList>
-                        <TabsTrigger value="receivable" className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50">Alacaklar</TabsTrigger>
-                        <TabsTrigger value="payable" className="data-[state=active]:text-red-600 data-[state=active]:bg-red-50">Verecekler</TabsTrigger>
-                    </TabsList>
-                    <OverviewCards type={tabValue} />
+                <TabsList className="fixed top-4 left-0 right-0 mx-auto">
+                    <TabsTrigger value="receivable" className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50">Alacaklar</TabsTrigger>
+                    <TabsTrigger value="payable" className="data-[state=active]:text-red-600 data-[state=active]:bg-red-50">Verecekler</TabsTrigger>
+                </TabsList>
+                <div className="flex items-center gap-10">
+                    <OverviewCards type="receivable" align="stretch" />
+                    <Separator orientation="vertical" className="!h-20 " />
+                    <OverviewCards type="payable" align="stretch" />
                 </div>
                 <TabsContent value="receivable">
                     <CustomerTable data={receivableCustomers} type="receivable" />

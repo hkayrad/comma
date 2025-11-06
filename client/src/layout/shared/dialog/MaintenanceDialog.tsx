@@ -57,7 +57,7 @@ export default function MaintenanceDialog() {
         <>
             {
                 configs?.maintenanceMode === "active" ? (
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
                         <DialogClose asChild>
                             <Button variant="ghost">İptal</Button>
                         </DialogClose>
@@ -87,7 +87,7 @@ export default function MaintenanceDialog() {
                                 step={60}
                             />
                         </div>
-                        <div className="col-span-2 flex justify-end mt-8">
+                        <div className="col-span-2 flex justify-end mt-8 gap-2">
                             <DialogClose asChild>
                                 <Button variant="ghost">İptal</Button>
                             </DialogClose>
