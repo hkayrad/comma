@@ -1,17 +1,15 @@
 import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import ExchangeRates from "./components/ExchangeRates";
+import { Button } from "@/components/ui/button";
+import { SidebarClose, SidebarOpen } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 
-type Props = {
-    isSidebarOpen: boolean;
-}
-
-export default function Header(props: Props) {
-    const { isSidebarOpen } = props;
-
+export default function Header() {
     const [currentPage, setCurrentPage] = useState<string>("Genel Bakış");
+
+    const { state, toggleSidebar } = useSidebar();
 
     useEffect(() => {
         const page = sessionStorage.getItem("current_page");
@@ -21,15 +19,26 @@ export default function Header(props: Props) {
     }, [sessionStorage.getItem("current_page")]);
 
     return (
-        <header className="border-b p-3">
+        <header className="border-b p-3 bg-background sticky top-0 z-10">
             <div className="flex w-full items-center">
                 <Tooltip
                     disableHoverableContent>
                     <TooltipTrigger asChild>
-                        <SidebarTrigger />
+                        <Button
+                            onClick={toggleSidebar}
+                            size="icon"
+                            variant="ghost"
+                            className="size-7"
+                        >
+                            {state === "collapsed" ? (
+                                <SidebarOpen />
+                            ) : (
+                                <SidebarClose />
+                            )}
+                        </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                        Kenarlığı {isSidebarOpen ? "Kapat" : "Aç"}s
+                        Kenarlığı {state === "collapsed" ? "Aç" : "Kapat"}
                     </TooltipContent>
                 </Tooltip>
                 <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />

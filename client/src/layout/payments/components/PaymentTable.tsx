@@ -95,19 +95,19 @@ export default function PaymentTable(props: Props) {
                 switch (row.getValue(column.id)) {
                     case "cash":
                         return <Badge
-                            className="bg-green-100 text-green-800 select-none hover:cursor-copy"
+                            className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
                             onClick={() => copyToClipboard("Nakit")}
                         >Nakit</Badge>;
                     case "bank_transfer":
-                        return <Badge className="bg-blue-100 text-blue-800 select-none hover:cursor-copy"
+                        return <Badge className="bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-300 select-none hover:cursor-copy"
                             onClick={() => copyToClipboard("Havale")}
                         >Havale</Badge>;
                     case "check":
-                        return <Badge className="bg-yellow-100 text-yellow-800 select-none hover:cursor-copy"
+                        return <Badge className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 select-none hover:cursor-copy"
                             onClick={() => copyToClipboard("Çek")}
                         >Çek</Badge>;
                     case "card":
-                        return <Badge className="bg-purple-100 text-purple-800 select-none hover:cursor-copy"
+                        return <Badge className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
                             onClick={() => copyToClipboard("Kart")}
                         >Kart</Badge>;
                 }
@@ -157,13 +157,13 @@ export default function PaymentTable(props: Props) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-red-500 hover:bg-red-100 hover:text-red-600"
+                                        className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
                                     >
                                         <Trash2 />
                                     </Button>
                                 </TooltipTrigger>
                             </DialogTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
                                 Ödemeyi sil
                             </TooltipContent>
                             <DialogContent>

@@ -22,7 +22,7 @@ export default function HksTablePagination(props: Props) {
                 <ChevronLeft />
                 Önceki
             </Button>
-            <ButtonGroupText className="bg-white">
+            <ButtonGroupText className="bg-background">
                 Sayfa
                 <span className="font-normal mx-0.5">{table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
             </ButtonGroupText>

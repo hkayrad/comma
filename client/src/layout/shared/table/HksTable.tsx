@@ -18,6 +18,7 @@ export default function HksTable(props: Props) {
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         "Mersis No": false,
     });
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
     const table = useReactTable({
         data,
@@ -29,7 +30,9 @@ export default function HksTable(props: Props) {
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
+        onPaginationChange: setPagination,
         state: {
+            pagination,
             sorting,
             columnFilters,
             columnVisibility,
@@ -43,7 +46,7 @@ export default function HksTable(props: Props) {
                 <Table>
                     <TableHeader className="select-none">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="hover:!bg-white">
+                            <TableRow key={headerGroup.id} className="hover:!bg-background">
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead

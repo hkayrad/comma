@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { useConfig } from "@/contexts/ConfigContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { ConfigApi } from "@/lib/api/config";
 import { Logger } from "@/lib/utils/logger";
+import { Clock } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -69,23 +70,35 @@ export default function MaintenanceDialog() {
                     <div className="grid grid-cols-2">
                         <div className="flex flex-col space-y-2 mr-4">
                             <Label htmlFor="startTime" className="font-medium">Başlangıç Zamanı</Label>
-                            <Input
-                                type="time"
-                                id="startTime"
-                                value={startTime}
-                                onChange={handleStartTimeChange}
-                                step={60}
-                            />
+                            <InputGroup>
+                                <InputGroupInput
+                                    type="time"
+                                    id="startTime"
+                                    value={startTime}
+                                    onChange={handleStartTimeChange}
+                                    step={60}
+                                    className="peer [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                                />
+                                <InputGroupAddon>
+                                    <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                </InputGroupAddon>
+                            </InputGroup>
                         </div>
                         <div className="flex flex-col space-y-2">
                             <Label htmlFor="endTime" className="font-medium">Bitiş Zamanı</Label>
-                            <Input
-                                type="time"
-                                id="endTime"
-                                value={endTime}
-                                onChange={handleEndTimeChange}
-                                step={60}
-                            />
+                            <InputGroup>
+                                <InputGroupInput
+                                    type="time"
+                                    id="endTime"
+                                    value={endTime}
+                                    onChange={handleEndTimeChange}
+                                    step={60}
+                                    className="peer [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                                />
+                                <InputGroupAddon>
+                                    <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                </InputGroupAddon>
+                            </InputGroup>
                         </div>
                         <div className="col-span-2 flex justify-end mt-8 gap-2">
                             <DialogClose asChild>

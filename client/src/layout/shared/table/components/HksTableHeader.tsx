@@ -5,7 +5,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { sendRefreshEvent } from "@/lib/utils";
 import type { Table } from "@tanstack/react-table";
-import { ArrowUpDown, Columns3Cog, FilterX, RefreshCw, Search } from "lucide-react";
+import { ArrowUpDown, Columns3Cog, FilterX, RefreshCw, Rows3, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -93,7 +93,7 @@ export default function HksTableHeader(props: Props) {
                         Tüm sıralamaları kaldır
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenu modal={false}>
+                <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline">
                             <Columns3Cog />
@@ -120,6 +120,46 @@ export default function HksTableHeader(props: Props) {
                                     </DropdownMenuCheckboxItem>
                                 )
                             })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            <Rows3 />
+                            <span>Satır Sayısı</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuCheckboxItem
+                            checked={table.getState().pagination.pageSize === 5}
+                            onCheckedChange={() => table.setPageSize(5)}
+                        >
+                            5 Satır
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={table.getState().pagination.pageSize === 10}
+                            onCheckedChange={() => table.setPageSize(10)}
+                        >
+                            10 Satır
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={table.getState().pagination.pageSize === 20}
+                            onCheckedChange={() => table.setPageSize(20)}
+                        >
+                            20 Satır
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={table.getState().pagination.pageSize === 50}
+                            onCheckedChange={() => table.setPageSize(50)}
+                        >
+                            50 Satır
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={table.getState().pagination.pageSize === 100}
+                            onCheckedChange={() => table.setPageSize(100)}
+                        >
+                            100 Satır
+                        </DropdownMenuCheckboxItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </ButtonGroup>

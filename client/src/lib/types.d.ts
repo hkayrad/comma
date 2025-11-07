@@ -88,3 +88,5 @@ export type ExchangeRates = {
         banknoteSelling: string;
     };
 }
+
+export type OverviewViewType = "receivable" | "payable";

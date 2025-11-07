@@ -1,10 +1,10 @@
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDialog } from "@/contexts/DialogContext"
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api"
-import type { CustomerDto } from "@/lib/types"
+import type { CustomerDto, OverviewViewType } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Archive, Hash, IdCard, Landmark, Mail, MapPinHouse, Phone } from "lucide-react"
@@ -14,7 +14,7 @@ import z from "zod"
 
 type Props = {
     customer?: CustomerDto,
-    type?: "receivable" | "payable",
+    type?: OverviewViewType,
 }
 
 const CustomerFormSchema = z.object({

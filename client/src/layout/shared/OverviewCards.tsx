@@ -1,12 +1,12 @@
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
-import type { Totals } from "@/lib/types";
+import type { OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Props = {
-    type: "receivable" | "payable";
+    type: OverviewViewType;
     width?: "full" | "auto";
     align?: "start" | "center" | "end" | "stretch";
 }
@@ -89,7 +89,7 @@ export default function OverviewCards(props: Props) {
         <div className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"}`}>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Toplam {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
+                    <CardDescription>Toplam {type === "receivable" ? "Alacak" : "Borç"}</CardDescription>
                     <CardTitle
                         className="text-2xl select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.total_debts)}
@@ -103,7 +103,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Ödenmiş {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
+                    <CardDescription>Ödenmiş {type === "receivable" ? "Alacak" : "Borç"}</CardDescription>
                     <CardTitle
                         className="text-2xl text-green-600 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.total_payments)}
@@ -117,7 +117,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="w-64">
                 <CardHeader>
-                    <CardDescription>Kalan {type === "receivable" ? "Alacak" : "Verecek"}</CardDescription>
+                    <CardDescription>Kalan {type === "receivable" ? "Alacak" : "Borç"}</CardDescription>
                     <CardTitle
                         className="text-2xl text-red-500 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard(formattedTotals.remaining_debt)}

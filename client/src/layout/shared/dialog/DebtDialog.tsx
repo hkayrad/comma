@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useDialog } from "@/contexts/DialogContext"
 import { PayableCustomerApi, PayableDebtApi, ReceivableCustomerApi, ReceivableDebtApi } from "@/lib/api"
-import type { CustomerIdName, DebtDto } from "@/lib/types"
+import type { CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 type Props = {
     debt?: DebtDto,
-    type?: "receivable" | "payable",
+    type?: OverviewViewType,
 }
 
 const DebtFormSchema = z.object({

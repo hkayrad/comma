@@ -1,4 +1,4 @@
-import type { CustomerDto } from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Info, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ import { formattedNumber } from "@/lib/utils/table";
 
 type Props = {
     data: CustomerDto[];
-    type?: "receivable" | "payable"
+    type?: OverviewViewType
 }
 
 export default function CustomerTable(props: Props) {
@@ -75,7 +75,7 @@ export default function CustomerTable(props: Props) {
             description: `${customer.is_company ? "Vergi No" : "TC Kimlik No"}: ${customer.tax_number || "-"} | Vergi Dairesi: ${customer.tax_office || "-"}`,
             size: "3xl",
             content: (
-                <CustomerDetails customer={customer} />
+                <CustomerDetails customer={customer} type={type} />
             ),
             showCloseButton: true,
         });
@@ -109,10 +109,10 @@ export default function CustomerTable(props: Props) {
             cell: ({ row, column }) => {
                 const isCompany = row.getValue(column.id);
                 return isCompany ?
-                    <Badge className="bg-violet-100 text-violet-800 select-none hover:cursor-copy"
+                    <Badge className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard("Şirket")}
                     >Şirket</Badge> :
-                    <Badge className="bg-orange-100 text-orange-800 select-none hover:cursor-copy"
+                    <Badge className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100 select-none hover:cursor-copy"
                         onClick={() => copyToClipboard("Birey")}
                     >Birey</Badge>
             }
@@ -146,21 +146,21 @@ export default function CustomerTable(props: Props) {
         },
         {
             accessorKey: "total_debt",
-            id: "Toplam Borç",
+            id: `Toplam ${type === "receivable" ? "Alacak" : "Borç"}`,
             header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "total_payments",
-            id: "Ödenmiş Borç",
+            id: `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"}`,
             header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
         },
         {
             accessorKey: "remaining_debt",
-            id: "Kalan Borç",
+            id: `Kalan ${type === "receivable" ? "Alacak" : "Borç"}`,
             header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
             sortingFn: formattedNumber,
@@ -169,20 +169,20 @@ export default function CustomerTable(props: Props) {
             id: "Borç Durumu",
             header: "Borç Durumu",
             cell: ({ row }) => {
-                const remaining_debt = parseFloat(row.getValue("Kalan Borç"));
+                const remaining_debt = parseFloat(row.getValue(`Kalan ${type === "receivable" ? "Alacak" : "Borç"}`));
                 if (remaining_debt > 0)
                     return <Badge
-                        className="bg-red-100 text-red-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Borçlu")}
-                    >Borçlu</Badge>
+                        className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                        onClick={() => copyToClipboard(type === "receivable" ? "Alacağınız Var" : "Borcunuz Var")}
+                    >{type === "receivable" ? "Alacağınız Var" : "Borcunuz Var"}</Badge>
                 else if (remaining_debt < 0)
-                    return <Badge className="bg-blue-100 text-blue-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Alacaklı")}
-                    >Alacaklı</Badge>
+                    return <Badge className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
+                        onClick={() => copyToClipboard(type === "receivable" ? "Borcunuz Var" : "Alacağınız Var")}
+                    >{type === "receivable" ? "Borcunuz Var" : "Alacağınız Var"}</Badge>
                 else
-                    return <Badge className="bg-green-100 text-green-800 select-none hover:cursor-copy"
-                        onClick={() => copyToClipboard("Borcu Yok")}
-                    >Borcu Yok</Badge>
+                    return <Badge className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                        onClick={() => copyToClipboard(type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok")}
+                    >{type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok"}</Badge>
             }
         },
         {
@@ -242,13 +242,13 @@ export default function CustomerTable(props: Props) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-red-500 hover:bg-red-100 hover:text-red-600"
+                                        className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
                                     >
                                         <Trash2 />
                                     </Button>
                                 </TooltipTrigger>
                             </DialogTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
                                 Müşteriyi sil
                             </TooltipContent>
                             <DialogContent>

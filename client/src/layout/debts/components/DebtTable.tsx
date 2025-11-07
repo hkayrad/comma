@@ -144,13 +144,13 @@ export default function DebtTable(props: Props) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-red-500 hover:bg-red-100 hover:text-red-600"
+                                        className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
                                     >
                                         <Trash2 />
                                     </Button>
                                 </TooltipTrigger>
                             </DialogTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
                                 Borcu sil
                             </TooltipContent>
                             <DialogContent>

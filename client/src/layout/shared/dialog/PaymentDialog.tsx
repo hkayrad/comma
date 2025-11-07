@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDialog } from "@/contexts/DialogContext"
 import { PayableCustomerApi, PayablePaymentApi, ReceivableCustomerApi, ReceivablePaymentApi } from "@/lib/api"
-import type { CustomerIdName, PaymentDto } from "@/lib/types"
+import type { CustomerIdName, OverviewViewType, PaymentDto } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,10 +14,11 @@ import z from "zod"
 import CustomerSelect from "./components/CustomerSelect"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import DateSelect from "./components/DateSelect"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 type Props = {
     payment?: PaymentDto,
-    type?: "receivable" | "payable"
+    type?: OverviewViewType
 }
 
 const PaymentFormSchema = z.object({

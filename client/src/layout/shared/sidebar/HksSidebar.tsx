@@ -6,20 +6,22 @@ import { useConfig } from "@/contexts/ConfigContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { AuthApi, useCurrentUser } from "@/lib/api"
 import { RoleBackgrounds, RoleColors, UserRole, type RoleBackgroundType, type RoleColorType, type UserRoleType } from "@/lib/enums";
-import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Scroll, ScrollText, ShieldUser, SidebarCloseIcon, SidebarOpenIcon } from "lucide-react";
+import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun } from "lucide-react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceDialog from "../dialog/MaintenanceDialog";
 import { useDialog } from "@/contexts/DialogContext";
 import HksSidebarItem from "./components/HksSidebarItem";
+import { useTheme } from "@/components/theme-provider";
 
 export default function HksSidebar() {
     const navigate = useNavigate();
     const user = useCurrentUser();
     const { openDialog } = useDialog();
-    const { toggleSidebar, state } = useSidebar();
+    const { state } = useSidebar();
     const { reloadConnection } = useWebSocket();
     const { configs } = useConfig();
+    const { theme, setTheme } = useTheme();
 
     const handleLogout = async () => {
         const promise = AuthApi.Logout();
@@ -73,11 +75,11 @@ export default function HksSidebar() {
             ]
         },
         payable: {
-            title: "Verecek Bilgileri",
+            title: "Borç Bilgileri",
             url: "/verecekler",
             items: [
                 {
-                    title: "Verecekler",
+                    title: "Borçlar",
                     url: "/borclar",
                     icon: Scroll,
                 },
@@ -166,7 +168,7 @@ export default function HksSidebar() {
                 <SidebarGroup className="!p-0">
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-2">
-                            <Tooltip
+                            {/* <Tooltip
                                 disableHoverableContent
                                 open={state === "collapsed" ? undefined : false}>
                                 <TooltipTrigger asChild>
@@ -182,7 +184,7 @@ export default function HksSidebar() {
                                     Kenarlığı Büyüt
                                 </TooltipContent>
                             </Tooltip>
-                            <SidebarSeparator className="!mx-0" />
+                            <SidebarSeparator className="!mx-0" /> */}
                             <SidebarMenuItem>
                                 <DropdownMenu>
                                     <Tooltip
@@ -226,8 +228,18 @@ export default function HksSidebar() {
                                         sideOffset={4}
                                     >
                                         <DropdownMenuItem
+                                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                        >
+                                            {theme === "dark" ? (
+                                                <Sun className="text-inherit bg-inherit select-none" />
+                                            ) : (
+                                                <Moon className="text-inherit bg-inherit select-none" />
+                                            )}
+                                            <span>{theme === "dark" ? "Açık Tema" : "Koyu Tema"}</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
                                             onClick={handleLogout}
-                                            className="!justify-start !text-red-600 hover:!bg-red-100 hover:!text-red-800">
+                                            className="!justify-start !text-red-600 dark:!text-red-400 hover:!bg-red-100 dark:hover:!bg-red-950/30 hover:!text-red-800 dark:hover:!text-red-300">
                                             <LogOut className="text-inherit bg-inherit select-none" />
                                             <span>Çıkış Yap</span>
                                         </DropdownMenuItem>

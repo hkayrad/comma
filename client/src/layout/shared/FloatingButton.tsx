@@ -140,7 +140,7 @@ export default function FloatingButton() {
                         </DropdownMenuGroup>}
                     {(location.pathname === "/" || location.pathname.startsWith("/verecekler")) &&
                         <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
-                            <DropdownMenuLabel>Verecek Eylemleri</DropdownMenuLabel>
+                            <DropdownMenuLabel>Borç Eylemleri</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleAddPayableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                                 <span>Müşteri Ekle</span>
