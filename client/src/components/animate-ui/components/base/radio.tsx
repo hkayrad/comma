@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { CircleIcon } from 'lucide-react';
 
 import {

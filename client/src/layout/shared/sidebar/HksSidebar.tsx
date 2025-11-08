@@ -6,7 +6,7 @@ import { useConfig } from "@/contexts/ConfigContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { AuthApi, useCurrentUser } from "@/lib/api"
 import { RoleBackgrounds, RoleColors, UserRole, type RoleBackgroundType, type RoleColorType, type UserRoleType } from "@/lib/enums";
-import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun } from "lucide-react";
+import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun, UsersRound } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceDialog from "../dialog/MaintenanceDialog";
@@ -22,7 +22,7 @@ export default function HksSidebar() {
     const user = useCurrentUser();
     const { openDialog } = useDialog();
     const { state } = useSidebar();
-    const { reloadConnection } = useWebSocket();
+    const { reloadConnection, sendGetActiveUsersRequest } = useWebSocket();
     const { configs } = useConfig();
     const { theme, setTheme } = useTheme();
 
@@ -66,6 +66,10 @@ export default function HksSidebar() {
             showCloseButton: true,
         });
     }, [configs?.maintenanceMode, openDialog]);
+
+    const handleGetActiveUsers = useCallback(() => {
+        sendGetActiveUsersRequest();
+    }, [sendGetActiveUsersRequest]);
 
     const financialItems = useMemo(() => ({
         overview: {
@@ -258,6 +262,12 @@ export default function HksSidebar() {
                                                 className="!justify-start">
                                                 <Construction className="text-inherit bg-inherit select-none" />
                                                 <span>Bakım Modu</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleGetActiveUsers}
+                                                className="!justify-start">
+                                                <UsersRound className="text-inherit bg-inherit select-none" />
+                                                <span>Aktif Kullanıcılar</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>

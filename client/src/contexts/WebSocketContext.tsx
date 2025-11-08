@@ -12,6 +12,7 @@ interface WebSocketContextType {
     reloadConnection: () => void;
     sendStartMaintenanceNotification: (startTime?: string, endTime?: string) => void;
     sendEndMaintenanceNotification: () => void;
+    sendGetActiveUsersRequest: () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -153,6 +154,9 @@ export const WebSocketProvider = ({ children, url }: WebSocketProviderProps) => 
                                 break;
                         }
                         break;
+                    case "ACTIVE_USERS":
+                        toast.success(`Aktif Kullanıcı Sayısı: ${data.userCount}`, { duration: 5000 });
+                        break;
                     default:
                         Logger.warn("Unknown message type:", data.type);
                 }
@@ -201,13 +205,22 @@ export const WebSocketProvider = ({ children, url }: WebSocketProviderProps) => 
         }
     }, [isConnected]);
 
+    const sendGetActiveUsersRequest = useCallback(() => {
+        if (ws.current && isConnected) {
+            const message = {
+                type: "GET_ACTIVE_USERS"
+            };
+            ws.current.send(JSON.stringify(message));
+        }
+    }, [isConnected]);
+
     useEffect(() => {
         connect();
         return () => disconnect();
     }, [connect, disconnect]);
 
     return (
-        <WebSocketContext.Provider value={{ isConnected, reloadConnection, sendStartMaintenanceNotification, sendEndMaintenanceNotification }}>
+        <WebSocketContext.Provider value={{ isConnected, reloadConnection, sendStartMaintenanceNotification, sendEndMaintenanceNotification, sendGetActiveUsersRequest }}>
             {children}
         </WebSocketContext.Provider>
     );

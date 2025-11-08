@@ -2,13 +2,8 @@ import { UploadedFile } from 'express-fileupload';
 import path from 'path';
 import { ApiResponse } from '../utils/apiResponse';
 import { Logger } from '../utils/logger';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { pool } from '../utils/db/pool';
-
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, '../uploads/logos');

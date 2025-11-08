@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import http from 'http';
 import fileUpload from "express-fileupload";
-import { Logger } from './utils/logger';
 import AuthController from "./controllers/AuthController";
 import ConfigController from "./controllers/ConfigController";
 import ReceivableCustomersController from "./controllers/Receivable/CustomersController";
@@ -17,6 +16,7 @@ import PayablePaymentsController from './controllers/Payable/PaymentsController'
 import NotificationWebSocket from './utils/notificationWebSocket';
 import TcmbController from './controllers/TcmbController';
 import CompanyController from "./controllers/CompanyController";
+import { Logger } from './utils';
 
 declare global {
     namespace Express {

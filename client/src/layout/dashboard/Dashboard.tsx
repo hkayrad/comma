@@ -46,7 +46,7 @@ export default function Dashboard() {
     }, [])
 
     return (
-        <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+        <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
             <Tabs value={tabValue} onValueChange={handleTabChange} className="w-full">
                 <TabsList className="fixed bottom-6 z-20 left-0 right-0 mx-auto">
                     <TabsTrigger value="receivable" className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50">Alacaklar</TabsTrigger>

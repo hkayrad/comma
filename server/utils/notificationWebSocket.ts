@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { Server } from "http";
-import verifyUser from "./verifyUser";
+import verifyUser from './verifyUser'
+;
 
 interface AuthenticatedWebSocket extends WebSocket {
     isAlive: boolean;
@@ -68,6 +69,8 @@ export default class NotificationWebSocket {
     }
 
     private handleMessage(ws: AuthenticatedWebSocket, message: any) {
+        console.log(message);
+        
         switch (message.type) {
             case 'SEND_NOTIFICATION':
                 if (ws.userRole !== "1") {
@@ -107,6 +110,19 @@ export default class NotificationWebSocket {
                         }));
                     }
                 });
+                break;
+            case "GET_ACTIVE_USERS":
+                console.log("GET_ACTIVE_USERS message received");
+                
+                if (ws.userRole !== "1") {
+                    ws.send(JSON.stringify({ type: 'ERROR', message: 'Unauthorized to get active users' }));
+                    return;
+                }
+
+                ws.send(JSON.stringify({
+                    type: 'ACTIVE_USERS',
+                    userCount: this.clients.size
+                }));
                 break;
             default:
                 this.clients.forEach(client => {
