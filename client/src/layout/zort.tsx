@@ -33,7 +33,7 @@ export default function Zort() {
                 Promise.all([uploadPromise, delayPromise]).then(([result]) => result),
                 {
                     loading: `Uploading ${logoSize === 'small' ? 'small' : 'large'} logo...`,
-                    success: (data) => {
+                    success: () => {
                         sendRefreshEvent("logo:refresh");
                         return `${logoSize === 'small' ? 'Small' : 'Large'} logo uploaded successfully`;
                     },

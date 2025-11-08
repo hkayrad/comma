@@ -83,7 +83,7 @@ export default function CustomerStatement(props: Props) {
     const { customer, debts, payments } = data;
 
     return (
-        <div className='space-y-6'>
+        <div className='space-y-6 p-4'>
             <div className='flex items-start justify-between'>
                 <div className='space-y-2'>
                     <div className='flex items-center gap-3'>
