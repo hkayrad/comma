@@ -1,10 +1,10 @@
 import express from 'express';
 import PayableCustomersService from '../../services/Payable/CustomersService';
-import dataMiddleware from '../../utils/middleware';
+import authMiddleware from '../../utils/middleware';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.post('/customers', async (req, res) => {
     const customer = req.body;

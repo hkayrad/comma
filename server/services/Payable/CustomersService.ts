@@ -121,7 +121,7 @@ export default class PayableCustomersService {
             WHERE c.id = ? AND c.company_id = ?
             `;
 
-            const customerResult = await conn.query(customerQuery, [customerId, companyId, customerId, companyId]);
+            const customerResult = await conn.query(customerQuery, [companyId, companyId, customerId, companyId]);
             if (customerResult.length === 0) {
                 return ApiResponse.error("Customer not found");
             }

@@ -1,10 +1,10 @@
 import express from 'express';
 import { parseStringPromise } from 'xml2js';
-import dataMiddleware from '../utils/middleware';
+import authMiddleware from '../utils/middleware';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.get('/', async (req, res) => {
     try {

@@ -1,10 +1,10 @@
 import express from 'express';
 import PayableDebtsService from '../../services/Payable/DebtsService';
-import dataMiddleware from '../../utils/middleware';
+import authMiddleware from '../../utils/middleware';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.post('/debts', async (req, res) => {
     const debt = req.body;

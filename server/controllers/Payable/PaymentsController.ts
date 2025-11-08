@@ -1,10 +1,10 @@
 import express from 'express';
 import PayablePaymentsService from '../../services/Payable/PaymentsService';
-import dataMiddleware from '../../utils/middleware';
+import authMiddleware from '../../utils/middleware';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.post('/payments', async (req, res) => {
     const payment = req.body;

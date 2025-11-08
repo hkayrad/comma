@@ -1,11 +1,11 @@
 import express from 'express';
 
-import dataMiddleware from '../utils/middleware';
+import authMiddleware from '../utils/middleware';
 import { CompanyService } from '../services/CompanyService';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.post("/logo/small", async (req, res) => {
     const response = await CompanyService.UploadLogo('small', req.files!.logo as any, req.companyId);

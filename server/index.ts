@@ -16,7 +16,7 @@ import PayablePaymentsController from './controllers/Payable/PaymentsController'
 import NotificationWebSocket from './utils/notificationWebSocket';
 import TcmbController from './controllers/TcmbController';
 import CompanyController from "./controllers/CompanyController";
-import { Logger } from './utils';
+import { Logger } from './utils/logger';
 
 declare global {
     namespace Express {

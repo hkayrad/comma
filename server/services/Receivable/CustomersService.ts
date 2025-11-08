@@ -120,7 +120,7 @@ export default class ReceivableCustomersService {
             WHERE c.id = ? AND c.company_id = ?
             `;
 
-            const customerResult = await conn.query(customerQuery, [customerId, customerId, customerId, companyId]);
+            const customerResult = await conn.query(customerQuery, [companyId, companyId, customerId, companyId]);
             if (customerResult.length === 0) {
                 return ApiResponse.error("Customer not found");
             }

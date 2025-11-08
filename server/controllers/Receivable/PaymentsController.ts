@@ -1,11 +1,11 @@
 import express from 'express';
 import verifyUser from '../../utils/verifyUser';
 import ReceivablePaymentsService from '../../services/Receivable/PaymentsService';
-import dataMiddleware from '../../utils/middleware';
+import authMiddleware from '../../utils/middleware';
 
 const router = express.Router();
 
-router.use(dataMiddleware);
+router.use(authMiddleware);
 
 router.post('/payments', async (req, res) => {
     const payment = req.body;

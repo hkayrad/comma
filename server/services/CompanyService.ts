@@ -6,10 +6,7 @@ import fs from 'fs';
 import { pool } from '../utils/db/pool';
 
 // Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '../uploads/logos');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+const uploadDir = path.resolve(process.cwd(), 'uploads', 'logos');
 
 export class CompanyService {
     static async UploadLogo(logoSize: 'small' | 'large', logo: UploadedFile, companyId: string) {
