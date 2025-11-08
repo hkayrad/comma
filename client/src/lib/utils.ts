@@ -20,8 +20,8 @@ export function copyToClipboard(text: string) {
     });
 }
 
-export function sendRefreshEvent() {
-  window.dispatchEvent(new Event("global:refresh"));
+export function sendRefreshEvent(type: "global:refresh" | "logo:refresh" = "global:refresh") {
+  window.dispatchEvent(new Event(type));
 }
 
 

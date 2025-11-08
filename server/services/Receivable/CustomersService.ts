@@ -2,7 +2,7 @@ import { pool } from "../../utils/db/pool";
 import { ApiResponse, Logger } from "../../utils";
 
 export default class ReceivableCustomersService {
-    static async Create(customer: any) {
+    static async Create(customer: any, companyId: string) {
         let conn;
 
         try {
@@ -13,13 +13,13 @@ export default class ReceivableCustomersService {
             }
 
             const query = `
-            INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null]);
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, companyId]);
             Logger.info("Customer creation result:", result);
 
             if (result.affectedRows === 0)
@@ -35,7 +35,7 @@ export default class ReceivableCustomersService {
         }
     }
 
-    static async GetAll() {
+    static async GetAll(companyId: string) {
         let conn;
 
         try {
@@ -51,6 +51,7 @@ export default class ReceivableCustomersService {
                     customer_id,
                     SUM(amount + COALESCE(vat, 0)) AS total_debt
                 FROM receivable_debts
+                WHERE company_id = ?
                 GROUP BY customer_id
             ) debt_summary ON c.id = debt_summary.customer_id
             LEFT JOIN (
@@ -58,14 +59,16 @@ export default class ReceivableCustomersService {
                     customer_id,
                     SUM(amount) AS total_payments
                 FROM receivable_payments
+                WHERE company_id = ?
                 GROUP BY customer_id
             ) payment_summary ON c.id = payment_summary.customer_id
+            WHERE c.company_id = ?
             ORDER BY c.created_at DESC
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query);
+            const result = await conn.query(query, [companyId, companyId, companyId]);
             Logger.info("Retrieved receivable_customers:", result);
 
             if (result.length === 0)
@@ -80,7 +83,7 @@ export default class ReceivableCustomersService {
         }
     }
 
-    static async GetStatement(customerId: string) {
+    static async GetStatement(customerId: string, companyId: string) {
         let conn;
 
         try {
@@ -103,6 +106,7 @@ export default class ReceivableCustomersService {
                     customer_id,
                     SUM(amount + COALESCE(vat, 0)) AS total_debt
                 FROM receivable_debts
+                WHERE company_id = ?
                 GROUP BY customer_id
             ) debt_summary ON c.id = debt_summary.customer_id
             LEFT JOIN (
@@ -110,12 +114,13 @@ export default class ReceivableCustomersService {
                     customer_id,
                     SUM(amount) AS total_payments
                 FROM receivable_payments
+                WHERE company_id = ?
                 GROUP BY customer_id
             ) payment_summary ON c.id = payment_summary.customer_id
-            WHERE c.id = ?
+            WHERE c.id = ? AND c.company_id = ?
             `;
 
-            const customerResult = await conn.query(customerQuery, [customerId]);
+            const customerResult = await conn.query(customerQuery, [customerId, customerId, customerId, companyId]);
             if (customerResult.length === 0) {
                 return ApiResponse.error("Customer not found");
             }
@@ -131,7 +136,7 @@ export default class ReceivableCustomersService {
                 d.issue_date,
                 d.created_at
             FROM receivable_debts d
-            WHERE d.customer_id = ?
+            WHERE d.customer_id = ? AND d.company_id = ?
             ORDER BY d.issue_date DESC, d.created_at DESC
             `;
 
@@ -145,13 +150,13 @@ export default class ReceivableCustomersService {
                 p.payment_date,
                 p.created_at
             FROM receivable_payments p
-            WHERE p.customer_id = ?
+            WHERE p.customer_id = ? AND p.company_id = ?
             ORDER BY p.payment_date DESC, p.created_at DESC
             `;
 
             const [debtsResult, paymentsResult] = await Promise.all([
-                conn.query(debtsQuery, [customerId]),
-                conn.query(paymentsQuery, [customerId])
+                conn.query(debtsQuery, [customerId, companyId]),
+                conn.query(paymentsQuery, [customerId, companyId])
             ]);
 
             const response = {
@@ -169,17 +174,17 @@ export default class ReceivableCustomersService {
         }
     }
 
-    static async GetIdAndName() {
+    static async GetIdAndName(companyId: string) {
         let conn;
 
         try {
             const query = `
-            SELECT id, name FROM receivable_customers
+            SELECT id, name FROM receivable_customers WHERE company_id = ?
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query);
+            const result = await conn.query(query, [companyId]);
             Logger.info("Retrieved receivable_customers:", result);
 
 
@@ -196,7 +201,7 @@ export default class ReceivableCustomersService {
         }
     }
 
-    static async Update(id: string, customer: any) {
+    static async Update(id: string, customer: any, companyId: string) {
         let conn;
 
         try {
@@ -213,12 +218,12 @@ export default class ReceivableCustomersService {
             const query = `
             UPDATE receivable_customers 
             SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-            WHERE id = ?
+            WHERE id = ? AND company_id = ?
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, id]);
+            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, id, companyId]);
             Logger.info("Customer update result:", result);
 
             if (result.affectedRows === 0)
@@ -234,7 +239,7 @@ export default class ReceivableCustomersService {
         }
     }
 
-    static async Delete(id: string) {
+    static async Delete(id: string, companyId: string) {
         let conn;
 
         try {
@@ -248,7 +253,7 @@ export default class ReceivableCustomersService {
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [id]);
+            const result = await conn.query(query, [id, companyId]);
             Logger.info("Customer deletion result:", result);
 
             if (result.affectedRows === 0)

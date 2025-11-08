@@ -33,7 +33,7 @@ export default function Payments(props: Props) {
     }, [type])
 
     return (
-        <div className="py-4 px-8 space-y-8">
+        <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
             <div className="flex items-center gap-4">
                 <OverviewCards type={type} />
             </div>

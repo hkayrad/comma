@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ExchangeRates from "./components/ExchangeRates";
 import { Button } from "@/components/ui/button";
 import { SidebarClose, SidebarOpen } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/animate-ui/components/radix/sidebar";
 
 export default function Header() {
     const [currentPage, setCurrentPage] = useState<string>("Genel Bakış");
@@ -42,7 +42,7 @@ export default function Header() {
                     </TooltipContent>
                 </Tooltip>
                 <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />
-                <p className="">{currentPage}</p>
+                <p className="whitespace-nowrap text-muted-foreground text-sm">{currentPage}</p>
                 <div className="ml-auto mr-2">
                     <ExchangeRates />
                 </div>

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import http from 'http';
+import fileUpload from "express-fileupload";
 import { Logger } from './utils/logger';
 import AuthController from "./controllers/AuthController";
 import ConfigController from "./controllers/ConfigController";
@@ -15,6 +16,15 @@ import PayableDebtsController from './controllers/Payable/DebtsController';
 import PayablePaymentsController from './controllers/Payable/PaymentsController';
 import NotificationWebSocket from './utils/notificationWebSocket';
 import TcmbController from './controllers/TcmbController';
+import CompanyController from "./controllers/CompanyController";
+
+declare global {
+    namespace Express {
+        interface Request {
+            companyId: string;
+        }
+    }
+}
 
 dotenv.config();
 
@@ -29,10 +39,22 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(fileUpload({
+    tempFileDir: '/tmp/',
+    createParentPath: true,
+    limits: { fileSize: 1024 * 1024 * 2 }, // 2 MB
+    safeFileNames: true,
+    preserveExtension: true,
+    useTempFiles: true
+}))
+
+app.use("/uploads", express.static("uploads"))
 
 app.use(AuthController);
 app.use("/config", ConfigController);
 app.use("/tcmb", TcmbController);
+
+app.use("/company", CompanyController);
 
 app.use("/receivable", ReceivableCustomersController);
 app.use("/receivable", ReceivableDebtsController);

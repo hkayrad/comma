@@ -1,54 +1,43 @@
 import express from 'express';
 import PayableCustomersService from '../../services/Payable/CustomersService';
-import verifyUser from '../../utils/verifyUser';
+import dataMiddleware from '../../utils/middleware';
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-
-    if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-
-    const decoded = verifyUser(token);
-    if (!decoded) {
-        return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-
-    next();
-});
+router.use(dataMiddleware);
 
 router.post('/customers', async (req, res) => {
     const customer = req.body;
-    const response = await PayableCustomersService.Create(customer);
+    const response = await PayableCustomersService.Create(customer, req.companyId);
     res.json(response);
 });
 
 router.get('/customers', async (req, res) => {
-    const response = await PayableCustomersService.GetAll();
+    const response = await PayableCustomersService.GetAll(req.companyId);
     res.json(response);
 });
 
 router.get('/customers/:id/statement', async (req, res) => {
     const { id } = req.params;
-    const response = await PayableCustomersService.GetStatement(id);
+    const response = await PayableCustomersService.GetStatement(id, req.companyId);
     res.json(response);
 });
 
 router.get('/customers/id-name', async (req, res) => {
-    const response = await PayableCustomersService.GetIdAndName();
+    const response = await PayableCustomersService.GetIdAndName(req.companyId);
     res.json(response);
 });
 
 router.put('/customers/:id', async (req, res) => {
     const { id } = req.params;
     const customer = req.body;
-    const response = await PayableCustomersService.Update(id, customer);
+    const response = await PayableCustomersService.Update(id, customer, req.companyId);
     res.json(response);
 });
 
 router.delete('/customers/:id', async (req, res) => {
     const { id } = req.params;
-    const response = await PayableCustomersService.Delete(id);
+    const response = await PayableCustomersService.Delete(id, req.companyId);
     res.json(response);
 });
 

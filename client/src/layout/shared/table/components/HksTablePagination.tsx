@@ -11,10 +11,10 @@ export default function HksTablePagination(props: Props) {
     const { table } = props;
 
     return (
-        <ButtonGroup className="py-4 ml-auto">
+        <ButtonGroup>
             <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 className="select-none"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
@@ -22,13 +22,13 @@ export default function HksTablePagination(props: Props) {
                 <ChevronLeft />
                 Önceki
             </Button>
-            <ButtonGroupText className="bg-background">
+            <ButtonGroupText className="bg-background whitespace-nowrap">
                 Sayfa
                 <span className="font-normal mx-0.5">{table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
             </ButtonGroupText>
             <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 className="select-none"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}

@@ -6,7 +6,7 @@ import CustomerDialog from "./dialog/CustomerDialog";
 import DebtDialog from "./dialog/DebtDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import PaymentDialog from "./dialog/PaymentDialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/animate-ui/components/radix/dropdown-menu";
 import { useLocation } from "react-router";
 
 export default function FloatingButton() {
@@ -124,7 +124,7 @@ export default function FloatingButton() {
                 >
                     {(location.pathname === "/" || location.pathname.startsWith("/alacaklar")) &&
                         <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
-                            <DropdownMenuLabel>Alacak Eylemleri</DropdownMenuLabel>
+                            <DropdownMenuLabel className="relative z-10">Alacak Eylemleri</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleAddReceivableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                                 <span>Müşteri Ekle</span>
@@ -140,7 +140,7 @@ export default function FloatingButton() {
                         </DropdownMenuGroup>}
                     {(location.pathname === "/" || location.pathname.startsWith("/verecekler")) &&
                         <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
-                            <DropdownMenuLabel>Borç Eylemleri</DropdownMenuLabel>
+                            <DropdownMenuLabel className="relative z-10">Borç Eylemleri</DropdownMenuLabel>
                             <DropdownMenuItem onClick={handleAddPayableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                                 <span>Müşteri Ekle</span>

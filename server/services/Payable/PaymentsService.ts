@@ -2,7 +2,7 @@ import { pool } from "../../utils/db/pool";
 import { ApiResponse, Logger } from "../../utils";
 
 export default class PayablePaymentsService {
-    static async Create(payment: any) {
+    static async Create(payment: any, companyId: string) {
         let conn;
 
         try {
@@ -15,8 +15,8 @@ export default class PayablePaymentsService {
 
             Logger.log("Creating payment with data:", payment);
             const query = `
-            INSERT INTO payable_payments (customer_id, amount, invoice_no, description, payment_date, payment_method)
-            VALUES (?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO payable_payments (customer_id, amount, invoice_no, description, payment_date, payment_method, company_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
             conn = await pool.getConnection();
@@ -27,7 +27,8 @@ export default class PayablePaymentsService {
                 invoice_no || null,
                 description || null,
                 payment_date,
-                payment_method
+                payment_method,
+                companyId
             ]);
             Logger.info("Payment creation result:", result);
 
@@ -43,7 +44,7 @@ export default class PayablePaymentsService {
         }
     }
 
-    static async GetAll() {
+    static async GetAll(companyId: string) {
         let conn;
 
         try {
@@ -54,12 +55,13 @@ export default class PayablePaymentsService {
                 c.tax_number AS customer_tax_number
             FROM payable_payments p
             JOIN payable_customers c ON p.customer_id = c.id
+            WHERE p.company_id = ?
             ORDER BY p.payment_date DESC
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query);
+            const result = await conn.query(query, [companyId]);
             Logger.info("Retrieved payable_payments:", result);
 
             return ApiResponse.success(result, "Payments retrieved successfully");
@@ -73,7 +75,7 @@ export default class PayablePaymentsService {
         }
     }
 
-    static async Update(paymentId: string, payment: any) {
+    static async Update(paymentId: string, payment: any, companyId: string) {
         let conn;
 
         try {
@@ -93,7 +95,7 @@ export default class PayablePaymentsService {
             const query = `
             UPDATE payable_payments
             SET customer_id = ?, amount = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
-            WHERE id = ?
+            WHERE id = ? AND company_id = ?
             `;
 
             conn = await pool.getConnection();
@@ -105,7 +107,8 @@ export default class PayablePaymentsService {
                 description || null,
                 payment_date,
                 payment_method,
-                paymentId
+                paymentId,
+                companyId
             ]);
             Logger.info("Payment update result:", result);
 
@@ -123,7 +126,7 @@ export default class PayablePaymentsService {
         }
     }
 
-    static async Delete(paymentId: string) {
+    static async Delete(paymentId: string, companyId: string) {
         let conn;
 
         try {
@@ -133,11 +136,11 @@ export default class PayablePaymentsService {
             }
 
             Logger.log("Deleting payment with ID:", paymentId);
-            const query = `DELETE FROM payable_payments WHERE id = ?`;
+            const query = `DELETE FROM payable_payments WHERE id = ? AND company_id = ?`;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [paymentId]);
+            const result = await conn.query(query, [paymentId, companyId]);
             Logger.info("Payment deletion result:", result);
 
             if (result.affectedRows === 0)

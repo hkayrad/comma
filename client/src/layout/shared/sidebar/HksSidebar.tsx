@@ -1,18 +1,21 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail, SidebarSeparator, useSidebar } from "@/components/ui/sidebar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/animate-ui/components/radix/dropdown-menu";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail, SidebarSeparator, useSidebar } from "@/components/animate-ui/components/radix/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useConfig } from "@/contexts/ConfigContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { AuthApi, useCurrentUser } from "@/lib/api"
 import { RoleBackgrounds, RoleColors, UserRole, type RoleBackgroundType, type RoleColorType, type UserRoleType } from "@/lib/enums";
 import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun } from "lucide-react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceDialog from "../dialog/MaintenanceDialog";
 import { useDialog } from "@/contexts/DialogContext";
 import HksSidebarItem from "./components/HksSidebarItem";
 import { useTheme } from "@/components/theme-provider";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CompanyApi } from "@/lib/api/company";
 
 export default function HksSidebar() {
     const navigate = useNavigate();
@@ -22,6 +25,24 @@ export default function HksSidebar() {
     const { reloadConnection } = useWebSocket();
     const { configs } = useConfig();
     const { theme, setTheme } = useTheme();
+
+    const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
+    const [logos, setLogos] = useState<{ smallLogo: string; largeLogo: string }>({ smallLogo: "", largeLogo: "" });
+    const logoSrc = useMemo(() => ({
+        small: logos.smallLogo ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}` : "/hks-icon.png",
+        large: logos.largeLogo ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}` : "/hks-logo.png",
+    }), [logos]);
+
+    const fetchLogos = useCallback(async () => {
+        try {
+            const response = await CompanyApi.GetLogos();
+            if (response.isSuccess) {
+                setLogos(response.data);
+            }
+        } catch (error) {
+            console.error("Şirket logoları alınırken bir hata oluştu:", error);
+        }
+    }, []);
 
     const handleLogout = async () => {
         const promise = AuthApi.Logout();
@@ -36,7 +57,7 @@ export default function HksSidebar() {
         });
     }
 
-    const handleToggleMaintenance = async () => {
+    const handleToggleMaintenance = useCallback(async () => {
         openDialog({
             title: configs?.maintenanceMode === "active" ? "Planlı Bakımı Bitir" : "Planlı Bakım Başlat",
             description: configs?.maintenanceMode === "active" ? "Bakımı sonlandırmak istediğinize emin misiniz?" : "Sistemi bakım moduna almak istediğinize emin misiniz? Bu işlem tüm kullanıcıların sistemden çıkış yapmasına neden olacaktır.",
@@ -44,9 +65,9 @@ export default function HksSidebar() {
             content: <MaintenanceDialog />,
             showCloseButton: true,
         });
-    }
+    }, [configs?.maintenanceMode, openDialog]);
 
-    const financialItems = {
+    const financialItems = useMemo(() => ({
         overview: {
             title: null,
             url: "",
@@ -89,8 +110,35 @@ export default function HksSidebar() {
                     icon: BanknoteArrowUp,
                 },
             ]
+        },
+        test: {
+            title: "Test Bölümü",
+            url: "",
+            items: [
+                {
+                    title: "Test Sayfası",
+                    url: "/test",
+                    icon: Component,
+                },
+            ]
         }
-    }
+    }), []);
+
+    useEffect(() => {
+        if (theme === "dark") {
+            setLogoFilter("brightness(0) invert(1)");
+        } else {
+            setLogoFilter("brightness(1) invert(0)");
+        }
+    }, [theme]);
+
+    useEffect(() => {
+        fetchLogos();
+        window.addEventListener("logo:refresh", fetchLogos);
+        return () => {
+            window.removeEventListener("logo:refresh", fetchLogos);
+        }
+    }, [fetchLogos]);
 
     return (
         <Sidebar
@@ -98,28 +146,83 @@ export default function HksSidebar() {
             variant="inset"
             collapsible="icon"
         >
-            <SidebarContent>
-                <SidebarRail />
+            <SidebarRail className={state === "collapsed" ? "w-2" : "w-4"} />
+            <SidebarHeader>
+                <NavLink to="/" onClick={() => sessionStorage.setItem("current_page", "Genel Bakış")}>
+                    <AnimatePresence mode="wait">
+                        {state === "collapsed" ? (
+                            <motion.img
+                                key="icon"
+                                src={logoSrc.small}
+                                alt="HKS.IO Logo"
+                                className="h-8 w-auto mx-auto clip mt-1"
+                                initial={{ opacity: 0, x: 0, scale: 1.2, filter: `blur(4px) ${logoFilter}` }}
+                                animate={{ opacity: 1, x: 0, scale: 1, filter: `blur(0px) ${logoFilter}` }}
+                                exit={{ opacity: 0, x: -30, scale: 0.8, filter: `blur(4px) ${logoFilter}` }}
+                                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                            />
+                        ) : (
+                            <motion.img
+                                key="logo"
+                                src={logoSrc.large}
+                                alt="HKS.IO Logo"
+                                className="h-8 w-auto mx-auto clip mt-1"
+                                initial={{ opacity: 0, x: 0, scale: 1.2, filter: `blur(4px) ${logoFilter}` }}
+                                animate={{ opacity: 1, x: 0, scale: 1, filter: `blur(0px) ${logoFilter}` }}
+                                exit={{ opacity: 0, x: -30, scale: 0.8, filter: `blur(4px) ${logoFilter}` }}
+                                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                            />
+                        )}
+                    </AnimatePresence>
+                </NavLink>
+            </SidebarHeader>
+            <SidebarContent className="gap-0">
                 {
                     Object.entries(financialItems).map(([key, group]) => (
-                        <SidebarGroup key={key}>
-                            {
-                                group.title && (
-                                    <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                                        <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
-                                            {group.title}
-                                        </span>
-                                    </SidebarGroupLabel>
-                                )
-                            }
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    {group.items.map((item) => (
-                                        <HksSidebarItem key={item.title} item={item} group={group} state={state} />
-                                    ))}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
+                        (key !== "test") && (
+                            <SidebarGroup key={key}>
+                                {
+                                    group.title && (
+                                        <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                                            <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
+                                                {group.title}
+                                            </span>
+                                        </SidebarGroupLabel>
+                                    )
+                                }
+                                <SidebarGroupContent>
+                                    <SidebarMenu>
+                                        {group.items.map((item) => (
+                                            <HksSidebarItem key={item.title} item={item} group={group} state={state} />
+                                        ))}
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </SidebarGroup>
+                        )
+                    ))
+                }
+                {
+                    Object.entries(financialItems).map(([key, group]) => (
+                        (import.meta.env.VITE_NODE_ENV === "development" && key === "test") && (
+                            <SidebarGroup key={key} className="bg-red-100 rounded-md text-red-700">
+                                {
+                                    group.title && (
+                                        <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                                            <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
+                                                {group.title}
+                                            </span>
+                                        </SidebarGroupLabel>
+                                    )
+                                }
+                                <SidebarGroupContent>
+                                    <SidebarMenu>
+                                        {group.items.map((item) => (
+                                            <HksSidebarItem key={item.title} item={item} group={group} state={state} />
+                                        ))}
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </SidebarGroup>
+                        )
                     ))
                 }
             </SidebarContent>
@@ -128,7 +231,6 @@ export default function HksSidebar() {
                     user?.role === 1 && (
                         <>
                             <SidebarMenu>
-
                                 <SidebarMenuItem>
                                     <DropdownMenu>
                                         <Tooltip
@@ -239,7 +341,8 @@ export default function HksSidebar() {
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={handleLogout}
-                                            className="!justify-start !text-red-600 dark:!text-red-400 hover:!bg-red-100 dark:hover:!bg-red-950/30 hover:!text-red-800 dark:hover:!text-red-300">
+                                            variant="destructive"
+                                            className="!justify-start">
                                             <LogOut className="text-inherit bg-inherit select-none" />
                                             <span>Çıkış Yap</span>
                                         </DropdownMenuItem>

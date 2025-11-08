@@ -1,4 +1,4 @@
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Radio, RadioGroup} from "@/components/animate-ui/components/base/radio"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
@@ -108,11 +108,11 @@ export default function CustomerDialog(props: Props) {
                             <FormControl>
                                 <RadioGroup className="flex gap-8" value={String(field.value)} onValueChange={(value) => field.onChange(value === "true")}>
                                     <div className="flex gap-2 items-center">
-                                        <RadioGroupItem value="true" id="company" />
+                                        <Radio value="true" id="company" />
                                         <label htmlFor="company" className="cursor-pointer select-none">Şirket</label>
                                     </div>
                                     <div className="flex gap-2 items-center">
-                                        <RadioGroupItem value="false" id="individual" />
+                                        <Radio value="false" id="individual" />
                                         <label htmlFor="individual" className="cursor-pointer select-none">Birey</label>
                                     </div>
                                 </RadioGroup>

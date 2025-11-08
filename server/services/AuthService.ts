@@ -41,6 +41,7 @@ export class AuthService {
             const token = jwt.sign(
                 {
                     id: user.id,
+                    companyId: user.company_id,
                     username: user.username,
                     role: user.role
                 },

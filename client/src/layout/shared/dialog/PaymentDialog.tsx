@@ -14,7 +14,7 @@ import z from "zod"
 import CustomerSelect from "./components/CustomerSelect"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import DateSelect from "./components/DateSelect"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Radio, RadioGroup } from "@/components/animate-ui/components/base/radio"
 
 type Props = {
     payment?: PaymentDto,
@@ -156,7 +156,7 @@ export default function PaymentDialog(props: Props) {
                                     {
                                         PaymentFormSchema.shape.payment_method.options.map((method) => (
                                             <div key={method} className="flex gap-2 items-center">
-                                                <RadioGroupItem value={method} id={method} />
+                                                <Radio value={method} id={method} />
                                                 <label htmlFor={method} className="cursor-pointer select-none">
                                                     {method === "cash" ? "Nakit" :
                                                         method === "bank_transfer" ? "Havale" :

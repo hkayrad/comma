@@ -30,6 +30,7 @@ export default function ExchangeRates() {
         <div className="flex gap-2">
             {exchangeRates && (
                 <>
+                    <p className="text-muted-foreground text-[10px] my-auto mr-1">Son Güncelleme: {exchangeRates.date}</p>
                     <Tooltip
                         disableHoverableContent>
                         <TooltipTrigger asChild>

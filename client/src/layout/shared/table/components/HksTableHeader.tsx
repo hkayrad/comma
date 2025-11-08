@@ -8,6 +8,7 @@ import type { Table } from "@tanstack/react-table";
 import { ArrowUpDown, Columns3Cog, FilterX, RefreshCw, Rows3, Search } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import HksTablePagination from "./HksTablePagination";
 
 type Props = {
     table: Table<any>;
@@ -48,8 +49,8 @@ export default function HksTableHeader(props: Props) {
     }
 
     return (
-        <div className="flex items-center pb-4 gap-2">
-            <InputGroup className="max-w-2xs">
+        <div className="flex items-center gap-2">
+            <InputGroup className="max-w-2xs bg-background min-w-48">
                 <InputGroupInput
                     placeholder="İsim ile Müşteri Ara..."
                     value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
@@ -163,17 +164,20 @@ export default function HksTableHeader(props: Props) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </ButtonGroup>
-            <Tooltip disableHoverableContent>
-                <TooltipTrigger asChild>
-                    <Button className=" ml-auto select-none" disabled={isRefreshing} onClick={onRefresh}>
-                        <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
-                        {isRefreshing ? "Yenileniyor..." : "Yenile"}
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                    Tabloyu yenile
-                </TooltipContent>
-            </Tooltip>
+            <div className="flex gap-4 ml-auto">
+                <HksTablePagination table={table} />
+                <Tooltip disableHoverableContent>
+                    <TooltipTrigger asChild>
+                        <Button className="select-none" disabled={isRefreshing} onClick={onRefresh}>
+                            <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
+                            {isRefreshing ? "Yenileniyor..." : "Yenile"}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                        Tabloyu yenile
+                    </TooltipContent>
+                </Tooltip>
+            </div>
         </div>
     )
 }

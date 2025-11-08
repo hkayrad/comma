@@ -1,25 +1,10 @@
 import express from 'express';
-import verifyUser from '../utils/verifyUser';
 import { parseStringPromise } from 'xml2js';
+import dataMiddleware from '../utils/middleware';
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-    if (req.path === '/' && req.method === 'GET') {
-        return next();
-    }
-
-    const token = req.headers['authorization']?.split(' ')[1];
-
-    if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-
-    const decoded = verifyUser(token);
-    if (!decoded) {
-        return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-
-    return next();
-});
+router.use(dataMiddleware);
 
 router.get('/', async (req, res) => {
     try {

@@ -2,7 +2,7 @@ import { pool } from "../../utils/db/pool";
 import { ApiResponse, Logger } from "../../utils";
 
 export default class PayableDebtsService {
-    static async Create(debt: any) {
+    static async Create(debt: any, companyId: string) {
         let conn;
 
         try {
@@ -13,13 +13,13 @@ export default class PayableDebtsService {
             }
 
             const query = `
-            INSERT INTO payable_debts (customer_id, amount, vat, issue_date, invoice_no, description)
-            VALUES (?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO payable_debts (customer_id, amount, vat, issue_date, invoice_no, description, company_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description]);
+            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description, companyId]);
             Logger.info("Debt creation result:", result);
 
             if (result.affectedRows === 0)
@@ -36,7 +36,7 @@ export default class PayableDebtsService {
         }
     }
 
-    static async GetAll() {
+    static async GetAll(companyId: string) {
         let conn;
 
         try {
@@ -48,12 +48,13 @@ export default class PayableDebtsService {
                 c.tax_number AS customer_tax_number
             FROM payable_debts d
             JOIN payable_customers c ON d.customer_id = c.id
+            WHERE d.company_id = ?
             ORDER BY d.issue_date DESC
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query);
+            const result = await conn.query(query, [companyId]);
             Logger.info("Retrieved payable_debts:", result);
 
             return ApiResponse.success(result, "Debts retrieved successfully");
@@ -67,20 +68,20 @@ export default class PayableDebtsService {
         }
     }
 
-    static async GetTotals() {
+    static async GetTotals(companyId: string) {
         let conn;
 
         try {
             const query = `
             SELECT
-                COALESCE((SELECT SUM(amount + vat) FROM payable_debts), 0) AS total_debts,
-                COALESCE((SELECT SUM(amount) FROM payable_payments), 0) AS total_payments,
-                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments), 0)), 0) AS remaining_debt
+                COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ?), 0) AS total_debts,
+                COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ?), 0) AS total_payments,
+                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ?), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ?), 0)), 0) AS remaining_debt
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query);
+            const result = await conn.query(query, [companyId, companyId, companyId, companyId]);
             Logger.info("Retrieved total debt:", result);
 
             if (result.length === 0)
@@ -97,7 +98,7 @@ export default class PayableDebtsService {
         }
     }
 
-    static async Update(id: string, debt: any) {
+    static async Update(id: string, debt: any, companyId: string) {
         let conn;
 
         try {
@@ -114,12 +115,12 @@ export default class PayableDebtsService {
             const query = `
             UPDATE payable_debts 
             SET customer_id = ?, amount = ?, vat = ?, issue_date = ?, invoice_no = ?, description = ?
-            WHERE id = ?
+            WHERE id = ? AND company_id = ?
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description, id]);
+            const result = await conn.query(query, [customer_id, amount, vat, issue_date, invoice_no, description, id, companyId]);
             Logger.info("Debt update result:", result);
 
             if (result.affectedRows === 0)
@@ -136,7 +137,7 @@ export default class PayableDebtsService {
         }
     }
 
-    static async Delete(id: string) {
+    static async Delete(id: string, companyId: string) {
         let conn;
 
         try {
@@ -145,12 +146,12 @@ export default class PayableDebtsService {
             }
 
             const query = `
-            DELETE FROM payable_debts WHERE id = ?
+            DELETE FROM payable_debts WHERE id = ? AND company_id = ?
             `;
 
             conn = await pool.getConnection();
 
-            const result = await conn.query(query, [id]);
+            const result = await conn.query(query, [id, companyId]);
             Logger.info("Debt deletion result:", result);
 
             if (result.affectedRows === 0)

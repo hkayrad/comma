@@ -12,6 +12,7 @@ import { ConfigProvider } from './contexts/ConfigContext';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { ThemeProvider } from './components/theme-provider';
 import { Toaster } from './components/ui/sonner';
+import Zort from './layout/zort';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="odemeler" element={<Payments type='payable' />} />
                 <Route path="borc_dokumu/:customerId" element={<CustomerStatement type='payable' />} />
               </Route>
+              <Route path="test" element={<Zort />} />
               <Route path="*" element={<div>404 Not Found</div>} />
             </Route>
           </Routes>

@@ -1,9 +1,6 @@
 import express from 'express';
 import { AuthService } from '../services/AuthService';
 import { ApiResponse, Logger } from '../utils';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 
 const router = express.Router();
 
