@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, DebtDto, Totals, UUID } from "../types";
+import type { ApiResponse, AvailableCurrency, DebtDto, Totals, UUID } from "../types";
 import { Logger } from "../utils/logger";
 
 export class ReceivableDebtApi {
@@ -35,9 +35,11 @@ export class ReceivableDebtApi {
         }
     }
 
-    static async GetTotals(): Promise<Totals | null> {
+    static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
         try {
-            const { data: response } = await instance.get<ApiResponse<Totals>>("/receivable/debts/totals");
+            const { data: response } = await instance.get<ApiResponse<Totals>>("/receivable/debts/totals", {
+                params: { currency }
+            });
 
             if (response.status === 200) {
                 return Promise.resolve(response.data);
@@ -117,9 +119,11 @@ export class PayableDebtApi {
         }
     }
 
-    static async GetTotals(): Promise<Totals | null> {
+    static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
         try {
-            const { data: response } = await instance.get<ApiResponse<Totals>>("/payable/debts/totals");
+            const { data: response } = await instance.get<ApiResponse<Totals>>("/payable/debts/totals", {
+                params: { currency }
+            });
 
             if (response.status === 200) {
                 return Promise.resolve(response.data);

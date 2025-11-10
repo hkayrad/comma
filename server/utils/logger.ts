@@ -1,6 +1,6 @@
 export class Logger {
-    static log(message: any, ...optionalParams: any[]) {
-        console.log(`[LOG] [${new Date().toISOString()}]`, message, ...optionalParams);
+    static info(message: any, ...optionalParams: any[]) {
+        console.log(`[INFO] [${new Date().toISOString()}]`, message, ...optionalParams);
     }
 
     static debug(message: any, ...optionalParams: any[]) {

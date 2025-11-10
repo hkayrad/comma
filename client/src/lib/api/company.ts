@@ -1,6 +1,28 @@
 import instance from "../instance";
+import type { CompanyDto } from "../types";
 
 export class CompanyApi {
+    static async GetCompanyById(companyId: string) {
+        try {
+            const response = await instance.get(`/company/${companyId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching company details:", error);
+            throw error;
+        }
+    }
+
+    static async UpdateCompanyDetails(companyId: string, details: CompanyDto) {
+        try {
+            const response = await instance.post(`/company/${companyId}`, details);
+            return response.data;
+        }
+        catch (error) {
+            console.error("Error updating company details:", error);
+            throw error;
+        }
+    }
+
     static async UploadLogo(logo: File, size: 'small' | 'large' = 'small') {
         try {
             const formData = new FormData();
@@ -20,7 +42,8 @@ export class CompanyApi {
 
     static async GetLogos() {
         try {
-            const response = await instance.get(`/company/logos`);
+            const response = await instance.get(`/company/logos`);     
+            console.log("Logos response:", response);
             return response.data;
         } catch (error) {
             console.error("Error fetching company logos:", error);

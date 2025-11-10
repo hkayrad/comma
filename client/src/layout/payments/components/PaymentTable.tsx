@@ -1,4 +1,4 @@
-import type { PaymentDto } from "@/lib/types";
+import type { AvailableCurrency, PaymentDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -6,7 +6,7 @@ import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
@@ -16,14 +16,19 @@ import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
+import { useMemo } from "react";
 
 type Props = {
     data: PaymentDto[];
     type: 'receivable' | 'payable';
+    currency?: {
+        state: AvailableCurrency;
+        onChange: (value: AvailableCurrency) => void;
+    };
 }
 
 export default function PaymentTable(props: Props) {
-    const { data, type } = props;
+    const { data, type, currency } = props;
 
     const { openDialog } = useDialog();
 
@@ -80,13 +85,15 @@ export default function PaymentTable(props: Props) {
                 </Tooltip>
             ),
         },
-        {
-            accessorKey: "amount",
-            id: "Ödeme Miktarı",
-            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
-            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
-            sortingFn: formattedNumber,
-        },
+        ...["TRY", "USD", "EUR"].flatMap((curr) => ([
+            {
+                accessorKey: "amount",
+                id: `Ödeme Miktarı (${curr})`,
+                header: ({ column }: { column: Column<any> }) => <SortableColumnHeader column={column} title={column.id} />,
+                cell: ({ row, column }: { row: Row<any>, column: Column<any> }) => <FormattedCurrency row={row} column={column} currency={curr as AvailableCurrency} />,
+                sortingFn: formattedNumber,
+            }
+        ])),
         {
             accessorKey: "payment_method",
             id: "Ödeme Yöntemi",
@@ -187,7 +194,14 @@ export default function PaymentTable(props: Props) {
         }
     ];
 
+    const FilteredPaymentTableColumns = useMemo(() => {
+        return PaymentTableColumns.filter(col => (
+            !col.id?.startsWith("Ödeme Miktarı") ||
+            (currency ? col.id?.endsWith(`(${currency.state})`) : true)
+        ));
+    }, [PaymentTableColumns, currency]);
+
     return (
-        <HksTable data={data} columns={PaymentTableColumns} searchColumn="Müşteri" />
+        <HksTable data={data.filter(d => d.currency === currency?.state)} columns={FilteredPaymentTableColumns} searchColumn="Müşteri" currency={currency} />
     )
 }

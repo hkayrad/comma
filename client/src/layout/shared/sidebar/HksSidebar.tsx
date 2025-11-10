@@ -6,7 +6,7 @@ import { useConfig } from "@/contexts/ConfigContext";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { AuthApi, useCurrentUser } from "@/lib/api"
 import { RoleBackgrounds, RoleColors, UserRole, type RoleBackgroundType, type RoleColorType, type UserRoleType } from "@/lib/enums";
-import { BanknoteArrowDown, BanknoteArrowUp, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun, UsersRound } from "lucide-react";
+import { BanknoteArrowDown, BanknoteArrowUp, Building2, Component, Construction, EllipsisVertical, LogOut, Moon, Scroll, ScrollText, ShieldUser, Sun, UsersRound } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceDialog from "../dialog/MaintenanceDialog";
@@ -16,6 +16,7 @@ import { useTheme } from "@/components/theme-provider";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CompanyApi } from "@/lib/api/company";
+import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog";
 
 export default function HksSidebar() {
     const navigate = useNavigate();
@@ -28,16 +29,18 @@ export default function HksSidebar() {
 
     const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
     const [logos, setLogos] = useState<{ smallLogo: string; largeLogo: string }>({ smallLogo: "", largeLogo: "" });
+    const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
     const logoSrc = useMemo(() => ({
-        small: logos.smallLogo ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}` : "/hks-icon.png",
-        large: logos.largeLogo ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}` : "/hks-logo.png",
-    }), [logos]);
+        small: logos.smallLogo ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}` : "/hks-icon.png",
+        large: logos.largeLogo ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}` : "/hks-logo.png",
+    }), [logos.largeLogo, logos.smallLogo, cacheBuster]);
 
     const fetchLogos = useCallback(async () => {
         try {
             const response = await CompanyApi.GetLogos();
             if (response.isSuccess) {
                 setLogos(response.data);
+                setCacheBuster(Date.now());
             }
         } catch (error) {
             console.error("Şirket logoları alınırken bir hata oluştu:", error);
@@ -66,6 +69,16 @@ export default function HksSidebar() {
             showCloseButton: true,
         });
     }, [configs?.maintenanceMode, openDialog]);
+
+    const handleCompanyDetails = useCallback(async () => {
+        openDialog({
+            title: "Şirket Detayları",
+            description: "Şirket bilgilerinizi görüntüleyin ve düzenleyin.",
+            size: "3xl",
+            content: <CompanyDetailsDialog />,
+            showCloseButton: true,
+        });
+    }, [openDialog]);
 
     const handleGetActiveUsers = useCallback(() => {
         sendGetActiveUsersRequest();
@@ -116,7 +129,7 @@ export default function HksSidebar() {
             ]
         },
         test: {
-            title: "Test Bölümü",
+            title: "TESTING",
             url: "",
             items: [
                 {
@@ -152,7 +165,11 @@ export default function HksSidebar() {
         >
             <SidebarRail className={state === "collapsed" ? "w-2" : "w-4"} />
             <SidebarHeader>
-                <NavLink to="/" onClick={() => sessionStorage.setItem("current_page", "Genel Bakış")}>
+                <NavLink
+                    to="/"
+                    onClick={() => sessionStorage.setItem("current_page", "Genel Bakış")}
+                    className="hover:scale-105 active:scale-100 transition-transform block w-full"
+                >
                     <AnimatePresence mode="wait">
                         {state === "collapsed" ? (
                             <motion.img
@@ -208,7 +225,7 @@ export default function HksSidebar() {
                 {
                     Object.entries(financialItems).map(([key, group]) => (
                         (import.meta.env.VITE_NODE_ENV === "development" && key === "test") && (
-                            <SidebarGroup key={key} className="bg-red-100 rounded-md text-red-700">
+                            <SidebarGroup key={key}>
                                 {
                                     group.title && (
                                         <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
@@ -242,7 +259,7 @@ export default function HksSidebar() {
                                             open={state === "collapsed" ? undefined : false}>
                                             <TooltipTrigger asChild>
                                                 <DropdownMenuTrigger asChild>
-                                                    <SidebarMenuButton onClick={handleToggleMaintenance}>
+                                                    <SidebarMenuButton>
                                                         <ShieldUser />
                                                         <span className="select-none">Yönetici Araçları</span>
                                                     </SidebarMenuButton>
@@ -269,6 +286,12 @@ export default function HksSidebar() {
                                                 <UsersRound className="text-inherit bg-inherit select-none" />
                                                 <span>Aktif Kullanıcılar</span>
                                             </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={handleCompanyDetails}
+                                                className="!justify-start">
+                                                <Building2 className="text-inherit bg-inherit select-none" />
+                                                <span>Şirket Detayları</span>
+                                            </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </SidebarMenuItem>
@@ -280,23 +303,6 @@ export default function HksSidebar() {
                 <SidebarGroup className="!p-0">
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-2">
-                            {/* <Tooltip
-                                disableHoverableContent
-                                open={state === "collapsed" ? undefined : false}>
-                                <TooltipTrigger asChild>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton
-                                            onClick={toggleSidebar}>
-                                            {state === "expanded" ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
-                                            <span className="select-none">Kenarlığı Küçült</span>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                    Kenarlığı Büyüt
-                                </TooltipContent>
-                            </Tooltip>
-                            <SidebarSeparator className="!mx-0" /> */}
                             <SidebarMenuItem>
                                 <DropdownMenu>
                                     <Tooltip

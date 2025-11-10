@@ -7,15 +7,16 @@ import { DollarSign, Euro, PoundSterling } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export default function ExchangeRates() {
-
     const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
 
     const fetchExchangeRates = async () => {
         try {
             const response = await TCMBApi.GetExchangeRates();
 
-            if (response)
+            if (response) {
                 setExchangeRates(response);
+                sessionStorage.setItem('exchangeRates', JSON.stringify(response));
+            }
 
         } catch (error) {
             console.log(error);

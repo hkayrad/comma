@@ -9,6 +9,89 @@ import { pool } from '../utils/db/pool';
 const uploadDir = path.resolve(process.cwd(), 'uploads', 'logos');
 
 export class CompanyService {
+    static async GetCompanyById(companyId: string, requesterCompanyId: string) {
+        let conn;
+
+        Logger.info('GetCompanyById called with companyId:', companyId, 'requesterCompanyId:', requesterCompanyId);
+
+        if (!companyId) {
+            return ApiResponse.error('Company ID is required');
+        }
+
+        if (companyId !== requesterCompanyId) {
+            return ApiResponse.error('Unauthorized');
+        }
+
+        try {
+            conn = await pool.getConnection();
+            const rows = await conn.query('SELECT name, address, phone, is_company, email, tax_number, tax_office, mersis_no FROM companies WHERE id = ?', [companyId]);
+
+            Logger.info(`Fetching company details for company: ${companyId}`);
+
+            if (Array.isArray(rows) && rows.length > 0) {
+                const company = rows[0] as any;
+
+                // Optionally, you can add permission checks here based on requesterCompanyId
+
+                return ApiResponse.success({
+                    id: company.id,
+                    name: company.name,
+                    address: company.address,
+                    phone: company.phone,
+                    email: company.email,
+                    is_company: company.is_company,
+                    tax_number: company.tax_number,
+                    tax_office: company.tax_office,
+                    mersis_no: company.mersis_no
+                }, 'Company details fetched successfully');
+            } else {
+                return ApiResponse.error('Company not found');
+            }
+        } catch (error: any) {
+            Logger.error('Error fetching company details:', error);
+            return ApiResponse.error(error.message || 'Failed to fetch company details');
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    static async UpdateCompanyDetails(companyId: string, details: any) {
+        let conn;
+
+        Logger.info('UpdateCompanyDetails called with companyId:', companyId, 'details:', details);
+
+        if (!companyId  || !details.name || details.is_company === undefined || details.is_company === null) {
+            return ApiResponse.error('Company ID and required details are missing');
+        }
+
+        try {
+            conn = await pool.getConnection();
+            await conn.query(
+                `UPDATE companies SET name = ?, is_company = ?, address = ?, phone = ?, email = ?, tax_number = ?, tax_office = ?, mersis_no = ? WHERE id = ?`,
+                [
+                    details.name,
+                    details.is_company,
+                    details.address,
+                    details.phone,
+                    details.email,
+                    details.tax_number,
+                    details.tax_office,
+                    details.mersis_no,
+                    companyId
+                ]
+            );
+
+            Logger.info(`Company details updated for company: ${companyId}`);
+
+            return ApiResponse.success(null, 'Company details updated successfully');
+        } catch (error: any) {
+            Logger.error('Error updating company details:', error);
+            return ApiResponse.error(error.message || 'Failed to update company details');
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
     static async UploadLogo(logoSize: 'small' | 'large', logo: UploadedFile, companyId: string) {
         try {
             if (!logo) {
@@ -23,7 +106,7 @@ export class CompanyService {
 
             // Generate unique filename
             const fileExtension = path.extname(logo.name);
-            const fileName = `${logoSize}-logo-${companyId}-${Date.now()}${fileExtension}`;
+            const fileName = `${logoSize}-logo-${companyId}${fileExtension}`;
             const filePath = path.join(uploadDir, fileName);
 
             // Move file to uploads directory

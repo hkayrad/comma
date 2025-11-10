@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useDialog } from "@/contexts/DialogContext"
 import { PayableCustomerApi, PayableDebtApi, ReceivableCustomerApi, ReceivableDebtApi } from "@/lib/api"
-import type { CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types"
+import type { AvailableCurrency, CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ReceiptText, TextInitial, TurkishLira } from "lucide-react"
-import { useEffect, useState } from "react"
+import { DollarSign, Euro, ReceiptText, TextInitial, TurkishLira } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
@@ -15,6 +15,8 @@ import CustomerSelect from "./components/CustomerSelect"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
 import DateSelect from "./components/DateSelect"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 
 type Props = {
     debt?: DebtDto,
@@ -25,6 +27,7 @@ const DebtFormSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçilmesi zorunludur"),
     amount: z.number({ error: "Geçersiz tutar" }).min(0.01, "Tutar en az 0.01 olmalıdır"),
     vat: z.number({ error: "Geçersiz tutar" }).min(0, "KDV en az 0 olmalıdır").or(z.literal(0)),
+    currency: z.enum(["TRY", "USD", "EUR"], { error: "Geçersiz para birimi" }),
     issue_date: z.date({ error: "Geçersiz tarih" }),
     invoice_no: z.string().max(100, "Fatura numarası en fazla 100 karakter olmalıdır").optional().or(z.literal("")),
     description: z.string().max(500, "Açıklama en fazla 500 karakter olmalıdır").optional().or(z.literal("")),
@@ -44,6 +47,7 @@ export default function DebtDialog(props: Props) {
             customer_id: debt?.customer_id || "",
             amount: debt?.amount ? Number(debt.amount) : 0,
             vat: debt?.vat ? Number(debt.vat) : 0,
+            currency: debt?.currency || "TRY",
             issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
             invoice_no: debt?.invoice_no || "",
             description: debt?.description || "",
@@ -93,6 +97,12 @@ export default function DebtDialog(props: Props) {
         });
     }
 
+    const currencySign = useMemo(() => ({
+        TRY: <TurkishLira />,
+        USD: <DollarSign />,
+        EUR: <Euro />,
+    }), []);
+
     useEffect(() => {
         handleFetchCustomerIdAndNames();
     }, []);
@@ -122,6 +132,40 @@ export default function DebtDialog(props: Props) {
                 />
                 <FormField
                     control={form.control}
+                    name="currency"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="flex gap-1">Para Birimi <span className="text-red-500">*</span></FormLabel>
+                            <FormControl>
+                                <Select name={field.name} onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="TRY">
+                                            <TurkishLira />
+                                            <span>Türk Lirası</span>
+                                        </SelectItem>
+                                        <SelectItem value="EUR">
+                                            <Euro />
+                                            <span>Euro</span>
+                                        </SelectItem>
+                                        <SelectItem value="USD">
+                                            <DollarSign />
+                                            <span>Amerikan Doları</span>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormDescription>
+                                Borç para birimi.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
@@ -140,7 +184,7 @@ export default function DebtDialog(props: Props) {
                                         }}
                                     />
                                     <InputGroupAddon>
-                                        <TurkishLira />
+                                        {currencySign[form.watch("currency") as AvailableCurrency]}
                                     </InputGroupAddon>
                                 </InputGroup>
                             </FormControl>
@@ -172,7 +216,7 @@ export default function DebtDialog(props: Props) {
                                             }}
                                         />
                                         <InputGroupAddon>
-                                            <TurkishLira />
+                                            {currencySign[form.watch("currency") as AvailableCurrency]}
                                         </InputGroupAddon>
                                         <InputGroupAddon align="inline-end">
                                             <Tooltip>

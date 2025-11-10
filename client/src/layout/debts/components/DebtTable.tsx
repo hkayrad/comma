@@ -1,4 +1,4 @@
-import type { DebtDto } from "@/lib/types";
+import type { AvailableCurrency, DebtDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -6,7 +6,7 @@ import { sendRefreshEvent } from "@/lib/utils";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/shared/dialog/DebtDialog";
 import { useDialog } from "@/contexts/DialogContext";
@@ -15,14 +15,19 @@ import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
+import { useMemo } from "react";
 
 type Props = {
     data: DebtDto[];
     type: 'receivable' | 'payable';
+    currency?: {
+        state: AvailableCurrency;
+        onChange: (value: AvailableCurrency) => void;
+    };
 }
 
 export default function DebtTable(props: Props) {
-    const { data, type } = props;
+    const { data, type, currency } = props;
 
     const { openDialog } = useDialog();
 
@@ -58,7 +63,7 @@ export default function DebtTable(props: Props) {
         });
     }
 
-    const DebtTableColumns: ColumnDef<DebtDto>[] = [
+    const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(() => ([
         {
             id: "#",
             header: ({ column }) => column.id,
@@ -79,32 +84,34 @@ export default function DebtTable(props: Props) {
                 </Tooltip>
             ),
         },
-        {
-            accessorKey: "amount",
-            id: "Tutar",
-            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
-            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
-            sortingFn: formattedNumber,
-        },
-        {
-            accessorKey: "vat",
-            id: "KDV",
-            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
-            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
-            sortingFn: formattedNumber,
-        },
+        ...["TRY", "USD", "EUR"].flatMap((curr) => [
+            {
+                accessorKey: "amount",
+                id: `Tutar (${curr})`,
+                header: ({ column }: { column: Column<any> }) => <SortableColumnHeader column={column} title={column.id} />,
+                cell: ({ row, column }: { row: Row<any>, column: Column<any> }) => <FormattedCurrency row={row} column={column} currency={curr as AvailableCurrency} />,
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "vat",
+                id: `KDV (${curr})`,
+                header: ({ column }: { column: Column<any> }) => <SortableColumnHeader column={column} title={column.id} />,
+                cell: ({ row, column }: { row: Row<any>, column: Column<any> }) => <FormattedCurrency row={row} column={column} currency={curr as AvailableCurrency} />,
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "total_amount",
+                id: `Toplam (${curr})`,
+                header: ({ column }: { column: Column<any> }) => <SortableColumnHeader column={column} title={column.id} />,
+                cell: ({ row, column }: { row: Row<any>, column: Column<any> }) => <FormattedCurrency row={row} column={column} currency={curr as AvailableCurrency} />,
+                sortingFn: formattedNumber,
+            },
+        ]),
         {
             accessorKey: "issue_date",
             id: "Düzenlenme Tarihi",
             header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
             cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
-        },
-        {
-            accessorKey: "total_amount",
-            id: "Toplam",
-            header: ({ column }) => <SortableColumnHeader column={column} title={column.id} />,
-            cell: ({ row, column }) => <FormattedCurrency row={row} column={column} />,
-            sortingFn: formattedNumber,
         },
         {
             accessorKey: "invoice_no",
@@ -172,9 +179,18 @@ export default function DebtTable(props: Props) {
                 </div>
             )
         }
-    ];
+    ]), [onEdit, type]);
+
+    const FilteredDebtTableColumns = useMemo(() => {
+        return DebtTableColumns.filter(col => (
+            !col.id?.startsWith("Toplam") &&
+            !col.id?.startsWith("Tutar") &&
+            !col.id?.startsWith("KDV") ||
+            (currency ? col.id?.endsWith(`(${currency.state})`) : true)
+        ));
+    }, [DebtTableColumns, currency]);
 
     return (
-        <HksTable data={data} columns={DebtTableColumns} searchColumn="Müşteri" />
+        <HksTable data={data.filter(d => d.currency === currency?.state)} columns={FilteredDebtTableColumns} searchColumn="Müşteri" currency={currency} />
     )
 }

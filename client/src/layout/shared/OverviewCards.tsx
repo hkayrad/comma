@@ -1,6 +1,6 @@
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
-import type { OverviewViewType, Totals } from "@/lib/types";
+import type { AvailableCurrency, OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -9,10 +9,11 @@ type Props = {
     type: OverviewViewType;
     width?: "full" | "auto";
     align?: "start" | "center" | "end" | "stretch";
+    currency: AvailableCurrency;
 }
 
 export default function OverviewCards(props: Props) {
-    const { type, width = "full", align = "center" } = props;
+    const { type, width = "full", align = "center", currency = "TRY" } = props;
 
     const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
     const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
@@ -23,13 +24,13 @@ export default function OverviewCards(props: Props) {
     });
 
     const fetchReceivableTotals = async () => {
-        const response = await ReceivableDebtApi.GetTotals();
+        const response = await ReceivableDebtApi.GetTotals(currency);
         if (response)
             setReceivableTotals(response);
     }
 
     const fetchPayableTotals = async () => {
-        const response = await PayableDebtApi.GetTotals();
+        const response = await PayableDebtApi.GetTotals(currency);
         if (response)
             setPayableTotals(response);
     }
@@ -45,7 +46,7 @@ export default function OverviewCards(props: Props) {
         return () => {
             window.removeEventListener("global:refresh", handleRefresh);
         }
-    }, [])
+    }, [currency])
 
     useEffect(() => {
         if (type === "receivable") {
@@ -53,15 +54,15 @@ export default function OverviewCards(props: Props) {
                 setFormattedTotals({
                     total_debts: Number(receivableTotals.total_debts || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     }),
                     total_payments: Number(receivableTotals.total_payments || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     }),
                     remaining_debt: Number(receivableTotals.remaining_debt || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     })
                 });
             }
@@ -70,20 +71,20 @@ export default function OverviewCards(props: Props) {
                 setFormattedTotals({
                     total_debts: Number(payableTotals.total_debts || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     }),
                     total_payments: Number(payableTotals.total_payments || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     }),
                     remaining_debt: Number(payableTotals.remaining_debt || 0).toLocaleString("tr-TR", {
                         style: "currency",
-                        currency: "TRY"
+                        currency: currency
                     })
                 });
             }
         }
-    }, [type, receivableTotals])
+    }, [type, receivableTotals, payableTotals, currency])
 
     return (
         <div className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"}`}>

@@ -67,12 +67,12 @@ app.use("/payable", PayablePaymentsController);
 const listenPort = process.env.SERVER_PORT || (() => { throw new Error("SERVER_PORT not defined"); })();
 
 server.listen(listenPort, () => {
-    Logger.log(`Server is running on port ${listenPort}`);
-    Logger.log(`DB_HOST: ${process.env.DB_URL}`);
-    Logger.log(`DB_USER: ${process.env.DB_USER}`);
-    Logger.log(`DB_NAME: ${process.env.DB_NAME}`);
-    Logger.log(`JWT_ISSUER: ${process.env.JWT_ISSUER}`);
-    Logger.log(`JWT_AUDIENCE: ${process.env.JWT_AUDIENCE}`);
-    Logger.log(`JWT_EXPIRES_IN: ${process.env.JWT_EXPIRES_IN}h`);
-    Logger.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+    Logger.info(`Server is running on port ${listenPort}`);
+    Logger.info(`DB_HOST: ${process.env.DB_URL}`);
+    Logger.info(`DB_USER: ${process.env.DB_USER}`);
+    Logger.info(`DB_NAME: ${process.env.DB_NAME}`);
+    Logger.info(`JWT_ISSUER: ${process.env.JWT_ISSUER}`);
+    Logger.info(`JWT_AUDIENCE: ${process.env.JWT_AUDIENCE}`);
+    Logger.info(`JWT_EXPIRES_IN: ${process.env.JWT_EXPIRES_IN}h`);
+    Logger.info(`NODE_ENV: ${process.env.NODE_ENV}`);
 });

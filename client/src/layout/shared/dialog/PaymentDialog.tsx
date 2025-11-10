@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useDialog } from "@/contexts/DialogContext"
 import { PayableCustomerApi, PayablePaymentApi, ReceivableCustomerApi, ReceivablePaymentApi } from "@/lib/api"
-import type { CustomerIdName, OverviewViewType, PaymentDto } from "@/lib/types"
+import type { AvailableCurrency, CustomerIdName, OverviewViewType, PaymentDto } from "@/lib/types"
 import { sendRefreshEvent } from "@/lib/utils"
 import { Logger } from "@/lib/utils/logger"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ReceiptText, TextInitial, TurkishLira } from "lucide-react"
-import { useEffect, useState } from "react"
+import { DollarSign, Euro, ReceiptText, TextInitial, TurkishLira } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z from "zod"
@@ -15,6 +15,7 @@ import CustomerSelect from "./components/CustomerSelect"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import DateSelect from "./components/DateSelect"
 import { Radio, RadioGroup } from "@/components/animate-ui/components/base/radio"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type Props = {
     payment?: PaymentDto,
@@ -24,6 +25,7 @@ type Props = {
 const PaymentFormSchema = z.object({
     customer_id: z.string().min(1, "Müşteri seçilmesi zorunludur"),
     amount: z.number({ error: "Geçersiz tutar" }).min(0.01, "Tutar en az 0.01 olmalıdır"),
+    currency: z.enum(["TRY", "USD", "EUR"], { error: "Geçersiz para birimi" }),
     payment_date: z.date({ error: "Geçersiz tarih" }),
     payment_method: z.enum(["cash", "bank_transfer", "check", "card"], { error: "Geçersiz ödeme yöntemi" }),
     invoice_no: z.string().max(100, "Fatura numarası en fazla 100 karakter olmalıdır").optional().or(z.literal("")),
@@ -43,6 +45,7 @@ export default function PaymentDialog(props: Props) {
         defaultValues: {
             customer_id: payment?.customer_id || "",
             amount: payment?.amount ? Number(payment.amount) : 0,
+            currency: payment?.currency || "TRY",
             payment_date: payment?.payment_date ? new Date(payment.payment_date) : new Date(),
             payment_method: payment?.payment_method || "bank_transfer",
             invoice_no: payment?.invoice_no || "",
@@ -87,6 +90,12 @@ export default function PaymentDialog(props: Props) {
         });
     }
 
+    const currencySign = useMemo(() => ({
+        TRY: <TurkishLira />,
+        USD: <DollarSign />,
+        EUR: <Euro />,
+    }), []);
+
     useEffect(() => {
         handleFetchCustomerIdAndNames();
     }, []);
@@ -116,6 +125,40 @@ export default function PaymentDialog(props: Props) {
                 />
                 <FormField
                     control={form.control}
+                    name="currency"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="flex gap-1">Para Birimi <span className="text-red-500">*</span></FormLabel>
+                            <FormControl>
+                                <Select name={field.name} onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="TRY">
+                                            <TurkishLira />
+                                            <span>Türk Lirası</span>
+                                        </SelectItem>
+                                        <SelectItem value="EUR">
+                                            <Euro />
+                                            <span>Euro</span>
+                                        </SelectItem>
+                                        <SelectItem value="USD">
+                                            <DollarSign />
+                                            <span>Amerikan Doları</span>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormDescription>
+                                Borç para birimi.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
                     name="amount"
                     render={({ field }) => (
                         <FormItem>
@@ -134,7 +177,7 @@ export default function PaymentDialog(props: Props) {
                                         }}
                                     />
                                     <InputGroupAddon>
-                                        <TurkishLira />
+                                        {currencySign[form.watch("currency") as AvailableCurrency]}
                                     </InputGroupAddon>
                                 </InputGroup>
                             </FormControl>

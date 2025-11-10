@@ -13,7 +13,7 @@ export class AuthService {
                 issuer: process.env.JWT_ISSUER,
                 audience: process.env.JWT_AUDIENCE
             });
-            Logger.log("Token verified:", decoded);
+            Logger.info("Token verified:", decoded);
             return decoded;
         } catch (err) {
             Logger.error(err);
@@ -43,7 +43,7 @@ export class AuthService {
                     id: user.id,
                     companyId: user.company_id,
                     username: user.username,
-                    role: user.role
+                    role: user.role,
                 },
                 process.env.JWT_SECRET as jwt.Secret,
                 {

@@ -13,7 +13,8 @@ router.post('/debts', async (req, res) => {
 });
 
 router.get('/debts/totals', async (req, res) => {
-    const response = await ReceivableDebtsService.GetTotals(req.companyId);
+    const { currency } = req.query;
+    const response = await ReceivableDebtsService.GetTotals(req.companyId, currency as string);
     res.json(response);
 });
 

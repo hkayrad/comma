@@ -1,16 +1,7 @@
 import Cookies from "js-cookie";
 import instance from "../instance";
 import { useJwt } from "react-jwt";
-
-type Token = {
-    aud: string,
-    exp: number,
-    iat: number,
-    id: string,
-    iss: string,
-    username: string,
-    role: number
-}
+import type { DecodedJwtToken } from "../types";
 
 export class AuthApi {
     static async Login(username: string, password: string) {
@@ -41,7 +32,7 @@ export class AuthApi {
 }
 
 // Custom hook to get the current user
-export function useCurrentUser(): Token | null {
+export function useCurrentUser(): DecodedJwtToken | null {
     const token = Cookies.get('user_session');
 
     const { decodedToken, isExpired } = useJwt(token || '');
@@ -53,5 +44,5 @@ export function useCurrentUser(): Token | null {
         return null;
     }
 
-    return decodedToken as Token;
+    return decodedToken as DecodedJwtToken;
 }

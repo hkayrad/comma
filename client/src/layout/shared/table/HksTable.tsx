@@ -2,15 +2,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useState } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type ColumnFiltersState, type SortingState, type VisibilityState } from "@tanstack/react-table";
 import HksTableHeader from "./components/HksTableHeader";
+import type { AvailableCurrency } from "@/lib/types";
 
 type Props = {
     data: any[];
     columns: ColumnDef<any>[];
     searchColumn: string;
+    currency?: {
+        state: AvailableCurrency;
+        onChange: (value: AvailableCurrency) => void;
+    };
 }
 
 export default function HksTable(props: Props) {
-    const { data, columns, searchColumn } = props;
+    const { data, columns, searchColumn, currency } = props;
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -40,8 +45,8 @@ export default function HksTable(props: Props) {
 
     return (
         <>
-            <div className="sticky -top-4 z-20 pt-4 pb-4 bg-background">
-                <HksTableHeader table={table} searchColumn={searchColumn} />
+            <div className="sticky -top-4 z-20 pt-2 pb-4 bg-background">
+                <HksTableHeader table={table} searchColumn={searchColumn} currency={currency} />
             </div>
             <div className="rounded-md border overflow-clip">
                 <div className="overflow-auto max-h-[calc(100vh-21rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">

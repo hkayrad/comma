@@ -42,14 +42,22 @@ export default class ReceivableCustomersService {
             const query = `
             SELECT
                 c.*,
-                COALESCE(debt_summary.total_debt, 0) AS total_debt,
-                COALESCE(payment_summary.total_payments, 0) AS total_payments,
-                (COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0)) AS remaining_debt
+                COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+                COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+                COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+                COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+                COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+                COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+                (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
+                (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
+                (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
             FROM receivable_customers c
             LEFT JOIN (
                 SELECT 
                     customer_id,
-                    SUM(amount + COALESCE(vat, 0)) AS total_debt
+                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
+                    SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
+                    SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
                 FROM receivable_debts
                 WHERE company_id = ?
                 GROUP BY customer_id
@@ -57,12 +65,14 @@ export default class ReceivableCustomersService {
             LEFT JOIN (
                 SELECT 
                     customer_id,
-                    SUM(amount) AS total_payments
+                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
+                    SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
+                    SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
                 FROM receivable_payments
                 WHERE company_id = ?
                 GROUP BY customer_id
             ) payment_summary ON c.id = payment_summary.customer_id
-            WHERE c.company_id = ?
+            WHERE company_id = ?
             ORDER BY c.created_at DESC
             `;
 
@@ -97,14 +107,22 @@ export default class ReceivableCustomersService {
             const customerQuery = `
             SELECT
                 c.*,
-                COALESCE(debt_summary.total_debt, 0) AS total_debt,
-                COALESCE(payment_summary.total_payments, 0) AS total_payments,
-                (COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0)) AS remaining_debt
+                COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+                COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+                COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+                COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+                COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+                COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+                (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
+                (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
+                (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
             FROM receivable_customers c
             LEFT JOIN (
                 SELECT 
                     customer_id,
-                    SUM(amount + COALESCE(vat, 0)) AS total_debt
+                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
+                    SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
+                    SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
                 FROM receivable_debts
                 WHERE company_id = ?
                 GROUP BY customer_id
@@ -112,7 +130,9 @@ export default class ReceivableCustomersService {
             LEFT JOIN (
                 SELECT 
                     customer_id,
-                    SUM(amount) AS total_payments
+                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
+                    SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
+                    SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
                 FROM receivable_payments
                 WHERE company_id = ?
                 GROUP BY customer_id

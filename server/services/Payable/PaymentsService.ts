@@ -6,17 +6,17 @@ export default class PayablePaymentsService {
         let conn;
 
         try {
-            const { customer_id, amount, invoice_no, payment_date, description, payment_method } = payment;
+            const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
 
-            if (!customer_id || !amount || !payment_date || !payment_method) {
-                Logger.log("Missing required fields:", { customer_id, amount, payment_date, payment_method });
+            if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+                Logger.info("Missing required fields:", { customer_id, amount, currency, payment_date, payment_method });
                 return ApiResponse.error("Missing required fields");
             }
 
-            Logger.log("Creating payment with data:", payment);
+            Logger.info("Creating payment with data:", payment);
             const query = `
-            INSERT INTO payable_payments (customer_id, amount, invoice_no, description, payment_date, payment_method, company_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO payable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
             conn = await pool.getConnection();
@@ -24,6 +24,7 @@ export default class PayablePaymentsService {
             const result = await conn.query(query, [
                 customer_id,
                 amount,
+                currency,
                 invoice_no || null,
                 description || null,
                 payment_date,
@@ -80,21 +81,21 @@ export default class PayablePaymentsService {
 
         try {
             if (!paymentId) {
-                Logger.log("Missing payment ID");
+                Logger.info("Missing payment ID");
                 return ApiResponse.error("Missing payment ID");
             }
 
-            const { customer_id, amount, invoice_no, payment_date, description, payment_method } = payment;
+            const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
 
-            if (!customer_id || !amount || !payment_date || !payment_method) {
-                Logger.log("Missing required fields:", { customer_id, amount, payment_date, payment_method });
+            if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+                Logger.info("Missing required fields:", { customer_id, amount, currency, payment_date, payment_method });
                 return ApiResponse.error("Missing required fields");
             }
 
-            Logger.log("Updating payment with ID:", paymentId);
+            Logger.info("Updating payment with ID:", paymentId);
             const query = `
             UPDATE payable_payments
-            SET customer_id = ?, amount = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
+            SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
             WHERE id = ? AND company_id = ?
             `;
 
@@ -103,6 +104,7 @@ export default class PayablePaymentsService {
             const result = await conn.query(query, [
                 customer_id,
                 amount,
+                currency,
                 invoice_no || null,
                 description || null,
                 payment_date,
@@ -131,11 +133,11 @@ export default class PayablePaymentsService {
 
         try {
             if (!paymentId) {
-                Logger.log("Missing payment ID");
+                Logger.info("Missing payment ID");
                 return ApiResponse.error("Missing payment ID");
             }
 
-            Logger.log("Deleting payment with ID:", paymentId);
+            Logger.info("Deleting payment with ID:", paymentId);
             const query = `DELETE FROM payable_payments WHERE id = ? AND company_id = ?`;
 
             conn = await pool.getConnection();

@@ -10,7 +10,7 @@ router.post('/login', async (req, res) => {
         return ApiResponse.error("Username and password are required");
     }
     const response = await AuthService.Login(username, password);
-    Logger.log(response);
+    Logger.info(response);
     res.json(response);
 });
 
