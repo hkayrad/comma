@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "../types";
+import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
 
 export class ReceivableCustomerApi {

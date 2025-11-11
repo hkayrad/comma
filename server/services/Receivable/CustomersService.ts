@@ -1,291 +1,381 @@
-import { pool } from "../../utils/db/pool";
-import { ApiResponse, Logger } from "../../utils";
+import { CustomerDto, CustomerIdName, DebtDto, InsertResult, PaymentDto, UUID } from "@common/types";
+import { pool } from "../../lib/db/pool";
+import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class ReceivableCustomersService {
-    static async Create(customer: any, companyId: string) {
-        let conn;
+	static async Create(customer: CustomerDto, companyId: UUID) {
+		let conn;
 
-        try {
-            const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
+		try {
+			Logger.info("[ReceivableCustomers] Creating customer", { companyId, customerName: customer.name });
 
-            if (!name || is_company === undefined || is_company === null) {
-                return ApiResponse.error("Name and customer type are required");
-            }
+			const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
 
-            const query = `
-            INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+			if (!name || is_company === undefined || is_company === null) {
+				Logger.error("[ReceivableCustomers] Missing required fields", { name, is_company });
+				return ApiResponse.error("Name and customer type are required");
+			}
+
+			const query = `
+                INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, companyId]);
-            Logger.info("Customer creation result:", result);
+			const result = (await conn.query(query, [
+				name,
+				phone || null,
+				is_company,
+				tax_number || null,
+				tax_office || null,
+				mersis_no || null,
+				email || null,
+				address || null,
+				companyId,
+			])) as InsertResult[];
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("Failed to create customer");
+			Logger.debug("[ReceivableCustomers] Customer creation result", { result });
 
-            return ApiResponse.success(result[0].id, "Customer created successfully");
+			if (!result || result.length === 0) {
+				Logger.error("[ReceivableCustomers] Failed to create customer - no result returned");
+				return ApiResponse.error("Failed to create customer");
+			}
 
-        } catch (error) {
-            Logger.error('Error creating customer:', error);
-            return ApiResponse.error("Error creating customer");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.info("[ReceivableCustomers] Customer created successfully", { customerId: result[0].id, companyId });
+			return ApiResponse.success(result[0].id, "Customer created successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error creating customer", { companyId, error: error.message });
+			return ApiResponse.error("Error creating customer");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-    static async GetAll(companyId: string) {
-        let conn;
+	static async GetAll(companyId: UUID) {
+		let conn;
 
-        try {
-            const query = `
-            SELECT
-                c.*,
-                COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
-                COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
-                COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
-                COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
-                COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
-                COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
-                (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
-                (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
-                (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
-            FROM receivable_customers c
-            LEFT JOIN (
-                SELECT 
-                    customer_id,
-                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
-                    SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
-                    SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
-                FROM receivable_debts
-                WHERE company_id = ?
-                GROUP BY customer_id
-            ) debt_summary ON c.id = debt_summary.customer_id
-            LEFT JOIN (
-                SELECT 
-                    customer_id,
-                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
-                    SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
-                    SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
-                FROM receivable_payments
-                WHERE company_id = ?
-                GROUP BY customer_id
-            ) payment_summary ON c.id = payment_summary.customer_id
-            WHERE company_id = ?
-            ORDER BY c.created_at DESC
+		try {
+			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId });
+
+			const query = `
+                SELECT
+                    c.*,
+                    COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+                    COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+                    COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+                    COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+                    COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+                    COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+                    (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
+                    (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
+                    (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
+                FROM receivable_customers c
+                LEFT JOIN (
+                    SELECT
+                        customer_id,
+                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
+                        SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
+                        SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
+                    FROM receivable_debts
+                    WHERE company_id = ?
+                    GROUP BY customer_id
+                ) debt_summary ON c.id = debt_summary.customer_id
+                LEFT JOIN (
+                    SELECT
+                        customer_id,
+                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
+                        SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
+                        SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
+                    FROM receivable_payments
+                    WHERE company_id = ?
+                    GROUP BY customer_id
+                ) payment_summary ON c.id = payment_summary.customer_id
+                WHERE c.company_id = ?
+                ORDER BY c.created_at DESC
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [companyId, companyId, companyId])) as CustomerDto[];
 
-            const result = await conn.query(query, [companyId, companyId, companyId]);
-            Logger.info("Retrieved receivable_customers:", result);
+			Logger.debug("[ReceivableCustomers] Customers fetched successfully", { companyId, count: result.length });
 
-            if (result.length === 0)
-                return ApiResponse.error("No receivable_customers found");
+			if (result.length === 0) {
+				Logger.debug("[ReceivableCustomers] No customers found", { companyId });
+				return ApiResponse.success([], "No customers found");
+			}
 
-            return ApiResponse.success(result, "Customers retrieved successfully");
-        } catch (error) {
-            Logger.error("Failed to retrieve receivable_customers:", error);
-            return ApiResponse.error("Failed to retrieve receivable_customers");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			return ApiResponse.success(result, "Customers retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error fetching customers", { companyId, error: error.message });
+			return ApiResponse.error("Failed to retrieve customers");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-    static async GetStatement(customerId: string, companyId: string) {
-        let conn;
+	static async GetStatement(customerId: UUID, companyId: UUID) {
+		let conn;
 
-        try {
-            if (!customerId) {
-                return ApiResponse.error("Customer ID is required");
-            }
+		try {
+			Logger.debug("[ReceivableCustomers] Fetching customer statement", { customerId, companyId });
 
-            conn = await pool.getConnection();
+			if (!customerId) {
+				Logger.error("[ReceivableCustomers] Missing customer ID");
+				return ApiResponse.error("Customer ID is required");
+			}
 
-            // Get customer base info with aggregates
-            const customerQuery = `
-            SELECT
-                c.*,
-                COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
-                COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
-                COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
-                COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
-                COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
-                COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
-                (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
-                (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
-                (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
-            FROM receivable_customers c
-            LEFT JOIN (
-                SELECT 
-                    customer_id,
-                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
-                    SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
-                    SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
-                FROM receivable_debts
-                WHERE company_id = ?
-                GROUP BY customer_id
-            ) debt_summary ON c.id = debt_summary.customer_id
-            LEFT JOIN (
-                SELECT 
-                    customer_id,
-                    SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
-                    SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
-                    SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
-                FROM receivable_payments
-                WHERE company_id = ?
-                GROUP BY customer_id
-            ) payment_summary ON c.id = payment_summary.customer_id
-            WHERE c.id = ? AND c.company_id = ?
+			conn = await pool.getConnection();
+
+			const customerQuery = `
+                SELECT
+                    c.*,
+                    COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+                    COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+                    COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+                    COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+                    COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+                    COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+                    (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
+                    (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
+                    (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
+                FROM receivable_customers c
+                LEFT JOIN (
+                    SELECT
+                        customer_id,
+                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
+                        SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
+                        SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
+                    FROM receivable_debts
+                    WHERE company_id = ?
+                    GROUP BY customer_id
+                ) debt_summary ON c.id = debt_summary.customer_id
+                LEFT JOIN (
+                    SELECT
+                        customer_id,
+                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
+                        SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
+                        SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
+                    FROM receivable_payments
+                    WHERE company_id = ?
+                    GROUP BY customer_id
+                ) payment_summary ON c.id = payment_summary.customer_id
+                WHERE c.id = ? AND c.company_id = ?
             `;
 
-            const customerResult = await conn.query(customerQuery, [companyId, companyId, customerId, companyId]);
-            if (customerResult.length === 0) {
-                return ApiResponse.error("Customer not found");
-            }
+			const customerResult = (await conn.query(customerQuery, [
+				companyId,
+				companyId,
+				customerId,
+				companyId,
+			])) as CustomerDto[];
 
-            const debtsQuery = `
-            SELECT 
-                d.id,
-                d.invoice_no,
-                d.amount,
-                d.vat,
-                (d.amount + d.vat) AS total_amount,
-                d.description,
-                d.issue_date,
-                d.created_at
-            FROM receivable_debts d
-            WHERE d.customer_id = ? AND d.company_id = ?
-            ORDER BY d.issue_date DESC, d.created_at DESC
+			if (customerResult.length === 0) {
+				Logger.error("[ReceivableCustomers] Customer not found", { customerId, companyId });
+				return ApiResponse.error("Customer not found");
+			}
+
+			const debtsQuery = `
+                SELECT
+                    d.id,
+                    d.invoice_no,
+                    d.amount,
+                    d.vat,
+                    (d.amount + d.vat) AS total_amount,
+                    d.description,
+                    d.issue_date,
+                    d.created_at
+                FROM receivable_debts d
+                WHERE d.customer_id = ? AND d.company_id = ?
+                ORDER BY d.issue_date DESC, d.created_at DESC
             `;
 
-            const paymentsQuery = `
-            SELECT 
-                p.id,
-                p.invoice_no,
-                p.amount,
-                p.payment_method,
-                p.description,
-                p.payment_date,
-                p.created_at
-            FROM receivable_payments p
-            WHERE p.customer_id = ? AND p.company_id = ?
-            ORDER BY p.payment_date DESC, p.created_at DESC
+			const paymentsQuery = `
+                SELECT
+                    p.id,
+                    p.invoice_no,
+                    p.amount,
+                    p.payment_method,
+                    p.description,
+                    p.payment_date,
+                    p.created_at
+                FROM receivable_payments p
+                WHERE p.customer_id = ? AND p.company_id = ?
+                ORDER BY p.payment_date DESC, p.created_at DESC
             `;
 
-            const [debtsResult, paymentsResult] = await Promise.all([
-                conn.query(debtsQuery, [customerId, companyId]),
-                conn.query(paymentsQuery, [customerId, companyId])
-            ]);
+			const [debtsResult, paymentsResult] = await Promise.all([
+				conn.query(debtsQuery, [customerId, companyId]) as Promise<DebtDto[]>,
+				conn.query(paymentsQuery, [customerId, companyId]) as Promise<PaymentDto[]>,
+			]);
 
-            const response = {
-                customer: customerResult[0],
-                debts: debtsResult,
-                payments: paymentsResult
-            };
+			Logger.debug("[ReceivableCustomers] Customer statement fetched successfully", {
+				customerId,
+				companyId,
+				debtsCount: debtsResult.length,
+				paymentsCount: paymentsResult.length,
+			});
 
-            return ApiResponse.success(response, "Customer statement retrieved successfully");
-        } catch (error) {
-            Logger.error("Failed to retrieve customer statement:", error);
-            return ApiResponse.error("Failed to retrieve customer statement");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			const response = {
+				customer: customerResult[0],
+				debts: debtsResult,
+				payments: paymentsResult,
+			};
 
-    static async GetIdAndName(companyId: string) {
-        let conn;
+			return ApiResponse.success(response, "Customer statement retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error fetching customer statement", {
+				customerId,
+				companyId,
+				error: error.message,
+			});
+			return ApiResponse.error("Failed to retrieve customer statement");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            const query = `
-            SELECT id, name FROM receivable_customers WHERE company_id = ?
+	static async GetIdAndName(companyId: UUID) {
+		let conn;
+
+		try {
+			Logger.debug("[ReceivableCustomers] Fetching customer IDs and names", { companyId });
+
+			const query = `
+                SELECT id, name FROM receivable_customers WHERE company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [companyId])) as CustomerIdName[];
 
-            const result = await conn.query(query, [companyId]);
-            Logger.info("Retrieved receivable_customers:", result);
+			Logger.debug("[ReceivableCustomers] Customer IDs and names fetched successfully", {
+				companyId,
+				count: result.length,
+			});
 
+			if (result.length === 0) {
+				Logger.debug("[ReceivableCustomers] No customers found", { companyId });
+				return ApiResponse.success([], "No customers found");
+			}
 
-            if (result.length === 0)
-                return ApiResponse.error("No receivable_customers found");
+			return ApiResponse.success(result, "Customers retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error fetching customer IDs and names", { companyId, error: error.message });
+			return ApiResponse.error("Error retrieving customers");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-            return ApiResponse.success(result, "Customers retrieved successfully");
+	static async Update(id: UUID, customer: CustomerDto, companyId: UUID) {
+		let conn;
 
-        } catch (error) {
-            Logger.error('Error retrieving receivable_customers:', error);
-            return ApiResponse.error("Error retrieving receivable_customers");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+		try {
+			Logger.info("[ReceivableCustomers] Updating customer", { customerId: id, companyId });
 
-    static async Update(id: string, customer: any, companyId: string) {
-        let conn;
+			if (!id) {
+				Logger.error("[ReceivableCustomers] Missing customer ID");
+				return ApiResponse.error("Customer ID is required");
+			}
 
-        try {
-            if (!id) {
-                return ApiResponse.error("Customer ID is required");
-            }
+			const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
 
-            const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
+			if (!name || is_company === undefined || is_company === null) {
+				Logger.error("[ReceivableCustomers] Missing required fields", { name, is_company });
+				return ApiResponse.error("Name and customer type are required");
+			}
 
-            if (!name || is_company === undefined || is_company === null) {
-                return ApiResponse.error("Name and customer type are required");
-            }
-
-            const query = `
-            UPDATE receivable_customers 
-            SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-            WHERE id = ? AND company_id = ?
+			const query = `
+                UPDATE receivable_customers
+                SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
+                WHERE id = ? AND company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [name, phone, is_company || false, tax_number || null, tax_office || null, mersis_no || null, email || null, address || null, id, companyId]);
-            Logger.info("Customer update result:", result);
+			const result = (await conn.query(query, [
+				name,
+				phone || null,
+				is_company,
+				tax_number || null,
+				tax_office || null,
+				mersis_no || null,
+				email || null,
+				address || null,
+				id,
+				companyId,
+			])) as { affectedRows: number };
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("Failed to update customer or customer not found");
+			Logger.debug("[ReceivableCustomers] Customer update result", {
+				customerId: id,
+				affectedRows: result.affectedRows,
+			});
 
-            return ApiResponse.success(result[0], "Customer updated successfully");
+			if (result.affectedRows === 0) {
+				Logger.error("[ReceivableCustomers] Failed to update customer or customer not found", {
+					customerId: id,
+					companyId,
+				});
+				return ApiResponse.error("Failed to update customer or customer not found");
+			}
 
-        } catch (error) {
-            Logger.error('Error updating customer:', error);
-            return ApiResponse.error("Error updating customer");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.info("[ReceivableCustomers] Customer updated successfully", { customerId: id, companyId });
+			return ApiResponse.success(null, "Customer updated successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error updating customer", {
+				customerId: id,
+				companyId,
+				error: error.message,
+			});
+			return ApiResponse.error("Error updating customer");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-    static async Delete(id: string, companyId: string) {
-        let conn;
+	static async Delete(id: UUID, companyId: UUID) {
+		let conn;
 
-        try {
-            if (!id) {
-                return ApiResponse.error("Customer ID is required");
-            }
+		try {
+			Logger.info("[ReceivableCustomers] Deleting customer", { customerId: id, companyId });
 
-            const query = `
-            DELETE FROM receivable_customers WHERE id = ?
+			if (!id) {
+				Logger.error("[ReceivableCustomers] Missing customer ID");
+				return ApiResponse.error("Customer ID is required");
+			}
+
+			const query = `
+                DELETE FROM receivable_customers WHERE id = ? AND company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [id, companyId]);
-            Logger.info("Customer deletion result:", result);
+			const result = (await conn.query(query, [id, companyId])) as { affectedRows: number };
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("Failed to delete customer or customer not found");
+			Logger.debug("[ReceivableCustomers] Customer deletion result", {
+				customerId: id,
+				affectedRows: result.affectedRows,
+			});
 
-            return ApiResponse.success(null, "Customer deleted successfully");
+			if (result.affectedRows === 0) {
+				Logger.error("[ReceivableCustomers] Failed to delete customer or customer not found", {
+					customerId: id,
+					companyId,
+				});
+				return ApiResponse.error("Failed to delete customer or customer not found");
+			}
 
-        } catch (error) {
-            Logger.error('Error deleting customer:', error);
-            return ApiResponse.error("Error deleting customer");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.info("[ReceivableCustomers] Customer deleted successfully", { customerId: id, companyId });
+			return ApiResponse.success(null, "Customer deleted successfully");
+		} catch (error: any) {
+			Logger.error("[ReceivableCustomers] Error deleting customer", {
+				customerId: id,
+				companyId,
+				error: error.message,
+			});
+			return ApiResponse.error("Error deleting customer");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 }

@@ -1,173 +1,231 @@
-import { pool } from "../../utils/db/pool";
-import { ApiResponse, Logger } from "../../utils";
+import { DebtDto, InsertResult, Totals, UUID } from "@common/types";
+import { pool } from "../../lib/db/pool";
+import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class PayableDebtsService {
-    static async Create(debt: any, companyId: string) {
-        let conn;
+	static async Create(debt: DebtDto, companyId: UUID) {
+		let conn;
 
-        try {
-            const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
+		try {
+			Logger.info("[PayableDebts] Creating debt", { companyId, customerId: debt.customer_id });
 
-            if (!customer_id || amount === undefined || amount === null || !issue_date || vat === undefined || vat === null || !currency) {
-                return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
-            }
+			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
 
-            const query = `
-            INSERT INTO payable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+			if (
+				!customer_id ||
+				amount === undefined ||
+				amount === null ||
+				!issue_date ||
+				vat === undefined ||
+				vat === null ||
+				!currency
+			) {
+				Logger.error("[PayableDebts] Missing required fields", { customer_id, amount, vat, issue_date, currency });
+				return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
+			}
+
+			const query = `
+                INSERT INTO payable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [customer_id, amount, vat, currency, issue_date, invoice_no, description, companyId]);
-            Logger.info("Debt creation result:", result);
+			const result = (await conn.query(query, [
+				customer_id,
+				amount,
+				vat,
+				currency,
+				issue_date,
+				invoice_no || null,
+				description || null,
+				companyId,
+			])) as InsertResult[];
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("Failed to create debt");
+			Logger.debug("[PayableDebts] Debt creation result", { result });
 
-            return ApiResponse.success(result[0].id, "Debt created successfully");
-        } catch (error) {
-            Logger.error("Failed to create debt:", error);
-            return ApiResponse.error("Failed to create debt");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+			if (!result || result.length === 0) {
+				Logger.error("[PayableDebts] Failed to create debt - no result returned");
+				return ApiResponse.error("Failed to create debt");
+			}
 
-    static async GetAll(companyId: string) {
-        let conn;
+			Logger.info("[PayableDebts] Debt created successfully", { debtId: result[0].id, companyId });
+			return ApiResponse.success(result[0].id, "Debt created successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error creating debt", { companyId, error: error.message });
+			return ApiResponse.error("Failed to create debt");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            const query = `
-            SELECT 
-                d.*,
-                (d.amount + d.vat) AS total_amount,
-                c.name AS customer_name, 
-                c.tax_number AS customer_tax_number
-            FROM payable_debts d
-            JOIN payable_customers c ON d.customer_id = c.id
-            WHERE d.company_id = ?
-            ORDER BY d.issue_date DESC
+	static async GetAll(companyId: UUID) {
+		let conn;
+
+		try {
+			Logger.debug("[PayableDebts] Fetching all debts", { companyId });
+
+			const query = `
+                SELECT
+                    d.*,
+                    (d.amount + d.vat) AS total_amount,
+                    c.name AS customer_name,
+                    c.tax_number AS customer_tax_number
+                FROM payable_debts d
+                JOIN payable_customers c ON d.customer_id = c.id
+                WHERE d.company_id = ?
+                ORDER BY d.issue_date DESC
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [companyId])) as DebtDto[];
 
-            const result = await conn.query(query, [companyId]);
-            Logger.info("Retrieved payable_debts:", result);
+			Logger.debug("[PayableDebts] Debts fetched successfully", { companyId, count: result.length });
+			return ApiResponse.success(result, "Debts retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error fetching debts", { companyId, error: error.message });
+			return ApiResponse.error("Failed to retrieve debts");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-            return ApiResponse.success(result, "Debts retrieved successfully");
-        } catch (error) {
-            Logger.error("Failed to retrieve payable_debts:", error);
-            return ApiResponse.error("Failed to retrieve payable_debts");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+	static async GetTotals(companyId: UUID, currency: UUID) {
+		let conn;
 
-    static async GetTotals(companyId: string, currency: string) {
-        let conn;
+		try {
+			Logger.debug("[PayableDebts] Fetching totals", { companyId, currency });
 
-        try {
-            const query = `
-            SELECT
-                COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) AS total_debts,
-                COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0) AS total_payments,
-                COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0)), 0) AS remaining_debt
+			const query = `
+                SELECT
+                    COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) AS total_debts,
+                    COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0) AS total_payments,
+                    COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0)), 0) AS remaining_debt
             `;
 
-            console.log(currency);
-            
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [
+				companyId,
+				currency,
+				companyId,
+				currency,
+				companyId,
+				currency,
+				companyId,
+				currency,
+			])) as Totals[];
 
-            conn = await pool.getConnection();
+			Logger.debug("[PayableDebts] Totals fetched successfully", { companyId, currency, totals: result[0] });
 
-            const result = await conn.query(query, [companyId, currency, companyId, currency, companyId, currency, companyId, currency]);
-            Logger.info("Retrieved total debt:", result);
+			if (result.length === 0) {
+				Logger.error("[PayableDebts] No debt data found", { companyId, currency });
+				return ApiResponse.error("No debt data found");
+			}
 
-            if (result.length === 0)
-                return ApiResponse.error("No debt data found");
+			return ApiResponse.success(result[0], "Total debt retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error fetching totals", { companyId, currency, error: error.message });
+			return ApiResponse.error("Failed to retrieve total debt");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-            return ApiResponse.success(result[0], "Total debt retrieved successfully");
-        } catch (error) {
-            Logger.error("Failed to retrieve total debt:", error);
-            return ApiResponse.error("Failed to retrieve total debt");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+	static async Update(id: UUID, debt: DebtDto, companyId: UUID) {
+		let conn;
 
-    static async Update(id: string, debt: any, companyId: string) {
-        let conn;
+		try {
+			Logger.info("[PayableDebts] Updating debt", { debtId: id, companyId });
 
-        try {
-            if (!id) {
-                return ApiResponse.error("Debt ID is required");
-            }
+			if (!id) {
+				Logger.error("[PayableDebts] Missing debt ID");
+				return ApiResponse.error("Debt ID is required");
+			}
 
-            const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
+			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
 
-            if (!customer_id || amount === undefined || amount === null || !issue_date || vat === undefined || vat === null || !currency) {
-                return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
-            }
+			if (
+				!customer_id ||
+				amount === undefined ||
+				amount === null ||
+				!issue_date ||
+				vat === undefined ||
+				vat === null ||
+				!currency
+			) {
+				Logger.error("[PayableDebts] Missing required fields", { customer_id, amount, vat, issue_date, currency });
+				return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
+			}
 
-            const query = `
-            UPDATE payable_debts 
-            SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
-            WHERE id = ? AND company_id = ?
+			const query = `
+                UPDATE payable_debts
+                SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
+                WHERE id = ? AND company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [customer_id, amount, vat, currency, issue_date, invoice_no, description, id, companyId]);
-            Logger.info("Debt update result:", result);
+			const result = (await conn.query(query, [
+				customer_id,
+				amount,
+				vat,
+				currency,
+				issue_date,
+				invoice_no || null,
+				description || null,
+				id,
+				companyId,
+			])) as { affectedRows: number };
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("No debt found with the provided ID");
+			Logger.debug("[PayableDebts] Debt update result", { debtId: id, affectedRows: result.affectedRows });
 
-            return ApiResponse.success(result[0], "Debt updated successfully");
-        } catch (error) {
-            Logger.error("Failed to update debt:", error);
-            return ApiResponse.error("Failed to update debt");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+			if (result.affectedRows === 0) {
+				Logger.error("[PayableDebts] No debt found with provided ID", { debtId: id, companyId });
+				return ApiResponse.error("No debt found with the provided ID");
+			}
 
-    static async Delete(id: string, companyId: string) {
-        let conn;
+			Logger.info("[PayableDebts] Debt updated successfully", { debtId: id, companyId });
+			return ApiResponse.success(null, "Debt updated successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error updating debt", { debtId: id, companyId, error: error.message });
+			return ApiResponse.error("Failed to update debt");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            if (!id) {
-                return ApiResponse.error("Debt ID is required");
-            }
+	static async Delete(id: UUID, companyId: UUID) {
+		let conn;
 
-            const query = `
-            DELETE FROM payable_debts WHERE id = ? AND company_id = ?
+		try {
+			Logger.info("[PayableDebts] Deleting debt", { debtId: id, companyId });
+
+			if (!id) {
+				Logger.error("[PayableDebts] Missing debt ID");
+				return ApiResponse.error("Debt ID is required");
+			}
+
+			const query = `
+                DELETE FROM payable_debts WHERE id = ? AND company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [id, companyId])) as { affectedRows: number };
 
-            const result = await conn.query(query, [id, companyId]);
-            Logger.info("Debt deletion result:", result);
+			Logger.debug("[PayableDebts] Debt deletion result", { debtId: id, affectedRows: result.affectedRows });
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("No debt found with the provided ID");
+			if (result.affectedRows === 0) {
+				Logger.error("[PayableDebts] No debt found with provided ID", { debtId: id, companyId });
+				return ApiResponse.error("No debt found with the provided ID");
+			}
 
-            return ApiResponse.success(null, "Debt deleted successfully");
-        } catch (error) {
-            Logger.error("Failed to delete debt:", error);
-            return ApiResponse.error("Failed to delete debt");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+			Logger.info("[PayableDebts] Debt deleted successfully", { debtId: id, companyId });
+			return ApiResponse.success(null, "Debt deleted successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error deleting debt", { debtId: id, companyId, error: error.message });
+			return ApiResponse.error("Failed to delete debt");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 }

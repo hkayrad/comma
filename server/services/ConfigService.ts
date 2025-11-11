@@ -1,72 +1,99 @@
-import { pool } from "../utils/db/pool";
-import dotenv from 'dotenv';
+import { pool } from "../lib/db/pool";
+import { Logger } from "../lib/utils/logger";
+import dotenv from "dotenv";
+import { ConfigDto, ConfigKey, ConfigValue } from "@common/types";
 
 dotenv.config();
 
 export class ConfigService {
-    static async GetConfigs() {
-        let conn;
+	static async GetConfigs(): Promise<{ [key: string]: string }> {
+		let conn;
 
-        try {
-            conn = await pool.getConnection();
-            const rows = await conn.query("SELECT `configKey`, `configValue` FROM config");
-            const configs: { [key: string]: string } = {};
+		try {
+			Logger.debug("[ConfigService] Fetching all configs");
+			conn = await pool.getConnection();
+			const rows = (await conn.query("SELECT `configKey`, `configValue` FROM config")) as ConfigDto[];
 
-            for (const row of rows) {
-                configs[row.configKey] = row.configValue;
-            }
+			const configs: { [key: string]: string } = {};
 
-            return configs;
+			for (const row of rows) {
+				configs[row.configKey] = row.configValue;
+			}
 
-        } catch (err) {
-            console.error(err);
-            return {};
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.debug("[ConfigService] Configs fetched successfully", { count: Object.keys(configs).length });
+			return configs;
+		} catch (error) {
+			Logger.error("[ConfigService] Error fetching configs", error);
+			return {};
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-    static async GetConfig(configKey: string) {
-        let conn;
+	static async GetConfig(configKey: ConfigKey): Promise<ConfigValue | null> {
+		let conn;
 
-        try {
-            conn = await pool.getConnection();
-            const rows = await conn.query("SELECT configValue FROM config WHERE `configKey` = ?", [configKey]);
+		try {
+			Logger.debug("[ConfigService] Fetching config", { configKey });
+			conn = await pool.getConnection();
+			const rows = (await conn.query("SELECT configValue FROM config WHERE `configKey` = ?", [
+				configKey,
+			])) as ConfigDto[];
 
-            if (rows.length === 0)
-                return null;
+			if (rows.length === 0) {
+				Logger.debug("[ConfigService] Config not found", { configKey });
+				return null;
+			}
 
-            return rows[0].configValue;
+			Logger.debug("[ConfigService] Config fetched successfully", { configKey });
+			return rows[0].configValue;
+		} catch (error) {
+			Logger.error("[ConfigService] Error fetching config", error);
+			return null;
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        } catch (err) {
-            console.error(err);
-            return null;
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+	static async SetConfig(configKey: ConfigKey, configValue: ConfigValue): Promise<boolean> {
+		let conn;
 
-    static async SetConfig(configKey: string, configValue: string) {
-        let conn;
+		try {
+			Logger.info("[ConfigService] Setting config", { configKey });
+			conn = await pool.getConnection();
+			await conn.query(
+				"INSERT INTO config (`configKey`, `configValue`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `configValue` = ?",
+				[configKey, configValue, configValue],
+			);
+			Logger.info("[ConfigService] Config set successfully", { configKey });
+			return true;
+		} catch (error) {
+			Logger.error("[ConfigService] Error setting config", { configKey, error });
+			return false;
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            conn = await pool.getConnection();
-            await conn.query("INSERT INTO config (`configKey`, `configValue`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `configValue` = ?", [configKey, configValue, configValue]);
-            return true;
+	static async StartMaintenanceMode(): Promise<boolean> {
+		Logger.info("[ConfigService] Starting maintenance mode");
+		const result = await this.SetConfig("maintenanceMode", "active");
+		if (result) {
+			Logger.info("[ConfigService] Maintenance mode started successfully");
+		} else {
+			Logger.error("[ConfigService] Failed to start maintenance mode");
+		}
+		return result;
+	}
 
-        } catch (err) {
-            console.error(err);
-            return false;
-        } finally {
-            if (conn) conn.release();
-        }
-    }
-
-    static async StartMaintenanceMode() {
-        return this.SetConfig('maintenanceMode', 'active');
-    }
-
-    static async EndMaintenanceMode() {
-        return this.SetConfig('maintenanceMode', 'inactive');
-    }
+	static async EndMaintenanceMode(): Promise<boolean> {
+		Logger.info("[ConfigService] Ending maintenance mode");
+		const result = await this.SetConfig("maintenanceMode", "inactive");
+		if (result) {
+			Logger.info("[ConfigService] Maintenance mode ended successfully");
+		} else {
+			Logger.error("[ConfigService] Failed to end maintenance mode");
+		}
+		return result;
+	}
 }

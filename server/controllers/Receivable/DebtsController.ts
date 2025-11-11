@@ -1,39 +1,104 @@
-import express from 'express';
-import ReceivableDebtsService from '../../services/Receivable/DebtsService';
-import authMiddleware from '../../utils/middleware';
+import express, { Request, Response } from "express";
+import ReceivableDebtsService from "../../services/Receivable/DebtsService";
+import authMiddleware from "../../lib/utils/middleware";
+import { Logger } from "../../lib/utils";
+import { DebtDto } from "@common/types";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post('/debts', async (req, res) => {
-    const debt = req.body;
-    const response = await ReceivableDebtsService.Create(debt, req.companyId);
-    res.json(response);
+router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
+	const debt = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableDebtsController] Create debt request", { companyId, customerId: debt.customer_id });
+
+	try {
+		const response = await ReceivableDebtsService.Create(debt, companyId);
+
+		Logger.info("[ReceivableDebtsController] Create debt result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error creating debt", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error creating debt" });
+	}
 });
 
-router.get('/debts/totals', async (req, res) => {
-    const { currency } = req.query;
-    const response = await ReceivableDebtsService.GetTotals(req.companyId, currency as string);
-    res.json(response);
+router.get("/debts/totals", async (req: Request<{}, {}, {}, { currency?: string }>, res: Response) => {
+	const { currency } = req.query;
+	const companyId = req.companyId;
+
+	Logger.debug("[ReceivableDebtsController] Get debt totals request", { companyId, currency });
+
+	try {
+		const response = await ReceivableDebtsService.GetTotals(companyId, currency as string);
+
+		Logger.debug("[ReceivableDebtsController] Get debt totals result", {
+			companyId,
+			currency,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error fetching debt totals", {
+			companyId,
+			currency,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error fetching debt totals" });
+	}
 });
 
-router.get('/debts', async (req, res) => {
-    const response = await ReceivableDebtsService.GetAll(req.companyId);
-    res.json(response);
+router.get("/debts", async (req: Request, res: Response) => {
+	const companyId = req.companyId;
+
+	Logger.debug("[ReceivableDebtsController] Get all debts request", { companyId });
+
+	try {
+		const response = await ReceivableDebtsService.GetAll(companyId);
+
+		Logger.debug("[ReceivableDebtsController] Get all debts result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error fetching debts", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching debts" });
+	}
 });
 
-router.put('/debts/:id', async (req, res) => {
-    const { id } = req.params;
-    const debt = req.body;
-    const response = await ReceivableDebtsService.Update(id, debt, req.companyId);
-    res.json(response);
+router.put("/debts/:id", async (req: Request<{ id: string }, {}, DebtDto>, res: Response) => {
+	const { id } = req.params;
+	const debt = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableDebtsController] Update debt request", { debtId: id, companyId });
+
+	try {
+		const response = await ReceivableDebtsService.Update(id, debt, companyId);
+
+		Logger.info("[ReceivableDebtsController] Update debt result", { debtId: id, companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error updating debt", { debtId: id, companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error updating debt" });
+	}
 });
 
-router.delete('/debts/:id', async (req, res) => {
-    const { id } = req.params;
-    const response = await ReceivableDebtsService.Delete(id, req.companyId);
-    res.json(response);
+router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableDebtsController] Delete debt request", { debtId: id, companyId });
+
+	try {
+		const response = await ReceivableDebtsService.Delete(id, companyId);
+
+		Logger.info("[ReceivableDebtsController] Delete debt result", { debtId: id, companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error deleting debt", { debtId: id, companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error deleting debt" });
+	}
 });
 
 export default router;

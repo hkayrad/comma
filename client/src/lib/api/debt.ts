@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, AvailableCurrency, DebtDto, Totals, UUID } from "../types";
+import type { ApiResponse, AvailableCurrency, DebtDto, Totals, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
 
 export class ReceivableDebtApi {

@@ -1,33 +1,95 @@
-import express from 'express';
-import PayablePaymentsService from '../../services/Payable/PaymentsService';
-import authMiddleware from '../../utils/middleware';
+import express, { Request, Response } from "express";
+import PayablePaymentsService from "../../services/Payable/PaymentsService";
+import authMiddleware from "../../lib/utils/middleware";
+import { Logger } from "../../lib/utils";
+import { PaymentDto } from "@common/types";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post('/payments', async (req, res) => {
-    const payment = req.body;
-    const response = await PayablePaymentsService.Create(payment, req.companyId);
-    res.json(response);
+router.post("/payments", async (req: Request<{}, {}, PaymentDto>, res: Response) => {
+	const payment = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[PayablePaymentsController] Create payment request", { companyId, customerId: payment.customer_id });
+
+	try {
+		const response = await PayablePaymentsService.Create(payment, companyId);
+
+		Logger.info("[PayablePaymentsController] Create payment result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[PayablePaymentsController] Error creating payment", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error creating payment" });
+	}
 });
 
-router.get('/payments', async (req, res) => {
-    const response = await PayablePaymentsService.GetAll(req.companyId);
-    res.json(response);
+router.get("/payments", async (req: Request, res: Response) => {
+	const companyId = req.companyId;
+
+	Logger.debug("[PayablePaymentsController] Get all payments request", { companyId });
+
+	try {
+		const response = await PayablePaymentsService.GetAll(companyId);
+
+		Logger.debug("[PayablePaymentsController] Get all payments result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[PayablePaymentsController] Error fetching payments", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching payments" });
+	}
 });
 
-router.put('/payments/:id', async (req, res) => {
-    const { id } = req.params;
-    const payment = req.body;
-    const response = await PayablePaymentsService.Update(id, payment, req.companyId);
-    res.json(response);
+router.put("/payments/:id", async (req: Request<{ id: string }, {}, PaymentDto>, res: Response) => {
+	const { id } = req.params;
+	const payment = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[PayablePaymentsController] Update payment request", { paymentId: id, companyId });
+
+	try {
+		const response = await PayablePaymentsService.Update(id, payment, companyId);
+
+		Logger.info("[PayablePaymentsController] Update payment result", {
+			paymentId: id,
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[PayablePaymentsController] Error updating payment", {
+			paymentId: id,
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error updating payment" });
+	}
 });
 
-router.delete('/payments/:id', async (req, res) => {
-    const paymentId = req.params.id;
-    const response = await PayablePaymentsService.Delete(paymentId, req.companyId);
-    res.json(response);
+router.delete("/payments/:id", async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const companyId = req.companyId;
+
+	Logger.info("[PayablePaymentsController] Delete payment request", { paymentId: id, companyId });
+
+	try {
+		const response = await PayablePaymentsService.Delete(id, companyId);
+
+		Logger.info("[PayablePaymentsController] Delete payment result", {
+			paymentId: id,
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[PayablePaymentsController] Error deleting payment", {
+			paymentId: id,
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error deleting payment" });
+	}
 });
 
 export default router;

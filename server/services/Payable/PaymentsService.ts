@@ -1,159 +1,183 @@
-import { pool } from "../../utils/db/pool";
-import { ApiResponse, Logger } from "../../utils";
+import { InsertResult, PaymentDto, UUID } from "@common/types";
+import { pool } from "../../lib/db/pool";
+import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class PayablePaymentsService {
-    static async Create(payment: any, companyId: string) {
-        let conn;
+	static async Create(payment: PaymentDto, companyId: UUID) {
+		let conn;
 
-        try {
-            const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
+		try {
+			Logger.info("[PayablePayments] Creating payment", { companyId, customerId: payment.customer_id });
 
-            if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
-                Logger.info("Missing required fields:", { customer_id, amount, currency, payment_date, payment_method });
-                return ApiResponse.error("Missing required fields");
-            }
+			const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
 
-            Logger.info("Creating payment with data:", payment);
-            const query = `
-            INSERT INTO payable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+			if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+				Logger.error("[PayablePayments] Missing required fields", {
+					customer_id,
+					amount,
+					currency,
+					payment_date,
+					payment_method,
+				});
+				return ApiResponse.error("Missing required fields");
+			}
+
+			const query = `
+                INSERT INTO payable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [
-                customer_id,
-                amount,
-                currency,
-                invoice_no || null,
-                description || null,
-                payment_date,
-                payment_method,
-                companyId
-            ]);
-            Logger.info("Payment creation result:", result);
+			const result = (await conn.query(query, [
+				customer_id,
+				amount,
+				currency,
+				invoice_no || null,
+				description || null,
+				payment_date,
+				payment_method,
+				companyId,
+			])) as InsertResult[];
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("Failed to create payment");
+			Logger.debug("[PayablePayments] Payment creation result", { result });
 
-            return ApiResponse.success(result[0], "Payment created successfully");
-        } catch (error) {
-            console.error('Error creating payment:', error);
-            return ApiResponse.error("Error creating payment");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			if (!result || result.length === 0) {
+				Logger.error("[PayablePayments] Failed to create payment - no result returned");
+				return ApiResponse.error("Failed to create payment");
+			}
 
-    static async GetAll(companyId: string) {
-        let conn;
+			Logger.info("[PayablePayments] Payment created successfully", { paymentId: result[0].id, companyId });
+			return ApiResponse.success(result[0], "Payment created successfully");
+		} catch (error: any) {
+			Logger.error("[PayablePayments] Error creating payment", { companyId, error: error.message });
+			return ApiResponse.error("Error creating payment");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            const query = `
-            SELECT 
-                p.*,
-                c.name AS customer_name, 
-                c.tax_number AS customer_tax_number
-            FROM payable_payments p
-            JOIN payable_customers c ON p.customer_id = c.id
-            WHERE p.company_id = ?
-            ORDER BY p.payment_date DESC
+	static async GetAll(companyId: UUID) {
+		let conn;
+
+		try {
+			Logger.debug("[PayablePayments] Fetching all payments", { companyId });
+
+			const query = `
+                SELECT
+                    p.*,
+                    c.name AS customer_name,
+                    c.tax_number AS customer_tax_number
+                FROM payable_payments p
+                JOIN payable_customers c ON p.customer_id = c.id
+                WHERE p.company_id = ?
+                ORDER BY p.payment_date DESC
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [companyId])) as PaymentDto[];
 
-            const result = await conn.query(query, [companyId]);
-            Logger.info("Retrieved payable_payments:", result);
+			Logger.debug("[PayablePayments] Payments fetched successfully", { companyId, count: result.length });
+			return ApiResponse.success(result, "Payments retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[PayablePayments] Error fetching payments", { companyId, error: error.message });
+			return ApiResponse.error("Failed to retrieve payments");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-            return ApiResponse.success(result, "Payments retrieved successfully");
-        } catch (error) {
-            Logger.error("Failed to retrieve payable_payments:", error);
-            return ApiResponse.error("Failed to retrieve payable_payments");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+	static async Update(paymentId: UUID, payment: PaymentDto, companyId: UUID) {
+		let conn;
 
-    static async Update(paymentId: string, payment: any, companyId: string) {
-        let conn;
+		try {
+			Logger.info("[PayablePayments] Updating payment", { paymentId, companyId });
 
-        try {
-            if (!paymentId) {
-                Logger.info("Missing payment ID");
-                return ApiResponse.error("Missing payment ID");
-            }
+			if (!paymentId) {
+				Logger.error("[PayablePayments] Missing payment ID");
+				return ApiResponse.error("Missing payment ID");
+			}
 
-            const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
+			const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
 
-            if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
-                Logger.info("Missing required fields:", { customer_id, amount, currency, payment_date, payment_method });
-                return ApiResponse.error("Missing required fields");
-            }
+			if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+				Logger.error("[PayablePayments] Missing required fields", {
+					customer_id,
+					amount,
+					currency,
+					payment_date,
+					payment_method,
+				});
+				return ApiResponse.error("Missing required fields");
+			}
 
-            Logger.info("Updating payment with ID:", paymentId);
-            const query = `
-            UPDATE payable_payments
-            SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
-            WHERE id = ? AND company_id = ?
+			const query = `
+                UPDATE payable_payments
+                SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
+                WHERE id = ? AND company_id = ?
             `;
 
-            conn = await pool.getConnection();
+			conn = await pool.getConnection();
 
-            const result = await conn.query(query, [
-                customer_id,
-                amount,
-                currency,
-                invoice_no || null,
-                description || null,
-                payment_date,
-                payment_method,
-                paymentId,
-                companyId
-            ]);
-            Logger.info("Payment update result:", result);
+			const result = (await conn.query(query, [
+				customer_id,
+				amount,
+				currency,
+				invoice_no || null,
+				description || null,
+				payment_date,
+				payment_method,
+				paymentId,
+				companyId,
+			])) as { affectedRows: number };
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("No payment found with the provided ID");
+			Logger.debug("[PayablePayments] Payment update result", { paymentId, affectedRows: result.affectedRows });
 
-            return ApiResponse.success(result[0], "Payment updated successfully");
-        } catch (error) {
-            Logger.error("Failed to update payment:", error);
-            return ApiResponse.error("Failed to update payment");
-        } finally {
-            if (conn) {
-                conn.release();
-            }
-        }
-    }
+			if (result.affectedRows === 0) {
+				Logger.error("[PayablePayments] No payment found with provided ID", { paymentId, companyId });
+				return ApiResponse.error("No payment found with the provided ID");
+			}
 
-    static async Delete(paymentId: string, companyId: string) {
-        let conn;
+			Logger.info("[PayablePayments] Payment updated successfully", { paymentId, companyId });
+			return ApiResponse.success(null, "Payment updated successfully");
+		} catch (error: any) {
+			Logger.error("[PayablePayments] Error updating payment", { paymentId, companyId, error: error.message });
+			return ApiResponse.error("Failed to update payment");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 
-        try {
-            if (!paymentId) {
-                Logger.info("Missing payment ID");
-                return ApiResponse.error("Missing payment ID");
-            }
+	static async Delete(paymentId: UUID, companyId: UUID) {
+		let conn;
 
-            Logger.info("Deleting payment with ID:", paymentId);
-            const query = `DELETE FROM payable_payments WHERE id = ? AND company_id = ?`;
+		try {
+			Logger.info("[PayablePayments] Deleting payment", { paymentId, companyId });
 
-            conn = await pool.getConnection();
+			if (!paymentId) {
+				Logger.error("[PayablePayments] Missing payment ID");
+				return ApiResponse.error("Missing payment ID");
+			}
 
-            const result = await conn.query(query, [paymentId, companyId]);
-            Logger.info("Payment deletion result:", result);
+			const query = `DELETE FROM payable_payments WHERE id = ? AND company_id = ?`;
 
-            if (result.affectedRows === 0)
-                return ApiResponse.error("No payment found with the given ID");
+			conn = await pool.getConnection();
+			const result = (await conn.query(query, [paymentId, companyId])) as { affectedRows: number };
 
-            return ApiResponse.success(null, "Payment deleted successfully");
-        } catch (error) {
-            Logger.error("Failed to delete payment:", error);
-            return ApiResponse.error("Failed to delete payment");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.debug("[PayablePayments] Payment deletion result", { paymentId, affectedRows: result.affectedRows });
+
+			if (result.affectedRows === 0) {
+				Logger.error("[PayablePayments] No payment found with given ID", { paymentId, companyId });
+				return ApiResponse.error("No payment found with the given ID");
+			}
+
+			Logger.info("[PayablePayments] Payment deleted successfully", { paymentId, companyId });
+			return ApiResponse.success(null, "Payment deleted successfully");
+		} catch (error: any) {
+			Logger.error("[PayablePayments] Error deleting payment", { paymentId, companyId, error: error.message });
+			return ApiResponse.error("Failed to delete payment");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 }

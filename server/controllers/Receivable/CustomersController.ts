@@ -1,44 +1,142 @@
-import express from 'express';
-import ReceivableCustomersService from '../../services/Receivable/CustomersService';
-import authMiddleware from '../../utils/middleware';
+import express, { Request, Response } from "express";
+import ReceivableCustomersService from "../../services/Receivable/CustomersService";
+import authMiddleware from "../../lib/utils/middleware";
+import { Logger } from "../../lib/utils";
+import { CustomerDto } from "@common/types";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post('/customers', async (req, res) => {
-    const customer = req.body;
-    const response = await ReceivableCustomersService.Create(customer, req.companyId);
-    res.json(response);
+router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Response) => {
+	const customer = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableCustomersController] Create customer request", { companyId, customerName: customer.name });
+
+	try {
+		const response = await ReceivableCustomersService.Create(customer, companyId);
+
+		Logger.info("[ReceivableCustomersController] Create customer result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error creating customer", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error creating customer" });
+	}
 });
 
-router.get('/customers', async (req, res) => {
-    const response = await ReceivableCustomersService.GetAll(req.companyId);
-    res.json(response);
+router.get("/customers", async (req: Request, res: Response) => {
+	const companyId = req.companyId;
+
+	Logger.debug("[ReceivableCustomersController] Get all customers request", { companyId });
+
+	try {
+		const response = await ReceivableCustomersService.GetAll(companyId);
+
+		Logger.debug("[ReceivableCustomersController] Get all customers result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error fetching customers", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching customers" });
+	}
 });
 
-router.get('/customers/:id/statement', async (req, res) => {
-    const { id } = req.params;
-    const response = await ReceivableCustomersService.GetStatement(id, req.companyId);
-    res.json(response);
+router.get("/customers/:id/statement", async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const companyId = req.companyId;
+
+	Logger.debug("[ReceivableCustomersController] Get customer statement request", { customerId: id, companyId });
+
+	try {
+		const response = await ReceivableCustomersService.GetStatement(id, companyId);
+
+		Logger.debug("[ReceivableCustomersController] Get customer statement result", {
+			customerId: id,
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error fetching customer statement", {
+			customerId: id,
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error fetching customer statement" });
+	}
 });
 
-router.get('/customers/id-name', async (req, res) => {
-    const response = await ReceivableCustomersService.GetIdAndName(req.companyId);
-    res.json(response);
+router.get("/customers/id-name", async (req: Request, res: Response) => {
+	const companyId = req.companyId;
+
+	Logger.debug("[ReceivableCustomersController] Get customer IDs and names request", { companyId });
+
+	try {
+		const response = await ReceivableCustomersService.GetIdAndName(companyId);
+
+		Logger.debug("[ReceivableCustomersController] Get customer IDs and names result", {
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error fetching customer IDs and names", {
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error fetching customer IDs and names" });
+	}
 });
 
-router.put('/customers/:id', async (req, res) => {
-    const { id } = req.params;
-    const customer = req.body;
-    const response = await ReceivableCustomersService.Update(id, customer, req.companyId);
-    res.json(response);
+router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto>, res: Response) => {
+	const { id } = req.params;
+	const customer = req.body;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableCustomersController] Update customer request", { customerId: id, companyId });
+
+	try {
+		const response = await ReceivableCustomersService.Update(id, customer, companyId);
+
+		Logger.info("[ReceivableCustomersController] Update customer result", {
+			customerId: id,
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error updating customer", {
+			customerId: id,
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error updating customer" });
+	}
 });
 
-router.delete('/customers/:id', async (req, res) => {
-    const { id } = req.params;
-    const response = await ReceivableCustomersService.Delete(id, req.companyId);
-    res.json(response);
+router.delete("/customers/:id", async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const companyId = req.companyId;
+
+	Logger.info("[ReceivableCustomersController] Delete customer request", { customerId: id, companyId });
+
+	try {
+		const response = await ReceivableCustomersService.Delete(id, companyId);
+
+		Logger.info("[ReceivableCustomersController] Delete customer result", {
+			customerId: id,
+			companyId,
+			success: response.success,
+		});
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableCustomersController] Error deleting customer", {
+			customerId: id,
+			companyId,
+			error: error.message,
+		});
+		return res.status(500).json({ success: false, message: "Error deleting customer" });
+	}
 });
 
 export default router;

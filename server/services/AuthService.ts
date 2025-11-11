@@ -1,65 +1,78 @@
-import { pool } from "../utils/db/pool";
-import { ApiResponse, Logger } from "../utils/index";
-import dotenv from 'dotenv';
+import { pool } from "../lib/db/pool";
+import { ApiResponse, Logger } from "../lib/utils/index";
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { DecodedJwtToken } from "@common/types";
 
 dotenv.config();
 
 export class AuthService {
-    static async VerifyToken(token: string) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET as jwt.Secret, {
-                issuer: process.env.JWT_ISSUER,
-                audience: process.env.JWT_AUDIENCE
-            });
-            Logger.info("Token verified:", decoded);
-            return decoded;
-        } catch (err) {
-            Logger.error(err);
-            return null;
-        }
-    }
+	static async VerifyToken(token: string): Promise<DecodedJwtToken | null> {
+		try {
+			Logger.debug("[AuthService] Verifying token");
+			const decoded = jwt.verify(token, process.env.JWT_SECRET as jwt.Secret, {
+				issuer: process.env.JWT_ISSUER,
+				audience: process.env.JWT_AUDIENCE,
+			}) as DecodedJwtToken;
 
-    static async Login(username: string, password: string) {
-        let conn;
+			Logger.debug("[AuthService] Token verified successfully", { userId: decoded.id, companyId: decoded.companyId });
+			return decoded;
+		} catch (error: any) {
+			Logger.error("[AuthService] Token verification failed", { error: error.message });
+			return null;
+		}
+	}
 
-        try {
-            conn = await pool.getConnection();
-            const rows = await conn.query("SELECT * FROM users WHERE username = ?", [username]);
+	static async Login(username: string, password: string) {
+		let conn;
 
-            if (rows.length === 0)
-                return ApiResponse.error("Invalid username or password");
+		try {
+			Logger.info("[AuthService] Login attempt", { username });
 
-            const user = rows[0];
+			conn = await pool.getConnection();
+			const rows = (await conn.query("SELECT * FROM users WHERE username = ?", [username])) as any[];
 
-            const passwordMatch = await bcrypt.compare(password, user.pass_hash);
+			if (rows.length === 0) {
+				Logger.error("[AuthService] User not found", { username });
+				return ApiResponse.error("Invalid username or password");
+			}
 
-            if (!passwordMatch)
-                return ApiResponse.error("Invalid username or password");
+			const user = rows[0];
 
-            const token = jwt.sign(
-                {
-                    id: user.id,
-                    companyId: user.company_id,
-                    username: user.username,
-                    role: user.role,
-                },
-                process.env.JWT_SECRET as jwt.Secret,
-                {
-                    issuer: process.env.JWT_ISSUER,
-                    audience: process.env.JWT_AUDIENCE,
-                    expiresIn: `${process.env.JWT_EXPIRES_IN}h` as any
-                }
-            )
+			Logger.debug("[AuthService] Verifying password", { username });
+			const passwordMatch = await bcrypt.compare(password, user.pass_hash);
 
-            return ApiResponse.success(token, "Login successful");
+			if (!passwordMatch) {
+				Logger.error("[AuthService] Invalid password", { username });
+				return ApiResponse.error("Invalid username or password");
+			}
 
-        } catch (err) {
-            Logger.error(err);
-            return ApiResponse.error("An error occurred during login");
-        } finally {
-            if (conn) conn.release();
-        }
-    }
+			Logger.debug("[AuthService] Generating JWT token", { userId: user.id, companyId: user.company_id });
+
+			const expiresIn = `${process.env.JWT_EXPIRES_IN || 8}h`;
+
+			const payload = {
+				id: user.id,
+				companyId: user.company_id,
+				username: user.username,
+				role: user.role,
+			};
+
+			const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
+				issuer: process.env.JWT_ISSUER,
+				audience: process.env.JWT_AUDIENCE,
+				expiresIn: expiresIn as any,
+			});
+
+			Logger.info("[AuthService] Login successful", { username, userId: user.id, companyId: user.company_id });
+
+			return ApiResponse.success(token, "Login successful");
+		} catch (error: any) {
+			Logger.error("[AuthService] Error during login", { username, error: error.message });
+			return ApiResponse.error("An error occurred during login");
+		} finally {
+			if (conn) conn.release();
+		}
+	}
 }

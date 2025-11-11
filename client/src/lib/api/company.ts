@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { CompanyDto } from "../types";
+import type { CompanyDto } from "../../../../common/types";
 
 export class CompanyApi {
     static async GetCompanyById(companyId: string) {

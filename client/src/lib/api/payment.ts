@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, PaymentDto, UUID } from "../types";
+import type { ApiResponse, PaymentDto, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
 
 export class ReceivablePaymentApi {

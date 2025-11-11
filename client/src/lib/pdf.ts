@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { CustomerStatement } from './types';
+import type { CustomerStatement } from '../../../common/types';
 import { format } from 'date-fns';
 import { formatCurrency } from './utils';
 import "./lexend-regular";
