@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import PayableCustomersService from "../../services/Payable/CustomersService";
-import authMiddleware from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/utils/middleware";
 import { Logger } from "../../lib/utils";
 import { CustomerDto } from "@common/types";
 
@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Response) => {
 	const customer = req.body;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[PayableCustomersController] Create customer request", { companyId, customerName: customer.name });
 
@@ -26,7 +26,7 @@ router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Respons
 });
 
 router.get("/customers", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[PayableCustomersController] Get all customers request", { companyId });
 
@@ -43,7 +43,7 @@ router.get("/customers", async (req: Request, res: Response) => {
 
 router.get("/customers/:id/statement", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[PayableCustomersController] Get customer statement request", { customerId: id, companyId });
 
@@ -67,7 +67,7 @@ router.get("/customers/:id/statement", async (req: Request<{ id: string }>, res:
 });
 
 router.get("/customers/id-name", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[PayableCustomersController] Get customer IDs and names request", { companyId });
 
@@ -91,7 +91,7 @@ router.get("/customers/id-name", async (req: Request, res: Response) => {
 router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto>, res: Response) => {
 	const { id } = req.params;
 	const customer = req.body;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[PayableCustomersController] Update customer request", { customerId: id, companyId });
 
@@ -116,7 +116,7 @@ router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto
 
 router.delete("/customers/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[PayableCustomersController] Delete customer request", { customerId: id, companyId });
 

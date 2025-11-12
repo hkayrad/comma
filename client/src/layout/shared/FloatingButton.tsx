@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import {
   Banknote,
   Plus,

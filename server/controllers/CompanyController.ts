@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import authMiddleware from "../lib/utils/middleware";
+import { authMiddleware } from "../lib/utils/middleware";
 import { CompanyService } from "../services/CompanyService";
 import { Logger } from "../lib/utils";
 import { UploadedFile } from "express-fileupload";
@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.post("/logo/small", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[CompanyController] Upload small logo request", { companyId });
 
@@ -31,7 +31,7 @@ router.post("/logo/small", async (req: Request, res: Response) => {
 });
 
 router.post("/logo/large", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[CompanyController] Upload large logo request", { companyId });
 
@@ -52,7 +52,7 @@ router.post("/logo/large", async (req: Request, res: Response) => {
 });
 
 router.delete("/logo/small", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[CompanyController] Delete small logo request", { companyId });
 
@@ -68,7 +68,7 @@ router.delete("/logo/small", async (req: Request, res: Response) => {
 });
 
 router.delete("/logo/large", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[CompanyController] Delete large logo request", { companyId });
 
@@ -84,7 +84,7 @@ router.delete("/logo/large", async (req: Request, res: Response) => {
 });
 
 router.get("/logos", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[CompanyController] Get logos request", { companyId });
 
@@ -99,14 +99,12 @@ router.get("/logos", async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
-	const companyId = req.params.id;
-	const requestCompanyId = req.companyId;
-
-	Logger.debug("[CompanyController] Get company by ID request", { companyId, requestCompanyId });
+router.get("/id", async (req: Request, res: Response) => {
+	const companyId = req.user.companyId;
+	Logger.debug("[CompanyController] Get company by ID request", { companyId });
 
 	try {
-		const response = await CompanyService.GetCompanyById(companyId, requestCompanyId);
+		const response = await CompanyService.GetCompanyById(companyId);
 
 		Logger.debug("[CompanyController] Company fetched", { companyId, success: response.success });
 		return res.json(response);
@@ -116,8 +114,8 @@ router.get("/:id", async (req: Request, res: Response) => {
 	}
 });
 
-router.post("/:id", async (req: Request, res: Response) => {
-	const companyId = req.params.id;
+router.put("/id", async (req: Request, res: Response) => {
+	const companyId = req.user.companyId;
 	const details: CompanyDto = req.body;
 
 	Logger.info("[CompanyController] Update company details request", { companyId });

@@ -23,7 +23,7 @@ import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";

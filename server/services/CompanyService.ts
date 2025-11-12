@@ -10,19 +10,14 @@ import { CompanyDto, LogoSize, UUID } from "@common/types";
 const uploadDir = path.resolve(process.cwd(), "uploads", "logos");
 
 export class CompanyService {
-	static async GetCompanyById(companyId: UUID, requesterCompanyId: UUID) {
+	static async GetCompanyById(companyId: UUID) {
 		let conn;
 
-		Logger.info("[CompanyService] GetCompanyById called", { companyId, requesterCompanyId });
+		Logger.info("[CompanyService] GetCompanyById called", { companyId });
 
 		if (!companyId) {
 			Logger.error("[CompanyService] Company ID is required");
 			return ApiResponse.error("Company ID is required");
-		}
-
-		if (companyId !== requesterCompanyId) {
-			Logger.error("[CompanyService] Unauthorized access attempt", { companyId, requesterCompanyId });
-			return ApiResponse.error("Unauthorized");
 		}
 
 		try {

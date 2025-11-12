@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
-import verifyUser from "../lib/utils/verifyUser";
 import { ConfigService } from "../services/ConfigService";
 import { Logger } from "../lib/utils";
+import { configMiddleware } from "../lib/utils/middleware";
 
 interface ConfigKeyValue {
 	configKey: string;
@@ -12,32 +12,7 @@ type Configs = Record<string, string>;
 
 const router = express.Router();
 
-router.use((req: Request, res: Response, next: NextFunction) => {
-	Logger.debug("[ConfigController] Incoming request", { method: req.method, path: req.path });
-
-	// allow public GET /
-	if (req.path === "/" && req.method === "GET") {
-		Logger.debug("[ConfigController] Public route - skipping auth", { path: req.path });
-		return next();
-	}
-
-	const authHeader = req.headers["authorization"] as string | undefined;
-	const token = authHeader?.split(" ")[1];
-
-	if (!token) {
-		Logger.warn("[ConfigController] Missing authorization token", { path: req.path });
-		return res.status(401).json({ success: false, message: "Unauthorized" });
-	}
-
-	const decoded = verifyUser(token);
-	if (!decoded) {
-		Logger.warn("[ConfigController] Invalid token", { path: req.path });
-		return res.status(401).json({ success: false, message: "Unauthorized" });
-	}
-
-	Logger.debug("[ConfigController] Authenticated request", { userId: (decoded as any).id ?? null, path: req.path });
-	return next();
-});
+router.use(configMiddleware);
 
 router.get("/", async (req: Request, res: Response) => {
 	Logger.debug("[ConfigController] Get all configs");

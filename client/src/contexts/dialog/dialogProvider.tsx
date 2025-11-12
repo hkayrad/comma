@@ -1,20 +1,9 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import type { CustomerDto } from "@/lib/types";
+import { useState, type ReactNode } from "react";
+import { DialogContext } from "./dialogContext";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-interface DialogConfig {
+export interface DialogConfig {
   title?: string;
   description?: string;
   content?: ReactNode;
@@ -24,23 +13,6 @@ interface DialogConfig {
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "full";
   showCloseButton?: boolean;
 }
-
-interface DialogContextType {
-  openDialog: (config: DialogConfig) => void;
-  closeDialog: () => void;
-  isOpen: boolean;
-  customerInfo: CustomerDto | null;
-}
-
-const DialogContext = createContext<DialogContextType | undefined>(undefined);
-
-export const useDialog = () => {
-  const context = useContext(DialogContext);
-  if (!context) {
-    throw new Error("useDialog must be used within a DialogProvider");
-  }
-  return context;
-};
 
 export const DialogProvider: React.FC<{ children: ReactNode }> = ({
   children,

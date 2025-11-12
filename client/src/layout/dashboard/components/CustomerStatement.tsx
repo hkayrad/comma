@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
 import type {
@@ -37,12 +37,11 @@ export default function CustomerStatement(props: Props) {
       .finally(() => setLoading(false));
   }, [customerId, API]);
 
-  const remainingColor = useMemo(() => {
-    if (!data) return "";
-    if ((data.customer.remaining_debt || 0) > 0) return "text-red-600";
-    if ((data.customer.remaining_debt || 0) < 0) return "text-blue-600";
+  const getRemainingColor = (amount: number) => {
+    if (amount > 0) return "text-red-600";
+    if (amount < 0) return "text-blue-600";
     return "text-green-600";
-  }, [data]);
+  };
 
   const exportStatement = useCallback(async () => {
     if (!data) return;
@@ -87,6 +86,8 @@ export default function CustomerStatement(props: Props) {
   }
 
   const { customer, debts, payments } = data;
+
+  console.log(data);
 
   return (
     <div className="space-y-6 p-4">
@@ -133,9 +134,15 @@ export default function CustomerStatement(props: Props) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Toplam Borç</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-red-600">
-              {formatCurrency(customer.total_debt || 0)}
+          <CardContent className="space-y-1">
+            <p className="text-xl font-bold text-red-600">
+              {formatCurrency(customer.total_debt_try || 0, "TRY")}
+            </p>
+            <p className="text-xl font-bold text-red-600">
+              {formatCurrency(customer.total_debt_usd || 0, "USD")}
+            </p>
+            <p className="text-xl font-bold text-red-600">
+              {formatCurrency(customer.total_debt_eur || 0, "EUR")}
             </p>
           </CardContent>
         </Card>
@@ -143,9 +150,15 @@ export default function CustomerStatement(props: Props) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Ödenen</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(customer.total_payments || 0)}
+          <CardContent className="space-y-1">
+            <p className="text-xl font-bold text-green-600">
+              {formatCurrency(customer.total_payments_try || 0, "TRY")}
+            </p>
+            <p className="text-xl font-bold text-green-600">
+              {formatCurrency(customer.total_payments_usd || 0, "USD")}
+            </p>
+            <p className="text-xl font-bold text-green-600">
+              {formatCurrency(customer.total_payments_eur || 0, "EUR")}
             </p>
           </CardContent>
         </Card>
@@ -153,9 +166,21 @@ export default function CustomerStatement(props: Props) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Kalan</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className={`text-2xl font-bold ${remainingColor}`}>
-              {formatCurrency(customer.remaining_debt || 0)}
+          <CardContent className="space-y-1">
+            <p
+              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_try || 0)}`}
+            >
+              {formatCurrency(customer.remaining_debt_try || 0, "TRY")}
+            </p>
+            <p
+              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_usd || 0)}`}
+            >
+              {formatCurrency(customer.remaining_debt_usd || 0, "USD")}
+            </p>
+            <p
+              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_eur || 0)}`}
+            >
+              {formatCurrency(customer.remaining_debt_eur || 0, "EUR")}
             </p>
           </CardContent>
         </Card>
@@ -176,13 +201,14 @@ export default function CustomerStatement(props: Props) {
                     <th className="py-2 px-3 font-medium">Tutar</th>
                     <th className="py-2 px-3 font-medium">KDV</th>
                     <th className="py-2 px-3 font-medium">Toplam</th>
+                    <th className="py-2 px-3 font-medium">Para Birimi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {debts.length === 0 && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="py-4 px-3 text-center text-muted-foreground"
                       >
                         Borç bulunamadı
@@ -199,13 +225,16 @@ export default function CustomerStatement(props: Props) {
                       </td>
                       <td className="py-1.5 px-3">{d.invoice_no || "-"}</td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
-                        {formatCurrency(d.amount)}
+                        {formatCurrency(d.amount, d.currency)}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
-                        {formatCurrency(d.vat)}
+                        {formatCurrency(d.vat, d.currency)}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap font-medium">
                         {formatCurrency(parseFloat(d.total_amount || "0"))}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap">
+                        {d.currency}
                       </td>
                     </tr>
                   ))}
@@ -226,6 +255,7 @@ export default function CustomerStatement(props: Props) {
                     <th className="py-2 px-3 font-medium">Tarih</th>
                     <th className="py-2 px-3 font-medium">Fatura No</th>
                     <th className="py-2 px-3 font-medium">Tutar</th>
+                    <th className="py-2 px-3 font-medium">Para Birimi</th>
                     <th className="py-2 px-3 font-medium">Yöntem</th>
                   </tr>
                 </thead>
@@ -233,7 +263,7 @@ export default function CustomerStatement(props: Props) {
                   {payments.length === 0 && (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={5}
                         className="py-4 px-3 text-center text-muted-foreground"
                       >
                         Ödeme bulunamadı
@@ -250,7 +280,10 @@ export default function CustomerStatement(props: Props) {
                       </td>
                       <td className="py-1.5 px-3">{p.invoice_no || "-"}</td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
-                        {formatCurrency(p.amount)}
+                        {formatCurrency(p.amount, p.currency)}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap">
+                        {p.currency}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
                         {p.payment_method === "cash"

@@ -22,7 +22,7 @@ import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/shared/dialog/DebtDialog";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";

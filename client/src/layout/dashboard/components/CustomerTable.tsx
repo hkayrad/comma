@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
 import CustomerDetails from "./CustomerDetails";
 import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";

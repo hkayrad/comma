@@ -8,8 +8,14 @@ import {
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { AvailableCurrency, OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
-import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import {
+  BadgeAlert,
+  BadgeCheck,
+  BadgeDollarSignIcon,
+  BadgeEuroIcon,
+  BadgeTurkishLiraIcon,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Props = {
   type: OverviewViewType;
@@ -28,6 +34,15 @@ export default function OverviewCards(props: Props) {
     total_payments: "₺0",
     remaining_debt: "₺0",
   });
+
+  const currencyBadges = useMemo(
+    () => ({
+      TRY: <BadgeTurkishLiraIcon />,
+      USD: <BadgeDollarSignIcon />,
+      EUR: <BadgeEuroIcon />,
+    }),
+    [],
+  );
 
   const fetchReceivableTotals = useCallback(async () => {
     const response = await ReceivableDebtApi.GetTotals(currency);
@@ -119,9 +134,7 @@ export default function OverviewCards(props: Props) {
           >
             {formattedTotals.total_debts}
           </CardTitle>
-          <CardAction>
-            <BadgeTurkishLiraIcon />
-          </CardAction>
+          <CardAction>{currencyBadges[currency]}</CardAction>
         </CardHeader>
       </Card>
       <Card className="w-64">

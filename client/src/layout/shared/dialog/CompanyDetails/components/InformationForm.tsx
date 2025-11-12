@@ -17,9 +17,10 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
+import { useUser } from "@/contexts/user";
 import { CompanyApi } from "@/lib/api/company";
-import type { CompanyDto, DecodedJwtToken } from "@/lib/types";
+import type { CompanyDto } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
@@ -30,15 +31,10 @@ import {
   MapPinHouse,
   Phone,
 } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-
-type Props = {
-  user: DecodedJwtToken | null;
-  companyDetails: CompanyDto | null;
-};
 
 const CompanyFormSchema = z.object({
   name: z
@@ -82,8 +78,9 @@ const CompanyFormSchema = z.object({
     .or(z.literal("")),
 });
 
-export default function InformationForm(props: Props) {
-  const { user, companyDetails } = props;
+export default function InformationForm() {
+  const { user } = useUser();
+  const [companyDetails, setCompanyDetails] = useState<CompanyDto | null>(null);
 
   const { closeDialog } = useDialog();
 
@@ -100,6 +97,18 @@ export default function InformationForm(props: Props) {
       address: companyDetails?.address || "",
     },
   });
+
+  const fetchCompanyDetails = useCallback(async () => {
+    try {
+      const response = await CompanyApi.GetCompanyById();
+
+      if (response.success) {
+        setCompanyDetails(response.data);
+      }
+    } catch (error) {
+      console.error("Şirket detayları alınırken bir hata oluştu:", error);
+    }
+  }, []);
 
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -130,6 +139,10 @@ export default function InformationForm(props: Props) {
   );
 
   useEffect(() => {
+    fetchCompanyDetails();
+  }, [fetchCompanyDetails]);
+
+  useEffect(() => {
     if (companyDetails) {
       form.reset({
         name: companyDetails.name || "",
@@ -142,8 +155,7 @@ export default function InformationForm(props: Props) {
         address: companyDetails.address || "",
       });
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyDetails]);
+  }, [companyDetails, form]);
 
   return (
     <Form {...form}>

@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { copyToClipboard } from "@/lib/utils";
-import { DollarSign, Euro, PoundSterling } from "lucide-react";
+import { DollarSign, Euro } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export default function ExchangeRates() {
@@ -36,9 +36,19 @@ export default function ExchangeRates() {
     <div className="flex gap-2">
       {exchangeRates && (
         <>
-          <p className="text-muted-foreground text-[10px] my-auto mr-1">
-            Son Güncelleme: {exchangeRates.date}
-          </p>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <p className="text-muted-foreground text-[10px] my-auto mr-1">
+                Son Güncelleme: {exchangeRates.date}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <span>
+                {exchangeRates.date} günü saat 15.30'da belirlenen, gösterge
+                niteliğindeki TCMB döviz kurları
+              </span>
+            </TooltipContent>
+          </Tooltip>
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
               <div className="flex gap-2 select-none">
@@ -104,7 +114,7 @@ export default function ExchangeRates() {
               <span>Euro (EUR)</span>
             </TooltipContent>
           </Tooltip>
-          <Separator orientation="vertical" className="w-px mx-2 !h-4" />
+          {/*<Separator orientation="vertical" className="w-px mx-2 !h-4" />
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
               <div className="flex gap-2 select-none">
@@ -136,7 +146,7 @@ export default function ExchangeRates() {
             <TooltipContent side="bottom">
               <span>Pound Sterling (GBP)</span>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip>*/}
         </>
       )}
     </div>

@@ -20,7 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import type { CustomerIdName } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, IdCard, Plus } from "lucide-react";

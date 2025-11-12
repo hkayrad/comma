@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/form";
 import { Eye, EyeOff, Loader, LogIn, Moon, Sun } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { AuthApi } from "@/lib/api";
 import { useCallback, useState } from "react";
 import { Form } from "@/components/ui/form";
 import { z } from "zod";
@@ -17,13 +16,15 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
-import { useWebSocket } from "@/contexts/WebSocketContext";
+import { useWebSocket } from "@/contexts/webSocket";
 import { useTheme } from "@/components/theme-provider";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useUser } from "@/contexts/user";
+import { Logger } from "@/lib/utils/logger";
 
 const formSchema = z.object({
   username: z
@@ -47,6 +48,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { reloadConnection } = useWebSocket();
   const { theme, setTheme } = useTheme();
+  const { login } = useUser();
 
   const togglePasswordVisibility = useCallback(() => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -62,10 +64,10 @@ export default function Login() {
       }
 
       setLoading(true);
-      const response = AuthApi.Login(username, password);
+      const promise = login(username, password);
       const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
       setTimeout(() => {
-        toast.promise(response, {
+        toast.promise(promise, {
           loading: "Giriş yapılıyor...",
           success: () => {
             setLoading(false);
@@ -73,17 +75,18 @@ export default function Login() {
             navigate("/");
             return "Giriş başarılı!";
           },
-          error: () => {
+          error: (error) => {
+            Logger.error(error);
             setLoading(false);
             return "Giriş başarısız, lütfen bilgilerinizi kontrol edin";
           },
         });
       }, timeout);
     },
-    [navigate, reloadConnection],
+    [navigate, reloadConnection, login],
   );
 
-  //! DEBUG LOGIN
+  //WARN DEBUG LOGIN
   const adminLogin = useCallback(async () => {
     form.setValue("username", "hkayrad");
     form.setValue("password", "Test1234");
@@ -104,7 +107,7 @@ export default function Login() {
             className="w-64 lg:w-96 saturate-0 brightness-0 invert"
           />
         </div>
-        <Tooltip>
+        <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
             <Button
               size="icon"

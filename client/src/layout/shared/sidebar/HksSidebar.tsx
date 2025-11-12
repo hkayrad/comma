@@ -26,8 +26,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useConfig } from "@/contexts/config";
-import { useWebSocket } from "@/contexts/WebSocketContext";
-import { AuthApi, useCurrentUser } from "@/lib/api";
+import { useWebSocket } from "@/contexts/webSocket";
+import { AuthApi } from "@/lib/api";
 import {
   RoleBackgrounds,
   RoleColors,
@@ -54,17 +54,21 @@ import {
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import MaintenanceDialog from "@/layout/shared/dialog/MaintenanceDialog";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import HksSidebarItem from "./components/HksSidebarItem";
 import { useTheme } from "@/components/theme-provider";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CompanyApi } from "@/lib/api/company";
 import CompanyDetailsDialog from "@/layout/shared/dialog/CompanyDetails/CompanyDetailsDialog";
+import { useUser } from "@/contexts/user";
+import { AdminOnly } from "@/layout/auth/RoleGuard";
+import { useRole } from "@/hooks/useRole";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
-  const user = useCurrentUser();
+  const { user, clearUser } = useUser();
+  const { role } = useRole();
   const { openDialog } = useDialog();
   const { state } = useSidebar();
   const { reloadConnection, sendGetActiveUsersRequest } = useWebSocket();
@@ -106,13 +110,14 @@ export default function HksSidebar() {
     toast.promise(promise, {
       loading: "Çıkış yapılıyor...",
       success: () => {
+        clearUser();
         navigate("/login");
         reloadConnection();
         return "Çıkış başarılı!";
       },
       error: "Çıkış yapılırken bir hata oluştu",
     });
-  }, [navigate, reloadConnection]);
+  }, [navigate, reloadConnection, clearUser]);
 
   const handleToggleMaintenance = useCallback(async () => {
     openDialog({
@@ -189,13 +194,13 @@ export default function HksSidebar() {
           },
         ],
       },
-      test: {
+      dev: {
         title: "TESTING",
         url: "",
         items: [
           {
             title: "Test Sayfası",
-            url: "/test",
+            url: "/dev",
             icon: Component,
           },
         ],
@@ -289,7 +294,7 @@ export default function HksSidebar() {
       <SidebarContent className="gap-0">
         {Object.entries(financialItems).map(
           ([key, group]) =>
-            key !== "test" && (
+            key !== "dev" && (
               <SidebarGroup key={key}>
                 {group.title && (
                   <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
@@ -316,7 +321,7 @@ export default function HksSidebar() {
         {Object.entries(financialItems).map(
           ([key, group]) =>
             import.meta.env.VITE_NODE_ENV === "development" &&
-            key === "test" && (
+            key === "dev" && (
               <SidebarGroup key={key}>
                 {group.title && (
                   <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
@@ -342,56 +347,54 @@ export default function HksSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter>
-        {user?.role === 1 && (
-          <>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <Tooltip
-                    disableHoverableContent
-                    open={state === "collapsed" ? undefined : false}
+        <AdminOnly>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <Tooltip
+                  disableHoverableContent
+                  open={state === "collapsed" ? undefined : false}
+                >
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton>
+                        <ShieldUser />
+                        <span className="select-none">Yönetici Araçları</span>
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    Yönetici Araçları
+                  </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent side="right" align="end" sideOffset={4}>
+                  <DropdownMenuItem
+                    onClick={handleToggleMaintenance}
+                    className="!justify-start"
                   >
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton>
-                          <ShieldUser />
-                          <span className="select-none">Yönetici Araçları</span>
-                        </SidebarMenuButton>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      Yönetici Araçları
-                    </TooltipContent>
-                  </Tooltip>
-                  <DropdownMenuContent side="right" align="end" sideOffset={4}>
-                    <DropdownMenuItem
-                      onClick={handleToggleMaintenance}
-                      className="!justify-start"
-                    >
-                      <Construction className="text-inherit bg-inherit select-none" />
-                      <span>Bakım Modu</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleGetActiveUsers}
-                      className="!justify-start"
-                    >
-                      <UsersRound className="text-inherit bg-inherit select-none" />
-                      <span>Aktif Kullanıcılar</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleCompanyDetails}
-                      className="!justify-start"
-                    >
-                      <Building2 className="text-inherit bg-inherit select-none" />
-                      <span>Şirket Detayları</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-            <SidebarSeparator className="!mx-0" />
-          </>
-        )}
+                    <Construction className="text-inherit bg-inherit select-none" />
+                    <span>Bakım Modu</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleGetActiveUsers}
+                    className="!justify-start"
+                  >
+                    <UsersRound className="text-inherit bg-inherit select-none" />
+                    <span>Aktif Kullanıcılar</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleCompanyDetails}
+                    className="!justify-start"
+                  >
+                    <Building2 className="text-inherit bg-inherit select-none" />
+                    <span>Şirket Detayları</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <SidebarSeparator className="!mx-0" />
+        </AdminOnly>
         <SidebarGroup className="!p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
@@ -411,8 +414,8 @@ export default function HksSidebar() {
                             <AvatarFallback
                               className={`
                                                         h-8 w-8 rounded-lg select-none
-                                                ${RoleBackgrounds[(user?.role ?? 0) as RoleBackgroundType]}
-                                                ${RoleColors[(user?.role ?? 0) as RoleColorType]}
+                                                ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
+                                                ${RoleColors[(role ?? 0) as RoleColorType]}
                                                 `}
                             >
                               {user?.username.charAt(0).toUpperCase()}
@@ -423,7 +426,7 @@ export default function HksSidebar() {
                               {user?.username}
                             </span>
                             <span className="text-muted-foreground truncate text-xs select-none">
-                              {UserRole[(user?.role ?? 0) as UserRoleType]}
+                              {UserRole[(role ?? 0) as UserRoleType]}
                             </span>
                           </div>
                           <EllipsisVertical className="ml-auto size-4" />

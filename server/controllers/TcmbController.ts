@@ -1,6 +1,6 @@
 import express from "express";
 import { parseStringPromise } from "xml2js";
-import authMiddleware from "../lib/utils/middleware";
+import { authMiddleware } from "../lib/utils/middleware";
 import { ExchangeRates } from "@common/types";
 import { Logger } from "../lib/utils";
 

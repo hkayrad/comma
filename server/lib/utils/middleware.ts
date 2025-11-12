@@ -1,53 +1,49 @@
 import { NextFunction, Request, Response } from "express";
-import verifyUser from "./verifyUser";
+import dotenv from "dotenv";
 import { Logger } from "./logger";
+import jwt from "jsonwebtoken";
+import { ApiResponse } from "./apiResponse";
 
-export default function authMiddleware(req: Request, res: Response, next: NextFunction) {
+dotenv.config();
+
+export function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	Logger.debug("[AuthMiddleware] Request received", {
 		method: req.method,
 		path: req.path,
 	});
 
 	try {
-		const authHeader = req.headers["authorization"];
+		const accessToken = req.cookies.access_token;
 
-		if (!authHeader) {
-			Logger.error("[AuthMiddleware] No authorization header provided", { path: req.path });
-			return res.status(401).json({ success: false, message: "Unauthorized" });
+		if (!accessToken) {
+			Logger.warn("[AuthMiddleware] Access token missing");
+			return res.status(401).json(ApiResponse.error("Unauthorized"));
 		}
 
-		const token = authHeader?.split(" ")[1];
+		jwt.verify(accessToken, process.env.JWT_SECRET as jwt.Secret, (err: any, user: any) => {
+			if (err) return res.status(401).json(ApiResponse.error("Unauthorized"));
 
-		if (token == null || token === "null" || token === "undefined" || token === undefined) {
-			Logger.error("[AuthMiddleware] Invalid or missing token", { path: req.path });
-			return res.status(401).json({ success: false, message: "Unauthorized" });
-		}
-
-		Logger.debug("[AuthMiddleware] Verifying token");
-		const decoded = verifyUser(token);
-
-		if (!decoded) {
-			Logger.error("[AuthMiddleware] Token verification failed", { path: req.path });
-			return res.status(401).json({ success: false, message: "Unauthorized" });
-		}
-
-		const companyId = decoded.companyId;
-
-		if (!companyId) {
-			Logger.error("[AuthMiddleware] No company ID in token", { userId: decoded.id });
-			return res.status(400).json({ success: false, message: "Company ID is required" });
-		}
-
-		req.companyId = companyId;
-		Logger.debug("[AuthMiddleware] Authentication successful", {
-			companyId,
-			userId: decoded.id,
-			path: req.path,
+			req.user = user;
+			next();
 		});
-
-		next();
 	} catch (error) {
-		Logger.error("[AuthMiddleware] Error in authentication", error);
-		return res.status(500).json({ success: false, message: "Internal Server Error" });
+		Logger.error("[AuthMiddleware] Error verifying token", { error });
+		return res.status(401).json(ApiResponse.error("Unauthorized"));
 	}
+}
+
+export function configMiddleware(req: Request, res: Response, next: NextFunction) {
+	Logger.debug("[ConfigMiddleware] Request received", {
+		method: req.method,
+		path: req.path,
+	});
+
+	// allow public GET /
+	if (req.path === "/" && req.method === "GET") {
+		Logger.debug("[ConfigMiddleware] Public route - skipping auth", { path: req.path });
+		return next();
+	}
+
+	Logger.debug("[ConfigMiddleware] Checking auth");
+	authMiddleware(req, res, next);
 }

@@ -1,21 +1,15 @@
 import { type JSX } from "react";
 import { Navigate } from "react-router";
-import Cookies from "js-cookie";
-
-function hasUserSession(): boolean {
-  const token = Cookies.get("user_session");
-
-  if (!token) return false;
-
-  return true;
-}
+import { useUser } from "@/contexts/user";
 
 type Props = {
   children: JSX.Element;
 };
 
 export function RequireAuth({ children }: Props): React.ReactNode {
-  if (!hasUserSession()) {
+  const { user } = useUser();
+
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
@@ -23,7 +17,9 @@ export function RequireAuth({ children }: Props): React.ReactNode {
 }
 
 export function RequireNoAuth({ children }: Props): React.ReactNode {
-  if (hasUserSession()) {
+  const { user } = useUser();
+
+  if (user) {
     return <Navigate to="/" replace />;
   }
 

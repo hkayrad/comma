@@ -1,55 +1,82 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { AuthService } from "../services/AuthService";
 import { ApiResponse, Logger } from "../lib/utils";
-import { DecodedJwtToken } from "@common/types";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = express.Router();
 
-router.post("/login", async (req: Request<{}, {}, { username: string; password: string }>, res: Response) => {
+router.post("/login", async (req, res) => {
 	const { username, password } = req.body;
-
-	Logger.info("[AuthController] Login attempt", { username });
+	Logger.info("[AuthController] Login attempt", { username: username });
 
 	if (!username || !password) {
 		Logger.warn("[AuthController] Missing credentials", { username: !!username, password: !!password });
 		return res.status(400).json(ApiResponse.error("Username and password are required"));
 	}
 
-	try {
-		const response = await AuthService.Login(username, password);
+	const response = await AuthService.Login(username, password);
 
-		Logger.info("[AuthController] Login result", { username, success: response.success });
-		return res.json(response);
-	} catch (error: any) {
-		Logger.error("[AuthController] Login error", { username, error: error.message });
-		return res.status(500).json(ApiResponse.error("Error during login"));
+	const { success, accessToken, refreshToken, message, user } = response;
+
+	Logger.info("[AuthController] Login result", { username, success: success });
+
+	if (!success) {
+		return res.status(401).json(ApiResponse.error(message));
 	}
+
+	res.cookie("access_token", accessToken, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge: 15 * 60 * 1000, // 15 minutes
+	});
+	res.cookie("refresh_token", refreshToken, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
+		path: "/refresh",
+	});
+	return res.json({ username: user?.username, role: user?.role });
 });
 
-router.post("/verify", async (req: Request<{}, {}, { token: string }>, res: Response) => {
-	const { token } = req.body;
+router.post("/refresh", async (req, res) => {
+	const reqRefreshToken = req.cookies.refresh_token;
 
-	Logger.debug("[AuthController] Token verification request");
-
-	if (!token) {
-		Logger.warn("[AuthController] Missing token");
-		return res.status(400).json({ success: false, message: "Token is required" });
+	if (!reqRefreshToken) {
+		return res.status(401).json(ApiResponse.error("Refresh token is missing"));
 	}
 
-	try {
-		const decoded = (await AuthService.VerifyToken(token)) as DecodedJwtToken | null;
+	const response = await AuthService.RefreshToken(reqRefreshToken);
 
-		if (decoded) {
-			Logger.debug("[AuthController] Token verified successfully", { userId: decoded.id });
-			return res.json({ success: true, decoded });
-		} else {
-			Logger.warn("[AuthController] Invalid token");
-			return res.json({ success: false, message: "Invalid token" });
-		}
-	} catch (error: any) {
-		Logger.error("[AuthController] Token verification error", { error: error.message });
-		return res.status(500).json({ success: false, message: "Error verifying token" });
+	if (!response) {
+		return res.status(401).json(ApiResponse.error("Token refresh failed"));
 	}
+
+	const { success, accessToken, refreshToken, message, user } = response;
+
+	Logger.info("[AuthController] Refresh result", { username: user?.username, success: success });
+
+	if (!success) return res.status(401).json(ApiResponse.error(message));
+
+	res.cookie("access_token", accessToken, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		maxAge: 8 * 60 * 60 * 1000, // 8 hours
+	});
+
+	return res.json({ username: user?.username, role: user?.role });
+});
+
+router.post("/logout", async (req, res) => {
+	res.clearCookie("access_token");
+	res.clearCookie("refresh_token", {
+		path: "/refresh",
+	});
+	return res.json({ message: "Logged out successfully" });
 });
 
 export default router;

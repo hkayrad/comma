@@ -1,3 +1,6 @@
+## cokomelli
+CustomerDetails.tsx ve CustomerStatement.tsx'i doviz icericek sekilde duzenle.
+
 short term
 ---
 sutunlar local storage tut, reloadda nasil gozukuyorsa oyle yukle

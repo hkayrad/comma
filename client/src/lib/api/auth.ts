@@ -1,7 +1,4 @@
-import Cookies from "js-cookie";
 import instance from "../instance";
-import { useJwt } from "react-jwt";
-import type { DecodedJwtToken } from "../../../../common/types";
 import { Logger } from "@/lib/utils/logger";
 
 export class AuthApi {
@@ -9,12 +6,14 @@ export class AuthApi {
 		try {
 			const response = await instance.post("/login", { username, password });
 
-			const { status, data } = response.data;
+			Logger.info("Login response", response);
 
-			if (status !== 200) return Promise.reject(new Error("Login failed"));
+			if (response.status !== 200) {
+				Logger.error("Login failed");
+				return Promise.reject(new Error("Login failed"));
+			}
 
-			Cookies.set("user_session", data, { expires: (1 / 24) * 8 }); // Expires in 8 hours
-			return Promise.resolve(true);
+			return Promise.resolve(response);
 		} catch (error) {
 			Logger.error(error);
 			return Promise.reject(new Error("Login failed"));
@@ -23,27 +22,33 @@ export class AuthApi {
 
 	static async Logout() {
 		try {
-			Cookies.remove("user_session");
+			const response = await instance.post("/logout");
+
+			if (response.status !== 200) {
+				Logger.error("Logout failed");
+				return Promise.reject(new Error("Logout failed"));
+			}
+
 			return Promise.resolve(true);
 		} catch (error) {
 			Logger.error(error);
 			return Promise.reject(new Error("Logout failed"));
 		}
 	}
-}
 
-// Custom hook to get the current user
-export function useCurrentUser(): DecodedJwtToken | null {
-	const token = Cookies.get("user_session");
+	static async Refresh() {
+		try {
+			const response = await instance.post("/refresh");
 
-	const { decodedToken, isExpired } = useJwt(token || "");
+			if (response.status !== 200) {
+				Logger.error("Refresh token failed");
+				return Promise.reject(new Error("Refresh token failed"));
+			}
 
-	if (!token || isExpired) {
-		if (token && isExpired) {
-			Cookies.remove("user_session");
+			return Promise.resolve(response);
+		} catch (error) {
+			Logger.error(error);
+			return Promise.reject(new Error("Refresh token failed"));
 		}
-		return null;
 	}
-
-	return decodedToken as DecodedJwtToken;
 }

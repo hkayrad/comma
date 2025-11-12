@@ -1,93 +1,24 @@
-import Cookies from "js-cookie";
-import { TriangleAlert } from "lucide-react";
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
   type ReactNode,
 } from "react";
+import { WebSocketContext } from "./webSocketContext";
 import { toast } from "sonner";
 import { Logger } from "@/lib/utils/logger";
 import { AuthApi } from "@/lib/api";
+import { TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useConfig } from "@/contexts/config/useConfig";
-
-interface WebSocketContextType {
-  isConnected: boolean;
-  reloadConnection: () => void;
-  sendStartMaintenanceNotification: (
-    startTime?: string,
-    endTime?: string,
-  ) => void;
-  sendEndMaintenanceNotification: () => void;
-  sendGetActiveUsersRequest: () => void;
-}
-
-const WebSocketContext = createContext<WebSocketContextType | undefined>(
-  undefined,
-);
+import { useConfig } from "@/contexts/config";
 
 interface WebSocketProviderProps {
   children: ReactNode;
   url: string;
 }
 
-const refreshTime = 5000; // 5 seconds
-
-const EndMaintenanceProgressBar = ({ duration }: { duration: number }) => {
-  const [progress, setProgress] = useState(100);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        const decrement = 100 / (duration / 100);
-        return Math.max(0, prev - decrement);
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [duration]);
-
-  return (
-    <div
-      className={`absolute bottom-0 left-0 right-0 h-1 bg-transparent ${progress === 0 ? "hidden" : ""}`}
-    >
-      <div
-        className="h-full bg-green-700 transition-all duration-100 ease-linear"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  );
-};
-
-const StartMaintenanceProgressBar = ({ duration }: { duration: number }) => {
-  const [progress, setProgress] = useState(100);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        const decrement = 100 / (duration / 100);
-        return Math.max(0, prev - decrement);
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [duration]);
-
-  return (
-    <div
-      className={`absolute bottom-0 left-0 right-0 h-1 bg-transparent ${progress === 0 ? "hidden" : ""}`}
-    >
-      <div
-        className="h-full bg-red-700 transition-all duration-100 ease-linear"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  );
-};
+const refreshTime = 5000; // 5 secondss
 
 export const WebSocketProvider = ({
   children,
@@ -100,22 +31,20 @@ export const WebSocketProvider = ({
   const navigate = useNavigate();
 
   const connect = useCallback(() => {
-    const token = Cookies.get("user_session");
-
-    ws.current = new WebSocket(
-      `${url}${token !== undefined ? `?token=${token}` : ""}`,
-    );
+    // Cookies are automatically sent with the WebSocket upgrade request
+    // No need to manually add token to URL
+    ws.current = new WebSocket(url);
 
     ws.current.onopen = () => {
       setIsConnected(true);
-      Logger.log("WebSocket connected on ", url);
+      Logger.info("WebSocket connected on ", url);
     };
 
     ws.current.onclose = () => {
       setIsConnected(false);
-      Logger.log("WebSocket disconnected");
+      Logger.info("WebSocket disconnected");
       reconnectTimeout.current = setTimeout(() => {
-        Logger.log("Reconnecting WebSocket...");
+        Logger.info("Reconnecting WebSocket...");
         connect();
       }, 3000);
     };
@@ -125,7 +54,7 @@ export const WebSocketProvider = ({
       setIsConnected(false);
     };
 
-    ws.current.onmessage = (event) => {
+    ws.current.onmessage = (event: any) => {
       try {
         const data = JSON.parse(event.data);
         const { type, title, body, notificationType, startTime, endTime } =
@@ -283,10 +212,54 @@ export const WebSocketProvider = ({
   );
 };
 
-export const useWebSocket = () => {
-  const context = useContext(WebSocketContext);
-  if (context === undefined) {
-    throw new Error("useWebSocket must be used within a WebSocketProvider");
-  }
-  return context;
+const StartMaintenanceProgressBar = ({ duration }: { duration: number }) => {
+  const [progress, setProgress] = useState(100);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const decrement = 100 / (duration / 100);
+        return Math.max(0, prev - decrement);
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [duration]);
+
+  return (
+    <div
+      className={`absolute bottom-0 left-0 right-0 h-1 bg-transparent ${progress === 0 ? "hidden" : ""}`}
+    >
+      <div
+        className="h-full bg-red-700 transition-all duration-100 ease-linear"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+};
+
+const EndMaintenanceProgressBar = ({ duration }: { duration: number }) => {
+  const [progress, setProgress] = useState(100);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const decrement = 100 / (duration / 100);
+        return Math.max(0, prev - decrement);
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [duration]);
+
+  return (
+    <div
+      className={`absolute bottom-0 left-0 right-0 h-1 bg-transparent ${progress === 0 ? "hidden" : ""}`}
+    >
+      <div
+        className="h-full bg-green-700 transition-all duration-100 ease-linear"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
 };

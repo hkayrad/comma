@@ -1,6 +1,9 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { Server } from "http";
-import verifyUser from "../utils/verifyUser";
+import { IncomingMessage } from "http";
+import jwt from "jsonwebtoken";
+import { DecodedJwtToken } from "@common/types";
+import { Logger } from "../utils";
 
 interface AuthenticatedWebSocket extends WebSocket {
 	isAlive: boolean;
@@ -18,12 +21,12 @@ export default class NotificationWebSocket {
 	private loginClients: Set<UnauthenticatedWebSocket> = new Set();
 
 	constructor(server: Server) {
-		this.wss = new WebSocketServer({ server, path: "/ws" });
+		this.wss = new WebSocketServer({ server, path: "/notification" });
 		this.setup();
 	}
 
 	private setup() {
-		this.wss.on("connection", (ws: AuthenticatedWebSocket, req: Request) => {
+		this.wss.on("connection", (ws: AuthenticatedWebSocket, req: IncomingMessage) => {
 			this.authenticate(ws, req);
 
 			ws.on("message", (data: string) => {
@@ -31,19 +34,28 @@ export default class NotificationWebSocket {
 					const message = JSON.parse(data.toString());
 					this.handleMessage(ws, message);
 				} catch (error) {
-					console.error("Error parsing message:", error);
+					Logger.error("Error parsing message:", error);
 				}
 			});
 
 			ws.on("close", () => {
-				console.log("Client disconnected from Notification WebSocket");
+				Logger.info("Client disconnected from Notification WebSocket");
+				this.clients.delete(ws);
+			});
+
+			ws.on("error", (error) => {
+				Logger.error("WebSocket error:", error);
+				this.clients.delete(ws);
 			});
 		});
 	}
 
-	private authenticate(ws: AuthenticatedWebSocket, req: Request) {
+	private authenticate(ws: AuthenticatedWebSocket, req: IncomingMessage) {
 		console.log("New client connected to Notification WebSocket");
-		const token = req.url?.split("token=")[1]?.split(";")[0];
+
+		// Parse cookies from request headers
+		const cookies = this.parseCookies(req.headers.cookie || "");
+		const token = cookies.access_token;
 
 		if (!token) {
 			this.loginClients.add(ws as UnauthenticatedWebSocket);
@@ -51,20 +63,39 @@ export default class NotificationWebSocket {
 			return;
 		}
 
-		const userCreds = verifyUser(token);
+		// Verify JWT token
+		try {
+			const decoded = jwt.verify(token, process.env.JWT_SECRET as string, {
+				issuer: process.env.JWT_ISSUER,
+				audience: process.env.JWT_AUDIENCE,
+			}) as DecodedJwtToken;
 
-		if (!userCreds) {
+			ws.isAlive = true;
+			ws.userId = decoded.id;
+			ws.userRole = decoded.role.toString();
+
+			this.clients.add(ws);
+			console.log(`Client authenticated: UserID=${ws.userId}, Role=${ws.userRole}`);
+		} catch (error) {
 			ws.close(1008, "Unauthorized: Invalid token");
-			console.log("Unauthorized: Invalid token");
+			console.log("Unauthorized: Invalid token", error);
 			return;
 		}
+	}
 
-		ws.isAlive = true;
-		ws.userId = userCreds.id;
-		ws.userRole = userCreds.role.toString();
+	private parseCookies(cookieHeader: string): Record<string, string> {
+		const cookies: Record<string, string> = {};
+		if (!cookieHeader) return cookies;
 
-		this.clients.add(ws);
-		console.log(`Client authenticated: UserID=${ws.userId}, Role=${ws.userRole}`);
+		cookieHeader.split(";").forEach((cookie) => {
+			const [name, ...rest] = cookie.split("=");
+			const value = rest.join("=").trim();
+			if (name && value) {
+				cookies[name.trim()] = decodeURIComponent(value);
+			}
+		});
+
+		return cookies;
 	}
 
 	private handleMessage(ws: AuthenticatedWebSocket, message: any) {

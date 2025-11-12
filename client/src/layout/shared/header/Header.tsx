@@ -42,7 +42,7 @@ export default function Header() {
           </TooltipContent>
         </Tooltip>
         <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />
-        <p className="whitespace-nowrap text-muted-foreground text-sm">
+        <p className="whitespace-nowrap text-muted-foreground text-sm select-none">
           {currentPage}
         </p>
         <div className="ml-auto mr-2">

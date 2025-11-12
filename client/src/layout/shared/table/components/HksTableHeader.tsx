@@ -130,12 +130,19 @@ export default function HksTableHeader(props: Props) {
           <TooltipContent>Tüm sıralamaları kaldır</TooltipContent>
         </Tooltip>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Columns3Cog />
-              <span>Sütunları Göster/Gizle</span>
-            </Button>
-          </DropdownMenuTrigger>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="select-none">
+                  <Columns3Cog />
+                  <span>Sütunları Göster/Gizle</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              İstenilen sütunları gizle veya göster
+            </TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -157,12 +164,17 @@ export default function HksTableHeader(props: Props) {
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Rows3 />
-              <span>Satır Sayısı</span>
-            </Button>
-          </DropdownMenuTrigger>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="select-none">
+                  <Rows3 />
+                  <span>Satır Sayısı</span>
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Satır sayısını seç</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end">
             <DropdownMenuCheckboxItem
               checked={table.getState().pagination.pageSize === 5}
@@ -219,22 +231,6 @@ export default function HksTableHeader(props: Props) {
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
-                onClick={() => onCurrencyChange("EUR")}
-                className={
-                  currency.state === "EUR"
-                    ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-                    : ""
-                }
-              >
-                <Euro />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Euro</TooltipContent>
-          </Tooltip>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
                 onClick={() => onCurrencyChange("USD")}
                 className={
                   currency.state === "USD"
@@ -246,6 +242,22 @@ export default function HksTableHeader(props: Props) {
               </Button>
             </TooltipTrigger>
             <TooltipContent>Amerikan Doları</TooltipContent>
+          </Tooltip>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={() => onCurrencyChange("EUR")}
+                className={
+                  currency.state === "EUR"
+                    ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
+                    : ""
+                }
+              >
+                <Euro />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Euro</TooltipContent>
           </Tooltip>
         </ButtonGroup>
       )}
@@ -262,7 +274,7 @@ export default function HksTableHeader(props: Props) {
               {isRefreshing ? "Yenileniyor..." : "Yenile"}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="left">Tabloyu yenile</TooltipContent>
+          <TooltipContent>Tabloyu yenile</TooltipContent>
         </Tooltip>
       </div>
     </div>

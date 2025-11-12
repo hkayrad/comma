@@ -21,7 +21,7 @@ import { Logger } from "./lib/utils/logger";
 declare global {
 	namespace Express {
 		interface Request {
-			companyId: string;
+			user: any;
 		}
 	}
 }

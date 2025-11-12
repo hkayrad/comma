@@ -8,7 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import {
   PayableCustomerApi,
   PayableDebtApi,
@@ -297,7 +297,7 @@ export default function DebtDialog(props: Props) {
                       }
                     </InputGroupAddon>
                     <InputGroupAddon align="inline-end">
-                      <Tooltip>
+                      <Tooltip disableHoverableContent>
                         <TooltipTrigger asChild>
                           <InputGroupButton
                             size="xs"

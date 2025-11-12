@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router";
-import { DialogProvider } from "@/contexts/DialogContext";
+import { DialogProvider } from "@/contexts/dialog";
 import { useEffect } from "react";
 import { sendRefreshEvent } from "@/lib/utils";
 import FloatingButton from "@/layout/shared/FloatingButton";

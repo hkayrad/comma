@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import ReceivableDebtsService from "../../services/Receivable/DebtsService";
-import authMiddleware from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/utils/middleware";
 import { Logger } from "../../lib/utils";
 import { DebtDto } from "@common/types";
 
@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
 	const debt = req.body;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[ReceivableDebtsController] Create debt request", { companyId, customerId: debt.customer_id });
 
@@ -27,7 +27,7 @@ router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
 
 router.get("/debts/totals", async (req: Request<{}, {}, {}, { currency?: string }>, res: Response) => {
 	const { currency } = req.query;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[ReceivableDebtsController] Get debt totals request", { companyId, currency });
 
@@ -51,7 +51,7 @@ router.get("/debts/totals", async (req: Request<{}, {}, {}, { currency?: string 
 });
 
 router.get("/debts", async (req: Request, res: Response) => {
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.debug("[ReceivableDebtsController] Get all debts request", { companyId });
 
@@ -69,7 +69,7 @@ router.get("/debts", async (req: Request, res: Response) => {
 router.put("/debts/:id", async (req: Request<{ id: string }, {}, DebtDto>, res: Response) => {
 	const { id } = req.params;
 	const debt = req.body;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[ReceivableDebtsController] Update debt request", { debtId: id, companyId });
 
@@ -86,7 +86,7 @@ router.put("/debts/:id", async (req: Request<{ id: string }, {}, DebtDto>, res: 
 
 router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.companyId;
+	const companyId = req.user.companyId;
 
 	Logger.info("[ReceivableDebtsController] Delete debt request", { debtId: id, companyId });
 

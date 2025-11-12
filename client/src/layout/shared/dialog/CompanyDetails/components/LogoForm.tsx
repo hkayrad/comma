@@ -5,7 +5,7 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
-import { useDialog } from "@/contexts/DialogContext";
+import { useDialog } from "@/contexts/dialog";
 import { CompanyApi } from "@/lib/api/company";
 import { sendRefreshEvent } from "@/lib/utils";
 import { Trash2 } from "lucide-react";

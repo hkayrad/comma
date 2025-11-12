@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { useConfig } from "@/contexts/config";
-import { useWebSocket } from "@/contexts/WebSocketContext";
+import { useWebSocket } from "@/contexts/webSocket";
 import { ConfigApi } from "@/lib/api/config";
 import { Logger } from "@/lib/utils/logger";
 import { Clock } from "lucide-react";
