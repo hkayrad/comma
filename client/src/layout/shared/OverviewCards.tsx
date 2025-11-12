@@ -37,9 +37,9 @@ export default function OverviewCards(props: Props) {
 
   const currencyBadges = useMemo(
     () => ({
-      TRY: <BadgeTurkishLiraIcon />,
-      USD: <BadgeDollarSignIcon />,
-      EUR: <BadgeEuroIcon />,
+      TRY: <BadgeTurkishLiraIcon className="hidden 2xl:block" />,
+      USD: <BadgeDollarSignIcon className="hidden 2xl:block" />,
+      EUR: <BadgeEuroIcon className="hidden 2xl:block" />,
     }),
     [],
   );
@@ -121,15 +121,15 @@ export default function OverviewCards(props: Props) {
 
   return (
     <div
-      className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"}`}
+      className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"} `}
     >
-      <Card className="w-64">
+      <Card className="grow w-48">
         <CardHeader>
-          <CardDescription>
+          <CardDescription className="text-xs 2xl:text-sm select-none">
             Toplam {type === "receivable" ? "Alacak" : "Borç"}
           </CardDescription>
           <CardTitle
-            className="text-2xl select-none hover:cursor-copy"
+            className="text-xl select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_debts)}
           >
             {formattedTotals.total_debts}
@@ -137,35 +137,35 @@ export default function OverviewCards(props: Props) {
           <CardAction>{currencyBadges[currency]}</CardAction>
         </CardHeader>
       </Card>
-      <Card className="w-64">
+      <Card className="grow w-48">
         <CardHeader>
-          <CardDescription>
+          <CardDescription className="text-xs 2xl:text-sm select-none">
             Ödenmiş {type === "receivable" ? "Alacak" : "Borç"}
           </CardDescription>
           <CardTitle
-            className="text-2xl text-green-600 select-none hover:cursor-copy"
+            className="text-xl text-green-600 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_payments)}
           >
             {formattedTotals.total_payments}
           </CardTitle>
           <CardAction>
-            <BadgeCheck className="text-green-600" />
+            <BadgeCheck className="text-green-600 hidden 2xl:block" />
           </CardAction>
         </CardHeader>
       </Card>
-      <Card className="w-64">
+      <Card className="grow w-48">
         <CardHeader>
-          <CardDescription>
+          <CardDescription className="text-xs 2xl:text-sm select-none">
             Kalan {type === "receivable" ? "Alacak" : "Borç"}
           </CardDescription>
           <CardTitle
-            className="text-2xl text-red-500 select-none hover:cursor-copy"
+            className="text-xl text-red-500 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.remaining_debt)}
           >
             {formattedTotals.remaining_debt}
           </CardTitle>
           <CardAction>
-            <BadgeAlert className="text-red-500" />
+            <BadgeAlert className="text-red-500 hidden 2xl:block" />
           </CardAction>
         </CardHeader>
       </Card>

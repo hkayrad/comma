@@ -9,6 +9,43 @@ const router = express.Router();
 
 router.use(authMiddleware);
 
+router.put("/", async (req: Request, res: Response) => {
+	const companyId = req.user.companyId;
+	const details: CompanyDto = req.body;
+
+	Logger.info("[CompanyController] Update company details request", { companyId });
+
+	try {
+		if (!details || Object.keys(details).length === 0) {
+			Logger.warn("[CompanyController] No details provided", { companyId });
+			return res.status(400).json({ success: false, message: "Company details are required" });
+		}
+
+		const response = await CompanyService.UpdateCompanyDetails(companyId, details);
+
+		Logger.info("[CompanyController] Company details update result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[CompanyController] Error updating company details", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error updating company details" });
+	}
+});
+
+router.get("/id", async (req: Request, res: Response) => {
+	const companyId = req.user.companyId;
+	Logger.debug("[CompanyController] Get company by ID request", { companyId });
+
+	try {
+		const response = await CompanyService.GetCompanyById(companyId);
+
+		Logger.debug("[CompanyController] Company fetched", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[CompanyController] Error fetching company", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching company" });
+	}
+});
+
 router.post("/logo/small", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
 
@@ -96,43 +133,6 @@ router.get("/logos", async (req: Request, res: Response) => {
 	} catch (error: any) {
 		Logger.error("[CompanyController] Error fetching logos", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching logos" });
-	}
-});
-
-router.get("/id", async (req: Request, res: Response) => {
-	const companyId = req.user.companyId;
-	Logger.debug("[CompanyController] Get company by ID request", { companyId });
-
-	try {
-		const response = await CompanyService.GetCompanyById(companyId);
-
-		Logger.debug("[CompanyController] Company fetched", { companyId, success: response.success });
-		return res.json(response);
-	} catch (error: any) {
-		Logger.error("[CompanyController] Error fetching company", { companyId, error: error.message });
-		return res.status(500).json({ success: false, message: "Error fetching company" });
-	}
-});
-
-router.put("/id", async (req: Request, res: Response) => {
-	const companyId = req.user.companyId;
-	const details: CompanyDto = req.body;
-
-	Logger.info("[CompanyController] Update company details request", { companyId });
-
-	try {
-		if (!details || Object.keys(details).length === 0) {
-			Logger.warn("[CompanyController] No details provided", { companyId });
-			return res.status(400).json({ success: false, message: "Company details are required" });
-		}
-
-		const response = await CompanyService.UpdateCompanyDetails(companyId, details);
-
-		Logger.info("[CompanyController] Company details update result", { companyId, success: response.success });
-		return res.json(response);
-	} catch (error: any) {
-		Logger.error("[CompanyController] Error updating company details", { companyId, error: error.message });
-		return res.status(500).json({ success: false, message: "Error updating company details" });
 	}
 });
 

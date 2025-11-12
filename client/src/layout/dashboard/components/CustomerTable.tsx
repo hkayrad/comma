@@ -35,6 +35,7 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useMemo } from "react";
+import { CurrencyIcons } from "@/lib/enums";
 
 type Props = {
   data: CustomerDto[];
@@ -201,7 +202,7 @@ export default function CustomerTable(props: Props) {
       ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
         {
           accessorKey: `total_debt_${curr.toLowerCase()}`,
-          id: `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${curr})`,
+          id: `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => column.id,
           cell: ({ row, column }: { row: any; column: any }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
@@ -210,7 +211,7 @@ export default function CustomerTable(props: Props) {
         },
         {
           accessorKey: `total_payments_${curr.toLowerCase()}`,
-          id: `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${curr})`,
+          id: `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => column.id,
           cell: ({ row, column }: { row: any; column: any }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
@@ -219,7 +220,7 @@ export default function CustomerTable(props: Props) {
         },
         {
           accessorKey: `remaining_debt_${curr.toLowerCase()}`,
-          id: `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${curr})`,
+          id: `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => column.id,
           cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
@@ -227,12 +228,12 @@ export default function CustomerTable(props: Props) {
           sortingFn: formattedNumber,
         },
         {
-          id: `Borç Durumu (${curr})`,
+          id: `Borç Durumu (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => column.id,
           cell: ({ row }: { row: Row<any> }) => {
             const remaining_debt = parseFloat(
               row.getValue(
-                `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${curr})`,
+                `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
               ),
             );
             if (remaining_debt > 0)
@@ -378,11 +379,11 @@ export default function CustomerTable(props: Props) {
           !col.id?.startsWith("Borç Durumu")) ||
         (currency &&
           (col.id ===
-            `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${currency.state})` ||
+            `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
             col.id ===
-              `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${currency.state})` ||
+              `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
             col.id ===
-              `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${currency.state})` ||
+              `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
             col.id === `Borç Durumu (${currency.state})`)),
     );
   }, [CustomerTableColumns, currency, type]);

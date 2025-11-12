@@ -6,43 +6,46 @@ import { useMemo } from "react";
  * Provides utilities to check user roles and permissions
  */
 export const useRole = () => {
-  const { user } = useUser();
+	const { user } = useUser();
 
-  const role = useMemo(() => user?.role ?? null, [user?.role]);
+	const role = useMemo(() => user?.role ?? null, [user?.role]);
 
-  const isAdmin = useMemo(() => role === 1, [role]);
+	const isSystemAdmin = useMemo(() => role === 99, [role]);
 
-  const isUser = useMemo(() => role === 0, [role]);
+	const isCompanyAdmin = useMemo(() => role === 1, [role]);
 
-  const hasRole = useMemo(
-    () => (requiredRole: number) => {
-      return role === requiredRole;
-    },
-    [role]
-  );
+	const isUser = useMemo(() => role === 0, [role]);
 
-  const hasMinimumRole = useMemo(
-    () => (minimumRole: number) => {
-      if (role === null) return false;
-      return role >= minimumRole;
-    },
-    [role]
-  );
+	const hasRole = useMemo(
+		() => (requiredRole: number) => {
+			return role === requiredRole;
+		},
+		[role],
+	);
 
-  const hasAnyRole = useMemo(
-    () => (roles: number[]) => {
-      if (role === null) return false;
-      return roles.includes(role);
-    },
-    [role]
-  );
+	const hasMinimumRole = useMemo(
+		() => (minimumRole: number) => {
+			if (role === null) return false;
+			return role >= minimumRole;
+		},
+		[role],
+	);
 
-  return {
-    role,
-    isAdmin,
-    isUser,
-    hasRole,
-    hasMinimumRole,
-    hasAnyRole,
-  };
+	const hasAnyRole = useMemo(
+		() => (roles: number[]) => {
+			if (role === null) return false;
+			return roles.includes(role);
+		},
+		[role],
+	);
+
+	return {
+		role,
+		isSystemAdmin,
+		isCompanyAdmin,
+		isUser,
+		hasRole,
+		hasMinimumRole,
+		hasAnyRole,
+	};
 };

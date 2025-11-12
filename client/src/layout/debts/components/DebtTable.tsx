@@ -29,6 +29,7 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useMemo } from "react";
+import { CurrencyIcons } from "@/lib/enums";
 
 type Props = {
   data: DebtDto[];
@@ -107,10 +108,10 @@ export default function DebtTable(props: Props) {
           </Tooltip>
         ),
       },
-      ...["TRY", "USD", "EUR"].flatMap((curr) => [
+      ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
         {
           accessorKey: "amount",
-          id: `Tutar (${curr})`,
+            id: `Tutar (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => (
             <SortableColumnHeader column={column} title={column.id} />
           ),
@@ -125,7 +126,7 @@ export default function DebtTable(props: Props) {
         },
         {
           accessorKey: "vat",
-          id: `KDV (${curr})`,
+          id: `KDV (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => (
             <SortableColumnHeader column={column} title={column.id} />
           ),
@@ -140,7 +141,7 @@ export default function DebtTable(props: Props) {
         },
         {
           accessorKey: "total_amount",
-          id: `Toplam (${curr})`,
+          id: `Toplam (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => (
             <SortableColumnHeader column={column} title={column.id} />
           ),
@@ -250,7 +251,7 @@ export default function DebtTable(props: Props) {
         (!col.id?.startsWith("Toplam") &&
           !col.id?.startsWith("Tutar") &&
           !col.id?.startsWith("KDV")) ||
-        (currency ? col.id?.endsWith(`(${currency.state})`) : true),
+        (currency ? col.id?.endsWith(`(${CurrencyIcons[currency.state]})`) : true),
     );
   }, [DebtTableColumns, currency]);
 

@@ -25,7 +25,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useConfig } from "@/contexts/config";
 import { useWebSocket } from "@/contexts/webSocket";
 import { AuthApi } from "@/lib/api";
 import {
@@ -50,10 +49,11 @@ import {
   ShieldUser,
   Sun,
   UsersRound,
+  Wrench,
+  TestTubeDiagonal,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
-import MaintenanceDialog from "@/layout/shared/dialog/MaintenanceDialog";
 import { useDialog } from "@/contexts/dialog";
 import HksSidebarItem from "./components/HksSidebarItem";
 import { useTheme } from "@/components/theme-provider";
@@ -62,8 +62,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CompanyApi } from "@/lib/api/company";
 import CompanyDetailsDialog from "@/layout/shared/dialog/CompanyDetails/CompanyDetailsDialog";
 import { useUser } from "@/contexts/user";
-import { AdminOnly } from "@/layout/auth/RoleGuard";
+import {
+  CompanyAdminOnly,
+  NonSystemAdminOnly,
+  SystemAdminOnly,
+} from "@/layout/auth/RoleGuard";
 import { useRole } from "@/hooks/useRole";
+import { useConfig } from "@/contexts/config";
+import MaintenanceDialog from "../dialog/MaintenanceDialog";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -72,8 +78,8 @@ export default function HksSidebar() {
   const { openDialog } = useDialog();
   const { state } = useSidebar();
   const { reloadConnection, sendGetActiveUsersRequest } = useWebSocket();
-  const { configs } = useConfig();
   const { theme, setTheme } = useTheme();
+  const { configs } = useConfig();
 
   const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
   const [logos, setLogos] = useState<{ smallLogo: string; largeLogo: string }>({
@@ -119,6 +125,16 @@ export default function HksSidebar() {
     });
   }, [navigate, reloadConnection, clearUser]);
 
+  const handleCompanyDetails = useCallback(async () => {
+    openDialog({
+      title: "Şirket Detayları",
+      description: "Şirket bilgilerinizi görüntüleyin ve düzenleyin.",
+      size: "3xl",
+      content: <CompanyDetailsDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog]);
+
   const handleToggleMaintenance = useCallback(async () => {
     openDialog({
       title:
@@ -134,17 +150,6 @@ export default function HksSidebar() {
       showCloseButton: true,
     });
   }, [configs?.maintenanceMode, openDialog]);
-
-  const handleCompanyDetails = useCallback(async () => {
-    openDialog({
-      title: "Şirket Detayları",
-      description: "Şirket bilgilerinizi görüntüleyin ve düzenleyin.",
-      size: "3xl",
-      content: <CompanyDetailsDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog]);
-
   const handleGetActiveUsers = useCallback(() => {
     sendGetActiveUsersRequest();
   }, [sendGetActiveUsersRequest]);
@@ -201,7 +206,7 @@ export default function HksSidebar() {
           {
             title: "Test Sayfası",
             url: "/dev",
-            icon: Component,
+            icon: TestTubeDiagonal,
           },
         ],
       },
@@ -292,62 +297,64 @@ export default function HksSidebar() {
         </NavLink>
       </SidebarHeader>
       <SidebarContent className="gap-0">
-        {Object.entries(financialItems).map(
-          ([key, group]) =>
-            key !== "dev" && (
-              <SidebarGroup key={key}>
-                {group.title && (
-                  <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                    <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
-                      {group.title}
-                    </span>
-                  </SidebarGroupLabel>
-                )}
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => (
-                      <HksSidebarItem
-                        key={item.title}
-                        item={item}
-                        group={group}
-                        state={state}
-                      />
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            ),
-        )}
-        {Object.entries(financialItems).map(
-          ([key, group]) =>
-            import.meta.env.VITE_NODE_ENV === "development" &&
-            key === "dev" && (
-              <SidebarGroup key={key}>
-                {group.title && (
-                  <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
-                    <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
-                      {group.title}
-                    </span>
-                  </SidebarGroupLabel>
-                )}
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => (
-                      <HksSidebarItem
-                        key={item.title}
-                        item={item}
-                        group={group}
-                        state={state}
-                      />
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            ),
-        )}
+        <NonSystemAdminOnly>
+          {Object.entries(financialItems).map(
+            ([key, group]) =>
+              key !== "dev" && (
+                <SidebarGroup key={key}>
+                  {group.title && (
+                    <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                      <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
+                        {group.title}
+                      </span>
+                    </SidebarGroupLabel>
+                  )}
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {group.items.map((item) => (
+                        <HksSidebarItem
+                          key={item.title}
+                          item={item}
+                          group={group}
+                          state={state}
+                        />
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ),
+          )}
+          {Object.entries(financialItems).map(
+            ([key, group]) =>
+              import.meta.env.VITE_NODE_ENV === "development" &&
+              key === "dev" && (
+                <SidebarGroup key={key}>
+                  {group.title && (
+                    <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
+                      <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
+                        {group.title}
+                      </span>
+                    </SidebarGroupLabel>
+                  )}
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {group.items.map((item) => (
+                        <HksSidebarItem
+                          key={item.title}
+                          item={item}
+                          group={group}
+                          state={state}
+                        />
+                      ))}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ),
+          )}
+        </NonSystemAdminOnly>
       </SidebarContent>
       <SidebarFooter>
-        <AdminOnly>
+        <SystemAdminOnly>
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
@@ -363,9 +370,7 @@ export default function HksSidebar() {
                       </SidebarMenuButton>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
-                    Yönetici Araçları
-                  </TooltipContent>
+                  <TooltipContent side="right">Yönetim Araçları</TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent side="right" align="end" sideOffset={4}>
                   <DropdownMenuItem
@@ -381,6 +386,37 @@ export default function HksSidebar() {
                   >
                     <UsersRound className="text-inherit bg-inherit select-none" />
                     <span>Aktif Kullanıcılar</span>
+                  </DropdownMenuItem>{" "}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SystemAdminOnly>
+        <CompanyAdminOnly>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <Tooltip
+                  disableHoverableContent
+                  open={state === "collapsed" ? undefined : false}
+                >
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton>
+                        <Wrench />
+                        <span className="select-none">Şirket Yönetimi</span>
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Şirket Yönetimi</TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent side="right" align="end" sideOffset={4}>
+                  <DropdownMenuItem
+                    onClick={() => {}}
+                    className="!justify-start"
+                  >
+                    <UsersRound className="text-inherit bg-inherit select-none" />
+                    <span>Kullanıcıları Düzenle</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleCompanyDetails}
@@ -394,7 +430,7 @@ export default function HksSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarSeparator className="!mx-0" />
-        </AdminOnly>
+        </CompanyAdminOnly>
         <SidebarGroup className="!p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">

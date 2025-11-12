@@ -30,6 +30,7 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useEffect, useMemo } from "react";
+import { CurrencyIcons } from "@/lib/enums";
 
 type Props = {
   data: PaymentDto[];
@@ -108,10 +109,10 @@ export default function PaymentTable(props: Props) {
           </Tooltip>
         ),
       },
-      ...["TRY", "USD", "EUR"].flatMap((curr) => [
+      ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
         {
           accessorKey: "amount",
-          id: `Ödeme Miktarı (${curr})`,
+          id: `Ödeme Miktarı (${CurrencyIcons[curr]})`,
           header: ({ column }: { column: Column<any> }) => (
             <SortableColumnHeader column={column} title={column.id} />
           ),
@@ -266,7 +267,9 @@ export default function PaymentTable(props: Props) {
     return PaymentTableColumns.filter(
       (col) =>
         !col.id?.startsWith("Ödeme Miktarı") ||
-        (currency ? col.id?.endsWith(`(${currency.state})`) : true),
+        (currency
+          ? col.id?.endsWith(`(${CurrencyIcons[currency.state]})`)
+          : true),
     );
   }, [PaymentTableColumns, currency]);
 

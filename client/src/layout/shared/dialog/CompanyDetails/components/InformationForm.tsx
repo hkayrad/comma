@@ -18,7 +18,6 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
-import { useUser } from "@/contexts/user";
 import { CompanyApi } from "@/lib/api/company";
 import type { CompanyDto } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -79,7 +78,6 @@ const CompanyFormSchema = z.object({
 });
 
 export default function InformationForm() {
-  const { user } = useUser();
   const [companyDetails, setCompanyDetails] = useState<CompanyDto | null>(null);
 
   const { closeDialog } = useDialog();
@@ -121,9 +119,7 @@ export default function InformationForm() {
 
   const onSubmit = useCallback(
     (data: z.infer<typeof CompanyFormSchema>) => {
-      if (!user?.companyId) return;
-
-      const promise = CompanyApi.UpdateCompanyDetails(user.companyId, data);
+      const promise = CompanyApi.UpdateCompanyDetails(data);
 
       toast.promise(promise, {
         loading: "Şirket detayları güncelleniyor...",
@@ -135,7 +131,7 @@ export default function InformationForm() {
         error: "Şirket detayları güncellenirken bir hata oluştu.",
       });
     },
-    [form, closeDialog, user],
+    [form, closeDialog],
   );
 
   useEffect(() => {

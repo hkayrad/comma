@@ -81,11 +81,11 @@ export default function HksTable(props: Props) {
                       <TableHead
                         key={header.id}
                         className={`
-                                                ${header.id === "Müşteri" && "w-64"}
-                                                ${header.id === "Vergi Dairesi" && "w-36"}
-                                                ${header.id === "İşlemler" && "w-fit"}
-                                                ${(header.id === "Borç Durumu" || header.id === "Tür") && "w-32"}
-                                                `}
+                          ${header.id === "Müşteri" && "w-64"}
+                          ${header.id === "Vergi Dairesi" && "w-36"}
+                          ${header.id === "İşlemler" && "w-fit"}
+                          ${(header.id === "Borç Durumu" || header.id === "Tür") && "w-32"}
+                          `}
                       >
                         {header.isPlaceholder
                           ? null
@@ -111,10 +111,10 @@ export default function HksTable(props: Props) {
                       <TableCell
                         key={cell.id}
                         className={`
-                                                    py-1.5
-                                            ${cell.column.id === "Müşteri" && "w-64 overflow-hidden"}
-                                            ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
-                                            `}
+                          py-1.5 select-none
+                          ${cell.column.id === "Müşteri" && "w-64 overflow-hidden"}
+                          ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
+                          `}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -128,9 +128,9 @@ export default function HksTable(props: Props) {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center"
+                    className="h-24 text-center select-none"
                   >
-                    No results.
+                    Veri Bulunamadı
                   </TableCell>
                 </TableRow>
               )}

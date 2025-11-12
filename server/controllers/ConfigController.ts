@@ -58,6 +58,12 @@ router.post("/", async (req: Request, res: Response) => {
 	const body = req.body as Partial<ConfigKeyValue>;
 	const configKey = body.configKey;
 	const configValue = body.configValue;
+	const user = req.user;
+
+	if (!user || user.role !== 99) {
+		Logger.warn("[ConfigController] Unauthorized user", { user });
+		return res.status(403).json({ success: false, message: "Unauthorized" });
+	}
 
 	if (!configKey || !configValue) {
 		Logger.warn("[ConfigController] Missing configKey or configValue", { body });
@@ -81,6 +87,13 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.post("/start-maintenance", async (req: Request, res: Response) => {
+	const user = req.user;
+
+	if (!user || user.role !== 99) {
+		Logger.warn("[ConfigController] Unauthorized user", { user });
+		return res.status(403).json({ success: false, message: "Unauthorized" });
+	}
+
 	Logger.debug("[ConfigController] Start maintenance request");
 	try {
 		const result = await ConfigService.StartMaintenanceMode();
@@ -99,6 +112,13 @@ router.post("/start-maintenance", async (req: Request, res: Response) => {
 });
 
 router.post("/end-maintenance", async (req: Request, res: Response) => {
+	const user = req.user;
+
+	if (!user || user.role !== 99) {
+		Logger.warn("[ConfigController] Unauthorized user", { user });
+		return res.status(403).json({ success: false, message: "Unauthorized" });
+	}
+
 	Logger.debug("[ConfigController] End maintenance request");
 	try {
 		const result = await ConfigService.EndMaintenanceMode();

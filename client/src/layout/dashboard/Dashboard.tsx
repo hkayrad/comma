@@ -73,7 +73,7 @@ export default function Dashboard() {
         onValueChange={handleTabChange}
         className="w-full gap-2"
       >
-        <TabsList className="fixed bottom-6 z-20 left-0 right-0 mx-auto">
+        <TabsList className="fixed bottom-6 z-20 left-0 right-0 mx-auto select-none">
           <TabsTrigger
             value="receivable"
             className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50"

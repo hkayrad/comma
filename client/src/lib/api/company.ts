@@ -12,9 +12,9 @@ export class CompanyApi {
 		}
 	}
 
-	static async UpdateCompanyDetails(companyId: string, details: CompanyDto) {
+	static async UpdateCompanyDetails(details: CompanyDto) {
 		try {
-			const response = await instance.post(`/company/${companyId}`, details);
+			const response = await instance.put(`/company`, details);
 			return response.data;
 		} catch (error) {
 			console.error("Error updating company details:", error);

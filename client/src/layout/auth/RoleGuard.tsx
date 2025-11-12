@@ -27,25 +27,25 @@ interface RoleGuardProps {
 
 /**
  * Component that conditionally renders children based on user role
- * 
+ *
  * @example
  * // Only admins can see this button
  * <RoleGuard requiredRole={1}>
  *   <Button>Admin Only Button</Button>
  * </RoleGuard>
- * 
+ *
  * @example
  * // Multiple roles can access
  * <RoleGuard allowedRoles={[1, 2]}>
  *   <Button>Manager or Admin Button</Button>
  * </RoleGuard>
- * 
+ *
  * @example
  * // Show fallback for non-admin users
  * <RoleGuard requiredRole={1} fallback={<div>Access Denied</div>}>
  *   <Button>Admin Only Button</Button>
  * </RoleGuard>
- * 
+ *
  * @example
  * // Hide something from admins
  * <RoleGuard requiredRole={1} invert>
@@ -83,10 +83,30 @@ export const RoleGuard = ({
   return hasAccess ? <>{children}</> : <>{fallback}</>;
 };
 
+export const SystemAdminOnly = ({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) => {
+  return (
+    <RoleGuard requiredRole={99} fallback={fallback}>
+      {children}
+    </RoleGuard>
+  );
+};
+
 /**
  * Component that only renders for admin users (role === 1)
  */
-export const AdminOnly = ({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) => {
+export const CompanyAdminOnly = ({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) => {
   return (
     <RoleGuard requiredRole={1} fallback={fallback}>
       {children}
@@ -97,9 +117,15 @@ export const AdminOnly = ({ children, fallback = null }: { children: ReactNode; 
 /**
  * Component that only renders for non-admin users (role !== 1)
  */
-export const NonAdminOnly = ({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) => {
+export const NonSystemAdminOnly = ({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) => {
   return (
-    <RoleGuard requiredRole={1} invert fallback={fallback}>
+    <RoleGuard minimumRole={99} invert fallback={fallback}>
       {children}
     </RoleGuard>
   );

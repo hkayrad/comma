@@ -14,6 +14,8 @@ import { Toaster } from "./components/ui/sonner";
 import Dev from "./layout/Dev";
 import { ConfigProvider } from "@/contexts/config";
 import { UserProvider } from "@/contexts/user";
+import { DialogProvider } from "@/contexts/dialog";
+import NotFound from "./layout/NotFound";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -21,58 +23,63 @@ createRoot(document.getElementById("root")!).render(
       <UserProvider>
         <WebSocketProvider url={import.meta.env.VITE_WEBSOCKET_URL}>
           <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-            <Toaster
-              richColors
-              closeButton
-              position="top-right"
-              className="select-none"
-            />
-            <Routes>
-              <Route
-                path="/login"
-                element={
-                  <RequireNoAuth>
-                    <Login />
-                  </RequireNoAuth>
-                }
-              ></Route>
-              <Route
-                path="/"
-                element={
-                  <RequireAuth>
-                    <App />
-                  </RequireAuth>
-                }
-              >
-                <Route index element={<Dashboard />} />
-                <Route path="alacaklar">
-                  <Route path="borclar" element={<Debts type="receivable" />} />
-                  <Route
-                    path="odemeler"
-                    element={<Payments type="receivable" />}
-                  />
-                  <Route
-                    path="borc_dokumu/:customerId"
-                    element={<CustomerStatement type="receivable" />}
-                  />
+            <DialogProvider>
+              <Toaster
+                richColors
+                closeButton
+                position="top-right"
+                className="select-none"
+              />
+              <Routes>
+                <Route
+                  path="/login"
+                  element={
+                    <RequireNoAuth>
+                      <Login />
+                    </RequireNoAuth>
+                  }
+                ></Route>
+                <Route
+                  path="/"
+                  element={
+                    <RequireAuth>
+                      <App />
+                    </RequireAuth>
+                  }
+                >
+                  <Route index element={<Dashboard />} />
+                  <Route path="alacaklar">
+                    <Route
+                      path="borclar"
+                      element={<Debts type="receivable" />}
+                    />
+                    <Route
+                      path="odemeler"
+                      element={<Payments type="receivable" />}
+                    />
+                    <Route
+                      path="borc_dokumu/:customerId"
+                      element={<CustomerStatement type="receivable" />}
+                    />
+                  </Route>
+                  <Route path="verecekler">
+                    <Route path="borclar" element={<Debts type="payable" />} />
+                    <Route
+                      path="odemeler"
+                      element={<Payments type="payable" />}
+                    />
+                    <Route
+                      path="borc_dokumu/:customerId"
+                      element={<CustomerStatement type="payable" />}
+                    />
+                  </Route>
+                  {import.meta.env.VITE_NODE_ENV === "development" && (
+                    <Route path="dev" element={<Dev />} />
+                  )}
                 </Route>
-                <Route path="verecekler">
-                  <Route path="borclar" element={<Debts type="payable" />} />
-                  <Route
-                    path="odemeler"
-                    element={<Payments type="payable" />}
-                  />
-                  <Route
-                    path="borc_dokumu/:customerId"
-                    element={<CustomerStatement type="payable" />}
-                  />
-                </Route>
-                {import.meta.env.VITE_NODE_ENV === "development" && (
-                  <Route path="dev" element={<Dev />} />
-                )}
-                <Route path="*" element={<div>404 Not Found</div>} />
-              </Route>
-            </Routes>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </DialogProvider>
           </ThemeProvider>
         </WebSocketProvider>
       </UserProvider>

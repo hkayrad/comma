@@ -103,7 +103,7 @@ export default class NotificationWebSocket {
 
 		switch (message.type) {
 			case "SEND_NOTIFICATION":
-				if (ws.userRole !== "1") {
+				if (ws.userRole !== "99") {
 					ws.send(JSON.stringify({ type: "ERROR", message: "Unauthorized to send notifications" }));
 					return;
 				}
@@ -148,7 +148,7 @@ export default class NotificationWebSocket {
 			case "GET_ACTIVE_USERS":
 				console.log("GET_ACTIVE_USERS message received");
 
-				if (ws.userRole !== "1") {
+				if (ws.userRole !== "99") {
 					ws.send(JSON.stringify({ type: "ERROR", message: "Unauthorized to get active users" }));
 					return;
 				}

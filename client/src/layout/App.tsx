@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router";
-import { DialogProvider } from "@/contexts/dialog";
 import { useEffect } from "react";
 import { sendRefreshEvent } from "@/lib/utils";
 import FloatingButton from "@/layout/shared/FloatingButton";
@@ -10,6 +9,8 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/animate-ui/components/radix/sidebar";
+import { NonSystemAdminOnly, SystemAdminOnly } from "./auth/RoleGuard";
+import Admin from "./admin/Admin";
 
 export default function App() {
   const location = useLocation();
@@ -20,17 +21,22 @@ export default function App() {
 
   return (
     <div className="selection:bg-foreground selection:text-background">
-      <DialogProvider>
+      <NonSystemAdminOnly>
         <FloatingButton />
-        <SidebarProvider>
-          <HksSidebar />
-          <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative">
-            <MaintenanceBanner />
+      </NonSystemAdminOnly>
+      <SidebarProvider>
+        <HksSidebar />
+        <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative">
+          <MaintenanceBanner />
+          <SystemAdminOnly>
+            <Admin />
+          </SystemAdminOnly>
+          <NonSystemAdminOnly>
             <Header />
             <Outlet />
-          </SidebarInset>
-        </SidebarProvider>
-      </DialogProvider>
+          </NonSystemAdminOnly>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 }

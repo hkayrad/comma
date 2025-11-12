@@ -38,7 +38,7 @@ export default function ExchangeRates() {
         <>
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
-              <p className="text-muted-foreground text-[10px] my-auto mr-1">
+              <p className="text-muted-foreground text-[10px] my-auto mr-1 select-none">
                 Son Güncelleme: {exchangeRates.date}
               </p>
             </TooltipTrigger>
