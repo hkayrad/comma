@@ -384,7 +384,7 @@ export default function CustomerTable(props: Props) {
               `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
             col.id ===
               `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
-            col.id === `Borç Durumu (${currency.state})`)),
+            col.id === `Borç Durumu (${CurrencyIcons[currency.state]})`)),
     );
   }, [CustomerTableColumns, currency, type]);
 

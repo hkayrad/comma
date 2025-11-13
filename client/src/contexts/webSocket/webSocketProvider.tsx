@@ -27,6 +27,7 @@ export const WebSocketProvider = ({
   const [isConnected, setIsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
+  const shouldReconnect = useRef(true);
   const { refreshConfigs } = useConfig();
   const navigate = useNavigate();
 
@@ -43,10 +44,12 @@ export const WebSocketProvider = ({
     ws.current.onclose = () => {
       setIsConnected(false);
       Logger.info("WebSocket disconnected");
-      reconnectTimeout.current = setTimeout(() => {
-        Logger.info("Reconnecting WebSocket...");
-        connect();
-      }, 3000);
+      if (shouldReconnect.current) {
+        reconnectTimeout.current = setTimeout(() => {
+          Logger.info("Reconnecting WebSocket...");
+          connect();
+        }, 3000);
+      }
     };
 
     ws.current.onerror = () => {
@@ -138,6 +141,7 @@ export const WebSocketProvider = ({
   }, [url, navigate, refreshConfigs]);
 
   const disconnect = useCallback(() => {
+    shouldReconnect.current = false;
     if (reconnectTimeout.current) {
       clearTimeout(reconnectTimeout.current);
     }
@@ -147,6 +151,7 @@ export const WebSocketProvider = ({
   const reloadConnection = useCallback(() => {
     disconnect();
     reconnectTimeout.current = setTimeout(() => {
+      shouldReconnect.current = true;
       connect();
     }, 1000);
   }, [connect, disconnect]);
@@ -193,6 +198,7 @@ export const WebSocketProvider = ({
   }, [isConnected]);
 
   useEffect(() => {
+    shouldReconnect.current = true;
     connect();
     return () => disconnect();
   }, [connect, disconnect]);

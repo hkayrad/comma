@@ -41,11 +41,13 @@ export default class NotificationWebSocket {
 			ws.on("close", () => {
 				Logger.info("Client disconnected from Notification WebSocket");
 				this.clients.delete(ws);
+				this.loginClients.delete(ws as UnauthenticatedWebSocket);
 			});
 
 			ws.on("error", (error) => {
 				Logger.error("WebSocket error:", error);
 				this.clients.delete(ws);
+				this.loginClients.delete(ws as UnauthenticatedWebSocket);
 			});
 		});
 	}
@@ -60,6 +62,7 @@ export default class NotificationWebSocket {
 		if (!token) {
 			this.loginClients.add(ws as UnauthenticatedWebSocket);
 			console.log("Unauthorized: No token provided");
+			console.log(`Total clients - Authenticated: ${this.clients.size}, Unauthenticated: ${this.loginClients.size}`);
 			return;
 		}
 
@@ -74,8 +77,16 @@ export default class NotificationWebSocket {
 			ws.userId = decoded.id;
 			ws.userRole = decoded.role.toString();
 
+			// Remove from loginClients if it was added there first
+			this.loginClients.delete(ws as UnauthenticatedWebSocket);
 			this.clients.add(ws);
+
+			// Count unique users
+			const uniqueUsers = new Set(Array.from(this.clients).map((client) => client.userId));
 			console.log(`Client authenticated: UserID=${ws.userId}, Role=${ws.userRole}`);
+			console.log(
+				`Total clients - Authenticated: ${this.clients.size}, Unauthenticated: ${this.loginClients.size}, Unique users: ${uniqueUsers.size}`,
+			);
 		} catch (error) {
 			ws.close(1008, "Unauthorized: Invalid token");
 			console.log("Unauthorized: Invalid token", error);
@@ -146,17 +157,24 @@ export default class NotificationWebSocket {
 				});
 				break;
 			case "GET_ACTIVE_USERS":
-				console.log("GET_ACTIVE_USERS message received");
+				Logger.info("GET_ACTIVE_USERS message received");
 
 				if (ws.userRole !== "99") {
 					ws.send(JSON.stringify({ type: "ERROR", message: "Unauthorized to get active users" }));
 					return;
 				}
 
+				// Count unique users by userId
+				const uniqueUserIds = new Set(Array.from(this.clients).map((client) => client.userId));
+				Logger.info(`Total authenticated connections: ${this.clients.size}`);
+				Logger.info(`Unique authenticated users: ${uniqueUserIds.size}`);
+				Logger.info(`Unauthenticated connections: ${this.loginClients.size}`);
+				Logger.info(`User IDs: [${Array.from(uniqueUserIds).join(", ")}]`);
+
 				ws.send(
 					JSON.stringify({
 						type: "ACTIVE_USERS",
-						userCount: this.clients.size,
+						userCount: uniqueUserIds.size,
 					}),
 				);
 				break;

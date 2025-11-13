@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 type Props = {
   item: any;
@@ -17,6 +17,7 @@ type Props = {
 
 export default function HksSidebarItem(props: Props) {
   const { item, group, state } = props;
+  const location = useLocation();
 
   return (
     <Tooltip
@@ -26,7 +27,10 @@ export default function HksSidebarItem(props: Props) {
     >
       <TooltipTrigger asChild>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild>
+          <SidebarMenuButton
+            isActive={location.pathname === group.url + item.url}
+            asChild
+          >
             <NavLink
               className="transition-all"
               to={group.url + item.url}
