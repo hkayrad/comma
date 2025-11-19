@@ -1,5 +1,6 @@
 import { useRole } from "@/hooks/useRole";
 import type { ReactNode } from "react";
+import { Outlet } from "react-router";
 
 interface RoleGuardProps {
   children: ReactNode;
@@ -83,16 +84,10 @@ export const RoleGuard = ({
   return hasAccess ? <>{children}</> : <>{fallback}</>;
 };
 
-export const SystemAdminOnly = ({
-  children,
-  fallback = null,
-}: {
-  children: ReactNode;
-  fallback?: ReactNode;
-}) => {
+export const SystemAdminOnly = ({ children }: { children?: ReactNode }) => {
   return (
-    <RoleGuard requiredRole={99} fallback={fallback}>
-      {children}
+    <RoleGuard requiredRole={99} fallback={null}>
+      {children ? children : <Outlet />}
     </RoleGuard>
   );
 };
@@ -104,12 +99,12 @@ export const CompanyAdminOnly = ({
   children,
   fallback = null,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   fallback?: ReactNode;
 }) => {
   return (
     <RoleGuard requiredRole={1} fallback={fallback}>
-      {children}
+      {children ? children : <Outlet />}
     </RoleGuard>
   );
 };
@@ -121,12 +116,12 @@ export const NonSystemAdminOnly = ({
   children,
   fallback = null,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   fallback?: ReactNode;
 }) => {
   return (
     <RoleGuard minimumRole={99} invert fallback={fallback}>
-      {children}
+      {children ? children : <Outlet />}
     </RoleGuard>
   );
 };

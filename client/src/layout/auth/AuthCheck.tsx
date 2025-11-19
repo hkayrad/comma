@@ -1,27 +1,22 @@
-import { type JSX } from "react";
-import { Navigate } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { useUser } from "@/contexts/user";
 
-type Props = {
-  children: JSX.Element;
-};
-
-export function RequireAuth({ children }: Props): React.ReactNode {
+export function RequireAuth(): React.ReactNode {
   const { user } = useUser();
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 }
 
-export function RequireNoAuth({ children }: Props): React.ReactNode {
+export function RequireNoAuth(): React.ReactNode {
   const { user } = useUser();
 
   if (user) {
     return <Navigate to="/" replace />;
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 }
