@@ -61,8 +61,8 @@ export default class NotificationWebSocket {
 
 		if (!token) {
 			this.loginClients.add(ws as UnauthenticatedWebSocket);
-			console.log("Unauthorized: No token provided");
-			console.log(`Total clients - Authenticated: ${this.clients.size}, Unauthenticated: ${this.loginClients.size}`);
+			Logger.warn("Unauthorized: No token provided");
+			Logger.info(`Total clients - Authenticated: ${this.clients.size}, Unauthenticated: ${this.loginClients.size}`);
 			return;
 		}
 
@@ -83,13 +83,13 @@ export default class NotificationWebSocket {
 
 			// Count unique users
 			const uniqueUsers = new Set(Array.from(this.clients).map((client) => client.userId));
-			console.log(`Client authenticated: UserID=${ws.userId}, Role=${ws.userRole}`);
-			console.log(
+			Logger.info(`Client authenticated: UserID=${ws.userId}, Role=${ws.userRole}`);
+			Logger.info(
 				`Total clients - Authenticated: ${this.clients.size}, Unauthenticated: ${this.loginClients.size}, Unique users: ${uniqueUsers.size}`,
 			);
 		} catch (error) {
 			ws.close(1008, "Unauthorized: Invalid token");
-			console.log("Unauthorized: Invalid token", error);
+			Logger.info("Unauthorized: Invalid token", error);
 			return;
 		}
 	}
@@ -110,8 +110,6 @@ export default class NotificationWebSocket {
 	}
 
 	private handleMessage(ws: AuthenticatedWebSocket, message: any) {
-		console.log(message);
-
 		switch (message.type) {
 			case "SEND_NOTIFICATION":
 				if (ws.userRole !== "99") {

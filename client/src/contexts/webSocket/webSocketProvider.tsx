@@ -30,8 +30,23 @@ export const WebSocketProvider = ({
   const shouldReconnect = useRef(true);
   const { refreshConfigs } = useConfig();
   const navigate = useNavigate();
+  const refreshConfigsRef = useRef(refreshConfigs);
+  const navigateRef = useRef(navigate);
+
+  // Keep refs up to date
+  useEffect(() => {
+    refreshConfigsRef.current = refreshConfigs;
+    navigateRef.current = navigate;
+  }, [refreshConfigs, navigate]);
 
   const connect = useCallback(() => {
+    // Close existing connection if any
+    if (ws.current) {
+      ws.current.onclose = null; // Prevent reconnection logic
+      ws.current.close();
+      ws.current = null;
+    }
+
     // Cookies are automatically sent with the WebSocket upgrade request
     // No need to manually add token to URL
     ws.current = new WebSocket(url);
@@ -73,7 +88,7 @@ export const WebSocketProvider = ({
                 const end =
                   endTime ||
                   `${new Date(Date.now() + 300000).getHours().toString().padStart(2, "0")}:${new Date(Date.now() + 300000).getMinutes().toString().padStart(2, "0")}`;
-                refreshConfigs();
+                refreshConfigsRef.current();
                 toast.error(title, {
                   description: (
                     <>
@@ -99,13 +114,13 @@ export const WebSocketProvider = ({
                 });
                 setTimeout(() => {
                   AuthApi.Logout().then(() => {
-                    navigate("/login");
+                    navigateRef.current("/login");
                   });
                 }, 60000);
                 break;
               }
               case "end_maintenance": {
-                refreshConfigs();
+                refreshConfigsRef.current();
                 toast.dismiss("maintenance_mode_toast");
                 toast.success(title, {
                   duration: refreshTime,
@@ -138,7 +153,7 @@ export const WebSocketProvider = ({
         Logger.error("Error parsing WebSocket message:", error);
       }
     };
-  }, [url, navigate, refreshConfigs]);
+  }, [url]);
 
   const disconnect = useCallback(() => {
     shouldReconnect.current = false;
