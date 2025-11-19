@@ -139,7 +139,9 @@ export default function CustomerTable(props: Props) {
       {
         accessorKey: "is_company",
         id: "Tür",
-        header: "Tür",
+        header: ({ column }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
         cell: ({ row, column }) => {
           const isCompany = row.getValue(column.id);
           return isCompany ? (
@@ -181,7 +183,7 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: "tax_number",
-        id: "Vergi No / TCKN",
+        id: "Vergi No",
         header: ({ column }) => (
           <SortableColumnHeader column={column} title={column.id} />
         ),
@@ -202,8 +204,10 @@ export default function CustomerTable(props: Props) {
       ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
         {
           accessorKey: `total_debt_${curr.toLowerCase()}`,
-          id: `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => column.id,
+          id: `Toplam (${CurrencyIcons[curr]})`,
+          header: ({ column }: { column: Column<any> }) => (
+            <SortableColumnHeader column={column} title={column.id} />
+          ),
           cell: ({ row, column }: { row: any; column: any }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
           ),
@@ -211,8 +215,10 @@ export default function CustomerTable(props: Props) {
         },
         {
           accessorKey: `total_payments_${curr.toLowerCase()}`,
-          id: `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => column.id,
+          id: `Ödenmiş (${CurrencyIcons[curr]})`,
+          header: ({ column }: { column: Column<any> }) => (
+            <SortableColumnHeader column={column} title={column.id} />
+          ),
           cell: ({ row, column }: { row: any; column: any }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
           ),
@@ -220,8 +226,10 @@ export default function CustomerTable(props: Props) {
         },
         {
           accessorKey: `remaining_debt_${curr.toLowerCase()}`,
-          id: `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => column.id,
+          id: `Kalan (${CurrencyIcons[curr]})`,
+          header: ({ column }: { column: Column<any> }) => (
+            <SortableColumnHeader column={column} title={column.id} />
+          ),
           cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
             <FormattedCurrency row={row} column={column} currency={curr} />
           ),
@@ -232,9 +240,7 @@ export default function CustomerTable(props: Props) {
           header: ({ column }: { column: Column<any> }) => column.id,
           cell: ({ row }: { row: Row<any> }) => {
             const remaining_debt = parseFloat(
-              row.getValue(
-                `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[curr]})`,
-              ),
+              row.getValue(`Kalan (${CurrencyIcons[curr]})`),
             );
             if (remaining_debt > 0)
               return (
@@ -378,15 +384,12 @@ export default function CustomerTable(props: Props) {
           !col.id?.startsWith("Kalan") &&
           !col.id?.startsWith("Borç Durumu")) ||
         (currency &&
-          (col.id ===
-            `Toplam ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
-            col.id ===
-              `Ödenmiş ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
-            col.id ===
-              `Kalan ${type === "receivable" ? "Alacak" : "Borç"} (${CurrencyIcons[currency.state]})` ||
+          (col.id === `Toplam (${CurrencyIcons[currency.state]})` ||
+            col.id === `Ödenmiş (${CurrencyIcons[currency.state]})` ||
+            col.id === `Kalan (${CurrencyIcons[currency.state]})` ||
             col.id === `Borç Durumu (${CurrencyIcons[currency.state]})`)),
     );
-  }, [CustomerTableColumns, currency, type]);
+  }, [CustomerTableColumns, currency]);
 
   return (
     <HksTable
