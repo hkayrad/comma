@@ -9,25 +9,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
-import { useSearchParams } from "react-router";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
     [],
   );
   const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCurrency, setSelectedCurrency] =
     useState<AvailableCurrency>("TRY");
-  const [tabValue, setTabValue] = useState<OverviewViewType>(null!);
+  const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
 
-  const handleTabChange = useCallback(
-    (value: string) => {
-      setTabValue(value as OverviewViewType);
-      setSearchParams({ tab: value });
-    },
-    [setSearchParams],
-  );
+  const handleTabChange = useCallback((value: string) => {
+    setTabValue(value as OverviewViewType);
+  }, []);
 
   const handleCurrencyChange = useCallback(
     (value: AvailableCurrency) => {
@@ -54,13 +48,12 @@ export default function Dashboard() {
   }, [fetchPayableCustomers, fetchReceivableCustomers]);
 
   useEffect(() => {
-    setTabValue((searchParams.get("tab") as OverviewViewType) || "receivable");
     handleRefresh();
     window.addEventListener("global:refresh", handleRefresh);
     return () => {
       window.removeEventListener("global:refresh", handleRefresh);
     };
-  }, [handleRefresh, searchParams]);
+  }, [handleRefresh]);
 
   useEffect(() => {
     console.log("Selected Currency:", selectedCurrency);
