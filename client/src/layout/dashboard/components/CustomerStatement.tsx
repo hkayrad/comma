@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
 import type {
   CustomerStatement as CustomerStatementType,
@@ -13,12 +13,10 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { exportCustomerStatementPDF } from "@/lib/pdf";
 
-type Props = {
-  type: "receivable" | "payable";
-};
-
-export default function CustomerStatement(props: Props) {
-  const { type } = props;
+export default function CustomerStatement() {
+  const location = useLocation();
+  const type: "payable" | "receivable" =
+    location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const { customerId } = useParams();
   const navigate = useNavigate();
 
@@ -90,7 +88,7 @@ export default function CustomerStatement(props: Props) {
   console.log(data);
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 overflow-y-auto">
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
