@@ -19,6 +19,9 @@ export const RoleColors = {
 } as const;
 export type RoleColorType = keyof typeof RoleColors;
 
+export const AvailableCurrencies = ["TRY", "USD", "EUR"] as const;
+export type AvailableCurrencyType = keyof typeof AvailableCurrencies;
+
 export const CurrencyIcons = {
 	TRY: "₺",
 	USD: "$",

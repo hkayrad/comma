@@ -1,7 +1,7 @@
 //! BUNLARI AYRI DOSYALARA AYIR
 
 export type OverviewViewType = "receivable" | "payable";
-export type AvailableCurrency = "TRY" | "EUR" | "USD";
+export type AvailableCurrency = "TRY" | "USD" | "EUR";
 export type AvailablePaymentMethod = "cash" | "bank_transfer" | "check" | "card";
 
 export type ApiResponse<T> = {
@@ -92,6 +92,8 @@ export type CompanyDto = {
 	tax_number?: string;
 	tax_office?: string;
 	mersis_no?: string;
+	small_logo_path?: string;
+	large_logo_path?: string;
 	created_at?: Date;
 	updated_at?: Date;
 };
