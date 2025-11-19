@@ -81,7 +81,7 @@ export default function HksTable(props: Props) {
                       <TableHead
                         key={header.id}
                         className={`
-                          ${header.id === "Müşteri" && "w-64"}
+                          ${header.id === "Müşteri" && "w-36"}
                           ${header.id === "Vergi Dairesi" && "w-36"}
                           ${header.id === "İşlemler" && "w-fit"}
                           ${(header.id === "Borç Durumu" || header.id === "Tür") && "w-32"}
@@ -112,7 +112,7 @@ export default function HksTable(props: Props) {
                         key={cell.id}
                         className={`
                           py-1.5 select-none
-                          ${cell.column.id === "Müşteri" && "w-64 overflow-hidden"}
+                          ${cell.column.id === "Müşteri" && "w-36 overflow-hidden"}
                           ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
                           `}
                       >
