@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { authMiddleware } from "../lib/utils/middleware";
+import { authMiddleware } from "../lib/middleware";
 import { CompanyService } from "../services/CompanyService";
 import { Logger } from "../lib/utils";
 import { UploadedFile } from "express-fileupload";

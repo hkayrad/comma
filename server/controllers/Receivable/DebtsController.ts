@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import ReceivableDebtsService from "../../services/Receivable/DebtsService";
-import { authMiddleware } from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/middleware";
 import { Logger } from "../../lib/utils";
 import { DebtDto } from "@common/types";
 
@@ -10,12 +10,12 @@ router.use(authMiddleware);
 
 router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
 	const debt = req.body;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[ReceivableDebtsController] Create debt request", { companyId, customerId: debt.customer_id });
 
 	try {
-		const response = await ReceivableDebtsService.Create(debt, companyId);
+		const response = await ReceivableDebtsService.Create(debt,userId, companyId);
 
 		Logger.info("[ReceivableDebtsController] Create debt result", { companyId, success: response.success });
 		return res.json(response);
@@ -86,12 +86,12 @@ router.put("/debts/:id", async (req: Request<{ id: string }, {}, DebtDto>, res: 
 
 router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[ReceivableDebtsController] Delete debt request", { debtId: id, companyId });
 
 	try {
-		const response = await ReceivableDebtsService.Delete(id, companyId);
+		const response = await ReceivableDebtsService.Delete(id,userId, companyId);
 
 		Logger.info("[ReceivableDebtsController] Delete debt result", { debtId: id, companyId, success: response.success });
 		return res.json(response);

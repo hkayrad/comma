@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { ConfigService } from "../services/ConfigService";
 import { Logger } from "../lib/utils";
-import { configMiddleware } from "../lib/utils/middleware";
+import { configMiddleware } from "../lib/middleware";
 
 interface ConfigKeyValue {
 	configKey: string;

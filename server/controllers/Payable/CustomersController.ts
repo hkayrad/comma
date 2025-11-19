@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import PayableCustomersService from "../../services/Payable/CustomersService";
-import { authMiddleware } from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/middleware";
 import { Logger } from "../../lib/utils";
 import { CustomerDto } from "@common/types";
 
@@ -10,17 +10,26 @@ router.use(authMiddleware);
 
 router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Response) => {
 	const customer = req.body;
-	const companyId = req.user.companyId;
+	const { companyId, id: userId } = req.user;
 
-	Logger.info("[PayableCustomersController] Create customer request", { companyId, customerName: customer.name });
+	Logger.info("[PayableCustomersController] Create customer request", {
+		companyId: companyId,
+		customerName: customer.name,
+	});
 
 	try {
-		const response = await PayableCustomersService.Create(customer, companyId);
+		const response = await PayableCustomersService.Create(customer, userId, companyId);
 
-		Logger.info("[PayableCustomersController] Create customer result", { companyId, success: response.success });
+		Logger.info("[PayableCustomersController] Create customer result", {
+			companyId: companyId,
+			success: response.success,
+		});
 		return res.json(response);
 	} catch (error: any) {
-		Logger.error("[PayableCustomersController] Error creating customer", { companyId, error: error.message });
+		Logger.error("[PayableCustomersController] Error creating customer", {
+			companyId: companyId,
+			error: error.message,
+		});
 		return res.status(500).json({ success: false, message: "Error creating customer" });
 	}
 });
@@ -116,12 +125,12 @@ router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto
 
 router.delete("/customers/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[PayableCustomersController] Delete customer request", { customerId: id, companyId });
 
 	try {
-		const response = await PayableCustomersService.Delete(id, companyId);
+		const response = await PayableCustomersService.Delete(id, userId, companyId);
 
 		Logger.info("[PayableCustomersController] Delete customer result", {
 			customerId: id,

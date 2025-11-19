@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import PayablePaymentsService from "../../services/Payable/PaymentsService";
-import { authMiddleware } from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/middleware";
 import { Logger } from "../../lib/utils";
 import { PaymentDto } from "@common/types";
 
@@ -10,12 +10,12 @@ router.use(authMiddleware);
 
 router.post("/payments", async (req: Request<{}, {}, PaymentDto>, res: Response) => {
 	const payment = req.body;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[PayablePaymentsController] Create payment request", { companyId, customerId: payment.customer_id });
 
 	try {
-		const response = await PayablePaymentsService.Create(payment, companyId);
+		const response = await PayablePaymentsService.Create(payment, userId, companyId);
 
 		Logger.info("[PayablePaymentsController] Create payment result", { companyId, success: response.success });
 		return res.json(response);
@@ -69,12 +69,12 @@ router.put("/payments/:id", async (req: Request<{ id: string }, {}, PaymentDto>,
 
 router.delete("/payments/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[PayablePaymentsController] Delete payment request", { paymentId: id, companyId });
 
 	try {
-		const response = await PayablePaymentsService.Delete(id, companyId);
+		const response = await PayablePaymentsService.Delete(id, userId, companyId);
 
 		Logger.info("[PayablePaymentsController] Delete payment result", {
 			paymentId: id,

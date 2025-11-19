@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import ReceivableCustomersService from "../../services/Receivable/CustomersService";
-import { authMiddleware } from "../../lib/utils/middleware";
+import { authMiddleware } from "../../lib/middleware";
 import { Logger } from "../../lib/utils";
 import { CustomerDto } from "@common/types";
 
@@ -10,12 +10,12 @@ router.use(authMiddleware);
 
 router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Response) => {
 	const customer = req.body;
-	const companyId = req.user.companyId;
+	const { companyId, id: userId } = req.user;
 
 	Logger.info("[ReceivableCustomersController] Create customer request", { companyId, customerName: customer.name });
 
 	try {
-		const response = await ReceivableCustomersService.Create(customer, companyId);
+		const response = await ReceivableCustomersService.Create(customer, userId, companyId);
 
 		Logger.info("[ReceivableCustomersController] Create customer result", { companyId, success: response.success });
 		return res.json(response);
@@ -116,12 +116,12 @@ router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto
 
 router.delete("/customers/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;
-	const companyId = req.user.companyId;
+	const { id: userId, companyId } = req.user;
 
 	Logger.info("[ReceivableCustomersController] Delete customer request", { customerId: id, companyId });
 
 	try {
-		const response = await ReceivableCustomersService.Delete(id, companyId);
+		const response = await ReceivableCustomersService.Delete(id, userId, companyId);
 
 		Logger.info("[ReceivableCustomersController] Delete customer result", {
 			customerId: id,
