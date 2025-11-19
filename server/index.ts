@@ -16,6 +16,7 @@ import PayablePaymentsController from "./controllers/Payable/PaymentsController"
 import NotificationWebSocket from "./lib/ws/notificationWebSocket";
 import TcmbController from "./controllers/TcmbController";
 import CompanyController from "./controllers/CompanyController";
+import CompanyManagementController from "./controllers/Admin/CompanyManagementController";
 import { Logger } from "./lib/utils/logger";
 
 declare global {
@@ -59,18 +60,20 @@ app.use(
 app.use("/uploads", express.static("uploads"));
 
 app.use(AuthController);
-app.use("/config", ConfigController);
+app.use("/configs", ConfigController);
 app.use("/tcmb", TcmbController);
 
-app.use("/company", CompanyController);
+app.use("/companies", CompanyController);
 
-app.use("/receivable", ReceivableCustomersController);
-app.use("/receivable", ReceivableDebtsController);
-app.use("/receivable", ReceivablePaymentsController);
+app.use("/receivables", ReceivableCustomersController);
+app.use("/receivables", ReceivableDebtsController);
+app.use("/receivables", ReceivablePaymentsController);
 
-app.use("/payable", PayableCustomersController);
-app.use("/payable", PayableDebtsController);
-app.use("/payable", PayablePaymentsController);
+app.use("/payables", PayableCustomersController);
+app.use("/payables", PayableDebtsController);
+app.use("/payables", PayablePaymentsController);
+
+app.use("/admin/companies", CompanyManagementController);
 
 const listenPort =
 	process.env.SERVER_PORT ||
@@ -88,7 +91,7 @@ server.listen(listenPort, () => {
 		"Database Name": process.env.DB_NAME,
 		"JWT Issuer": process.env.JWT_ISSUER,
 		"JWT Audience": process.env.JWT_AUDIENCE,
-		"JWT Expires In": `${process.env.JWT_EXPIRES_IN} (hours)`,
+		"Refresh Token Expires In": `${process.env.JWT_EXPIRES_IN} (days)`,
 		"Node Environment": process.env.NODE_ENV,
 	});
 });
