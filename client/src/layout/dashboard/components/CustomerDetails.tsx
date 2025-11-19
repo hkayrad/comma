@@ -13,8 +13,6 @@ type Props = {
 export default function CustomerDetails(props: Props) {
   const { customer, type = "receivable" } = props;
 
-  console.log(customer);
-
   return (
     <div className="space-y-6">
       {/* Header */}
