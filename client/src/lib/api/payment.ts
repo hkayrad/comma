@@ -5,7 +5,7 @@ import { Logger } from "../utils/logger";
 export class ReceivablePaymentApi {
 	static async Create(data: PaymentDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivable/payments", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/payments", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -21,7 +21,7 @@ export class ReceivablePaymentApi {
 
 	static async GetAll(): Promise<PaymentDto[] | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<PaymentDto[]>>("/receivable/payments");
+			const { data: response } = await instance.get<ApiResponse<PaymentDto[]>>("/receivables/payments");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -37,7 +37,7 @@ export class ReceivablePaymentApi {
 
 	static async Update(id: string, data: PaymentDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivable/payments/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivables/payments/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -53,7 +53,7 @@ export class ReceivablePaymentApi {
 
 	static async Delete(id: UUID): Promise<boolean> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivable/payments/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/payments/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve(true);
@@ -71,7 +71,7 @@ export class ReceivablePaymentApi {
 export class PayablePaymentApi {
 	static async Create(data: PaymentDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/payable/payments", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/payments", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -87,7 +87,7 @@ export class PayablePaymentApi {
 
 	static async GetAll(): Promise<PaymentDto[] | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<PaymentDto[]>>("/payable/payments");
+			const { data: response } = await instance.get<ApiResponse<PaymentDto[]>>("/payables/payments");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -103,7 +103,7 @@ export class PayablePaymentApi {
 
 	static async Update(id: string, data: PaymentDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payable/payments/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payables/payments/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -119,7 +119,7 @@ export class PayablePaymentApi {
 
 	static async Delete(id: UUID): Promise<boolean> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/payable/payments/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/payments/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve(true);

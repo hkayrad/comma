@@ -4,7 +4,7 @@ import { Logger } from "../utils/logger";
 export class ConfigApi {
 	static async GetConfigs() {
 		try {
-			const response = await instance.get("/config");
+			const response = await instance.get("/configs");
 			return response.data;
 		} catch (error) {
 			Logger.error("Error fetching configs:", error);
@@ -14,7 +14,7 @@ export class ConfigApi {
 
 	static async GetConfig(configKey: string) {
 		try {
-			const response = await instance.get(`/config/${configKey}`);
+			const response = await instance.get(`/configs/${configKey}`);
 			return response.data;
 		} catch (error) {
 			Logger.error(`Error fetching config ${configKey}:`, error);
@@ -24,7 +24,7 @@ export class ConfigApi {
 
 	static async SetConfig(configKey: string, configValue: string) {
 		try {
-			const response = await instance.post("/config", { configKey, configValue });
+			const response = await instance.post("/configs", { configKey, configValue });
 			return response.data;
 		} catch (error) {
 			Logger.error(`Error setting config ${configKey}:`, error);
@@ -34,7 +34,7 @@ export class ConfigApi {
 
 	static async StartMaintenanceMode() {
 		try {
-			const response = await instance.post("/config/start-maintenance");
+			const response = await instance.post("/configs/start-maintenance");
 			return response.data;
 		} catch (error) {
 			Logger.error("Error starting maintenance mode:", error);
@@ -44,7 +44,7 @@ export class ConfigApi {
 
 	static async EndMaintenanceMode() {
 		try {
-			const response = await instance.post("/config/end-maintenance");
+			const response = await instance.post("/configs/end-maintenance");
 			return response.data;
 		} catch (error) {
 			Logger.error("Error ending maintenance mode:", error);

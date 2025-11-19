@@ -13,6 +13,7 @@ export default function SortableColumnHeader(props: Props) {
   return (
     <Button
       variant="ghost"
+      size="sm"
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       {title}

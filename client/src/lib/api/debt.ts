@@ -5,7 +5,7 @@ import { Logger } from "../utils/logger";
 export class ReceivableDebtApi {
 	static async Create(data: DebtDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivable/debts", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/debts", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -21,7 +21,7 @@ export class ReceivableDebtApi {
 
 	static async GetAll(): Promise<DebtDto[] | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<DebtDto[]>>("/receivable/debts");
+			const { data: response } = await instance.get<ApiResponse<DebtDto[]>>("/receivables/debts");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -37,7 +37,7 @@ export class ReceivableDebtApi {
 
 	static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<Totals>>("/receivable/debts/totals", {
+			const { data: response } = await instance.get<ApiResponse<Totals>>("/receivables/debts/totals", {
 				params: { currency },
 			});
 
@@ -55,7 +55,7 @@ export class ReceivableDebtApi {
 
 	static async Update(id: string, data: DebtDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<null>>(`/receivable/debts/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<null>>(`/receivables/debts/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -71,7 +71,7 @@ export class ReceivableDebtApi {
 
 	static async Delete(id: string): Promise<boolean> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivable/debts/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/debts/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve(true);
@@ -89,7 +89,7 @@ export class ReceivableDebtApi {
 export class PayableDebtApi {
 	static async Create(data: DebtDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/payable/debts", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/debts", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -105,7 +105,7 @@ export class PayableDebtApi {
 
 	static async GetAll(): Promise<DebtDto[] | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<DebtDto[]>>("/payable/debts");
+			const { data: response } = await instance.get<ApiResponse<DebtDto[]>>("/payables/debts");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -121,7 +121,7 @@ export class PayableDebtApi {
 
 	static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<Totals>>("/payable/debts/totals", {
+			const { data: response } = await instance.get<ApiResponse<Totals>>("/payables/debts/totals", {
 				params: { currency },
 			});
 
@@ -139,7 +139,7 @@ export class PayableDebtApi {
 
 	static async Update(id: string, data: DebtDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<null>>(`/payable/debts/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<null>>(`/payables/debts/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -155,7 +155,7 @@ export class PayableDebtApi {
 
 	static async Delete(id: string): Promise<boolean> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/payable/debts/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/debts/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve(true);

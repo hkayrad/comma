@@ -5,7 +5,7 @@ import { Logger } from "../utils/logger";
 export class ReceivableCustomerApi {
 	static async Create(data: CustomerDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivable/customers", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/customers", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -21,7 +21,7 @@ export class ReceivableCustomerApi {
 
 	static async GetAll(): Promise<CustomerDto[]> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/receivable/customers");
+			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/receivables/customers");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -37,7 +37,7 @@ export class ReceivableCustomerApi {
 
 	static async GetIdAndName(): Promise<CustomerIdName[]> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/receivable/customers/id-name");
+			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/receivables/customers/id-name");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -54,7 +54,7 @@ export class ReceivableCustomerApi {
 	static async GetStatement(id: string): Promise<CustomerStatement | null> {
 		try {
 			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/receivable/customers/${id}/statement`,
+				`/receivables/customers/${id}/statement`,
 			);
 
 			if (response.status === 200) {
@@ -71,7 +71,7 @@ export class ReceivableCustomerApi {
 
 	static async Update(id: string, data: CustomerDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivable/customers/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivables/customers/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -87,7 +87,7 @@ export class ReceivableCustomerApi {
 
 	static async Delete(id: string): Promise<void> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivable/customers/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/customers/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve();
@@ -105,7 +105,7 @@ export class ReceivableCustomerApi {
 export class PayableCustomerApi {
 	static async Create(data: CustomerDto): Promise<UUID | null> {
 		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/payable/customers", data);
+			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/customers", data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -121,7 +121,7 @@ export class PayableCustomerApi {
 
 	static async GetAll(): Promise<CustomerDto[]> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payable/customers");
+			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payables/customers");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -137,7 +137,7 @@ export class PayableCustomerApi {
 
 	static async GetIdAndName(): Promise<CustomerIdName[]> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/payable/customers/id-name");
+			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/payables/customers/id-name");
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || []);
@@ -154,7 +154,7 @@ export class PayableCustomerApi {
 	static async GetStatement(id: string): Promise<CustomerStatement | null> {
 		try {
 			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/payable/customers/${id}/statement`,
+				`/payables/customers/${id}/statement`,
 			);
 
 			if (response.status === 200) {
@@ -171,7 +171,7 @@ export class PayableCustomerApi {
 
 	static async Update(id: string, data: CustomerDto): Promise<string | null> {
 		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payable/customers/${id}`, data);
+			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payables/customers/${id}`, data);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data);
@@ -187,7 +187,7 @@ export class PayableCustomerApi {
 
 	static async Delete(id: string): Promise<void> {
 		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/payable/customers/${id}`);
+			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/customers/${id}`);
 
 			if (response.status === 200) {
 				return Promise.resolve();

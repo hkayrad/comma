@@ -4,7 +4,7 @@ import type { CompanyDto } from "../../../../common/types";
 export class CompanyApi {
 	static async GetCompanyById() {
 		try {
-			const response = await instance.get(`/company/id`);
+			const response = await instance.get(`/companies/id`);
 			return response.data;
 		} catch (error) {
 			console.error("Error fetching company details:", error);
@@ -14,7 +14,7 @@ export class CompanyApi {
 
 	static async UpdateCompanyDetails(details: CompanyDto) {
 		try {
-			const response = await instance.put(`/company`, details);
+			const response = await instance.put(`/companies`, details);
 			return response.data;
 		} catch (error) {
 			console.error("Error updating company details:", error);
@@ -27,7 +27,7 @@ export class CompanyApi {
 			const formData = new FormData();
 			formData.append("logo", logo);
 
-			const response = await instance.post(`/company/logo/${size}`, formData, {
+			const response = await instance.post(`/companies/logo/${size}`, formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},
@@ -41,7 +41,7 @@ export class CompanyApi {
 
 	static async GetLogos() {
 		try {
-			const response = await instance.get(`/company/logos`);
+			const response = await instance.get(`/companies/logos`);
 			console.log("Logos response:", response);
 			return response.data;
 		} catch (error) {
@@ -52,7 +52,7 @@ export class CompanyApi {
 
 	static async DeleteLogo(size: "small" | "large" = "small") {
 		try {
-			const response = await instance.delete(`/company/logo/${size}`);
+			const response = await instance.delete(`/companies/logo/${size}`);
 			return response.data;
 		} catch (error) {
 			console.error("Error deleting company logo:", error);
