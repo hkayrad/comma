@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
-import { Logger } from "./logger";
+import { Logger } from "./utils/logger";
 import jwt from "jsonwebtoken";
-import { ApiResponse } from "./apiResponse";
+import { ApiResponse } from "./utils/apiResponse";
 
 dotenv.config();
 
@@ -30,6 +30,21 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 		Logger.error("[AuthMiddleware] Error verifying token", { error });
 		return res.status(401).json(ApiResponse.error("Unauthorized"));
 	}
+}
+
+export function adminMiddleware(req: Request, res: Response, next: NextFunction) {
+	authMiddleware(req, res, (err) => {
+		if (err) return next(err);
+
+		const role = req.user.role;
+
+		if (role !== 99) {
+			Logger.warn("[AdminMiddleware] User is not an admin");
+			return res.status(403).json(ApiResponse.error("Forbidden"));
+		}
+
+		next();
+	});
 }
 
 export function configMiddleware(req: Request, res: Response, next: NextFunction) {
