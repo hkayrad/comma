@@ -119,10 +119,10 @@ export default function DebtDialog(props: Props) {
   }, [CUSTOMER_API]);
 
   const handleVatButtonClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    (e: React.MouseEvent<HTMLButtonElement>, vatPercentage: number) => {
       e.preventDefault();
       const amount = form.getValues("amount");
-      form.setValue("vat", Number((amount * 0.2).toFixed(2)));
+      form.setValue("vat", Number((amount * vatPercentage).toFixed(2)));
     },
     [form],
   );
@@ -301,7 +301,20 @@ export default function DebtDialog(props: Props) {
                         <TooltipTrigger asChild>
                           <InputGroupButton
                             size="xs"
-                            onClick={handleVatButtonClick}
+                            onClick={(e) => handleVatButtonClick(e, 0.1)}
+                          >
+                            %10
+                          </InputGroupButton>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Tutarın %10'unu KDV olarak ayarla</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip disableHoverableContent>
+                        <TooltipTrigger asChild>
+                          <InputGroupButton
+                            size="xs"
+                            onClick={(e) => handleVatButtonClick(e, 0.2)}
                           >
                             %20
                           </InputGroupButton>
@@ -310,6 +323,7 @@ export default function DebtDialog(props: Props) {
                           <p>Tutarın %20'sini KDV olarak ayarla</p>
                         </TooltipContent>
                       </Tooltip>
+
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
