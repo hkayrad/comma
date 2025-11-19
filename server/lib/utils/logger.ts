@@ -17,39 +17,39 @@ export class Logger {
 	}
 
 	static table(data: any) {
-		console.group("[TABLE] " + new Date().toString());
+		console.group(new Date().toString() + " [TABLE]");
 		console.table(data);
 		console.groupEnd();
 
-		const message = `[TABLE] [${new Date().toString()}] ${JSON.stringify(data, null, 2)}`;
+		const message = `${new Date().toString()} [TABLE] ${JSON.stringify(data, null, 2)}`;
 		Logger.writeToFile(message);
 	}
 
 	static debug(message: any, ...optionalParams: any[]) {
-		console.debug(`[DEBUG] [${new Date().toString()}]`, message, ...optionalParams);
+		console.debug(`${new Date().toString()} [DEBUG] `, message, ...optionalParams);
 
-		const logMessage = `[DEBUG] [${new Date().toString()}] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${new Date().toString()} [DEBUG] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 
 	static info(message: any, ...optionalParams: any[]) {
-		console.info(`[INFO] [${new Date().toString()}]`, message, ...optionalParams);
+		console.info(`${new Date().toString()} [INFO] `, message, ...optionalParams);
 
-		const logMessage = `[INFO] [${new Date().toString()}] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${new Date().toString()} [INFO] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 
 	static warn(message: any, ...optionalParams: any[]) {
-		console.warn(`[WARN] [${new Date().toString()}]`, message, ...optionalParams);
+		console.warn(`${new Date().toString()} [WARN] `, message, ...optionalParams);
 
-		const logMessage = `[WARN] [${new Date().toString()}] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${new Date().toString()} [WARN] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 
 	static error(message: any, ...optionalParams: any[]) {
-		console.error(`[ERROR] [${new Date().toString()}]`, message, ...optionalParams);
+		console.error(`${new Date().toString()} [ERROR] `, message, ...optionalParams);
 
-		const logMessage = `[ERROR] [${new Date().toString()}] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${new Date().toString()} [ERROR] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 }
