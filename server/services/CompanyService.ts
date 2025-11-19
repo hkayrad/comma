@@ -23,10 +23,14 @@ export class CompanyService {
 		try {
 			conn = await pool.getConnection();
 			Logger.debug("[CompanyService] Fetching company details", { companyId });
-			const rows = (await conn.query(
-				"SELECT name, address, phone, is_company, email, tax_number, tax_office, mersis_no FROM companies WHERE id = ?",
-				[companyId],
-			)) as CompanyDto[];
+
+			const query = `
+				SELECT name, address, phone, is_company, email, tax_number, tax_office, mersis_no
+				FROM companies
+				WHERE id = ? AND deleted_at IS NULL
+				`;
+
+			const rows = (await conn.query(query, [companyId])) as CompanyDto[];
 
 			if (Array.isArray(rows) && rows.length > 0) {
 				const company = rows[0];

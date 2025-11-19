@@ -3,11 +3,11 @@ import { pool } from "../../lib/db/pool";
 import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class PayableDebtsService {
-	static async Create(debt: DebtDto, companyId: UUID) {
+	static async Create(debt: DebtDto, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
-			Logger.info("[PayableDebts] Creating debt", { companyId, customerId: debt.customer_id });
+			Logger.info("[PayableDebts] Creating debt", { companyId, customerId: debt.customer_id, userId });
 
 			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
 
@@ -25,8 +25,8 @@ export default class PayableDebtsService {
 			}
 
 			const query = `
-                INSERT INTO payable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO payable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -40,6 +40,7 @@ export default class PayableDebtsService {
 				invoice_no || null,
 				description || null,
 				companyId,
+				userId,
 			])) as InsertResult[];
 
 			Logger.debug("[PayableDebts] Debt creation result", { result });
@@ -66,16 +67,20 @@ export default class PayableDebtsService {
 			Logger.debug("[PayableDebts] Fetching all debts", { companyId });
 
 			const query = `
-                SELECT
-                    d.*,
-                    (d.amount + d.vat) AS total_amount,
-                    c.name AS customer_name,
-                    c.tax_number AS customer_tax_number
-                FROM payable_debts d
-                JOIN payable_customers c ON d.customer_id = c.id
-                WHERE d.company_id = ?
-                ORDER BY d.issue_date DESC
-            `;
+				SELECT
+			    d.*,
+			    (d.amount + COALESCE(d.vat, 0)) AS total_amount,
+			    c.name AS customer_name,
+			    c.tax_number AS customer_tax_number
+				FROM payable_debts d
+				JOIN payable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+				WHERE d.company_id = ?
+			    AND d.deleted_at IS NULL
+			    AND d.deleted_by IS NULL
+			    AND c.deleted_at IS NULL
+			    AND c.deleted_by IS NULL
+				ORDER BY d.issue_date DESC;
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [companyId])) as DebtDto[];
@@ -97,23 +102,39 @@ export default class PayableDebtsService {
 			Logger.debug("[PayableDebts] Fetching totals", { companyId, currency });
 
 			const query = `
-                SELECT
-                    COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) AS total_debts,
-                    COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0) AS total_payments,
-                    COALESCE((COALESCE((SELECT SUM(amount + vat) FROM payable_debts WHERE company_id = ? AND currency = ?), 0) - COALESCE((SELECT SUM(amount) FROM payable_payments WHERE company_id = ? AND currency = ?), 0)), 0) AS remaining_debt
-            `;
+				WITH debts_summary AS (
+			    SELECT COALESCE(SUM(d.amount + d.vat), 0) AS total
+			    FROM payable_debts d
+			    INNER JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
+			    WHERE d.company_id = ?
+			        AND d.currency = ?
+			        AND d.deleted_at IS NULL
+			        AND d.deleted_by IS NULL
+			        AND c.deleted_at IS NULL
+			        AND c.deleted_by IS NULL
+				),
+				payments_summary AS (
+		    	SELECT COALESCE(SUM(p.amount), 0) AS total
+			    FROM payable_payments p
+			    INNER JOIN payable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+			    WHERE p.company_id = ?
+		        AND p.currency = ?
+		        AND p.deleted_at IS NULL
+		        AND p.deleted_by IS NULL
+		        AND c.deleted_at IS NULL
+		        AND c.deleted_by IS NULL
+				)
+				SELECT
+			    debts_summary.total AS total_debts,
+			    payments_summary.total AS total_payments,
+			    debts_summary.total - payments_summary.total AS remaining_debt
+				FROM
+			    debts_summary,
+			    payments_summary;
+     	`;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [
-				companyId,
-				currency,
-				companyId,
-				currency,
-				companyId,
-				currency,
-				companyId,
-				currency,
-			])) as Totals[];
+			const result = (await conn.query(query, [companyId, currency, companyId, currency])) as Totals[];
 
 			Logger.debug("[PayableDebts] Totals fetched successfully", { companyId, currency, totals: result[0] });
 
@@ -158,10 +179,10 @@ export default class PayableDebtsService {
 			}
 
 			const query = `
-                UPDATE payable_debts
-                SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
-                WHERE id = ? AND company_id = ?
-            `;
+        UPDATE payable_debts
+        SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+	    `;
 
 			conn = await pool.getConnection();
 
@@ -194,7 +215,7 @@ export default class PayableDebtsService {
 		}
 	}
 
-	static async Delete(id: UUID, companyId: UUID) {
+	static async Delete(id: UUID, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
@@ -206,11 +227,13 @@ export default class PayableDebtsService {
 			}
 
 			const query = `
-                DELETE FROM payable_debts WHERE id = ? AND company_id = ?
-            `;
+        UPDATE payable_debts
+        SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+     	`;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [id, companyId])) as { affectedRows: number };
+			const result = (await conn.query(query, [userId, id, companyId])) as { affectedRows: number };
 
 			Logger.debug("[PayableDebts] Debt deletion result", { debtId: id, affectedRows: result.affectedRows });
 

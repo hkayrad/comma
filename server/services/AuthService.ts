@@ -1,9 +1,8 @@
 import { pool } from "../lib/db/pool";
-import { ApiResponse, Logger } from "../lib/utils/index";
+import { Logger } from "../lib/utils/index";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { DecodedJwtToken } from "@common/types";
 import { PoolConnection } from "mariadb/*";
 
 dotenv.config();

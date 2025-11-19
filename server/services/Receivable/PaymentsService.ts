@@ -3,11 +3,11 @@ import { pool } from "../../lib/db/pool";
 import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class ReceivablePaymentsService {
-	static async Create(payment: PaymentDto, companyId: string) {
+	static async Create(payment: PaymentDto, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
-			Logger.info("[ReceivablePayments] Creating payment", { companyId, customerId: payment.customer_id });
+			Logger.info("[ReceivablePayments] Creating payment", { companyId, customerId: payment.customer_id, userId });
 
 			const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
 
@@ -23,8 +23,8 @@ export default class ReceivablePaymentsService {
 			}
 
 			const query = `
-                INSERT INTO receivable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO receivable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -38,6 +38,7 @@ export default class ReceivablePaymentsService {
 				payment_date,
 				payment_method,
 				companyId,
+				userId,
 			])) as InsertResult[];
 
 			Logger.debug("[ReceivablePayments] Payment creation result", { result });
@@ -64,15 +65,15 @@ export default class ReceivablePaymentsService {
 			Logger.debug("[ReceivablePayments] Fetching all payments", { companyId });
 
 			const query = `
-                SELECT
-                    p.*,
-                    c.name AS customer_name,
-                    c.tax_number AS customer_tax_number
-                FROM receivable_payments p
-                JOIN receivable_customers c ON p.customer_id = c.id
-                WHERE p.company_id = ?
-                ORDER BY p.payment_date DESC
-            `;
+        SELECT
+            p.*,
+            c.name AS customer_name,
+            c.tax_number AS customer_tax_number
+        FROM receivable_payments p
+        JOIN receivable_customers c ON p.customer_id = c.id
+        WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL
+        ORDER BY p.payment_date DESC
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [companyId])) as PaymentDto[];
@@ -112,10 +113,10 @@ export default class ReceivablePaymentsService {
 			}
 
 			const query = `
-                UPDATE receivable_payments
-                SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
-                WHERE id = ? AND company_id = ?
-            `;
+        UPDATE receivable_payments
+        SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
 
@@ -148,7 +149,7 @@ export default class ReceivablePaymentsService {
 		}
 	}
 
-	static async Delete(paymentId: UUID, companyId: UUID) {
+	static async Delete(paymentId: UUID, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
@@ -159,10 +160,14 @@ export default class ReceivablePaymentsService {
 				return ApiResponse.error("Missing payment ID");
 			}
 
-			const query = `DELETE FROM receivable_payments WHERE id = ? AND company_id = ?`;
+			const query = `
+				UPDATE receivable_payments
+				SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
+				WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+			`;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [paymentId, companyId])) as { affectedRows: number };
+			const result = (await conn.query(query, [userId, paymentId, companyId])) as { affectedRows: number };
 
 			Logger.debug("[ReceivablePayments] Payment deletion result", { paymentId, affectedRows: result.affectedRows });
 

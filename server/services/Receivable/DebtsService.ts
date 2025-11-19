@@ -3,11 +3,11 @@ import { pool } from "../../lib/db/pool";
 import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class ReceivableDebtsService {
-	static async Create(debt: DebtDto, companyId: UUID) {
+	static async Create(debt: DebtDto, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
-			Logger.info("[ReceivableDebts] Creating debt", { companyId, customerId: debt.customer_id });
+			Logger.info("[ReceivableDebts] Creating debt", { companyId, customerId: debt.customer_id, userId });
 
 			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
 
@@ -25,8 +25,8 @@ export default class ReceivableDebtsService {
 			}
 
 			const query = `
-                INSERT INTO receivable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+				INSERT INTO receivable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -40,6 +40,7 @@ export default class ReceivableDebtsService {
 				invoice_no || null,
 				description || null,
 				companyId,
+				userId,
 			])) as InsertResult[];
 
 			Logger.debug("[ReceivableDebts] Debt creation result", { result });
@@ -66,15 +67,19 @@ export default class ReceivableDebtsService {
 			Logger.debug("[ReceivableDebts] Fetching all debts", { companyId });
 
 			const query = `
-                SELECT
-                    d.*,
-                    (d.amount + d.vat) AS total_amount,
-                    c.name AS customer_name,
-                    c.tax_number AS customer_tax_number
-                FROM receivable_debts d
-                JOIN receivable_customers c ON d.customer_id = c.id
-                WHERE d.company_id = ?
-                ORDER BY d.issue_date DESC
+				SELECT
+			    d.*,
+			    (d.amount + COALESCE(d.vat, 0)) AS total_amount,
+			    c.name AS customer_name,
+			    c.tax_number AS customer_tax_number
+				FROM receivable_debts d
+				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+				WHERE d.company_id = ?
+			    AND d.deleted_at IS NULL
+			    AND d.deleted_by IS NULL
+			    AND c.deleted_at IS NULL
+			    AND c.deleted_by IS NULL
+				ORDER BY d.issue_date DESC;
             `;
 
 			conn = await pool.getConnection();
@@ -97,11 +102,36 @@ export default class ReceivableDebtsService {
 			Logger.debug("[ReceivableDebts] Fetching totals", { companyId, currency });
 
 			const query = `
-                SELECT
-                    COALESCE((SELECT SUM(amount + vat) FROM receivable_debts WHERE company_id = ? AND currency = ?), 0) AS total_debts,
-                    COALESCE((SELECT SUM(amount) FROM receivable_payments WHERE company_id = ? AND currency = ?), 0) AS total_payments,
-                    COALESCE((COALESCE((SELECT SUM(amount + vat) FROM receivable_debts WHERE company_id = ? AND currency = ?), 0) - COALESCE((SELECT SUM(amount) FROM receivable_payments WHERE company_id = ? AND currency = ?), 0)), 0) AS remaining_debt
-            `;
+				WITH debts_summary AS (
+			    SELECT COALESCE(SUM(d.amount + d.vat), 0) AS total
+			    FROM receivable_debts d
+			    INNER JOIN receivable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
+			    WHERE d.company_id = ?
+			        AND d.currency = ?
+			        AND d.deleted_at IS NULL
+			        AND d.deleted_by IS NULL
+			        AND c.deleted_at IS NULL
+			        AND c.deleted_by IS NULL
+				),
+				payments_summary AS (
+		    	SELECT COALESCE(SUM(p.amount), 0) AS total
+			    FROM receivable_payments p
+			    INNER JOIN receivable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+			    WHERE p.company_id = ?
+		        AND p.currency = ?
+		        AND p.deleted_at IS NULL
+		        AND p.deleted_by IS NULL
+		        AND c.deleted_at IS NULL
+		        AND c.deleted_by IS NULL
+				)
+				SELECT
+			    debts_summary.total AS total_debts,
+			    payments_summary.total AS total_payments,
+			    debts_summary.total - payments_summary.total AS remaining_debt
+				FROM
+			    debts_summary,
+			    payments_summary;
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [
@@ -158,10 +188,10 @@ export default class ReceivableDebtsService {
 			}
 
 			const query = `
-                UPDATE receivable_debts
-                SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
-                WHERE id = ? AND company_id = ?
-            `;
+        UPDATE receivable_debts
+        SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
 
@@ -194,7 +224,7 @@ export default class ReceivableDebtsService {
 		}
 	}
 
-	static async Delete(id: UUID, companyId: UUID) {
+	static async Delete(id: UUID, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
@@ -205,10 +235,14 @@ export default class ReceivableDebtsService {
 				return ApiResponse.error("Debt ID is required");
 			}
 
-			const query = `DELETE FROM receivable_debts WHERE id = ? AND company_id = ?`;
+			const query = `
+				UPDATE receivable_debts
+        SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [id, companyId])) as { affectedRows: number };
+			const result = (await conn.query(query, [userId, id, companyId])) as { affectedRows: number };
 
 			Logger.debug("[ReceivableDebts] Debt deletion result", { debtId: id, affectedRows: result.affectedRows });
 

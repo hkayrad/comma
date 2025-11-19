@@ -3,11 +3,11 @@ import { pool } from "../../lib/db/pool";
 import { ApiResponse, Logger } from "../../lib/utils";
 
 export default class PayableCustomersService {
-	static async Create(customer: CustomerDto, companyId: UUID) {
+	static async Create(customer: CustomerDto, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
-			Logger.info("[PayableCustomers] Creating customer", { companyId, customerName: customer.name });
+			Logger.info("[PayableCustomers] Creating customer", { companyId, customerName: customer.name, userId });
 
 			const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
 
@@ -17,8 +17,8 @@ export default class PayableCustomersService {
 			}
 
 			const query = `
-                INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -33,6 +33,7 @@ export default class PayableCustomersService {
 				email || null,
 				address || null,
 				companyId,
+				userId,
 			])) as InsertResult[];
 
 			Logger.debug("[PayableCustomers] Customer creation result", { result });
@@ -59,41 +60,49 @@ export default class PayableCustomersService {
 			Logger.debug("[PayableCustomers] Fetching all customers", { companyId });
 
 			const query = `
-                SELECT
-                    c.*,
-                    COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
-                    COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
-                    COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
-                    COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
-                    COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
-                    COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
-                    (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
-                    (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
-                    (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
-                FROM payable_customers c
-                LEFT JOIN (
-                    SELECT
-                        customer_id,
-                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
-                        SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
-                        SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
-                    FROM payable_debts
-                    WHERE company_id = ?
-                    GROUP BY customer_id
-                ) debt_summary ON c.id = debt_summary.customer_id
-                LEFT JOIN (
-                    SELECT
-                        customer_id,
-                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
-                        SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
-                        SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
-                    FROM payable_payments
-                    WHERE company_id = ?
-                    GROUP BY customer_id
-                ) payment_summary ON c.id = payment_summary.customer_id
-                WHERE c.company_id = ?
-                ORDER BY c.created_at DESC
-            `;
+				WITH debt_summary AS (
+			    SELECT
+			        customer_id,
+			        SUM(CASE WHEN IFNULL(currency, 'TRY') = 'TRY' THEN amount + IFNULL(vat, 0) ELSE 0 END) AS total_debt_try,
+			        SUM(CASE WHEN currency = 'USD' THEN amount + IFNULL(vat, 0) ELSE 0 END) AS total_debt_usd,
+			        SUM(CASE WHEN currency = 'EUR' THEN amount + IFNULL(vat, 0) ELSE 0 END) AS total_debt_eur
+			    FROM payable_debts
+			    WHERE company_id = ?
+			        AND deleted_at IS NULL
+			        AND deleted_by IS NULL
+			    GROUP BY customer_id
+				),
+				payment_summary AS (
+			    SELECT
+		        customer_id,
+		        SUM(CASE WHEN IFNULL(currency, 'TRY') = 'TRY' THEN amount ELSE 0 END) AS total_payments_try,
+		        SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
+		        SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
+			    FROM payable_payments
+			    WHERE company_id = ?
+		        AND deleted_at IS NULL
+		        AND deleted_by IS NULL
+			    GROUP BY customer_id
+				)
+				SELECT
+			    c.*,
+			    COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+			    COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+			    COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+			    COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+			    COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+			    COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+			    COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0) AS remaining_debt_try,
+			    COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0) AS remaining_debt_usd,
+			    COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0) AS remaining_debt_eur
+				FROM payable_customers c
+				LEFT JOIN debt_summary ON c.id = debt_summary.customer_id
+				LEFT JOIN payment_summary ON c.id = payment_summary.customer_id
+				WHERE c.company_id = ?
+			    AND c.deleted_at IS NULL
+			    AND c.deleted_by IS NULL
+				ORDER BY c.created_at DESC;
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [companyId, companyId, companyId])) as CustomerDto[];
@@ -128,43 +137,56 @@ export default class PayableCustomersService {
 			conn = await pool.getConnection();
 
 			const customerQuery = `
-                SELECT
-                    c.*,
-                    COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
-                    COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
-                    COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
-                    COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
-                    COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
-                    COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
-                    (COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0)) AS remaining_debt_try,
-                    (COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0)) AS remaining_debt_usd,
-                    (COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0)) AS remaining_debt_eur
-                FROM payable_customers c
-                LEFT JOIN (
-                    SELECT
-                        customer_id,
-                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_try,
-                        SUM(CASE WHEN currency = 'USD' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_usd,
-                        SUM(CASE WHEN currency = 'EUR' THEN amount + COALESCE(vat, 0) ELSE 0 END) AS total_debt_eur
-                    FROM payable_debts
-                    WHERE company_id = ?
-                    GROUP BY customer_id
-                ) debt_summary ON c.id = debt_summary.customer_id
-                LEFT JOIN (
-                    SELECT
-                        customer_id,
-                        SUM(CASE WHEN currency = 'TRY' OR currency IS NULL THEN amount ELSE 0 END) AS total_payments_try,
-                        SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END) AS total_payments_usd,
-                        SUM(CASE WHEN currency = 'EUR' THEN amount ELSE 0 END) AS total_payments_eur
-                    FROM payable_payments
-                    WHERE company_id = ?
-                    GROUP BY customer_id
-                ) payment_summary ON c.id = payment_summary.customer_id
-                WHERE c.id = ? AND c.company_id = ?
-            `;
+				SELECT
+          c.*,
+          COALESCE(debt_summary.total_debt_try, 0) AS total_debt_try,
+          COALESCE(debt_summary.total_debt_usd, 0) AS total_debt_usd,
+          COALESCE(debt_summary.total_debt_eur, 0) AS total_debt_eur,
+          COALESCE(payment_summary.total_payments_try, 0) AS total_payments_try,
+          COALESCE(payment_summary.total_payments_usd, 0) AS total_payments_usd,
+          COALESCE(payment_summary.total_payments_eur, 0) AS total_payments_eur,
+          COALESCE(debt_summary.total_debt_try, 0) - COALESCE(payment_summary.total_payments_try, 0) AS remaining_debt_try,
+          COALESCE(debt_summary.total_debt_usd, 0) - COALESCE(payment_summary.total_payments_usd, 0) AS remaining_debt_usd,
+          COALESCE(debt_summary.total_debt_eur, 0) - COALESCE(payment_summary.total_payments_eur, 0) AS remaining_debt_eur
+	      FROM payable_customers c
+	      LEFT JOIN (
+          SELECT
+            SUM(CASE WHEN d.currency = 'TRY' OR d.currency IS NULL THEN d.amount + COALESCE(d.vat, 0) ELSE 0 END) AS total_debt_try,
+            SUM(CASE WHEN d.currency = 'USD' THEN d.amount + COALESCE(d.vat, 0) ELSE 0 END) AS total_debt_usd,
+            SUM(CASE WHEN d.currency = 'EUR' THEN d.amount + COALESCE(d.vat, 0) ELSE 0 END) AS total_debt_eur
+          FROM payable_debts d
+          INNER JOIN payable_customers pc ON d.customer_id = pc.id AND d.company_id = pc.company_id
+          WHERE d.customer_id = ?
+            AND d.company_id = ?
+            AND d.deleted_at IS NULL
+            AND d.deleted_by IS NULL
+            AND pc.deleted_at IS NULL
+            AND pc.deleted_by IS NULL
+	      ) debt_summary ON 1=1
+	      LEFT JOIN (
+          SELECT
+            SUM(CASE WHEN p.currency = 'TRY' OR p.currency IS NULL THEN p.amount ELSE 0 END) AS total_payments_try,
+            SUM(CASE WHEN p.currency = 'USD' THEN p.amount ELSE 0 END) AS total_payments_usd,
+            SUM(CASE WHEN p.currency = 'EUR' THEN p.amount ELSE 0 END) AS total_payments_eur
+          FROM payable_payments p
+          INNER JOIN payable_customers pc ON p.customer_id = pc.id AND p.company_id = pc.company_id
+          WHERE p.customer_id = ?
+	          AND p.company_id = ?
+	          AND p.deleted_at IS NULL
+	          AND p.deleted_by IS NULL
+	          AND pc.deleted_at IS NULL
+	          AND pc.deleted_by IS NULL
+	      ) payment_summary ON 1=1
+	      WHERE c.id = ?
+	          AND c.company_id = ?
+	          AND c.deleted_at IS NULL
+	          AND c.deleted_by IS NULL;
+      `;
 
 			const customerResult = (await conn.query(customerQuery, [
 				companyId,
+				companyId,
+				customerId,
 				companyId,
 				customerId,
 				companyId,
@@ -176,35 +198,47 @@ export default class PayableCustomersService {
 			}
 
 			const debtsQuery = `
-                SELECT
-                    d.id,
-                    d.invoice_no,
-                    d.amount,
-                    d.vat,
-                    d.currency,
-                    (d.amount + d.vat) AS total_amount,
-                    d.description,
-                    d.issue_date,
-                    d.created_at
-                FROM payable_debts d
-                WHERE d.customer_id = ? AND d.company_id = ?
-                ORDER BY d.issue_date DESC, d.created_at DESC
-            `;
+				SELECT
+          d.id,
+          d.invoice_no,
+          d.amount,
+          d.vat,
+          d.currency,
+          (d.amount + d.vat) AS total_amount,
+          d.description,
+          d.issue_date,
+          d.created_at
+		    FROM payable_debts d
+		    INNER JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
+		    WHERE d.customer_id = ?
+          AND d.company_id = ?
+          AND d.deleted_at IS NULL
+          AND d.deleted_by IS NULL
+          AND c.deleted_at IS NULL
+          AND c.deleted_by IS NULL
+        ORDER BY d.issue_date DESC, d.created_at DESC
+      `;
 
 			const paymentsQuery = `
-                SELECT
-                    p.id,
-                    p.invoice_no,
-                    p.amount,
-                    p.currency,
-                    p.payment_method,
-                    p.description,
-                    p.payment_date,
-                    p.created_at
-                FROM payable_payments p
-                WHERE p.customer_id = ? AND p.company_id = ?
-                ORDER BY p.payment_date DESC, p.created_at DESC
-            `;
+				SELECT
+          p.id,
+          p.invoice_no,
+          p.amount,
+          p.currency,
+          p.payment_method,
+          p.description,
+          p.payment_date,
+          p.created_at
+	      FROM payable_payments p
+	      INNER JOIN payable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+	      WHERE p.customer_id = ?
+          AND p.company_id = ?
+          AND p.deleted_at IS NULL
+          AND p.deleted_by IS NULL
+          AND c.deleted_at IS NULL
+          AND c.deleted_by IS NULL
+	      ORDER BY p.payment_date DESC, p.created_at DESC
+      `;
 
 			const [debtsResult, paymentsResult] = await Promise.all([
 				conn.query(debtsQuery, [customerId, companyId]) as Promise<DebtDto[]>,
@@ -244,7 +278,7 @@ export default class PayableCustomersService {
 			Logger.debug("[PayableCustomers] Fetching customer IDs and names", { companyId });
 
 			const query = `
-                SELECT id, name FROM payable_customers WHERE company_id = ?
+                SELECT id, name FROM payable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
             `;
 
 			conn = await pool.getConnection();
@@ -290,7 +324,7 @@ export default class PayableCustomersService {
 			const query = `
                 UPDATE payable_customers
                 SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-                WHERE id = ? AND company_id = ?
+                WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
             `;
 
 			conn = await pool.getConnection();
@@ -328,7 +362,7 @@ export default class PayableCustomersService {
 		}
 	}
 
-	static async Delete(id: UUID, companyId: UUID) {
+	static async Delete(id: UUID, userId: UUID, companyId: UUID) {
 		let conn;
 
 		try {
@@ -340,11 +374,13 @@ export default class PayableCustomersService {
 			}
 
 			const query = `
-                DELETE FROM payable_customers WHERE id = ? AND company_id = ?
+                UPDATE payable_customers
+                SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
+                WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
             `;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [id, companyId])) as { affectedRows: number };
+			const result = (await conn.query(query, [userId, id, companyId])) as { affectedRows: number };
 
 			Logger.debug("[PayableCustomers] Customer deletion result", {
 				customerId: id,
