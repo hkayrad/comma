@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-type DataStateValue = string | boolean | null;
+export type DataStateValue = string | boolean | null;
 
 function parseDatasetValue(value: string | null): DataStateValue {
   if (value === null) return null;
@@ -11,7 +11,7 @@ function parseDatasetValue(value: string | null): DataStateValue {
   return value;
 }
 
-function useDataState<T extends HTMLElement = HTMLElement>(
+export function useDataState<T extends HTMLElement = HTMLElement>(
   key: string,
   forwardedRef?: React.Ref<T | null>,
   onChange?: (value: DataStateValue) => void,
@@ -50,5 +50,3 @@ function useDataState<T extends HTMLElement = HTMLElement>(
 
   return [value, localRef];
 }
-
-export { useDataState, type DataStateValue };
