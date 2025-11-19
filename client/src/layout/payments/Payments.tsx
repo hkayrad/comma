@@ -3,13 +3,12 @@ import type { AvailableCurrency, PaymentDto } from "@/lib/types";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import PaymentTable from "./components/PaymentTable";
+import { useLocation } from "react-router";
 
-type Props = {
-  type: "receivable" | "payable";
-};
-
-export default function Payments(props: Props) {
-  const { type } = props;
+export default function Payments() {
+  const location = useLocation();
+  const type: "payable" | "receivable" =
+    location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const [payments, setPayments] = useState<PaymentDto[]>([]);
   const [selectedCurrency, setSelectedCurrency] =
     useState<AvailableCurrency>("TRY");
