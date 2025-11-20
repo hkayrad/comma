@@ -114,39 +114,6 @@ export default function ExchangeRates() {
               <span>Euro (EUR)</span>
             </TooltipContent>
           </Tooltip>
-          {/*<Separator orientation="vertical" className="w-px mx-2 !h-4" />
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <div className="flex gap-2 select-none">
-                <PoundSterling size={20} />
-                <p className="text-sm">
-                  Alış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.gbp.forexBuying)
-                    }
-                  >
-                    {exchangeRates.gbp.forexBuying.slice(0, 5)}
-                  </span>
-                </p>
-                <p className="text-sm">
-                  Satış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.gbp.forexSelling)
-                    }
-                  >
-                    {exchangeRates.gbp.forexSelling.slice(0, 5)}
-                  </span>
-                </p>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <span>Pound Sterling (GBP)</span>
-            </TooltipContent>
-          </Tooltip>*/}
         </>
       )}
     </div>

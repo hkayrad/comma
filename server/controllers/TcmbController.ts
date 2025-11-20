@@ -44,10 +44,9 @@ router.get("/", async (req, res) => {
 
 		const usd = currencies.find((c: CurrencyData) => c.$.Kod === "USD");
 		const eur = currencies.find((c: CurrencyData) => c.$.Kod === "EUR");
-		const gbp = currencies.find((c: CurrencyData) => c.$.Kod === "GBP");
 
-		if (!usd || !eur || !gbp) {
-			Logger.error("[TCMB] Missing required currency data", { hasUsd: !!usd, hasEur: !!eur, hasGbp: !!gbp });
+		if (!usd || !eur) {
+			Logger.error("[TCMB] Missing required currency data", { hasUsd: !!usd, hasEur: !!eur });
 			return res.status(500).json({ success: false, message: "Missing currency data" });
 		}
 
@@ -64,12 +63,6 @@ router.get("/", async (req, res) => {
 				forexSelling: eur.ForexSelling[0],
 				banknoteBuying: eur.BanknoteBuying[0],
 				banknoteSelling: eur.BanknoteSelling[0],
-			},
-			gbp: {
-				forexBuying: gbp.ForexBuying[0],
-				forexSelling: gbp.ForexSelling[0],
-				banknoteBuying: gbp.BanknoteBuying[0],
-				banknoteSelling: gbp.BanknoteSelling[0],
 			},
 		};
 

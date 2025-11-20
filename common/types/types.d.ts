@@ -126,12 +126,6 @@ export type ExchangeRates = {
 		banknoteBuying: string;
 		banknoteSelling: string;
 	};
-	gbp: {
-		forexBuying: string;
-		forexSelling: string;
-		banknoteBuying: string;
-		banknoteSelling: string;
-	};
 };
 
 export type InsertResult = {
