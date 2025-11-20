@@ -184,7 +184,7 @@ export default class PayableCustomersService {
       `;
 
 			const customerResult = (await conn.query(customerQuery, [
-				companyId,
+				customerId,
 				companyId,
 				customerId,
 				companyId,
