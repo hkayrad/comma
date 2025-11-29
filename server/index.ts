@@ -1,4 +1,6 @@
 import express from "express";
+import path from "path";
+import fs from "fs";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -57,7 +59,38 @@ app.use(
 	}),
 );
 
-app.use("/uploads", express.static("uploads"));
+app.use(
+	"/uploads",
+	express.static("uploads", {
+		setHeaders: (res) => {
+			res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL || "*");
+			res.setHeader("Access-Control-Allow-Credentials", "true");
+		},
+	}),
+);
+
+app.get("/logo-proxy/:filename", (req, res) => {
+	const filename = req.params.filename;
+	// Security check: prevent directory traversal
+	if (filename.includes("..") || filename.includes("/")) {
+		res.status(400).send("Invalid filename");
+		return;
+	}
+
+	const filePath = path.join(process.cwd(), "uploads", "logos", filename);
+
+	// Check if file exists
+	if (!fs.existsSync(filePath)) {
+		res.status(404).send("File not found");
+		return;
+	}
+
+	// Set CORS headers explicitly
+	res.setHeader("Access-Control-Allow-Origin", "*");
+
+	// Send file
+	res.sendFile(filePath);
+});
 
 app.use(AuthController);
 app.use("/configs", ConfigController);

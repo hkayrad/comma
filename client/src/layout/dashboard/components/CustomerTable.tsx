@@ -41,8 +41,8 @@ type Props = {
   data: CustomerDto[];
   type?: OverviewViewType;
   currency?: {
-    state: AvailableCurrency;
-    onChange: (value: AvailableCurrency) => void;
+    state: AvailableCurrency | "";
+    onChange: (value: AvailableCurrency | "") => void;
   };
 };
 
@@ -201,89 +201,87 @@ export default function CustomerTable(props: Props) {
           <ClickToCopyText value={row.getValue(column.id) || "-"} />
         ),
       },
-      ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
-        {
-          accessorKey: `total_debt_${curr.toLowerCase()}`,
-          id: `Toplam (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: any; column: any }) => (
-            <FormattedCurrency row={row} column={column} currency={curr} />
-          ),
-          sortingFn: formattedNumber,
-        },
-        {
-          accessorKey: `total_payments_${curr.toLowerCase()}`,
-          id: `Ödenmiş (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: any; column: any }) => (
-            <FormattedCurrency row={row} column={column} currency={curr} />
-          ),
-          sortingFn: formattedNumber,
-        },
-        {
-          accessorKey: `remaining_debt_${curr.toLowerCase()}`,
-          id: `Kalan (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-            <FormattedCurrency row={row} column={column} currency={curr} />
-          ),
-          sortingFn: formattedNumber,
-        },
-        {
-          id: `Borç Durumu (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => column.id,
-          cell: ({ row }: { row: Row<any> }) => {
-            const remaining_debt = parseFloat(
-              row.getValue(`Kalan (${CurrencyIcons[curr]})`),
+      {
+        accessorKey: `total_debt`,
+        id: `Toplam`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: any; column: any }) => (
+          <FormattedCurrency row={row} column={column} currency={"TRY"} />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: `total_payments`,
+        id: `Ödenmiş`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: any; column: any }) => (
+          <FormattedCurrency row={row} column={column} currency={"TRY"} />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: `remaining_debt`,
+        id: `Kalan`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency row={row} column={column} currency={"TRY"} />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        id: `Borç Durumu`,
+        header: ({ column }: { column: Column<any> }) => column.id,
+        cell: ({ row }: { row: Row<any> }) => {
+          const remaining_debt = parseFloat(
+            row.getValue(`Kalan`),
+          );
+          if (remaining_debt > 0)
+            return (
+              <Badge
+                className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                onClick={() =>
+                  copyToClipboard(
+                    type === "receivable" ? "Alacağınız Var" : "Borcunuz Var",
+                  )
+                }
+              >
+                {type === "receivable" ? "Alacağınız Var" : "Borcunuz Var"}
+              </Badge>
             );
-            if (remaining_debt > 0)
-              return (
-                <Badge
-                  className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
-                  onClick={() =>
-                    copyToClipboard(
-                      type === "receivable" ? "Alacağınız Var" : "Borcunuz Var",
-                    )
-                  }
-                >
-                  {type === "receivable" ? "Alacağınız Var" : "Borcunuz Var"}
-                </Badge>
-              );
-            else if (remaining_debt < 0)
-              return (
-                <Badge
-                  className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
-                  onClick={() =>
-                    copyToClipboard(
-                      type === "receivable" ? "Borcunuz Var" : "Alacağınız Var",
-                    )
-                  }
-                >
-                  {type === "receivable" ? "Borcunuz Var" : "Alacağınız Var"}
-                </Badge>
-              );
-            else
-              return (
-                <Badge
-                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
-                  onClick={() =>
-                    copyToClipboard(
-                      type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok",
-                    )
-                  }
-                >
-                  {type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok"}
-                </Badge>
-              );
-          },
+          else if (remaining_debt < 0)
+            return (
+              <Badge
+                className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
+                onClick={() =>
+                  copyToClipboard(
+                    type === "receivable" ? "Borcunuz Var" : "Alacağınız Var",
+                  )
+                }
+              >
+                {type === "receivable" ? "Borcunuz Var" : "Alacağınız Var"}
+              </Badge>
+            );
+          else
+            return (
+              <Badge
+                className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                onClick={() =>
+                  copyToClipboard(
+                    type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok",
+                  )
+                }
+              >
+                {type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok"}
+              </Badge>
+            );
         },
-      ]),
+      },
       {
         id: "İşlemler",
         header: ({ column }) => column.id,
@@ -377,17 +375,17 @@ export default function CustomerTable(props: Props) {
   );
 
   const FilteredCustomerTableColumns = useMemo(() => {
-    return CustomerTableColumns.filter(
-      (col) =>
-        (!col.id?.startsWith("Toplam") &&
-          !col.id?.startsWith("Ödenmiş") &&
-          !col.id?.startsWith("Kalan") &&
-          !col.id?.startsWith("Borç Durumu")) ||
-        (currency &&
-          (col.id === `Toplam (${CurrencyIcons[currency.state]})` ||
-            col.id === `Ödenmiş (${CurrencyIcons[currency.state]})` ||
-            col.id === `Kalan (${CurrencyIcons[currency.state]})` ||
-            col.id === `Borç Durumu (${CurrencyIcons[currency.state]})`)),
+    return CustomerTableColumns.filter((col) =>
+      currency && currency.state !== ""
+        ? (!col.id?.startsWith("Toplam") &&
+            !col.id?.startsWith("Ödenmiş") &&
+            !col.id?.startsWith("Kalan") &&
+            !col.id?.startsWith("Borç Durumu")) ||
+          col.id === `Toplam (${CurrencyIcons[currency.state]})` ||
+          col.id === `Ödenmiş (${CurrencyIcons[currency.state]})` ||
+          col.id === `Kalan (${CurrencyIcons[currency.state]})` ||
+          col.id === `Borç Durumu (${CurrencyIcons[currency.state]})`
+        : col,
     );
   }, [CustomerTableColumns, currency]);
 

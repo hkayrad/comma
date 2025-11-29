@@ -53,7 +53,7 @@ export default class NotificationWebSocket {
 	}
 
 	private authenticate(ws: AuthenticatedWebSocket, req: IncomingMessage) {
-		console.log("New client connected to Notification WebSocket");
+		Logger.info("New client connected to Notification WebSocket");
 
 		// Parse cookies from request headers
 		const cookies = this.parseCookies(req.headers.cookie || "");

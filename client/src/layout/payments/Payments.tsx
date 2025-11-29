@@ -11,7 +11,7 @@ export default function Payments() {
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const [payments, setPayments] = useState<PaymentDto[]>([]);
   const [selectedCurrency, setSelectedCurrency] =
-    useState<AvailableCurrency>("TRY");
+    useState<AvailableCurrency | "">("");
 
   useEffect(() => {
     const fetchPayments = async () => {

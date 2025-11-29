@@ -27,8 +27,8 @@ type Props = {
   columns: ColumnDef<any>[];
   searchColumn: string;
   currency?: {
-    state: AvailableCurrency;
-    onChange: (value: AvailableCurrency) => void;
+    state: AvailableCurrency | "";
+    onChange: (value: AvailableCurrency | "") => void;
   };
 };
 

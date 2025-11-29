@@ -129,7 +129,7 @@ export default function CustomerDetails(props: Props) {
                       Toplam {type === "receivable" ? "Alacak" : "Borç"}
                     </p>
                     <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-                      {formatCurrency(customer.total_debt_try || 0)}
+                      {formatCurrency(customer.total_debt || 0)}
                     </p>
                   </div>
                   <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-lg">
@@ -137,7 +137,7 @@ export default function CustomerDetails(props: Props) {
                       Toplam Ödeme
                     </p>
                     <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                      {formatCurrency(customer.total_payments_try || 0)}
+                      {formatCurrency(customer.total_payments || 0)}
                     </p>
                   </div>
                   <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
@@ -145,82 +145,14 @@ export default function CustomerDetails(props: Props) {
                       Kalan {type === "receivable" ? "Alacak" : "Borç"}
                     </p>
                     <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                      {formatCurrency(customer.remaining_debt_try || 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* USD */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Amerikan Doları (USD)
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-red-50 dark:bg-red-950/30 rounded-lg">
-                    <p className="text-sm text-red-600 dark:text-red-400 mb-1">
-                      Toplam {type === "receivable" ? "Alacak" : "Borç"}
-                    </p>
-                    <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-                      {formatCurrency(customer.total_debt_usd || 0, "USD")}
-                    </p>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                    <p className="text-sm text-green-600 dark:text-green-400 mb-1">
-                      Toplam Ödeme
-                    </p>
-                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                      {formatCurrency(customer.total_payments_usd || 0, "USD")}
-                    </p>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                    <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
-                      Kalan {type === "receivable" ? "Alacak" : "Borç"}
-                    </p>
-                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                      {formatCurrency(customer.remaining_debt_usd || 0, "USD")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* EUR */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Euro (EUR)
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-red-50 dark:bg-red-950/30 rounded-lg">
-                    <p className="text-sm text-red-600 dark:text-red-400 mb-1">
-                      Toplam {type === "receivable" ? "Alacak" : "Borç"}
-                    </p>
-                    <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-                      {formatCurrency(customer.total_debt_eur || 0, "EUR")}
-                    </p>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                    <p className="text-sm text-green-600 dark:text-green-400 mb-1">
-                      Toplam Ödeme
-                    </p>
-                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                      {formatCurrency(customer.total_payments_eur || 0, "EUR")}
-                    </p>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                    <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
-                      Kalan {type === "receivable" ? "Alacak" : "Borç"}
-                    </p>
-                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-                      {formatCurrency(customer.remaining_debt_eur || 0, "EUR")}
+                      {formatCurrency(customer.remaining_debt || 0)}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Warning Messages */}
-              {((customer.remaining_debt_try || 0) > 0 ||
-                (customer.remaining_debt_usd || 0) > 0 ||
-                (customer.remaining_debt_eur || 0) > 0) && (
+              {((customer.remaining_debt || 0) > 0) && (
                 <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center gap-2">
                   <BanknoteX className="text-amber-800 dark:text-amber-400" />
                   <p className="text-amber-800 dark:text-amber-300 text-sm font-medium">
@@ -230,9 +162,7 @@ export default function CustomerDetails(props: Props) {
                   </p>
                 </div>
               )}
-              {((customer.remaining_debt_try || 0) < 0 ||
-                (customer.remaining_debt_usd || 0) < 0 ||
-                (customer.remaining_debt_eur || 0) < 0) && (
+              {((customer.remaining_debt || 0) < 0) && (
                 <div className="mt-4 p-3 bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-lg flex items-center gap-2">
                   <BanknoteX className="text-sky-800 dark:text-sky-400" />
                   <p className="text-sky-800 dark:text-sky-300 text-sm font-medium">

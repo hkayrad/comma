@@ -2,7 +2,7 @@
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
-    "postbuild": "cp package.json dist/package.json && cd dist && npm install --only=production",
+    "postbuild": "cp package.json dist/package.json && cd dist",
     "serve": "node dist/index.js"
   },
   "dependencies": {

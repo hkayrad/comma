@@ -1,25 +1,57 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { CustomerStatement } from "../../../common/types";
+import type { CompanyDto, CustomerStatement } from "../../../common/types";
 import { format } from "date-fns";
 import { formatCurrency } from "./utils";
 import "./lexend-regular";
 
-async function loadLogo(): Promise<string | null> {
+async function loadLogo(url: string): Promise<{ dataUrl: string; width: number; height: number } | null> {
 	try {
-		const res = await fetch("/hks-logo.png"); // served from public/
+		const res = await fetch(url);
 		const blob = await res.blob();
 		return await new Promise((resolve) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result as string);
-			reader.readAsDataURL(blob);
+			const img = new Image();
+			img.onload = () => {
+				const canvas = document.createElement("canvas");
+				const MAX_WIDTH = 500;
+				const scale = MAX_WIDTH / img.width;
+				let finalWidth = img.width;
+				let finalHeight = img.height;
+
+				// Only resize if image is larger than MAX_WIDTH
+				if (scale < 1) {
+					finalWidth = MAX_WIDTH;
+					finalHeight = img.height * scale;
+				}
+
+				canvas.width = finalWidth;
+				canvas.height = finalHeight;
+
+				const ctx = canvas.getContext("2d");
+				if (ctx) {
+					ctx.drawImage(img, 0, 0, finalWidth, finalHeight);
+					resolve({
+						dataUrl: canvas.toDataURL("image/png"),
+						width: finalWidth,
+						height: finalHeight,
+					});
+				} else {
+					resolve(null);
+				}
+			};
+			img.onerror = () => resolve(null);
+			img.src = URL.createObjectURL(blob);
 		});
 	} catch {
 		return null;
 	}
 }
 
-export async function exportCustomerStatementPDF(statement: CustomerStatement) {
+export async function exportCustomerStatementPDF(
+	statement: CustomerStatement,
+	company: CompanyDto | null,
+	dateRange: { from: Date; to: Date },
+) {
 	const doc = new jsPDF({ unit: "pt", format: "a4" });
 	const pageWidth = doc.internal.pageSize.getWidth();
 	const MARGIN_LEFT = 32; // unified horizontal margin
@@ -28,29 +60,41 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	let cursorY = MARGIN_TOP;
 	const marginX = MARGIN_LEFT; // keep existing variable usage below
 
-	const logoDataUrl = await loadLogo();
+	let logoData: { dataUrl: string; width: number; height: number } | null = null;
+	const baseUrl = import.meta.env.VITE_API_URL;
+	if (company?.large_logo_path) {
+		logoData = await loadLogo(`${baseUrl}/logo-proxy/${company.large_logo_path}`);
+	} else if (company?.small_logo_path) {
+		logoData = await loadLogo(`${baseUrl}/logo-proxy/${company.small_logo_path}`);
+	} else {
+		logoData = await loadLogo("/hks-logo.png");
+	}
 
 	// Header
 	doc.setFont("Lexend-Regular");
 	// Original logo size: 608x139 -> aspect ratio width/height ≈ 4.373
 	// We'll choose a display width that fits left side nicely while leaving room for title on the right.
-	const targetLogoWidth = 140; // adjust if needed
-	const aspect = 608 / 139;
-	const targetLogoHeight = targetLogoWidth / aspect; // ≈ 32px
-	const logoWidth = targetLogoWidth;
-	const logoHeight = targetLogoHeight;
-	// Left: Logo, Right: Company info (address + vergi no)
-	const companyAddress = "Hisar Mah. 1702. Sok. No:8 Tepebaşı Eskişehir"; // TODO: externalize if needed
-	const companyTaxNo = "Vergi No: 4540091806";
-	const today = format(new Date(), "dd.MM.yyyy HH:mm");
 
-	if (logoDataUrl) {
+	const targetLogoHeight = 48;
+	let targetLogoWidth = 140; // default fallback
+
+	if (logoData) {
+		const aspect = logoData.width / logoData.height;
+		targetLogoWidth = targetLogoHeight * aspect;
 		try {
-			doc.addImage(logoDataUrl, "PNG", marginX, cursorY, logoWidth, logoHeight);
+			doc.addImage(logoData.dataUrl, "PNG", marginX, cursorY, targetLogoWidth, targetLogoHeight);
 		} catch {
 			/* ignore */
 		}
 	}
+
+	const logoWidth = targetLogoWidth;
+
+	// Left: Logo, Right: Company info (address + vergi no)
+	const companyAddress = company?.address || "Hisar Mah. 1702. Sok. No:8 Tepebaşı Eskişehir";
+	const companyTaxOffice = company?.tax_office ? `Vergi Dairesi: ${company.tax_office}` : "";
+	const companyTaxNo = company?.tax_number ? `Vergi No: ${company.tax_number}` : "";
+	const today = format(new Date(), "dd.MM.yyyy HH:mm");
 
 	// Right side block (address + tax + date)
 	const infoX = marginX + logoWidth + 28; // left boundary of info area
@@ -58,7 +102,12 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	const infoRightX = pageWidth - MARGIN_RIGHT; // right alignment x
 	doc.setFontSize(11);
 	doc.setTextColor(40);
-	const infoLines: string[] = [companyAddress, companyTaxNo, `Oluşturma: ${today}`];
+	const infoLines: string[] = [
+		companyAddress,
+		`${companyTaxOffice} | ${companyTaxNo}`,
+		`Tarih Aralığı: ${format(dateRange.from, "dd.MM.yyyy")} - ${format(dateRange.to, "dd.MM.yyyy")}`,
+		`Oluşturma: ${today}`,
+	];
 	let infoLineY = cursorY + 4;
 	infoLines.forEach((l) => {
 		const maxChars = 70;
@@ -75,7 +124,7 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	});
 
 	// Customer name FULL WIDTH under the header (with wrapping)
-	const nameTopY = Math.max(cursorY + logoHeight, infoLineY) + 14;
+	const nameTopY = Math.max(cursorY + targetLogoHeight, infoLineY) + 14;
 	const fullWidth = pageWidth - MARGIN_LEFT - MARGIN_RIGHT;
 	doc.setFontSize(14);
 	doc.setTextColor(0, 0, 0);
@@ -94,7 +143,7 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 		}
 	});
 	if (currentLine) lines.push(currentLine);
-	let lineY = nameTopY;
+	let lineY = nameTopY + 10;
 	lines.slice(0, 5).forEach((l) => {
 		// cap at 5 lines to avoid pushing too far
 		doc.text(l, marginX, lineY, { maxWidth: fullWidth });
@@ -105,35 +154,35 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	doc.line(marginX, headerBottomY, pageWidth - marginX, headerBottomY);
 
 	// Summary three columns below header separator (with 3 currencies each)
-	const { customer } = statement;
+	// Summary three columns below header separator (with 3 currencies each)
 	const colWidth = (pageWidth - MARGIN_LEFT - MARGIN_RIGHT) / 3;
 	const boxY = headerBottomY + 10; // tighter spacing after full-width name block
+
+	// Calculate totals from filtered data
+	const totalDebt = statement.debts.reduce((sum, d) => {
+		const val = Number(d.total_in_try);
+		return sum + (isNaN(val) ? 0 : val);
+	}, 0);
+	const totalPayments = statement.payments.reduce((sum, p) => {
+		const val = Number(p.amount_in_try);
+		return sum + (isNaN(val) ? 0 : val);
+	}, 0);
+	const remainingDebt = totalDebt - totalPayments;
+
 	const metrics = [
 		{
 			label: "Toplam Borç",
-			values: [
-				{ amount: customer.total_debt_try || 0, curr: "TRY" },
-				{ amount: customer.total_debt_usd || 0, curr: "USD" },
-				{ amount: customer.total_debt_eur || 0, curr: "EUR" },
-			],
+			values: [{ amount: totalDebt, curr: "TRY" }],
 			color: [180, 30, 30],
 		},
 		{
 			label: "Toplam Ödeme",
-			values: [
-				{ amount: customer.total_payments_try || 0, curr: "TRY" },
-				{ amount: customer.total_payments_usd || 0, curr: "USD" },
-				{ amount: customer.total_payments_eur || 0, curr: "EUR" },
-			],
+			values: [{ amount: totalPayments, curr: "TRY" }],
 			color: [25, 135, 84],
 		},
 		{
 			label: "Kalan",
-			values: [
-				{ amount: customer.remaining_debt_try || 0, curr: "TRY" },
-				{ amount: customer.remaining_debt_usd || 0, curr: "USD" },
-				{ amount: customer.remaining_debt_eur || 0, curr: "EUR" },
-			],
+			values: [{ amount: remainingDebt, curr: "TRY" }],
 			color: [25, 70, 170],
 		},
 	];
@@ -154,7 +203,7 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	// reset color
 	doc.setTextColor(0, 0, 0);
 	// Reduce spacer before 'Borçlar' heading
-	cursorY = boxY + 60; // adjusted for 3 currency lines
+	cursorY = boxY + 30; // adjusted for 3 currency lines
 	doc.setDrawColor(200);
 	doc.line(marginX, cursorY, pageWidth - marginX, cursorY);
 	cursorY += 12; // was +20
@@ -165,28 +214,19 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	autoTable(doc, {
 		startY: cursorY + 14,
 		margin: { left: MARGIN_LEFT, right: MARGIN_RIGHT },
-		head: [["Tarih", "Fatura No", "Tutar", "KDV", "Toplam", "Para Birimi"]],
+		head: [["Tarih", "Fatura No", "Tutar", "KDV", "Toplam", "Para Birimi", "Kur", "Net Tutar"]],
 		body: statement.debts.map((d) => [
 			format(new Date(d.issue_date), "dd.MM.yyyy"),
 			d.invoice_no || "-",
 			formatCurrency(d.amount, d.currency),
 			formatCurrency(d.vat, d.currency),
-			formatCurrency(parseFloat(d.total_amount || "0"), d.currency),
+			formatCurrency(d.total, d.currency),
 			d.currency,
+			d.exchange_rate === 1 ? "-" : formatCurrency(d.exchange_rate, "TRY"),
+			formatCurrency(d.total_in_try, "TRY"),
 		]),
 		styles: { fontSize: 8, font: "Lexend-Regular" },
-		headStyles: { fillColor: [32, 45, 96] },
-		didDrawPage: (data: { pageNumber: number }) => {
-			const pageCount = doc.getNumberOfPages();
-			// Footer with separator
-			const footerY = doc.internal.pageSize.getHeight() - 40;
-			doc.setDrawColor(220);
-			doc.line(MARGIN_LEFT, footerY, pageWidth - MARGIN_RIGHT, footerY);
-			doc.setFontSize(8);
-			doc.setTextColor(90);
-			doc.text("HKS IO - Müşteri Borç Dökümü", MARGIN_LEFT, footerY + 15);
-			doc.text(`Sayfa ${data.pageNumber} / ${pageCount}`, pageWidth - MARGIN_RIGHT, footerY + 15, { align: "right" });
-		},
+		headStyles: { fillColor: [32, 45, 96], font: "Lexend-Regular", fontStyle: "normal" },
 	});
 
 	// Payments table
@@ -195,33 +235,39 @@ export async function exportCustomerStatementPDF(statement: CustomerStatement) {
 	autoTable(doc, {
 		startY: afterDebtsY,
 		margin: { left: MARGIN_LEFT, right: MARGIN_RIGHT },
-		head: [["Tarih", "Fatura No", "Tutar", "Para Birimi", "Yöntem"]],
+		head: [["Tarih", "Fatura No", "Tutar", "Para Birimi", "Kur", "Net Tutar", "Yöntem"]],
 		body: statement.payments.map((p) => [
 			format(new Date(p.payment_date), "dd.MM.yyyy"),
 			p.invoice_no || "-",
-			formatCurrency(p.amount),
+			formatCurrency(p.amount, p.currency),
 			p.currency,
+			p.exchange_rate === 1 ? "-" : formatCurrency(p.exchange_rate),
+			formatCurrency(p.amount_in_try),
 			p.payment_method === "cash"
 				? "Nakit"
 				: p.payment_method === "bank_transfer"
 					? "Havale"
 					: p.payment_method === "check"
 						? "Çek"
-						: p.payment_method,
+						: p.payment_method === "card"
+							? "Kart"
+							: p.payment_method,
 		]),
 		styles: { fontSize: 8, font: "Lexend-Regular" },
-		headStyles: { fillColor: [32, 45, 96] },
-		didDrawPage: (data: { pageNumber: number }) => {
-			const pageCount = doc.getNumberOfPages();
-			const footerY = doc.internal.pageSize.getHeight() - 40;
-			doc.setDrawColor(220);
-			doc.line(MARGIN_LEFT, footerY, pageWidth - MARGIN_RIGHT, footerY);
-			doc.setFontSize(8);
-			doc.setTextColor(90);
-			doc.text("HKS IO - Müşteri Borç Dökümü", MARGIN_LEFT, footerY + 15);
-			doc.text(`Sayfa ${data.pageNumber} / ${pageCount}`, pageWidth - MARGIN_RIGHT, footerY + 15, { align: "right" });
-		},
+		headStyles: { fillColor: [32, 45, 96], font: "Lexend-Regular", fontStyle: "normal" },
 	});
+
+	const pageCount = doc.getNumberOfPages();
+	for (let i = 1; i <= pageCount; i++) {
+		doc.setPage(i);
+		const footerY = doc.internal.pageSize.getHeight() - 40;
+		doc.setDrawColor(220);
+		doc.line(MARGIN_LEFT, footerY, pageWidth - MARGIN_RIGHT, footerY);
+		doc.setFontSize(8);
+		doc.setTextColor(90);
+		doc.text("IO - Müşteri Borç Dökümü", MARGIN_LEFT, footerY + 15);
+		doc.text(`Sayfa ${i} / ${pageCount}`, pageWidth - MARGIN_RIGHT, footerY + 15, { align: "right" });
+	}
 
 	doc.save(`${statement.customer.name.replace(/\s+/g, "_")}_dokum.pdf`);
 }

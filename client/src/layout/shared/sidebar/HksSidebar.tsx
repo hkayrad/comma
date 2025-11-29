@@ -59,6 +59,7 @@ import {
 import { CompanyApi } from "@/lib/api/company";
 import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog";
 import { useDialog } from "@/contexts/dialog";
+import { Logger } from "@/lib/utils/logger";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ export default function HksSidebar() {
         setCacheBuster(Date.now());
       }
     } catch (error) {
-      console.error("Şirket logoları alınırken bir hata oluştu:", error);
+      Logger.error("Şirket logoları alınırken bir hata oluştu:", error);
     }
   }, []);
 
@@ -146,7 +147,7 @@ export default function HksSidebar() {
         <NavLink
           to="/"
           onClick={() => sessionStorage.setItem("current_page", "Genel Bakış")}
-          className="hover:scale-105 active:scale-100 transition-transform block w-full"
+          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-8"
         >
           <AnimatePresence mode="wait">
             {state === "collapsed" ? (
@@ -154,7 +155,7 @@ export default function HksSidebar() {
                 key="icon"
                 src={logoSrc.small}
                 alt="HKS.IO Logo"
-                className="h-8 w-auto mx-auto clip mt-1"
+                className="h-full mx-auto !bg-contain"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -180,7 +181,7 @@ export default function HksSidebar() {
                 key="logo"
                 src={logoSrc.large}
                 alt="HKS.IO Logo"
-                className="h-8 w-auto mx-auto clip mt-1"
+                className="h-full w-auto mx-auto !bg-contain"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -220,10 +221,7 @@ export default function HksSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
-                <Tooltip
-                  disableHoverableContent
-                  open={state === "collapsed" ? undefined : false}
-                >
+                <Tooltip disableHoverableContent>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuButton>
@@ -232,7 +230,9 @@ export default function HksSidebar() {
                       </SidebarMenuButton>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
-                  <TooltipContent side="right">Şirket Yönetimi</TooltipContent>
+                  <TooltipContent side="right" hidden={state !== "collapsed"}>
+                    Şirket Yönetimi
+                  </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent side="right" align="end" sideOffset={4}>
                   <DropdownMenuItem
@@ -260,10 +260,7 @@ export default function HksSidebar() {
             <SidebarMenu className="gap-2">
               <SidebarMenuItem>
                 <DropdownMenu>
-                  <Tooltip
-                    disableHoverableContent
-                    open={state === "collapsed" ? undefined : false}
-                  >
+                  <Tooltip disableHoverableContent>
                     <TooltipTrigger asChild>
                       <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
@@ -293,7 +290,9 @@ export default function HksSidebar() {
                         </SidebarMenuButton>
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Hesap Ayarları</TooltipContent>
+                    <TooltipContent side="right" hidden={state !== "collapsed"}>
+                      Hesap Ayarları
+                    </TooltipContent>
                   </Tooltip>
                   <DropdownMenuContent side="right" align="end" sideOffset={4}>
                     <DropdownMenuItem

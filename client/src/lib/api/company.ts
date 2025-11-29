@@ -1,5 +1,6 @@
 import instance from "../instance";
 import type { CompanyDto } from "../../../../common/types";
+import { Logger } from "../utils/logger";
 
 export class CompanyApi {
 	static async GetCompanyById() {
@@ -7,7 +8,7 @@ export class CompanyApi {
 			const response = await instance.get(`/companies/id`);
 			return response.data;
 		} catch (error) {
-			console.error("Error fetching company details:", error);
+			Logger.error("Error fetching company details:", error);
 			throw error;
 		}
 	}
@@ -17,7 +18,7 @@ export class CompanyApi {
 			const response = await instance.put(`/companies`, details);
 			return response.data;
 		} catch (error) {
-			console.error("Error updating company details:", error);
+			Logger.error("Error updating company details:", error);
 			throw error;
 		}
 	}
@@ -34,7 +35,7 @@ export class CompanyApi {
 			});
 			return response.data;
 		} catch (error) {
-			console.error("Error uploading company logo:", error);
+			Logger.error("Error uploading company logo:", error);
 			throw error;
 		}
 	}
@@ -42,10 +43,10 @@ export class CompanyApi {
 	static async GetLogos() {
 		try {
 			const response = await instance.get(`/companies/logos`);
-			console.log("Logos response:", response);
+			Logger.info("Logos response:", response);
 			return response.data;
 		} catch (error) {
-			console.error("Error fetching company logos:", error);
+			Logger.error("Error fetching company logos:", error);
 			throw error;
 		}
 	}
@@ -55,7 +56,7 @@ export class CompanyApi {
 			const response = await instance.delete(`/companies/logo/${size}`);
 			return response.data;
 		} catch (error) {
-			console.error("Error deleting company logo:", error);
+			Logger.error("Error deleting company logo:", error);
 			throw error;
 		}
 	}

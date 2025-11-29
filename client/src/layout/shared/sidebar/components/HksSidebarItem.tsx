@@ -20,11 +20,7 @@ export default function HksSidebarItem(props: Props) {
   const location = useLocation();
 
   return (
-    <Tooltip
-      disableHoverableContent
-      key={item.title}
-      open={state === "collapsed" ? undefined : false}
-    >
+    <Tooltip disableHoverableContent key={item.title}>
       <TooltipTrigger asChild>
         <SidebarMenuItem>
           <SidebarMenuButton
@@ -42,7 +38,9 @@ export default function HksSidebarItem(props: Props) {
           </SidebarMenuButton>
         </SidebarMenuItem>
       </TooltipTrigger>
-      <TooltipContent side="right">{item.title}</TooltipContent>
+      <TooltipContent side="right" hidden={state !== "collapsed"}>
+        {item.title}
+      </TooltipContent>
     </Tooltip>
   );
 }

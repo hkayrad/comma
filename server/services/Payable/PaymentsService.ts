@@ -9,22 +9,24 @@ export default class PayablePaymentsService {
 		try {
 			Logger.info("[PayablePayments] Creating payment", { companyId, customerId: payment.customer_id });
 
-			const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+				payment;
 
-			if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
 				Logger.error("[PayablePayments] Missing required fields", {
 					customer_id,
 					amount,
 					currency,
 					payment_date,
 					payment_method,
+					exchange_rate,
 				});
 				return ApiResponse.error("Missing required fields");
 			}
 
 			const query = `
-                INSERT INTO payable_payments (customer_id, amount, currency, invoice_no, description, payment_date, payment_method, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO payable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -33,6 +35,7 @@ export default class PayablePaymentsService {
 				customer_id,
 				amount,
 				currency,
+				exchange_rate,
 				invoice_no || null,
 				description || null,
 				payment_date,
@@ -99,13 +102,15 @@ export default class PayablePaymentsService {
 				return ApiResponse.error("Missing payment ID");
 			}
 
-			const { customer_id, amount, currency, invoice_no, payment_date, description, payment_method } = payment;
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+				payment;
 
-			if (!customer_id || !amount || !currency || !payment_date || !payment_method) {
+			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
 				Logger.error("[PayablePayments] Missing required fields", {
 					customer_id,
 					amount,
 					currency,
+					exchange_rate,
 					payment_date,
 					payment_method,
 				});
@@ -114,7 +119,7 @@ export default class PayablePaymentsService {
 
 			const query = `
         UPDATE payable_payments
-        SET customer_id = ?, amount = ?, currency = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
+        SET customer_id = ?, amount = ?, currency = ?, exchange_rate = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
         WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
       `;
 
@@ -124,6 +129,7 @@ export default class PayablePaymentsService {
 				customer_id,
 				amount,
 				currency,
+				exchange_rate,
 				invoice_no || null,
 				description || null,
 				payment_date,

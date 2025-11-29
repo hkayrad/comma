@@ -21,11 +21,12 @@ type Props = {
   type: OverviewViewType;
   width?: "full" | "auto";
   align?: "start" | "center" | "end" | "stretch";
-  currency: AvailableCurrency;
+  currency: AvailableCurrency | "";
 };
 
 export default function OverviewCards(props: Props) {
-  const { type, width = "full", align = "center", currency = "TRY" } = props;
+  const { type, width = "full", align = "center" } = props;
+  const currency = "TRY";
 
   const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
   const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
@@ -123,7 +124,7 @@ export default function OverviewCards(props: Props) {
     <div
       className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"} `}
     >
-      <Card className="grow w-48">
+      <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
             Toplam {type === "receivable" ? "Alacak" : "Borç"}
@@ -137,7 +138,7 @@ export default function OverviewCards(props: Props) {
           <CardAction>{currencyBadges[currency]}</CardAction>
         </CardHeader>
       </Card>
-      <Card className="grow w-48">
+      <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
             Ödenmiş {type === "receivable" ? "Alacak" : "Borç"}
@@ -153,7 +154,7 @@ export default function OverviewCards(props: Props) {
           </CardAction>
         </CardHeader>
       </Card>
-      <Card className="grow w-48">
+      <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
             Kalan {type === "receivable" ? "Alacak" : "Borç"}

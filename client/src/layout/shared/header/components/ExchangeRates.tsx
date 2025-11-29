@@ -9,6 +9,7 @@ import {
 import { copyToClipboard } from "@/lib/utils";
 import { DollarSign, Euro } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Logger } from "@/lib/utils/logger";
 
 export default function ExchangeRates() {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(
@@ -24,7 +25,7 @@ export default function ExchangeRates() {
         sessionStorage.setItem("exchangeRates", JSON.stringify(response));
       }
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
     }
   }, []);
 

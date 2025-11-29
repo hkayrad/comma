@@ -71,6 +71,10 @@ const DebtFormSchema = z.object({
     .min(0, "KDV en az 0 olmalıdır")
     .or(z.literal(0)),
   currency: z.enum(["TRY", "USD", "EUR"], { error: "Geçersiz para birimi" }),
+  exchange_rate: z
+    .number({ error: "Geçersiz kur" })
+    .min(0, "Kur en az 0 olmalıdır")
+    .or(z.literal(0)),
   issue_date: z.date({ error: "Geçersiz tarih" }),
   invoice_no: z
     .string()
@@ -102,6 +106,7 @@ export default function DebtDialog(props: Props) {
       amount: debt?.amount ? Number(debt.amount) : 0,
       vat: debt?.vat ? Number(debt.vat) : 0,
       currency: debt?.currency || "TRY",
+      exchange_rate: debt?.exchange_rate || 1,
       issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
       invoice_no: debt?.invoice_no || "",
       description: debt?.description || "",
@@ -123,6 +128,25 @@ export default function DebtDialog(props: Props) {
       e.preventDefault();
       const amount = form.getValues("amount");
       form.setValue("vat", Number((amount * vatPercentage).toFixed(2)));
+    },
+    [form],
+  );
+
+  const handleSetExchangeRateButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      const exchangeRatesString = sessionStorage.getItem("exchangeRates");
+      const exchangeRates =
+        exchangeRatesString && JSON.parse(exchangeRatesString);
+
+      const selectedCurrency = form.watch("currency").toLowerCase();
+
+      if (exchangeRates && exchangeRates[selectedCurrency]) {
+        form.setValue(
+          "exchange_rate",
+          parseFloat(exchangeRates[selectedCurrency].forexBuying),
+        );
+      }
     },
     [form],
   );
@@ -171,6 +195,13 @@ export default function DebtDialog(props: Props) {
   useEffect(() => {
     handleFetchCustomerIdAndNames();
   }, [handleFetchCustomerIdAndNames]);
+
+  const selectedCurrency = form.watch("currency");
+  useEffect(() => {
+    if (selectedCurrency === "TRY") {
+      form.setValue("exchange_rate", 1);
+    }
+  }, [form, selectedCurrency]);
 
   return (
     <Form {...form}>
@@ -323,7 +354,6 @@ export default function DebtDialog(props: Props) {
                           <p>Tutarın %20'sini KDV olarak ayarla</p>
                         </TooltipContent>
                       </Tooltip>
-
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
@@ -333,6 +363,54 @@ export default function DebtDialog(props: Props) {
             </FormItem>
           )}
         />
+        {form.watch("currency") !== "TRY" && (
+          <FormField
+            control={form.control}
+            name="exchange_rate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-1">
+                  Kur <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="flex items-center gap-1">
+                    <InputGroup>
+                      <InputGroupInput
+                        type="number"
+                        placeholder="0.00"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const num = value === "" ? "" : parseFloat(value);
+                          field.onChange(Number.isNaN(num) ? undefined : num);
+                        }}
+                      />
+                      <InputGroupAddon>{currencySign["TRY"]}</InputGroupAddon>
+                      <InputGroupAddon align="inline-end">
+                        <Tooltip disableHoverableContent>
+                          <TooltipTrigger asChild>
+                            <InputGroupButton
+                              size="xs"
+                              onClick={handleSetExchangeRateButtonClick}
+                            >
+                              TCMB Kuru
+                            </InputGroupButton>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Kur olarak TCMB günlük kurunu kullan</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </div>
+                </FormControl>
+                <FormDescription>Döviz Kuru</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="invoice_no"

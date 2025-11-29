@@ -5,13 +5,30 @@ import type {
   CustomerStatement as CustomerStatementType,
   DebtDto,
   PaymentDto,
+  CompanyDto,
 } from "@/lib/types";
+import { CompanyApi } from "@/lib/api/company";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileDown, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileDown,
+  Loader2,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import type { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 import { exportCustomerStatementPDF } from "@/lib/pdf";
+import { Logger } from "@/lib/utils/logger";
 
 export default function CustomerStatement() {
   const location = useLocation();
@@ -25,15 +42,30 @@ export default function CustomerStatement() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<CustomerStatementType | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [date, setDate] = useState<DateRange | undefined>(undefined);
+
+  const [company, setCompany] = useState<CompanyDto | null>(null);
+
+  useEffect(() => {
+    CompanyApi.GetCompanyById()
+      .then((response) => setCompany(response.data))
+      .catch(Logger.error);
+  }, []);
 
   useEffect(() => {
     if (!customerId) return;
-    setLoading(true);
-    API.GetStatement(customerId)
+    // setLoading(true);
+
+    const filters = {
+      startDate: date?.from ? format(date.from, "yyyy-MM-dd") : undefined,
+      endDate: date?.to ? format(date.to, "yyyy-MM-dd") : undefined,
+    };
+
+    API.GetStatement(customerId, filters)
       .then((res) => setData(res))
       .catch(() => toast.error("Borç dökümü getirilirken hata oluştu"))
       .finally(() => setLoading(false));
-  }, [customerId, API]);
+  }, [customerId, API, date]);
 
   const getRemainingColor = (amount: number) => {
     if (amount > 0) return "text-red-600";
@@ -42,18 +74,25 @@ export default function CustomerStatement() {
   };
 
   const exportStatement = useCallback(async () => {
-    if (!data) return;
+    if (!data || !company) {
+      if (!company) toast.error("Şirket bilgileri yüklenemedi");
+      return;
+    }
     try {
       setExporting(true);
-      await exportCustomerStatementPDF(data);
+      const pdfDateRange = {
+        from: date?.from || new Date(0),
+        to: date?.to || new Date("2100-01-01"),
+      };
+      await exportCustomerStatementPDF(data, company, pdfDateRange);
       toast.success("PDF indirildi");
     } catch (e) {
-      console.error(e);
+      Logger.error(e);
       toast.error("PDF oluşturulurken hata oluştu");
     } finally {
       setExporting(false);
     }
-  }, [data]);
+  }, [data, company, date]);
 
   if (loading) {
     return (
@@ -85,8 +124,6 @@ export default function CustomerStatement() {
 
   const { customer, debts, payments } = data;
 
-  console.log(data);
-
   return (
     <div className="space-y-6 p-4 overflow-y-auto">
       <div className="flex items-start justify-between">
@@ -107,8 +144,6 @@ export default function CustomerStatement() {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            size="sm"
             disabled={exporting}
             onClick={exportStatement}
             className="flex items-center gap-2"
@@ -125,6 +160,47 @@ export default function CustomerStatement() {
 
       <div className="px-12 flex items-center gap-3">
         <h1 className="text-2xl font-semibold">{customer.name}</h1>
+        <div className="flex ml-auto gap-2">
+          <Button variant="outline" onClick={() => setDate(undefined)}>
+            Tarih seçimini sıfırla
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-fit justify-start text-left font-normal",
+                  !date && "text-muted-foreground",
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "dd LLL y", { locale: tr })} -{" "}
+                      {format(date.to, "dd LLL y", { locale: tr })}
+                    </>
+                  ) : (
+                    format(date.from, "dd LLL y", { locale: tr })
+                  )
+                ) : (
+                  <span>Tarih aralığı seçin</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+                locale={tr}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 px-12">
@@ -134,13 +210,7 @@ export default function CustomerStatement() {
           </CardHeader>
           <CardContent className="space-y-1">
             <p className="text-xl font-bold text-red-600">
-              {formatCurrency(customer.total_debt_try || 0, "TRY")}
-            </p>
-            <p className="text-xl font-bold text-red-600">
-              {formatCurrency(customer.total_debt_usd || 0, "USD")}
-            </p>
-            <p className="text-xl font-bold text-red-600">
-              {formatCurrency(customer.total_debt_eur || 0, "EUR")}
+              {formatCurrency(customer.total_debt || 0, "TRY")}
             </p>
           </CardContent>
         </Card>
@@ -150,13 +220,7 @@ export default function CustomerStatement() {
           </CardHeader>
           <CardContent className="space-y-1">
             <p className="text-xl font-bold text-green-600">
-              {formatCurrency(customer.total_payments_try || 0, "TRY")}
-            </p>
-            <p className="text-xl font-bold text-green-600">
-              {formatCurrency(customer.total_payments_usd || 0, "USD")}
-            </p>
-            <p className="text-xl font-bold text-green-600">
-              {formatCurrency(customer.total_payments_eur || 0, "EUR")}
+              {formatCurrency(customer.total_payments || 0, "TRY")}
             </p>
           </CardContent>
         </Card>
@@ -166,19 +230,9 @@ export default function CustomerStatement() {
           </CardHeader>
           <CardContent className="space-y-1">
             <p
-              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_try || 0)}`}
+              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt || 0)}`}
             >
-              {formatCurrency(customer.remaining_debt_try || 0, "TRY")}
-            </p>
-            <p
-              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_usd || 0)}`}
-            >
-              {formatCurrency(customer.remaining_debt_usd || 0, "USD")}
-            </p>
-            <p
-              className={`text-xl font-bold ${getRemainingColor(customer.remaining_debt_eur || 0)}`}
-            >
-              {formatCurrency(customer.remaining_debt_eur || 0, "EUR")}
+              {formatCurrency(customer.remaining_debt || 0, "TRY")}
             </p>
           </CardContent>
         </Card>
@@ -200,6 +254,8 @@ export default function CustomerStatement() {
                     <th className="py-2 px-3 font-medium">KDV</th>
                     <th className="py-2 px-3 font-medium">Toplam</th>
                     <th className="py-2 px-3 font-medium">Para Birimi</th>
+                    <th className="py-2 px-3 font-medium">Kur</th>
+                    <th className="py-2 px-3 font-medium">Net Toplam</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,10 +285,18 @@ export default function CustomerStatement() {
                         {formatCurrency(d.vat, d.currency)}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap font-medium">
-                        {formatCurrency(parseFloat(d.total_amount || "0"))}
+                        {formatCurrency(d.total, d.currency)}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
                         {d.currency}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap font-medium">
+                        {d.exchange_rate === 1
+                          ? "-"
+                          : formatCurrency(d.exchange_rate)}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap font-medium">
+                        {formatCurrency(d.total_in_try)}
                       </td>
                     </tr>
                   ))}
@@ -254,6 +318,8 @@ export default function CustomerStatement() {
                     <th className="py-2 px-3 font-medium">Fatura No</th>
                     <th className="py-2 px-3 font-medium">Tutar</th>
                     <th className="py-2 px-3 font-medium">Para Birimi</th>
+                    <th className="py-2 px-3 font-medium">Kur</th>
+                    <th className="py-2 px-3 font-medium">Net Tutar</th>
                     <th className="py-2 px-3 font-medium">Yöntem</th>
                   </tr>
                 </thead>
@@ -284,13 +350,23 @@ export default function CustomerStatement() {
                         {p.currency}
                       </td>
                       <td className="py-1.5 px-3 whitespace-nowrap">
+                        {p.exchange_rate === 1
+                          ? "-"
+                          : formatCurrency(p.exchange_rate)}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap">
+                        {formatCurrency(p.amount_in_try)}
+                      </td>
+                      <td className="py-1.5 px-3 whitespace-nowrap">
                         {p.payment_method === "cash"
                           ? "Nakit"
                           : p.payment_method === "bank_transfer"
                             ? "Havale"
                             : p.payment_method === "check"
                               ? "Çek"
-                              : p.payment_method}
+                              : p.payment_method === "card"
+                                ? "Kart"
+                                : p.payment_method}
                       </td>
                     </tr>
                   ))}

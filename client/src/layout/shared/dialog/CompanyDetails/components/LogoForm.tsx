@@ -8,7 +8,8 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import { CompanyApi } from "@/lib/api/company";
 import { sendRefreshEvent } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
+import { Logger } from "@/lib/utils/logger";
+import { Trash2, UploadIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -39,12 +40,11 @@ export default function LogoForm() {
         setCacheBuster(Date.now()); // Update cache buster when fetching logos
       }
     } catch (error) {
-      console.error("Şirket logoları alınırken bir hata oluştu:", error);
+      Logger.error("Şirket logoları alınırken bir hata oluştu:", error);
     }
   }, []);
 
   const handleDrop = useCallback((files: File[], size: "small" | "large") => {
-    console.log(files, size);
     const SET_LOGO = size === "small" ? setSmallLogo : setLargeLogo;
     const SET_PREVIEW =
       size === "small" ? setSmallLogoPreview : setLargeLogoPreview;
@@ -128,13 +128,26 @@ export default function LogoForm() {
           </div>
           <Dropzone
             accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
-            src={smallLogo ? [smallLogo] : []}
+            src={smallLogo ? [smallLogo] : logos.smallLogo ? [] : undefined}
             onDrop={(files) => handleDrop(files, "small")}
-            onError={console.error}
+            onError={Logger.error}
             multiple={false}
             className={`${smallLogo && "aspect-square"} w-auto !p-6`}
           >
-            <DropzoneEmptyState />
+            <DropzoneEmptyState>
+              <div className="flex flex-col items-center justify-center text-center p-4">
+                <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground mb-2">
+                  <UploadIcon className="h-4 w-4" />
+                </div>
+                <p className="font-medium text-sm">Dosya Yükle</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Sürükleyip bırakın veya tıklayın
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Kabul edilen formatlar: png, jpg, jpeg
+                </p>
+              </div>
+            </DropzoneEmptyState>
             <DropzoneContent>
               {(smallLogoPreview || logos.smallLogo) && (
                 <img
@@ -169,13 +182,26 @@ export default function LogoForm() {
           </div>
           <Dropzone
             accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
-            src={largeLogo ? [largeLogo] : []}
+            src={largeLogo ? [largeLogo] : logos.largeLogo ? [] : undefined}
             onDrop={(files) => handleDrop(files, "large")}
-            onError={console.error}
+            onError={Logger.error}
             multiple={false}
             className="w-auto !p-6"
           >
-            <DropzoneEmptyState />
+            <DropzoneEmptyState>
+              <div className="flex flex-col items-center justify-center text-center p-4">
+                <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground mb-2">
+                  <UploadIcon className="h-4 w-4" />
+                </div>
+                <p className="font-medium text-sm">Dosya Yükle</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Sürükleyip bırakın veya tıklayın
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Kabul edilen formatlar: png, jpg, jpeg
+                </p>
+              </div>
+            </DropzoneEmptyState>
             <DropzoneContent>
               {(largeLogoPreview || logos.largeLogo) && (
                 <img

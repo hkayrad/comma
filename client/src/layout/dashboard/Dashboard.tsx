@@ -9,37 +9,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
+import { Logger } from "@/lib/utils/logger";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
     [],
   );
   const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
-  const [selectedCurrency, setSelectedCurrency] =
-    useState<AvailableCurrency>("TRY");
+  const [selectedCurrency] = useState<AvailableCurrency | "">("");
   const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
 
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as OverviewViewType);
   }, []);
 
-  const handleCurrencyChange = useCallback(
-    (value: AvailableCurrency) => {
-      setSelectedCurrency(value);
-    },
-    [setSelectedCurrency],
-  );
+  // const handleCurrencyChange = useCallback(
+  //   (value: AvailableCurrency | "") => {
+  //     setSelectedCurrency(value);
+  //   },
+  //   [setSelectedCurrency],
+  // );
 
   const fetchReceivableCustomers = useCallback(async () => {
     const response = await ReceivableCustomerApi.GetAll();
     if (response) setReceivableCustomers(response);
+    else Logger.error("Müşteriler getirilirken bir hata oluştu", response);
   }, []);
 
   const fetchPayableCustomers = useCallback(async () => {
     const response = await PayableCustomerApi.GetAll();
-    console.log(response);
-
     if (response) setPayableCustomers(response);
+    else Logger.error("Müşteriler getirilirken bir hata oluştu", response);
   }, []);
 
   const handleRefresh = useCallback(() => {
@@ -54,10 +54,6 @@ export default function Dashboard() {
       window.removeEventListener("global:refresh", handleRefresh);
     };
   }, [handleRefresh]);
-
-  useEffect(() => {
-    console.log("Selected Currency:", selectedCurrency);
-  }, [selectedCurrency]);
 
   return (
     <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
@@ -97,20 +93,20 @@ export default function Dashboard() {
           <CustomerTable
             type="receivable"
             data={receivableCustomers}
-            currency={{
-              state: selectedCurrency,
-              onChange: handleCurrencyChange,
-            }}
+            // currency={{
+            //   state: selectedCurrency,
+            //   onChange: handleCurrencyChange,
+            // }}
           />
         </TabsContent>
         <TabsContent value="payable">
           <CustomerTable
             type="payable"
             data={payableCustomers}
-            currency={{
-              state: selectedCurrency,
-              onChange: handleCurrencyChange,
-            }}
+            // currency={{
+            //   state: selectedCurrency,
+            //   onChange: handleCurrencyChange,
+            // }}
           />
         </TabsContent>
       </Tabs>

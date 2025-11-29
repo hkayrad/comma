@@ -10,8 +10,9 @@ export default function Debts() {
   const type: "payable" | "receivable" =
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const [debts, setDebts] = useState<DebtDto[]>([]);
-  const [selectedCurrency, setSelectedCurrency] =
-    useState<AvailableCurrency>("TRY");
+  const [selectedCurrency, setSelectedCurrency] = useState<
+    AvailableCurrency | ""
+  >("");
 
   useEffect(() => {
     const fetchDebts = async () => {

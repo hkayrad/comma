@@ -20,6 +20,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import { CompanyApi } from "@/lib/api/company";
 import type { CompanyDto } from "@/lib/types";
+import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
@@ -104,7 +105,7 @@ export default function InformationForm() {
         setCompanyDetails(response.data);
       }
     } catch (error) {
-      console.error("Şirket detayları alınırken bir hata oluştu:", error);
+      Logger.error("Şirket detayları alınırken bir hata oluştu:", error);
     }
   }, []);
 

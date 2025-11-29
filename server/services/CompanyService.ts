@@ -25,7 +25,7 @@ export class CompanyService {
 			Logger.debug("[CompanyService] Fetching company details", { companyId });
 
 			const query = `
-				SELECT name, address, phone, is_company, email, tax_number, tax_office, mersis_no
+				SELECT *
 				FROM companies
 				WHERE id = ? AND deleted_at IS NULL
 				`;
@@ -48,6 +48,8 @@ export class CompanyService {
 						tax_number: company.tax_number,
 						tax_office: company.tax_office,
 						mersis_no: company.mersis_no,
+						small_logo_path: company.small_logo_path,
+						large_logo_path: company.large_logo_path,
 					},
 					"Company details fetched successfully",
 				);

@@ -26,20 +26,20 @@ import {
   FilterX,
   RefreshCw,
   Rows3,
-  Search,
   TurkishLira,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
 import type { AvailableCurrency } from "@/lib/types";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type Props = {
   table: Table<any>;
   searchColumn: string;
   currency?: {
-    state: AvailableCurrency;
-    onChange: (value: AvailableCurrency) => void;
+    state: AvailableCurrency | "";
+    onChange: (value: AvailableCurrency | "") => void;
   };
 };
 
@@ -47,6 +47,25 @@ export default function HksTableHeader(props: Props) {
   const { table, searchColumn, currency } = props;
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        e.ctrlKey &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const onFilterReset = useCallback(() => {
     table.resetColumnFilters();
@@ -57,15 +76,6 @@ export default function HksTableHeader(props: Props) {
     table.resetSorting();
     toast.success("Sıralama sıfırlandı!");
   }, [table]);
-
-  const onCurrencyChange = useCallback(
-    (value: AvailableCurrency) => {
-      if (currency) {
-        currency.onChange(value);
-      }
-    },
-    [currency],
-  );
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -89,6 +99,7 @@ export default function HksTableHeader(props: Props) {
     <div className="flex items-center gap-2">
       <InputGroup className="max-w-2xs bg-background min-w-48">
         <InputGroupInput
+          ref={searchInputRef}
           placeholder="İsim ile Müşteri Ara..."
           value={
             (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
@@ -96,10 +107,20 @@ export default function HksTableHeader(props: Props) {
           onChange={(event) =>
             table.getColumn(searchColumn)?.setFilterValue(event.target.value)
           }
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              searchInputRef.current?.blur();
+            }
+          }}
           className="select-none"
         />
-        <InputGroupAddon>
-          <Search />
+        <InputGroupAddon align="inline-end" className="gap-1">
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">Ctrl</span>
+          </kbd>
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">/</span>
+          </kbd>
         </InputGroupAddon>
       </InputGroup>
       <ButtonGroup>
@@ -210,58 +231,99 @@ export default function HksTableHeader(props: Props) {
         </DropdownMenu>
       </ButtonGroup>
       {currency && (
-        <ButtonGroup>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                onClick={() => onCurrencyChange("TRY")}
-                className={
-                  currency.state === "TRY"
-                    ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-                    : ""
-                }
-              >
-                <TurkishLira />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Türk Lirası</TooltipContent>
-          </Tooltip>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                onClick={() => onCurrencyChange("USD")}
-                className={
-                  currency.state === "USD"
-                    ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-                    : ""
-                }
-              >
-                <DollarSign />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Amerikan Doları</TooltipContent>
-          </Tooltip>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                onClick={() => onCurrencyChange("EUR")}
-                className={
-                  currency.state === "EUR"
-                    ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-                    : ""
-                }
-              >
-                <Euro />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Euro</TooltipContent>
-          </Tooltip>
-        </ButtonGroup>
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          size="default"
+          value={currency.state as string}
+          onValueChange={(value) =>
+            currency.onChange(value ? (value as AvailableCurrency) : "")
+          }
+          className="shadow-xs"
+        >
+          <ToggleGroupItem value="TRY" className="!p-0">
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <span className="flex items-center justify-center w-full h-full !p-3">
+                  <TurkishLira />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Türk Lirası</TooltipContent>
+            </Tooltip>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="USD" className="!p-0">
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <span className="flex items-center justify-center w-full h-full !p-3">
+                  <DollarSign />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Amerikan Doları</TooltipContent>
+            </Tooltip>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="EUR" className="!p-0">
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <span className="flex items-center justify-center w-full h-full !p-3">
+                  <Euro />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Euro</TooltipContent>
+            </Tooltip>
+          </ToggleGroupItem>
+        </ToggleGroup>
+        // <ButtonGroup>
+        //   <Tooltip disableHoverableContent>
+        //     <TooltipTrigger asChild>
+        //       <Button
+        //         variant="outline"
+        //         onClick={() => onCurrencyChange("TRY")}
+        //         className={
+        //           currency.state === "TRY"
+        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
+        //             : ""
+        //         }
+        //       >
+        //         <TurkishLira />
+        //       </Button>
+        //     </TooltipTrigger>
+        //     <TooltipContent>Türk Lirası</TooltipContent>
+        //   </Tooltip>
+        //   <Tooltip disableHoverableContent>
+        //     <TooltipTrigger asChild>
+        //       <Button
+        //         variant="outline"
+        //         onClick={() => onCurrencyChange("USD")}
+        //         className={
+        //           currency.state === "USD"
+        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
+        //             : ""
+        //         }
+        //       >
+        //         <DollarSign />
+        //       </Button>
+        //     </TooltipTrigger>
+        //     <TooltipContent>Amerikan Doları</TooltipContent>
+        //   </Tooltip>
+        //   <Tooltip disableHoverableContent>
+        //     <TooltipTrigger asChild>
+        //       <Button
+        //         variant="outline"
+        //         onClick={() => onCurrencyChange("EUR")}
+        //         className={
+        //           currency.state === "EUR"
+        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
+        //             : ""
+        //         }
+        //       >
+        //         <Euro />
+        //       </Button>
+        //     </TooltipTrigger>
+        //     <TooltipContent>Euro</TooltipContent>
+        //   </Tooltip>
+        // </ButtonGroup>
       )}
-      <div className="flex gap-4 ml-auto">
+      <div className="flex gap-4 ml-auto ">
         <HksTablePagination table={table} />
         <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
@@ -270,7 +332,9 @@ export default function HksTableHeader(props: Props) {
               disabled={isRefreshing}
               onClick={onRefresh}
             >
-              <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
+              <RefreshCw
+                className={`${isRefreshing ? "animate-spin" : ""} shadow-xs`}
+              />
               {isRefreshing ? "Yenileniyor..." : "Yenile"}
             </Button>
           </TooltipTrigger>

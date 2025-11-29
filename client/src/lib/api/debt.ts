@@ -55,6 +55,7 @@ export class ReceivableDebtApi {
 
 	static async Update(id: string, data: DebtDto): Promise<string | null> {
 		try {
+			Logger.info(data)
 			const { data: response } = await instance.put<ApiResponse<null>>(`/receivables/debts/${id}`, data);
 
 			if (response.status === 200) {

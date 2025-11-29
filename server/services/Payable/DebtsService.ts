@@ -9,7 +9,7 @@ export default class PayableDebtsService {
 		try {
 			Logger.info("[PayableDebts] Creating debt", { companyId, customerId: debt.customer_id, userId });
 
-			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
+			const { customer_id, amount, vat, currency, exchange_rate, issue_date, invoice_no, description } = debt;
 
 			if (
 				!customer_id ||
@@ -18,15 +18,16 @@ export default class PayableDebtsService {
 				!issue_date ||
 				vat === undefined ||
 				vat === null ||
-				!currency
+				!currency ||
+				!exchange_rate
 			) {
 				Logger.error("[PayableDebts] Missing required fields", { customer_id, amount, vat, issue_date, currency });
-				return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
+				return ApiResponse.error("Customer, amount, issue date, VAT, currency, exchange rate are required");
 			}
 
 			const query = `
-                INSERT INTO payable_debts (customer_id, amount, vat, currency, issue_date, invoice_no, description, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+                INSERT INTO payable_debts (customer_id, amount, vat, currency, exchange_rate, issue_date, invoice_no, description, company_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -36,6 +37,7 @@ export default class PayableDebtsService {
 				amount,
 				vat,
 				currency,
+				exchange_rate,
 				issue_date,
 				invoice_no || null,
 				description || null,
@@ -69,7 +71,6 @@ export default class PayableDebtsService {
 			const query = `
 				SELECT
 			    d.*,
-			    (d.amount + COALESCE(d.vat, 0)) AS total_amount,
 			    c.name AS customer_name,
 			    c.tax_number AS customer_tax_number
 				FROM payable_debts d
@@ -103,38 +104,40 @@ export default class PayableDebtsService {
 
 			const query = `
 				WITH debts_summary AS (
-			    SELECT COALESCE(SUM(d.amount + d.vat), 0) AS total
+			    SELECT
+						COALESCE(SUM(d.total), 0) AS total,
+						COALESCE(SUM(d.total_in_try), 0) AS total_in_try
 			    FROM payable_debts d
 			    INNER JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
 			    WHERE d.company_id = ?
-			        AND d.currency = ?
-			        AND d.deleted_at IS NULL
-			        AND d.deleted_by IS NULL
-			        AND c.deleted_at IS NULL
-			        AND c.deleted_by IS NULL
+		        AND d.deleted_at IS NULL
+		        AND d.deleted_by IS NULL
+		        AND c.deleted_at IS NULL
+		        AND c.deleted_by IS NULL
 				),
 				payments_summary AS (
-		    	SELECT COALESCE(SUM(p.amount), 0) AS total
+		    	SELECT
+						COALESCE(SUM(p.amount), 0) AS total,
+						COALESCE(SUM(p.amount_in_try), 0) AS total_in_try
 			    FROM payable_payments p
 			    INNER JOIN payable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
 			    WHERE p.company_id = ?
-		        AND p.currency = ?
 		        AND p.deleted_at IS NULL
 		        AND p.deleted_by IS NULL
 		        AND c.deleted_at IS NULL
 		        AND c.deleted_by IS NULL
 				)
 				SELECT
-			    debts_summary.total AS total_debts,
-			    payments_summary.total AS total_payments,
-			    debts_summary.total - payments_summary.total AS remaining_debt
+			    debts_summary.total_in_try AS total_debts,
+			    payments_summary.total_in_try AS total_payments,
+			    debts_summary.total_in_try - payments_summary.total_in_try AS remaining_debt
 				FROM
 			    debts_summary,
 			    payments_summary;
      	`;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId, currency, companyId, currency])) as Totals[];
+			const result = (await conn.query(query, [companyId, companyId])) as Totals[];
 
 			Logger.debug("[PayableDebts] Totals fetched successfully", { companyId, currency, totals: result[0] });
 
@@ -163,7 +166,7 @@ export default class PayableDebtsService {
 				return ApiResponse.error("Debt ID is required");
 			}
 
-			const { customer_id, amount, vat, currency, issue_date, invoice_no, description } = debt;
+			const { customer_id, amount, vat, currency, exchange_rate, issue_date, invoice_no, description } = debt;
 
 			if (
 				!customer_id ||
@@ -172,15 +175,16 @@ export default class PayableDebtsService {
 				!issue_date ||
 				vat === undefined ||
 				vat === null ||
-				!currency
+				!currency ||
+				!exchange_rate
 			) {
 				Logger.error("[PayableDebts] Missing required fields", { customer_id, amount, vat, issue_date, currency });
-				return ApiResponse.error("Customer, amount, issue date, VAT, and currency are required");
+				return ApiResponse.error("Customer, amount, issue date, VAT, currency, and exchange rate are required");
 			}
 
 			const query = `
         UPDATE payable_debts
-        SET customer_id = ?, amount = ?, vat = ?, currency = ?, issue_date = ?, invoice_no = ?, description = ?
+        SET customer_id = ?, amount = ?, vat = ?, currency = ?, exchange_rate = ?, issue_date = ?, invoice_no = ?, description = ?
         WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
 	    `;
 
@@ -191,6 +195,7 @@ export default class PayableDebtsService {
 				amount,
 				vat,
 				currency,
+				exchange_rate,
 				issue_date,
 				invoice_no || null,
 				description || null,

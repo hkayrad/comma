@@ -51,10 +51,18 @@ export class ReceivableCustomerApi {
 		}
 	}
 
-	static async GetStatement(id: string): Promise<CustomerStatement | null> {
+	static async GetStatement(
+		id: string,
+		filters?: { startDate?: string; endDate?: string },
+	): Promise<CustomerStatement | null> {
 		try {
+			const { startDate, endDate } = filters || {};
+			const queryParams = new URLSearchParams();
+			if (startDate) queryParams.append("startDate", startDate);
+			if (endDate) queryParams.append("endDate", endDate);
+
 			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/receivables/customers/${id}/statement`,
+				`/receivables/customers/${id}/statement?${queryParams.toString()}`,
 			);
 
 			if (response.status === 200) {
@@ -151,10 +159,18 @@ export class PayableCustomerApi {
 		}
 	}
 
-	static async GetStatement(id: string): Promise<CustomerStatement | null> {
+	static async GetStatement(
+		id: string,
+		filters?: { startDate?: string; endDate?: string },
+	): Promise<CustomerStatement | null> {
 		try {
+			const { startDate, endDate } = filters || {};
+			const queryParams = new URLSearchParams();
+			if (startDate) queryParams.append("startDate", startDate);
+			if (endDate) queryParams.append("endDate", endDate);
+
 			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/payables/customers/${id}/statement`,
+				`/payables/customers/${id}/statement?${queryParams.toString()}`,
 			);
 
 			if (response.status === 200) {

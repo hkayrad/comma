@@ -42,15 +42,9 @@ export type CustomerDto = {
 	mersis_no?: string;
 	email?: string;
 	address?: string;
-	total_debt_try?: number;
-	total_debt_usd?: number;
-	total_debt_eur?: number;
-	total_payments_try?: number;
-	total_payments_usd?: number;
-	total_payments_eur?: number;
-	remaining_debt_try?: number;
-	remaining_debt_usd?: number;
-	remaining_debt_eur?: number;
+	total_debt?: number;
+	total_payments?: number;
+	remaining_debt?: number;
 	created_at?: Date;
 	updated_at?: Date;
 };
@@ -62,7 +56,9 @@ export type DebtDto = {
 	amount: number;
 	vat: number;
 	currency: AvailableCurrency;
-	total_amount?: string;
+	exchange_rate: number;
+	total?: number;
+	total_in_try?: number;
 	description?: string;
 	issue_date: Date;
 	created_at?: Date;
@@ -74,6 +70,8 @@ export type PaymentDto = {
 	customer_id: UUID;
 	amount: number;
 	currency: AvailableCurrency;
+	exchange_rate: number;
+	amount_in_try?: number;
 	payment_method: AvailablePaymentMethod;
 	description?: string;
 	invoice_no?: string;

@@ -50,30 +50,39 @@ router.get("/customers", async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/customers/:id/statement", async (req: Request<{ id: string }>, res: Response) => {
-	const { id } = req.params;
-	const companyId = req.user.companyId;
+router.get(
+	"/customers/:id/statement",
+	async (req: Request<{ id: string }, {}, {}, { startDate?: string; endDate?: string }>, res: Response) => {
+		const { id } = req.params;
+		const { startDate, endDate } = req.query;
+		const companyId = req.user.companyId;
 
-	Logger.debug("[PayableCustomersController] Get customer statement request", { customerId: id, companyId });
-
-	try {
-		const response = await PayableCustomersService.GetStatement(id, companyId);
-
-		Logger.debug("[PayableCustomersController] Get customer statement result", {
+		Logger.debug("[PayableCustomersController] Get customer statement request", {
 			customerId: id,
 			companyId,
-			success: response.success,
+			startDate,
+			endDate,
 		});
-		return res.json(response);
-	} catch (error: any) {
-		Logger.error("[PayableCustomersController] Error fetching customer statement", {
-			customerId: id,
-			companyId,
-			error: error.message,
-		});
-		return res.status(500).json({ success: false, message: "Error fetching customer statement" });
+
+		try {
+			const response = await PayableCustomersService.GetStatement(id, companyId, startDate, endDate);
+
+			Logger.debug("[PayableCustomersController] Get customer statement result", {
+				customerId: id,
+				companyId,
+				success: response.success,
+			});
+			return res.json(response);
+		} catch (error: any) {
+			Logger.error("[PayableCustomersController] Error fetching customer statement", {
+				customerId: id,
+				companyId,
+				error: error.message,
+			});
+			return res.status(500).json({ success: false, message: "Error fetching customer statement" });
+		}
 	}
-});
+);
 
 router.get("/customers/id-name", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;

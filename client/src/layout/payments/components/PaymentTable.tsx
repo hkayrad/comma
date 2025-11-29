@@ -29,15 +29,14 @@ import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
-import { useCallback, useEffect, useMemo } from "react";
-import { CurrencyIcons } from "@/lib/enums";
+import { useCallback, useMemo } from "react";
 
 type Props = {
   data: PaymentDto[];
   type: "receivable" | "payable";
   currency?: {
-    state: AvailableCurrency;
-    onChange: (value: AvailableCurrency) => void;
+    state: AvailableCurrency | "";
+    onChange: (value: AvailableCurrency | "") => void;
   };
 };
 
@@ -109,23 +108,45 @@ export default function PaymentTable(props: Props) {
           </Tooltip>
         ),
       },
-      ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
-        {
-          accessorKey: "amount",
-          id: `Ödeme Miktarı (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-            <FormattedCurrency
-              row={row}
-              column={column}
-              currency={curr as AvailableCurrency}
-            />
-          ),
-          sortingFn: formattedNumber,
-        },
-      ]),
+      {
+        accessorKey: "amount",
+        id: `Gelen Miktar`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("Para Birimi")}
+          />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: "currency",
+        id: "Para Birimi",
+        header: ({ column }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }) => (
+          <ClickToCopyText
+            value={row.getValue(column.id) || "-"}
+            column={column}
+          />
+        ),
+      },
+      {
+        accessorKey: "amount_in_try",
+        id: `Ödeme Miktarı`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency row={row} column={column} currency="TRY" />
+        ),
+        sortingFn: formattedNumber,
+      },
       {
         accessorKey: "payment_method",
         id: "Ödeme Yöntemi",
@@ -263,24 +284,14 @@ export default function PaymentTable(props: Props) {
     [handleDelete, onEdit],
   );
 
-  const FilteredPaymentTableColumns = useMemo(() => {
-    return PaymentTableColumns.filter(
-      (col) =>
-        !col.id?.startsWith("Ödeme Miktarı") ||
-        (currency
-          ? col.id?.endsWith(`(${CurrencyIcons[currency.state]})`)
-          : true),
-    );
-  }, [PaymentTableColumns, currency]);
-
-  useEffect(() => {
-    console.log(data);
-  }, [data, currency]);
-
   return (
     <HksTable
-      data={data.filter((d) => d.currency === currency?.state)}
-      columns={FilteredPaymentTableColumns}
+      data={
+        currency?.state
+          ? data.filter((item) => item.currency === currency.state)
+          : data
+      }
+      columns={PaymentTableColumns}
       searchColumn="Müşteri"
       currency={currency}
     />

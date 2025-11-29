@@ -29,14 +29,13 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useMemo } from "react";
-import { CurrencyIcons } from "@/lib/enums";
 
 type Props = {
   data: DebtDto[];
   type: "receivable" | "payable";
   currency?: {
-    state: AvailableCurrency;
-    onChange: (value: AvailableCurrency) => void;
+    state: AvailableCurrency | "";
+    onChange: (value: AvailableCurrency | "") => void;
   };
 };
 
@@ -108,53 +107,75 @@ export default function DebtTable(props: Props) {
           </Tooltip>
         ),
       },
-      ...(["TRY", "USD", "EUR"] as AvailableCurrency[]).flatMap((curr) => [
-        {
-          accessorKey: "amount",
-            id: `Tutar (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-            <FormattedCurrency
-              row={row}
-              column={column}
-              currency={curr as AvailableCurrency}
-            />
-          ),
-          sortingFn: formattedNumber,
-        },
-        {
-          accessorKey: "vat",
-          id: `KDV (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-            <FormattedCurrency
-              row={row}
-              column={column}
-              currency={curr as AvailableCurrency}
-            />
-          ),
-          sortingFn: formattedNumber,
-        },
-        {
-          accessorKey: "total_amount",
-          id: `Toplam (${CurrencyIcons[curr]})`,
-          header: ({ column }: { column: Column<any> }) => (
-            <SortableColumnHeader column={column} title={column.id} />
-          ),
-          cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-            <FormattedCurrency
-              row={row}
-              column={column}
-              currency={curr as AvailableCurrency}
-            />
-          ),
-          sortingFn: formattedNumber,
-        },
-      ]),
+      {
+        accessorKey: "amount",
+        id: `Tutar`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("Para Birimi")}
+          />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: "vat",
+        id: `KDV`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("Para Birimi")}
+          />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: "total",
+        id: `Toplam`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("Para Birimi")}
+          />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: "currency",
+        id: "Para Birimi",
+        header: ({ column }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }) => (
+          <ClickToCopyText
+            value={row.getValue(column.id) || "-"}
+            column={column}
+          />
+        ),
+      },
+      {
+        accessorKey: "total_in_try",
+        id: `Ödenecek Miktar`,
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency row={row} column={column} currency="TRY" />
+        ),
+        sortingFn: formattedNumber,
+      },
       {
         accessorKey: "issue_date",
         id: "Düzenlenme Tarihi",
@@ -245,20 +266,14 @@ export default function DebtTable(props: Props) {
     [onEdit, handleDelete],
   );
 
-  const FilteredDebtTableColumns = useMemo(() => {
-    return DebtTableColumns.filter(
-      (col) =>
-        (!col.id?.startsWith("Toplam") &&
-          !col.id?.startsWith("Tutar") &&
-          !col.id?.startsWith("KDV")) ||
-        (currency ? col.id?.endsWith(`(${CurrencyIcons[currency.state]})`) : true),
-    );
-  }, [DebtTableColumns, currency]);
-
   return (
     <HksTable
-      data={data.filter((d) => d.currency === currency?.state)}
-      columns={FilteredDebtTableColumns}
+      data={
+        currency?.state
+          ? data.filter((item) => item.currency === currency.state)
+          : data
+      }
+      columns={DebtTableColumns}
       searchColumn="Müşteri"
       currency={currency}
     />

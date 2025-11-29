@@ -39,6 +39,7 @@ import CustomerSelect from "./components/CustomerSelect";
 import {
   InputGroup,
   InputGroupAddon,
+  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import DateSelect from "./components/DateSelect";
@@ -53,6 +54,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   payment?: PaymentDto;
@@ -65,6 +71,10 @@ const PaymentFormSchema = z.object({
     .number({ error: "Geçersiz tutar" })
     .min(0.01, "Tutar en az 0.01 olmalıdır"),
   currency: z.enum(["TRY", "USD", "EUR"], { error: "Geçersiz para birimi" }),
+  exchange_rate: z
+    .number({ error: "Geçersiz kur" })
+    .min(0, "Kur en az 0 olmalıdır")
+    .or(z.literal(0)),
   payment_date: z.date({ error: "Geçersiz tarih" }),
   payment_method: z.enum(["cash", "bank_transfer", "check", "card"], {
     error: "Geçersiz ödeme yöntemi",
@@ -99,6 +109,7 @@ export default function PaymentDialog(props: Props) {
       customer_id: payment?.customer_id || "",
       amount: payment?.amount ? Number(payment.amount) : 0,
       currency: payment?.currency || "TRY",
+      exchange_rate: payment?.exchange_rate || 1,
       payment_date: payment?.payment_date
         ? new Date(payment.payment_date)
         : new Date(),
@@ -117,6 +128,25 @@ export default function PaymentDialog(props: Props) {
       Logger.error("Failed to fetch customer ID and names:", error);
     }
   }, [CUSTOMER_API]);
+
+  const handleSetExchangeRateButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      const exchangeRatesString = sessionStorage.getItem("exchangeRates");
+      const exchangeRates =
+        exchangeRatesString && JSON.parse(exchangeRatesString);
+
+      const selectedCurrency = form.watch("currency").toLowerCase();
+
+      if (exchangeRates && exchangeRates[selectedCurrency]) {
+        form.setValue(
+          "exchange_rate",
+          parseFloat(exchangeRates[selectedCurrency].forexBuying),
+        );
+      }
+    },
+    [form],
+  );
 
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -164,6 +194,13 @@ export default function PaymentDialog(props: Props) {
   useEffect(() => {
     handleFetchCustomerIdAndNames();
   }, [handleFetchCustomerIdAndNames]);
+
+  const selectedCurrency = form.watch("currency");
+  useEffect(() => {
+    if (selectedCurrency === "TRY") {
+      form.setValue("exchange_rate", 1);
+    }
+  }, [form, selectedCurrency]);
 
   return (
     <Form {...form}>
@@ -260,6 +297,54 @@ export default function PaymentDialog(props: Props) {
             </FormItem>
           )}
         />
+        {form.watch("currency") !== "TRY" && (
+          <FormField
+            control={form.control}
+            name="exchange_rate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex gap-1">
+                  Kur <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="flex items-center gap-1">
+                    <InputGroup>
+                      <InputGroupInput
+                        type="number"
+                        placeholder="0.00"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const num = value === "" ? "" : parseFloat(value);
+                          field.onChange(Number.isNaN(num) ? undefined : num);
+                        }}
+                      />
+                      <InputGroupAddon>{currencySign["TRY"]}</InputGroupAddon>
+                      <InputGroupAddon align="inline-end">
+                        <Tooltip disableHoverableContent>
+                          <TooltipTrigger asChild>
+                            <InputGroupButton
+                              size="xs"
+                              onClick={handleSetExchangeRateButtonClick}
+                            >
+                              TCMB Kuru
+                            </InputGroupButton>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Kur olarak TCMB günlük kurunu kullan</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </div>
+                </FormControl>
+                <FormDescription>Döviz Kuru</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="payment_method"

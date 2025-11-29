@@ -118,7 +118,7 @@ export default function FloatingButton() {
         </Tooltip>
         <DropdownMenuContent
           className="w-fit !bg-transparent !p-0 !border-none !space-y-1 !shadow-none overflow-visible"
-          side="left"
+          side="top"
           align="end"
           sideOffset={4}
         >
