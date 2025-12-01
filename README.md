@@ -110,6 +110,11 @@ The project is organized into a monorepo structure with two main packages: `clie
     - **`services/`**: The business logic of the application, which is called by the controllers.
     - **`lib/`**: Utility functions, middleware, and the database connection pool.
 
+## API Documentation
+
+For detailed information about the API endpoints, please refer to the [API Documentation](API.md).
+
+
 ## License
 
 This project is a closed-source project. All rights are reserved. See the `LICENSE.md` file for more details.
