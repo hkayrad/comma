@@ -137,6 +137,19 @@ export default function PaymentTable(props: Props) {
         ),
       },
       {
+        accessorKey: "exchange_rate",
+        id: "Kur",
+        header: ({ column }) => (
+          <SortableColumnHeader column={column} title={column.id} />
+        ),
+        cell: ({ row, column }) => (
+          <ClickToCopyText
+            value={row.getValue(column.id) == 1 ? "-" : row.getValue(column.id)}
+            column={column}
+          />
+        ),
+      },
+      {
         accessorKey: "amount_in_try",
         id: `Ödeme Miktarı`,
         header: ({ column }: { column: Column<any> }) => (
