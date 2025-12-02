@@ -116,8 +116,8 @@ export default function HksSidebar() {
 
   const handleCompanyDetails = useCallback(async () => {
     openDialog({
-      title: "Şirket Detayları",
-      description: "Şirket bilgilerinizi görüntüleyin ve düzenleyin.",
+      title: "Hesap Detayları",
+      description: "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
       size: "3xl",
       content: <CompanyDetailsDialog />,
       showCloseButton: true,
@@ -226,28 +226,28 @@ export default function HksSidebar() {
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuButton>
                         <Wrench />
-                        <span className="select-none">Şirket Yönetimi</span>
+                        <span className="select-none">Yönetim</span>
                       </SidebarMenuButton>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="right" hidden={state !== "collapsed"}>
-                    Şirket Yönetimi
+                    Yönetim
                   </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent side="right" align="end" sideOffset={4}>
-                  <DropdownMenuItem
+                  {/*<DropdownMenuItem
                     onClick={() => {}}
                     className="!justify-start"
                   >
                     <UsersRound className="text-inherit bg-inherit select-none" />
                     <span>Kullanıcıları Düzenle</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem>*/}
                   <DropdownMenuItem
                     onClick={handleCompanyDetails}
                     className="!justify-start"
                   >
                     <Building2 className="text-inherit bg-inherit select-none" />
-                    <span>Şirket Detayları</span>
+                    <span>Hesap Detayları</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -166,7 +166,8 @@ export default function InformationForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Şirket Adı <span className="text-red-500">*</span>
+                {form.watch("is_company") ? "Şirket Adı" : "Adınız"}{" "}
+                <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl>
                 <InputGroup>
@@ -181,7 +182,11 @@ export default function InformationForm() {
                 </InputGroup>
               </FormControl>
               <FormDescription>
-                <span>Şirketinizin tam adı.</span>
+                <span>
+                  {form.watch("is_company")
+                    ? "Şirketinizin tam adı."
+                    : "Adınız, soyadınız."}
+                </span>
               </FormDescription>
             </FormItem>
           )}
@@ -355,7 +360,7 @@ export default function InformationForm() {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Adresi</FormLabel>
+              <FormLabel>Adres</FormLabel>
               <FormControl>
                 <InputGroup>
                   <InputGroupInput

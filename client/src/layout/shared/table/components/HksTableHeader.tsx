@@ -4,6 +4,9 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -23,20 +26,26 @@ import {
   Columns3Cog,
   DollarSign,
   Euro,
+  Filter,
   FilterX,
   RefreshCw,
   Rows3,
   TurkishLira,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
 import type { AvailableCurrency } from "@/lib/types";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   table: Table<any>;
   searchColumn: string;
+  tags?: {
+    column: string;
+    value: string;
+  }[];
   currency?: {
     state: AvailableCurrency | "";
     onChange: (value: AvailableCurrency | "") => void;
@@ -44,10 +53,13 @@ type Props = {
 };
 
 export default function HksTableHeader(props: Props) {
-  const { table, searchColumn, currency } = props;
+  const { table, searchColumn, tags, currency } = props;
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,6 +81,7 @@ export default function HksTableHeader(props: Props) {
 
   const onFilterReset = useCallback(() => {
     table.resetColumnFilters();
+    setSelectedFilters(new Set());
     toast.success("Filtreler temizlendi!");
   }, [table]);
 
@@ -94,6 +107,79 @@ export default function HksTableHeader(props: Props) {
       },
     );
   }, []);
+
+  const handleFilterToggle = useCallback(
+    (tag: { column: string; value: string }) => {
+      const filterKey = `${tag.column}:${tag.value}`;
+
+      setSelectedFilters((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(filterKey)) {
+          newSet.delete(filterKey);
+        } else {
+          newSet.add(filterKey);
+        }
+        return newSet;
+      });
+    },
+    [],
+  );
+
+  // Apply filters to table when selectedFilters changes
+  useEffect(() => {
+    if (!tags) return;
+
+    // Group filters by column
+    const filtersByColumn = new Map<string, string[]>();
+
+    selectedFilters.forEach((filterKey) => {
+      const [column, value] = filterKey.split(":");
+      if (!filtersByColumn.has(column)) {
+        filtersByColumn.set(column, []);
+      }
+      filtersByColumn.get(column)!.push(value);
+    });
+
+    // Get unique columns from tags
+    const uniqueColumns = new Set(tags.map((tag) => tag.column));
+
+    // Apply filters to each column
+    uniqueColumns.forEach((columnId) => {
+      const column = table.getColumn(columnId);
+      if (!column) return;
+
+      const values = filtersByColumn.get(columnId);
+      if (values && values.length > 0) {
+        // Set filter value as array - Tanstack Table will use arrIncludesSome by default
+        column.setFilterValue(values);
+      } else {
+        // Clear filter for this column if no values selected
+        column.setFilterValue(undefined);
+      }
+    });
+  }, [selectedFilters, tags, table]);
+
+  const activeFilterCount = useMemo(
+    () => selectedFilters.size,
+    [selectedFilters],
+  );
+
+  const rowCounts = useMemo(() => [5, 10, 20, 50, 100], []);
+
+  // Group tags by column
+  const groupedTags = useMemo(() => {
+    if (!tags)
+      return new Map<string, Array<{ column: string; value: string }>>();
+
+    const groups = new Map<string, Array<{ column: string; value: string }>>();
+    tags.forEach((tag) => {
+      if (!groups.has(tag.column)) {
+        groups.set(tag.column, []);
+      }
+      groups.get(tag.column)!.push(tag);
+    });
+    return groups;
+  }, [tags]);
 
   return (
     <div className="flex items-center gap-2">
@@ -123,6 +209,51 @@ export default function HksTableHeader(props: Props) {
           </kbd>
         </InputGroupAddon>
       </InputGroup>
+      {tags && (
+        <DropdownMenu>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="select-none relative">
+                  <Filter />
+                  <span>Filtreler</span>
+                  {activeFilterCount > 0 && (
+                    <Badge variant="default">{activeFilterCount}</Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Filtreleme seçeneklerini göster</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" className="max-w-xs">
+            {Array.from(groupedTags.entries()).map(
+              ([columnName, columnTags], groupIndex) => (
+                <DropdownMenuGroup key={columnName}>
+                  <DropdownMenuLabel className="text-muted-foreground">
+                    {columnName}
+                  </DropdownMenuLabel>
+                  {columnTags.map((tag) => {
+                    const filterKey = `${tag.column}:${tag.value}`;
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={filterKey}
+                        checked={selectedFilters.has(filterKey)}
+                        onCheckedChange={() => handleFilterToggle(tag)}
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        {tag.value}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+                  {groupIndex < groupedTags.size - 1 && (
+                    <DropdownMenuSeparator />
+                  )}
+                </DropdownMenuGroup>
+              ),
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       <ButtonGroup>
         <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
@@ -177,6 +308,7 @@ export default function HksTableHeader(props: Props) {
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
                     }
+                    onSelect={(e) => e.preventDefault()}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -197,36 +329,14 @@ export default function HksTableHeader(props: Props) {
             <TooltipContent>Satır sayısını seç</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={table.getState().pagination.pageSize === 5}
-              onCheckedChange={() => table.setPageSize(5)}
-            >
-              5 Satır
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getState().pagination.pageSize === 10}
-              onCheckedChange={() => table.setPageSize(10)}
-            >
-              10 Satır
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getState().pagination.pageSize === 20}
-              onCheckedChange={() => table.setPageSize(20)}
-            >
-              20 Satır
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getState().pagination.pageSize === 50}
-              onCheckedChange={() => table.setPageSize(50)}
-            >
-              50 Satır
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getState().pagination.pageSize === 100}
-              onCheckedChange={() => table.setPageSize(100)}
-            >
-              100 Satır
-            </DropdownMenuCheckboxItem>
+            {rowCounts.map((rowCount) => (
+              <DropdownMenuCheckboxItem
+                checked={table.getState().pagination.pageSize === rowCount}
+                onCheckedChange={() => table.setPageSize(rowCount)}
+              >
+                {rowCount} Satır
+              </DropdownMenuCheckboxItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </ButtonGroup>
@@ -272,56 +382,6 @@ export default function HksTableHeader(props: Props) {
             </Tooltip>
           </ToggleGroupItem>
         </ToggleGroup>
-        // <ButtonGroup>
-        //   <Tooltip disableHoverableContent>
-        //     <TooltipTrigger asChild>
-        //       <Button
-        //         variant="outline"
-        //         onClick={() => onCurrencyChange("TRY")}
-        //         className={
-        //           currency.state === "TRY"
-        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-        //             : ""
-        //         }
-        //       >
-        //         <TurkishLira />
-        //       </Button>
-        //     </TooltipTrigger>
-        //     <TooltipContent>Türk Lirası</TooltipContent>
-        //   </Tooltip>
-        //   <Tooltip disableHoverableContent>
-        //     <TooltipTrigger asChild>
-        //       <Button
-        //         variant="outline"
-        //         onClick={() => onCurrencyChange("USD")}
-        //         className={
-        //           currency.state === "USD"
-        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-        //             : ""
-        //         }
-        //       >
-        //         <DollarSign />
-        //       </Button>
-        //     </TooltipTrigger>
-        //     <TooltipContent>Amerikan Doları</TooltipContent>
-        //   </Tooltip>
-        //   <Tooltip disableHoverableContent>
-        //     <TooltipTrigger asChild>
-        //       <Button
-        //         variant="outline"
-        //         onClick={() => onCurrencyChange("EUR")}
-        //         className={
-        //           currency.state === "EUR"
-        //             ? "bg-accent text-accent-foreground dark:bg-accent-dark dark:text-accent-foreground-dark"
-        //             : ""
-        //         }
-        //       >
-        //         <Euro />
-        //       </Button>
-        //     </TooltipTrigger>
-        //     <TooltipContent>Euro</TooltipContent>
-        //   </Tooltip>
-        // </ButtonGroup>
       )}
       <div className="flex gap-4 ml-auto ">
         <HksTablePagination table={table} />

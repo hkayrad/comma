@@ -160,6 +160,12 @@ export default function CustomerTable(props: Props) {
             </Badge>
           );
         },
+        filterFn: (row, columnId, filterValue) => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
+          const cellValue = row.getValue(columnId) ? "Şirket" : "Birey";
+          return filterValue.includes(cellValue);
+        },
       },
       {
         accessorKey: "tax_office",
@@ -238,9 +244,7 @@ export default function CustomerTable(props: Props) {
         id: `Borç Durumu`,
         header: ({ column }: { column: Column<any> }) => column.id,
         cell: ({ row }: { row: Row<any> }) => {
-          const remaining_debt = parseFloat(
-            row.getValue(`Kalan`),
-          );
+          const remaining_debt = parseFloat(row.getValue(`Kalan`));
           if (remaining_debt > 0)
             return (
               <Badge
@@ -280,6 +284,20 @@ export default function CustomerTable(props: Props) {
                 {type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok"}
               </Badge>
             );
+        },
+        filterFn: (row, _columnId, filterValue) => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
+          const remaining_debt = parseFloat(row.getValue(`Kalan`));
+          let status = "";
+          if (remaining_debt > 0) {
+            status = type === "receivable" ? "Alacağınız Var" : "Borcunuz Var";
+          } else if (remaining_debt < 0) {
+            status = type === "receivable" ? "Borcunuz Var" : "Alacağınız Var";
+          } else {
+            status = type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok";
+          }
+          return filterValue.includes(status);
         },
       },
       {
@@ -389,11 +407,32 @@ export default function CustomerTable(props: Props) {
     );
   }, [CustomerTableColumns, currency]);
 
+  const tags = useMemo(
+    () =>
+      type === "receivable"
+        ? [
+            { column: "Tür", value: "Şirket" },
+            { column: "Tür", value: "Birey" },
+            { column: "Borç Durumu", value: "Alacağınız Var" },
+            { column: "Borç Durumu", value: "Alacağınız Yok" },
+            { column: "Borç Durumu", value: "Borcunuz Var" },
+          ]
+        : [
+            { column: "Tür", value: "Şirket" },
+            { column: "Tür", value: "Birey" },
+            { column: "Borç Durumu", value: "Alacağınız Var" },
+            { column: "Borç Durumu", value: "Borcunuz Yok" },
+            { column: "Borç Durumu", value: "Borcunuz Var" },
+          ],
+    [type],
+  );
+
   return (
     <HksTable
       data={data}
       columns={FilteredCustomerTableColumns}
       searchColumn="Müşteri"
+      tags={tags}
       currency={currency}
     />
   );

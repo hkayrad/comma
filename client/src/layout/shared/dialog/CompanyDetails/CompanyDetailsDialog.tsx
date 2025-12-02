@@ -6,7 +6,7 @@ export default function CompanyDetailsDialog() {
   return (
     <Tabs defaultValue="info" className="w-full">
       <TabsList>
-        <TabsTrigger value="info">Şirket Bilgileri</TabsTrigger>
+        <TabsTrigger value="info">Hesap Bilgileri</TabsTrigger>
         <TabsTrigger value="logos">Logolar</TabsTrigger>
       </TabsList>
 

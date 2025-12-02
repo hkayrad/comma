@@ -206,6 +206,26 @@ export default function PaymentTable(props: Props) {
               );
           }
         },
+        filterFn: (row, columnId, filterValue) => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+          const rawValue = row.getValue(columnId);
+          let displayValue = "";
+          switch (rawValue) {
+            case "cash":
+              displayValue = "Nakit";
+              break;
+            case "bank_transfer":
+              displayValue = "Havale";
+              break;
+            case "check":
+              displayValue = "Çek";
+              break;
+            case "card":
+              displayValue = "Kart";
+              break;
+          }
+          return filterValue.includes(displayValue);
+        },
       },
       {
         accessorKey: "payment_date",
@@ -297,6 +317,13 @@ export default function PaymentTable(props: Props) {
     [handleDelete, onEdit],
   );
 
+  const tags = useMemo(() => [
+    { column: "Ödeme Yöntemi", value: "Nakit" },
+    { column: "Ödeme Yöntemi", value: "Havale" },
+    { column: "Ödeme Yöntemi", value: "Çek" },
+    { column: "Ödeme Yöntemi", value: "Kart" },
+  ], []);
+
   return (
     <HksTable
       data={
@@ -306,6 +333,7 @@ export default function PaymentTable(props: Props) {
       }
       columns={PaymentTableColumns}
       searchColumn="Müşteri"
+      tags={tags}
       currency={currency}
     />
   );

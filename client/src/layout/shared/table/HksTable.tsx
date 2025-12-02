@@ -26,6 +26,10 @@ type Props = {
   data: any[];
   columns: ColumnDef<any>[];
   searchColumn: string;
+  tags?: {
+    column: string;
+    value: string;
+  }[];
   currency?: {
     state: AvailableCurrency | "";
     onChange: (value: AvailableCurrency | "") => void;
@@ -33,7 +37,7 @@ type Props = {
 };
 
 export default function HksTable(props: Props) {
-  const { data, columns, searchColumn, currency } = props;
+  const { data, columns, searchColumn, tags, currency } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -67,6 +71,7 @@ export default function HksTable(props: Props) {
         <HksTableHeader
           table={table}
           searchColumn={searchColumn}
+          tags={tags}
           currency={currency}
         />
       </div>
@@ -90,9 +95,9 @@ export default function HksTable(props: Props) {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                       </TableHead>
                     );
                   })}
