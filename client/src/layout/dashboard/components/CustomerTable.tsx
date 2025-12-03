@@ -304,7 +304,7 @@ export default function CustomerTable(props: Props) {
                   onClick={() => {
                     sessionStorage.setItem("current_page", "Borç Dökümü");
                     navigate(
-                      `${type === "receivable" ? "/alacaklar" : "/verecekler"}/borc_dokumu/${row.original.id}`,
+                      `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
                     );
                   }}
                 >
@@ -387,19 +387,19 @@ export default function CustomerTable(props: Props) {
     () =>
       type === "receivable"
         ? [
-            { column: "Tür", value: "Şirket", color: "violet" },
-            { column: "Tür", value: "Birey", color: "orange" },
-            { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
-            { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
-            { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
-          ]
+          { column: "Tür", value: "Şirket", color: "violet" },
+          { column: "Tür", value: "Birey", color: "orange" },
+          { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
+          { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
+          { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
+        ]
         : [
-            { column: "Tür", value: "Şirket", color: "violet" },
-            { column: "Tür", value: "Birey", color: "orange" },
-            { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
-            { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
-            { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
-          ],
+          { column: "Tür", value: "Şirket", color: "violet" },
+          { column: "Tür", value: "Birey", color: "orange" },
+          { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
+          { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
+          { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
+        ],
     [type],
   );
 

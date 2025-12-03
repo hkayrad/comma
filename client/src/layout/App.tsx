@@ -11,6 +11,7 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { NonSystemAdminOnly, SystemAdminOnly } from "./auth/RoleGuard";
 import Admin from "./admin/Admin";
+import { BreadcrumbProvider } from "@/contexts/BreadcrumbContext";
 
 export default function App() {
   const location = useLocation();
@@ -24,19 +25,21 @@ export default function App() {
       <NonSystemAdminOnly>
         <FloatingButton />
       </NonSystemAdminOnly>
-      <SidebarProvider>
-        <HksSidebar />
-        <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative">
-          <MaintenanceBanner />
-          <SystemAdminOnly>
-            <Admin />
-          </SystemAdminOnly>
-          <NonSystemAdminOnly>
-            <Header />
-            <Outlet />
-          </NonSystemAdminOnly>
-        </SidebarInset>
-      </SidebarProvider>
+      <BreadcrumbProvider>
+        <SidebarProvider>
+          <HksSidebar />
+          <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative">
+            <MaintenanceBanner />
+            <SystemAdminOnly>
+              <Admin />
+            </SystemAdminOnly>
+            <NonSystemAdminOnly>
+              <Header />
+              <Outlet />
+            </NonSystemAdminOnly>
+          </SidebarInset>
+        </SidebarProvider>
+      </BreadcrumbProvider>
     </div>
   );
 }

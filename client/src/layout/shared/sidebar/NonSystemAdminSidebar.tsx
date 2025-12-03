@@ -39,7 +39,7 @@ export default function NonSystemAdminSidebarContent() {
         items: [
           {
             title: "Alacaklar",
-            url: "/borclar",
+            url: "",
             icon: ScrollText,
           },
           {
@@ -51,11 +51,11 @@ export default function NonSystemAdminSidebarContent() {
       },
       payable: {
         title: "Borç Bilgileri",
-        url: "/verecekler",
+        url: "/borclar",
         items: [
           {
             title: "Borçlar",
-            url: "/borclar",
+            url: "",
             icon: Scroll,
           },
           {

@@ -30,7 +30,13 @@ export default function HksSidebarItem(props: Props) {
             <NavLink
               className="transition-all"
               to={group.url + item.url}
-              onClick={() => sessionStorage.setItem("current_page", item.title)}
+              onClick={(e) => {
+                if (location.pathname === group.url + item.url) {
+                  e.preventDefault();
+                  return;
+                }
+                sessionStorage.setItem("current_page", item.title);
+              }}
             >
               <item.icon />
               <span className="select-none">{item.title}</span>

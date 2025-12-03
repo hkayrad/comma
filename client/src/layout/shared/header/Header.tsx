@@ -4,24 +4,69 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
 import ExchangeRates from "./components/ExchangeRates";
 import { Button } from "@/components/ui/button";
 import { SidebarClose, SidebarOpen } from "lucide-react";
 import { useSidebar } from "@/components/animate-ui/components/radix/sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { useLocation, Link } from "react-router";
+import React from "react";
+
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const PATH_MAP: Record<string, string> = {
+  alacaklar: "Alacaklar",
+  borclar: "Borçlar",
+  odemeler: "Ödemeler",
+  dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
+  borc_dokumu: "Borç Dökümü",
+};
 
 export default function Header() {
-  const [currentPage, setCurrentPage] = useState<string>("Genel Bakış");
-
   const { state, toggleSidebar } = useSidebar();
+  const location = useLocation();
+  const { labels } = useBreadcrumb();
 
-  const storedPage = sessionStorage.getItem("current_page");
+  const pathSegments = location.pathname.split("/").filter(Boolean);
 
-  useEffect(() => {
-    if (storedPage) {
-      setCurrentPage(storedPage);
+  const breadcrumbItems = pathSegments.map((segment, index) => {
+    const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
+    const isUUID =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        segment,
+      );
+
+    let name: React.ReactNode = labels[segment] || PATH_MAP[segment] || segment;
+
+    if (isUUID && !labels[segment]) {
+      name = <Skeleton className="h-4 w-24" />;
     }
-  }, [storedPage]);
+
+    const isLast = index === pathSegments.length - 1;
+
+    return {
+      name,
+      path,
+      isLast,
+    };
+  });
+
+  // If we are at root, show "Genel Bakış"
+  if (breadcrumbItems.length === 0) {
+    breadcrumbItems.push({
+      name: "Genel Bakış",
+      path: "/",
+      isLast: true,
+    });
+  }
 
   return (
     <header className="border-b p-3 bg-background sticky top-0 z-10">
@@ -42,9 +87,30 @@ export default function Header() {
           </TooltipContent>
         </Tooltip>
         <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />
-        <p className="whitespace-nowrap text-muted-foreground text-sm select-none">
-          {currentPage}
-        </p>
+
+        <Breadcrumb>
+          <BreadcrumbList>
+            {breadcrumbItems.map((item) => (
+              <React.Fragment key={item.path}>
+                <BreadcrumbItem>
+                  {item.isLast ? (
+                    <BreadcrumbPage>{item.name}</BreadcrumbPage>
+                  ) : item.name === "Borç Dökümü" ? (
+                    <BreadcrumbPage className="text-muted-foreground cursor-default">
+                      {item.name}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link to={item.path}>{item.name}</Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {!item.isLast && <BreadcrumbSeparator />}
+              </React.Fragment>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <div className="ml-auto mr-2">
           <ExchangeRates />
         </div>

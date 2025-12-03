@@ -45,7 +45,7 @@ const router = createBrowserRouter([
                     path: "alacaklar",
                     children: [
                       {
-                        path: "borclar",
+                        index: true,
                         Component: Debts,
                       },
                       {
@@ -59,10 +59,10 @@ const router = createBrowserRouter([
                     ],
                   },
                   {
-                    path: "verecekler",
+                    path: "borclar",
                     children: [
                       {
-                        path: "borclar",
+                        index: true,
                         Component: Debts,
                       },
                       {

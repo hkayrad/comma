@@ -77,24 +77,10 @@ export default function Dashboard() {
           <OverviewCards type="payable" align="stretch" />
         </div>
         <TabsContent value="receivable">
-          <CustomerTable
-            type="receivable"
-            data={receivableCustomers}
-            // currency={{
-            //   state: selectedCurrency,
-            //   onChange: handleCurrencyChange,
-            // }}
-          />
+          <CustomerTable type="receivable" data={receivableCustomers} />
         </TabsContent>
         <TabsContent value="payable">
-          <CustomerTable
-            type="payable"
-            data={payableCustomers}
-            // currency={{
-            //   state: selectedCurrency,
-            //   onChange: handleCurrencyChange,
-            // }}
-          />
+          <CustomerTable type="payable" data={payableCustomers} />
         </TabsContent>
       </Tabs>
     </div>

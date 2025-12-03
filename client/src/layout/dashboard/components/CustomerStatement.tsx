@@ -30,12 +30,15 @@ import { tr } from "date-fns/locale";
 import { exportCustomerStatementPDF } from "@/lib/pdf";
 import { Logger } from "@/lib/utils/logger";
 
+import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
+
 export default function CustomerStatement() {
   const location = useLocation();
   const type: "payable" | "receivable" =
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const { customerId } = useParams();
   const navigate = useNavigate();
+  const { setLabel } = useBreadcrumb();
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -62,10 +65,15 @@ export default function CustomerStatement() {
     };
 
     API.GetStatement(customerId, filters)
-      .then((res) => setData(res))
+      .then((res) => {
+        setData(res);
+        if (res?.customer?.name) {
+          setLabel(customerId, res.customer.name);
+        }
+      })
       .catch(() => toast.error("Borç dökümü getirilirken hata oluştu"))
       .finally(() => setLoading(false));
-  }, [customerId, API, date]);
+  }, [customerId, API, date, setLabel]);
 
   const getRemainingColor = (amount: number) => {
     if (amount > 0) return "text-red-600";

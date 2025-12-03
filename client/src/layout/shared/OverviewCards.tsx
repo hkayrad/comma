@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
@@ -27,6 +28,7 @@ export default function OverviewCards(props: Props) {
   const { type, width = "full", align = "center" } = props;
   const currency = "TRY";
 
+  const [isLoading, setIsLoading] = useState(true);
   const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
   const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
   const [formattedTotals, setFormattedTotals] = useState({
@@ -54,9 +56,10 @@ export default function OverviewCards(props: Props) {
     if (response) setPayableTotals(response);
   }, [currency]);
 
-  const handleRefresh = useCallback(() => {
-    fetchReceivableTotals();
-    fetchPayableTotals();
+  const handleRefresh = useCallback(async () => {
+    setIsLoading(true);
+    await Promise.all([fetchReceivableTotals(), fetchPayableTotals()]);
+    setIsLoading(false);
   }, [fetchReceivableTotals, fetchPayableTotals]);
 
   useEffect(() => {
@@ -132,7 +135,7 @@ export default function OverviewCards(props: Props) {
             className="text-xl select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_debts)}
           >
-            {formattedTotals.total_debts}
+            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.total_debts}
           </CardTitle>
           <CardAction>{currencyBadges[currency]}</CardAction>
         </CardHeader>
@@ -146,7 +149,7 @@ export default function OverviewCards(props: Props) {
             className="text-xl text-green-600 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_payments)}
           >
-            {formattedTotals.total_payments}
+            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.total_payments}
           </CardTitle>
           <CardAction>
             <BadgeCheck className="text-green-600 hidden 2xl:block" />
@@ -162,7 +165,7 @@ export default function OverviewCards(props: Props) {
             className="text-xl text-red-500 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.remaining_debt)}
           >
-            {formattedTotals.remaining_debt}
+            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.remaining_debt}
           </CardTitle>
           <CardAction>
             <BadgeAlert className="text-red-500 hidden 2xl:block" />
