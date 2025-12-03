@@ -282,8 +282,7 @@ export default function DebtTable(props: Props) {
                   <DialogHeader>
                     <DialogTitle>Emin misiniz?</DialogTitle>
                     <DialogDescription>
-                      Bu işlem geri alınamaz. Bu, borç kaydını kalıcı olarak
-                      silecektir.
+                      Bu işlem borç kaydını silecektir. Onaylıyor musunuz?
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>

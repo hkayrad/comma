@@ -357,9 +357,7 @@ export default function CustomerTable(props: Props) {
                   <DialogHeader>
                     <DialogTitle>Emin misiniz?</DialogTitle>
                     <DialogDescription>
-                      Bu işlem geri alınamaz. Bu, müşteri kaydını kalıcı olarak
-                      silecektir. Eğer müşteri ile ilgili borçlar veya ödemeler
-                      varsa, bu işlemi gerçekleştiremezsiniz.
+                      Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
@@ -387,19 +385,19 @@ export default function CustomerTable(props: Props) {
     () =>
       type === "receivable"
         ? [
-          { column: "Tür", value: "Şirket", color: "violet" },
-          { column: "Tür", value: "Birey", color: "orange" },
-          { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
-          { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
-          { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
-        ]
+            { column: "Tür", value: "Şirket", color: "violet" },
+            { column: "Tür", value: "Birey", color: "orange" },
+            { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
+            { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
+            { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
+          ]
         : [
-          { column: "Tür", value: "Şirket", color: "violet" },
-          { column: "Tür", value: "Birey", color: "orange" },
-          { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
-          { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
-          { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
-        ],
+            { column: "Tür", value: "Şirket", color: "violet" },
+            { column: "Tür", value: "Birey", color: "orange" },
+            { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
+            { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
+            { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
+          ],
     [type],
   );
 

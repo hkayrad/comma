@@ -320,8 +320,7 @@ export default function PaymentTable(props: Props) {
                   <DialogHeader>
                     <DialogTitle>Emin misiniz?</DialogTitle>
                     <DialogDescription>
-                      Bu işlem geri alınamaz. Bu, ödeme kaydını kalıcı olarak
-                      silecektir.
+                      Bu işlem ödemeyi silecektir. Onaylıyor musunuz?
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
