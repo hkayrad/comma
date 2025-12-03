@@ -1,5 +1,4 @@
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -68,7 +67,7 @@ export default function HksTable(props: Props) {
       </div>
       <div className="rounded-md border overflow-clip">
         <div className="overflow-auto max-h-[calc(100vh-21rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
-          <Table>
+          <table className="w-full caption-bottom text-sm">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:!bg-background">
@@ -79,7 +78,7 @@ export default function HksTable(props: Props) {
                         className={`
                           ${header.id === "Müşteri" && "w-36"}
                           ${header.id === "Vergi Dairesi" && "w-36"}
-                          ${header.id === "İşlemler" && "w-fit"}
+                          ${header.id === "İşlemler" && "w-1"}
                           ${(header.id === "Borç Durumu" || header.id === "Tür") && "w-32"}
                           `}
                       >
@@ -110,6 +109,7 @@ export default function HksTable(props: Props) {
                           py-1.5 select-none
                           ${cell.column.id === "Müşteri" && "w-36 overflow-hidden"}
                           ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "İşlemler" && "w-fit"}
                           `}
                       >
                         {flexRender(
@@ -131,7 +131,7 @@ export default function HksTable(props: Props) {
                 </TableRow>
               )}
             </TableBody>
-          </Table>
+          </table>
         </div>
       </div>
     </>

@@ -91,17 +91,17 @@ export default function HksSidebar() {
     smallLogo: "",
     largeLogo: "",
   });
-  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
+
   const logoSrc = useMemo(
     () => ({
       small: logos.smallLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
+        ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}`
         : "/hks-icon.png",
       large: logos.largeLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
+        ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}`
         : "/hks-logo.png",
     }),
-    [logos.largeLogo, logos.smallLogo, cacheBuster],
+    [logos.largeLogo, logos.smallLogo],
   );
 
   const fetchLogos = useCallback(async () => {
@@ -109,7 +109,6 @@ export default function HksSidebar() {
       const response = await CompanyApi.GetLogos();
       if (response.success) {
         setLogos(response.data);
-        setCacheBuster(Date.now());
       }
     } catch (error) {
       Logger.error("Şirket logoları alınırken bir hata oluştu:", error);
