@@ -190,10 +190,13 @@ export default function HksTableHeader(props: Props) {
                 ref={searchInputRef}
                 placeholder="İsim ile Müşteri Ara..."
                 value={
-                  (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
+                  (table.getColumn(searchColumn)?.getFilterValue() as string) ??
+                  ""
                 }
                 onChange={(event) =>
-                  table.getColumn(searchColumn)?.setFilterValue(event.target.value)
+                  table
+                    .getColumn(searchColumn)
+                    ?.setFilterValue(event.target.value)
                 }
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
@@ -247,7 +250,7 @@ export default function HksTableHeader(props: Props) {
                           onSelect={(e) => e.preventDefault()}
                         >
                           <Badge
-                            className={`bg-${tag.color}-100 dark:bg-${tag.color}-950/30 text-${tag.color}-800 dark:text-${tag.color}-300 select-none`}
+                            className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
                           >
                             {tag.value}
                           </Badge>

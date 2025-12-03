@@ -160,8 +160,8 @@ export default function DebtTable(props: Props) {
             case "TRY":
               return (
                 <Badge
-                  className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Havale")}
+                  className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("TRY")}
                 >
                   TRY
                 </Badge>
@@ -169,8 +169,8 @@ export default function DebtTable(props: Props) {
             case "USD":
               return (
                 <Badge
-                  className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Nakit")}
+                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("USD")}
                 >
                   USD
                 </Badge>
@@ -178,8 +178,8 @@ export default function DebtTable(props: Props) {
             case "EUR":
               return (
                 <Badge
-                  className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Kart")}
+                  className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("EUR")}
                 >
                   EUR
                 </Badge>

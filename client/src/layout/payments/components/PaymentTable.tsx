@@ -130,8 +130,8 @@ export default function PaymentTable(props: Props) {
             case "TRY":
               return (
                 <Badge
-                  className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Havale")}
+                  className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("TRY")}
                 >
                   TRY
                 </Badge>
@@ -139,8 +139,8 @@ export default function PaymentTable(props: Props) {
             case "USD":
               return (
                 <Badge
-                  className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Nakit")}
+                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("USD")}
                 >
                   USD
                 </Badge>
@@ -148,8 +148,8 @@ export default function PaymentTable(props: Props) {
             case "EUR":
               return (
                 <Badge
-                  className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Kart")}
+                  className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("EUR")}
                 >
                   EUR
                 </Badge>
@@ -198,7 +198,7 @@ export default function PaymentTable(props: Props) {
             case "cash":
               return (
                 <Badge
-                  className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
+                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
                   onClick={() => copyToClipboard("Nakit")}
                 >
                   Nakit
@@ -207,7 +207,7 @@ export default function PaymentTable(props: Props) {
             case "bank_transfer":
               return (
                 <Badge
-                  className="bg-blue-100 dark:bg-blue-950/30 text-blue-800 dark:text-blue-300 select-none hover:cursor-copy"
+                  className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
                   onClick={() => copyToClipboard("Havale")}
                 >
                   Havale
@@ -216,7 +216,7 @@ export default function PaymentTable(props: Props) {
             case "check":
               return (
                 <Badge
-                  className="bg-yellow-100 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 select-none hover:cursor-copy"
+                  className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 select-none hover:cursor-copy"
                   onClick={() => copyToClipboard("Çek")}
                 >
                   Çek
@@ -225,7 +225,7 @@ export default function PaymentTable(props: Props) {
             case "card":
               return (
                 <Badge
-                  className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
+                  className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
                   onClick={() => copyToClipboard("Kart")}
                 >
                   Kart

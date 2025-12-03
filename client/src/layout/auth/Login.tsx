@@ -87,6 +87,10 @@ export default function Login() {
   );
 
   //WARN DEBUG LOGIN
+  const sysAdminLogin = useCallback(async () => {
+    form.setValue("username", "admin");
+    form.setValue("password", "Test1234");
+  }, [form]);
   const adminLogin = useCallback(async () => {
     form.setValue("username", "hkayrad");
     form.setValue("password", "Test1234");
@@ -195,9 +199,16 @@ export default function Login() {
               <Button
                 className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
                 size="sm"
-                onClick={adminLogin}
+                onClick={sysAdminLogin}
               >
                 Admin Hesabı Doldur
+              </Button>
+              <Button
+                className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
+                size="sm"
+                onClick={adminLogin}
+              >
+                Yönetici Hesabı Doldur
               </Button>
               <Button
                 className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
