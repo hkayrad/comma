@@ -31,6 +31,7 @@ import {
 import {
   Building2,
   EllipsisVertical,
+  Info,
   LogOut,
   Moon,
   Sun,
@@ -60,6 +61,7 @@ import { CompanyApi } from "@/lib/api/company";
 import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog";
 import { useDialog } from "@/contexts/dialog";
 import { Logger } from "@/lib/utils/logger";
+import InfoDialog from "./components/InfoDialog";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -120,6 +122,17 @@ export default function HksSidebar() {
       description: "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
       size: "3xl",
       content: <CompanyDetailsDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog]);
+
+  const handleInfo = useCallback(async () => {
+    openDialog({
+      title: "Hakkında",
+      description:
+        "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
+      size: "lg",
+      content: <InfoDialog />,
       showCloseButton: true,
     });
   }, [openDialog]);
@@ -253,8 +266,22 @@ export default function HksSidebar() {
               </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
-          <SidebarSeparator className="!mx-0" />
         </CompanyAdminOnly>
+        <Tooltip disableHoverableContent>
+          <TooltipTrigger asChild>
+            <SidebarMenu>
+              <SidebarMenuButton onClick={handleInfo}>
+                <Info />
+                Hakkında
+              </SidebarMenuButton>
+            </SidebarMenu>
+          </TooltipTrigger>
+          <TooltipContent side="right" hidden={state !== "collapsed"}>
+            Hakkında
+          </TooltipContent>
+        </Tooltip>
+        <SidebarSeparator className="!mx-0" />
+
         <SidebarGroup className="!p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">

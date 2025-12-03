@@ -1,4 +1,4 @@
-import type { AvailableCurrency, DebtDto } from "@/lib/types";
+import type { DebtDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import {
@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import {
   Dialog,
   DialogClose,
@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
-import DebtDialog from "@/layout/shared/dialog/DebtDialog";
+import DebtDialog from "@/layout/debts/components/DebtDialog";
 import { useDialog } from "@/contexts/dialog";
 import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
@@ -29,18 +29,15 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useMemo } from "react";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   data: DebtDto[];
   type: "receivable" | "payable";
-  currency?: {
-    state: AvailableCurrency | "";
-    onChange: (value: AvailableCurrency | "") => void;
-  };
 };
 
 export default function DebtTable(props: Props) {
-  const { data, type, currency } = props;
+  const { data, type } = props;
 
   const { openDialog } = useDialog();
 
@@ -158,12 +155,43 @@ export default function DebtTable(props: Props) {
         header: ({ column }) => (
           <SortableColumnHeader column={column} title={column.id} />
         ),
-        cell: ({ row, column }) => (
-          <ClickToCopyText
-            value={row.getValue(column.id) || "-"}
-            column={column}
-          />
-        ),
+        cell: ({ row, column }) => {
+          switch (row.getValue(column.id)) {
+            case "TRY":
+              return (
+                <Badge
+                  className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Havale")}
+                >
+                  TRY
+                </Badge>
+              );
+            case "USD":
+              return (
+                <Badge
+                  className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Nakit")}
+                >
+                  USD
+                </Badge>
+              );
+            case "EUR":
+              return (
+                <Badge
+                  className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Kart")}
+                >
+                  EUR
+                </Badge>
+              );
+          }
+        },
+        filterFn: (row, columnId, filterValue) => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
+          const rawValue = row.getValue(columnId);
+          return filterValue.includes(rawValue);
+        },
       },
       {
         accessorKey: "exchange_rate",
@@ -279,16 +307,21 @@ export default function DebtTable(props: Props) {
     [onEdit, handleDelete],
   );
 
+  const tags = useMemo(
+    () => [
+      { column: "Para Birimi", value: "TRY", color: "red" },
+      { column: "Para Birimi", value: "USD", color: "green" },
+      { column: "Para Birimi", value: "EUR", color: "purple" },
+    ],
+    [],
+  );
+
   return (
     <HksTable
-      data={
-        currency?.state
-          ? data.filter((item) => item.currency === currency.state)
-          : data
-      }
+      data={data}
       columns={DebtTableColumns}
+      tags={tags}
       searchColumn="Müşteri"
-      currency={currency}
     />
   );
 }

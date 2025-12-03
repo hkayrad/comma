@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
-import type { AvailableCurrency, OverviewViewType, Totals } from "@/lib/types";
+import type { OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import {
   BadgeAlert,
@@ -21,7 +21,6 @@ type Props = {
   type: OverviewViewType;
   width?: "full" | "auto";
   align?: "start" | "center" | "end" | "stretch";
-  currency: AvailableCurrency | "";
 };
 
 export default function OverviewCards(props: Props) {

@@ -24,19 +24,14 @@ import type { Table } from "@tanstack/react-table";
 import {
   ArrowUpDown,
   Columns3Cog,
-  DollarSign,
-  Euro,
   Filter,
   FilterX,
   RefreshCw,
   Rows3,
-  TurkishLira,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
-import type { AvailableCurrency } from "@/lib/types";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 
 type Props = {
@@ -45,15 +40,12 @@ type Props = {
   tags?: {
     column: string;
     value: string;
+    color: string;
   }[];
-  currency?: {
-    state: AvailableCurrency | "";
-    onChange: (value: AvailableCurrency | "") => void;
-  };
 };
 
 export default function HksTableHeader(props: Props) {
-  const { table, searchColumn, tags, currency } = props;
+  const { table, searchColumn, tags } = props;
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +73,7 @@ export default function HksTableHeader(props: Props) {
 
   const onFilterReset = useCallback(() => {
     table.resetColumnFilters();
+    table.setPageIndex(0);
     setSelectedFilters(new Set());
     toast.success("Filtreler temizlendi!");
   }, [table]);
@@ -169,9 +162,15 @@ export default function HksTableHeader(props: Props) {
   // Group tags by column
   const groupedTags = useMemo(() => {
     if (!tags)
-      return new Map<string, Array<{ column: string; value: string }>>();
+      return new Map<
+        string,
+        Array<{ column: string; value: string; color: string }>
+      >();
 
-    const groups = new Map<string, Array<{ column: string; value: string }>>();
+    const groups = new Map<
+      string,
+      Array<{ column: string; value: string; color: string }>
+    >();
     tags.forEach((tag) => {
       if (!groups.has(tag.column)) {
         groups.set(tag.column, []);
@@ -183,104 +182,87 @@ export default function HksTableHeader(props: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <InputGroup className="max-w-2xs bg-background min-w-48">
-        <InputGroupInput
-          ref={searchInputRef}
-          placeholder="İsim ile Müşteri Ara..."
-          value={
-            (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn(searchColumn)?.setFilterValue(event.target.value)
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              searchInputRef.current?.blur();
-            }
-          }}
-          className="select-none"
-        />
-        <InputGroupAddon align="inline-end" className="gap-1">
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-            <span className="text-xs">Ctrl</span>
-          </kbd>
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-            <span className="text-xs">/</span>
-          </kbd>
-        </InputGroupAddon>
-      </InputGroup>
-      {tags && (
-        <DropdownMenu>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="select-none relative">
-                  <Filter />
-                  <span>Filtreler</span>
-                  {activeFilterCount > 0 && (
-                    <Badge variant="default">{activeFilterCount}</Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent>Filtreleme seçeneklerini göster</TooltipContent>
-          </Tooltip>
-          <DropdownMenuContent align="end" className="max-w-xs">
-            {Array.from(groupedTags.entries()).map(
-              ([columnName, columnTags], groupIndex) => (
-                <DropdownMenuGroup key={columnName}>
-                  <DropdownMenuLabel className="text-muted-foreground">
-                    {columnName}
-                  </DropdownMenuLabel>
-                  {columnTags.map((tag) => {
-                    const filterKey = `${tag.column}:${tag.value}`;
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={filterKey}
-                        checked={selectedFilters.has(filterKey)}
-                        onCheckedChange={() => handleFilterToggle(tag)}
-                        onSelect={(e) => e.preventDefault()}
-                      >
-                        {tag.value}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
-                  {groupIndex < groupedTags.size - 1 && (
-                    <DropdownMenuSeparator />
-                  )}
-                </DropdownMenuGroup>
-              ),
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
       <ButtonGroup>
-        <Tooltip disableHoverableContent>
+        <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              className="select-none"
-              onClick={onFilterReset}
-            >
-              <FilterX />
-              Filtreleri Temizle
-            </Button>
+            <InputGroup className="max-w-2xs bg-background min-w-48">
+              <InputGroupInput
+                ref={searchInputRef}
+                placeholder="İsim ile Müşteri Ara..."
+                value={
+                  (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
+                }
+                onChange={(event) =>
+                  table.getColumn(searchColumn)?.setFilterValue(event.target.value)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    searchInputRef.current?.blur();
+                  }
+                }}
+                className="select-none"
+              />
+              <InputGroupAddon align="inline-end" className="gap-1">
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <span className="text-xs">Ctrl</span>
+                </kbd>
+                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <span className="text-xs">/</span>
+                </kbd>
+              </InputGroupAddon>
+            </InputGroup>
           </TooltipTrigger>
-          <TooltipContent>Tüm filtreleri kaldır</TooltipContent>
+          <TooltipContent>İsim ile müşteri ara</TooltipContent>
         </Tooltip>
-        <Tooltip disableHoverableContent>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              className="select-none"
-              onClick={onSortReset}
-            >
-              <ArrowUpDown />
-              Sıralamayı Sıfırla
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Tüm sıralamaları kaldır</TooltipContent>
-        </Tooltip>
+        {tags && (
+          <DropdownMenu>
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="select-none relative">
+                    <Filter />
+                    <span>Filtreler</span>
+                    {activeFilterCount > 0 && (
+                      <Badge variant="default">{activeFilterCount}</Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Filtreleme seçeneklerini göster</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent align="end" className="max-w-xs">
+              {Array.from(groupedTags.entries()).map(
+                ([columnName, columnTags], groupIndex) => (
+                  <DropdownMenuGroup key={columnName}>
+                    <DropdownMenuLabel className="text-muted-foreground">
+                      {columnName}
+                    </DropdownMenuLabel>
+                    {columnTags.map((tag) => {
+                      const filterKey = `${tag.column}:${tag.value}`;
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={filterKey}
+                          checked={selectedFilters.has(filterKey)}
+                          onCheckedChange={() => handleFilterToggle(tag)}
+                          onSelect={(e) => e.preventDefault()}
+                        >
+                          <Badge
+                            className={`bg-${tag.color}-100 dark:bg-${tag.color}-950/30 text-${tag.color}-800 dark:text-${tag.color}-300 select-none`}
+                          >
+                            {tag.value}
+                          </Badge>
+                        </DropdownMenuCheckboxItem>
+                      );
+                    })}
+                    {groupIndex < groupedTags.size - 1 && (
+                      <DropdownMenuSeparator />
+                    )}
+                  </DropdownMenuGroup>
+                ),
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         <DropdownMenu>
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
@@ -340,49 +322,34 @@ export default function HksTableHeader(props: Props) {
           </DropdownMenuContent>
         </DropdownMenu>
       </ButtonGroup>
-      {currency && (
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          size="default"
-          value={currency.state as string}
-          onValueChange={(value) =>
-            currency.onChange(value ? (value as AvailableCurrency) : "")
-          }
-          className="shadow-xs"
-        >
-          <ToggleGroupItem value="TRY" className="!p-0">
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <span className="flex items-center justify-center w-full h-full !p-3">
-                  <TurkishLira />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Türk Lirası</TooltipContent>
-            </Tooltip>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="USD" className="!p-0">
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <span className="flex items-center justify-center w-full h-full !p-3">
-                  <DollarSign />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Amerikan Doları</TooltipContent>
-            </Tooltip>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="EUR" className="!p-0">
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <span className="flex items-center justify-center w-full h-full !p-3">
-                  <Euro />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Euro</TooltipContent>
-            </Tooltip>
-          </ToggleGroupItem>
-        </ToggleGroup>
-      )}
+      <ButtonGroup>
+        <Tooltip disableHoverableContent>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              className="select-none"
+              onClick={onFilterReset}
+            >
+              <FilterX />
+              Filtreleri Temizle
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Tüm filtreleri kaldır</TooltipContent>
+        </Tooltip>
+        <Tooltip disableHoverableContent>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              className="select-none"
+              onClick={onSortReset}
+            >
+              <ArrowUpDown />
+              Sıralamayı Sıfırla
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Tüm sıralamaları kaldır</TooltipContent>
+        </Tooltip>
+      </ButtonGroup>
       <div className="flex gap-4 ml-auto ">
         <HksTablePagination table={table} />
         <Tooltip disableHoverableContent>
@@ -395,7 +362,7 @@ export default function HksTableHeader(props: Props) {
               <RefreshCw
                 className={`${isRefreshing ? "animate-spin" : ""} shadow-xs`}
               />
-              {isRefreshing ? "Yenileniyor..." : "Yenile"}
+              Yenile
             </Button>
           </TooltipTrigger>
           <TooltipContent>Tabloyu yenile</TooltipContent>

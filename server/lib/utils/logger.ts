@@ -26,10 +26,12 @@ export class Logger {
 	}
 
 	static debug(message: any, ...optionalParams: any[]) {
-		console.debug(`${new Date().toString()} [DEBUG] `, message, ...optionalParams);
+		if (process.env.NODE_ENV === "development") {
+			console.debug(`${new Date().toString()} [DEBUG] `, message, ...optionalParams);
 
-		const logMessage = `${new Date().toString()} [DEBUG] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
-		Logger.writeToFile(logMessage);
+			const logMessage = `${new Date().toString()} [DEBUG] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+			Logger.writeToFile(logMessage);
+		}
 	}
 
 	static info(message: any, ...optionalParams: any[]) {

@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Logger } from "@/lib/utils/logger";
 
 export default function ExchangeRates() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(
     null,
   );
@@ -31,92 +32,100 @@ export default function ExchangeRates() {
 
   useEffect(() => {
     fetchExchangeRates();
+    setTimeout(() => setIsLoading(false), 300);
   }, [fetchExchangeRates]);
 
   return (
-    <div className="flex gap-2">
-      {exchangeRates && (
-        <>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <p className="text-muted-foreground text-[10px] my-auto mr-1 select-none">
-                Son Güncelleme: {exchangeRates.date}
-              </p>
-            </TooltipTrigger>
-            <TooltipContent side="left">
-              <span>
-                {exchangeRates.date} günü saat 15.30'da belirlenen, gösterge
-                niteliğindeki TCMB döviz kurları
-              </span>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <div className="flex gap-2 select-none">
-                <DollarSign size={20} />
-                <p className="text-sm">
-                  Alış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.usd.forexBuying)
-                    }
-                  >
-                    {exchangeRates.usd.forexBuying}
-                  </span>
+    !isLoading && (
+      <div className="flex gap-2">
+        {exchangeRates ? (
+          <>
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <p className="text-muted-foreground text-[10px] my-auto mr-1 select-none">
+                  Son Güncelleme: {exchangeRates.date.replaceAll("-", "/")}
                 </p>
-                <p className="text-sm">
-                  Satış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.usd.forexSelling)
-                    }
-                  >
-                    {exchangeRates.usd.forexSelling}
-                  </span>
-                </p>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <span>Amerikan Doları (USD)</span>
-            </TooltipContent>
-          </Tooltip>
-          <Separator orientation="vertical" className="w-px mx-2 !h-4" />
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger asChild>
-              <div className="flex gap-2 select-none">
-                <Euro size={20} />
-                <p className="text-sm">
-                  Alış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.eur.forexBuying)
-                    }
-                  >
-                    {exchangeRates.eur.forexBuying}
-                  </span>
-                </p>
-                <p className="text-sm">
-                  Satış:&nbsp;
-                  <span
-                    className="hover:cursor-copy"
-                    onClick={() =>
-                      copyToClipboard(exchangeRates.eur.forexSelling)
-                    }
-                  >
-                    {exchangeRates.eur.forexSelling}
-                  </span>
-                </p>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <span>Euro (EUR)</span>
-            </TooltipContent>
-          </Tooltip>
-        </>
-      )}
-    </div>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <span>
+                  {exchangeRates.date.replaceAll("-", "/")} günü için, Türkiye
+                  Cumhuriyeti Merkez Bankası tarafından belirlenmiş kur
+                  bilgileri
+                </span>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <div className="flex gap-2 select-none">
+                  <DollarSign size={20} />
+                  <p className="text-sm">
+                    Alış:&nbsp;
+                    <span
+                      className="hover:cursor-copy"
+                      onClick={() =>
+                        copyToClipboard(exchangeRates.usd.forexBuying)
+                      }
+                    >
+                      {exchangeRates.usd.forexBuying}
+                    </span>
+                  </p>
+                  <p className="text-sm">
+                    Satış:&nbsp;
+                    <span
+                      className="hover:cursor-copy"
+                      onClick={() =>
+                        copyToClipboard(exchangeRates.usd.forexSelling)
+                      }
+                    >
+                      {exchangeRates.usd.forexSelling}
+                    </span>
+                  </p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <span>Amerikan Doları (USD)</span>
+              </TooltipContent>
+            </Tooltip>
+            <Separator orientation="vertical" className="w-px mx-2 !h-4" />
+            <Tooltip disableHoverableContent>
+              <TooltipTrigger asChild>
+                <div className="flex gap-2 select-none">
+                  <Euro size={20} />
+                  <p className="text-sm">
+                    Alış:&nbsp;
+                    <span
+                      className="hover:cursor-copy"
+                      onClick={() =>
+                        copyToClipboard(exchangeRates.eur.forexBuying)
+                      }
+                    >
+                      {exchangeRates.eur.forexBuying}
+                    </span>
+                  </p>
+                  <p className="text-sm">
+                    Satış:&nbsp;
+                    <span
+                      className="hover:cursor-copy"
+                      onClick={() =>
+                        copyToClipboard(exchangeRates.eur.forexSelling)
+                      }
+                    >
+                      {exchangeRates.eur.forexSelling}
+                    </span>
+                  </p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <span>Euro (EUR)</span>
+              </TooltipContent>
+            </Tooltip>
+          </>
+        ) : (
+          <p className="text-muted-foreground text-[10px] select-none">
+            Merkez Bankası verileri mevcut değildir.
+          </p>
+        )}
+      </div>
+    )
   );
 }

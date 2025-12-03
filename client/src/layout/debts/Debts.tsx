@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { AvailableCurrency, DebtDto } from "@/lib/types";
+import type { DebtDto } from "@/lib/types";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
 import DebtTable from "./components/DebtTable";
 import OverviewCards from "@/layout/shared/OverviewCards";
@@ -10,9 +10,6 @@ export default function Debts() {
   const type: "payable" | "receivable" =
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const [debts, setDebts] = useState<DebtDto[]>([]);
-  const [selectedCurrency, setSelectedCurrency] = useState<
-    AvailableCurrency | ""
-  >("");
 
   useEffect(() => {
     const fetchDebts = async () => {
@@ -34,13 +31,9 @@ export default function Debts() {
 
   return (
     <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 flex flex-col gap-2">
-      <OverviewCards type={type} currency={selectedCurrency} />
+      <OverviewCards type={type} />
       <div>
-        <DebtTable
-          data={debts}
-          type={type}
-          currency={{ state: selectedCurrency, onChange: setSelectedCurrency }}
-        />
+        <DebtTable data={debts} type={type} />
       </div>
     </div>
   );

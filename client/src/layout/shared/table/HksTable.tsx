@@ -20,7 +20,6 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import HksTableHeader from "./components/HksTableHeader";
-import type { AvailableCurrency } from "@/lib/types";
 
 type Props = {
   data: any[];
@@ -29,15 +28,12 @@ type Props = {
   tags?: {
     column: string;
     value: string;
+    color: string;
   }[];
-  currency?: {
-    state: AvailableCurrency | "";
-    onChange: (value: AvailableCurrency | "") => void;
-  };
 };
 
 export default function HksTable(props: Props) {
-  const { data, columns, searchColumn, tags, currency } = props;
+  const { data, columns, searchColumn, tags } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -68,12 +64,7 @@ export default function HksTable(props: Props) {
   return (
     <>
       <div className="sticky -top-4 z-20 pt-2 pb-4 bg-background">
-        <HksTableHeader
-          table={table}
-          searchColumn={searchColumn}
-          tags={tags}
-          currency={currency}
-        />
+        <HksTableHeader table={table} searchColumn={searchColumn} tags={tags} />
       </div>
       <div className="rounded-md border overflow-clip">
         <div className="overflow-auto max-h-[calc(100vh-21rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
@@ -95,9 +86,9 @@ export default function HksTable(props: Props) {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                       </TableHead>
                     );
                   })}

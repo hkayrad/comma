@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
-import DebtDialog from "@/layout/shared/dialog/DebtDialog";
-import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
+import DebtDialog from "@/layout/debts/components/DebtDialog";
+import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import {
   Tooltip,
   TooltipContent,

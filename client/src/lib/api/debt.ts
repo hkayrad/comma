@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, AvailableCurrency, DebtDto, Totals, UUID } from "../../../../common/types";
+import type { ApiResponse, DebtDto, Totals, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
 
 export class ReceivableDebtApi {
@@ -35,7 +35,7 @@ export class ReceivableDebtApi {
 		}
 	}
 
-	static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
+	static async GetTotals(currency: string): Promise<Totals | null> {
 		try {
 			const { data: response } = await instance.get<ApiResponse<Totals>>("/receivables/debts/totals", {
 				params: { currency },
@@ -120,7 +120,7 @@ export class PayableDebtApi {
 		}
 	}
 
-	static async GetTotals(currency: AvailableCurrency): Promise<Totals | null> {
+	static async GetTotals(currency: string): Promise<Totals | null> {
 		try {
 			const { data: response } = await instance.get<ApiResponse<Totals>>("/payables/debts/totals", {
 				params: { currency },

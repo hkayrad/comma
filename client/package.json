@@ -1,7 +1,11 @@
 {
   "name": "hks-io",
+  "author": {
+    "name": "Hakan Kayra Doğan",
+    "url": "https://hkayrad.tr"
+  },
   "private": true,
-  "version": "0.0.0",
+  "version": "1.12.2",
   "type": "module",
   "scripts": {
     "dev": "vite",

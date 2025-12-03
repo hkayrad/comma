@@ -1,8 +1,4 @@
-import type {
-  AvailableCurrency,
-  CustomerDto,
-  OverviewViewType,
-} from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Info, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -35,19 +31,14 @@ import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHead
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table";
 import { useCallback, useMemo } from "react";
-import { CurrencyIcons } from "@/lib/enums";
 
 type Props = {
   data: CustomerDto[];
   type?: OverviewViewType;
-  currency?: {
-    state: AvailableCurrency | "";
-    onChange: (value: AvailableCurrency | "") => void;
-  };
 };
 
 export default function CustomerTable(props: Props) {
-  const { data, type = "receivable", currency } = props;
+  const { data, type = "receivable" } = props;
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -392,37 +383,22 @@ export default function CustomerTable(props: Props) {
     [handleDelete, navigate, onDetails, onEdit, type],
   );
 
-  const FilteredCustomerTableColumns = useMemo(() => {
-    return CustomerTableColumns.filter((col) =>
-      currency && currency.state !== ""
-        ? (!col.id?.startsWith("Toplam") &&
-            !col.id?.startsWith("Ödenmiş") &&
-            !col.id?.startsWith("Kalan") &&
-            !col.id?.startsWith("Borç Durumu")) ||
-          col.id === `Toplam (${CurrencyIcons[currency.state]})` ||
-          col.id === `Ödenmiş (${CurrencyIcons[currency.state]})` ||
-          col.id === `Kalan (${CurrencyIcons[currency.state]})` ||
-          col.id === `Borç Durumu (${CurrencyIcons[currency.state]})`
-        : col,
-    );
-  }, [CustomerTableColumns, currency]);
-
   const tags = useMemo(
     () =>
       type === "receivable"
         ? [
-            { column: "Tür", value: "Şirket" },
-            { column: "Tür", value: "Birey" },
-            { column: "Borç Durumu", value: "Alacağınız Var" },
-            { column: "Borç Durumu", value: "Alacağınız Yok" },
-            { column: "Borç Durumu", value: "Borcunuz Var" },
+            { column: "Tür", value: "Şirket", color: "violet" },
+            { column: "Tür", value: "Birey", color: "orange" },
+            { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
+            { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
+            { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
           ]
         : [
-            { column: "Tür", value: "Şirket" },
-            { column: "Tür", value: "Birey" },
-            { column: "Borç Durumu", value: "Alacağınız Var" },
-            { column: "Borç Durumu", value: "Borcunuz Yok" },
-            { column: "Borç Durumu", value: "Borcunuz Var" },
+            { column: "Tür", value: "Şirket", color: "violet" },
+            { column: "Tür", value: "Birey", color: "orange" },
+            { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
+            { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
+            { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
           ],
     [type],
   );
@@ -430,10 +406,9 @@ export default function CustomerTable(props: Props) {
   return (
     <HksTable
       data={data}
-      columns={FilteredCustomerTableColumns}
+      columns={CustomerTableColumns}
       searchColumn="Müşteri"
       tags={tags}
-      currency={currency}
     />
   );
 }

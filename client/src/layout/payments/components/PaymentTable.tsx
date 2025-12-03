@@ -1,4 +1,4 @@
-import type { AvailableCurrency, PaymentDto } from "@/lib/types";
+import type { PaymentDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import {
@@ -22,7 +22,7 @@ import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
-import PaymentDialog from "@/layout/shared/dialog/PaymentDialog";
+import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
 import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
@@ -34,14 +34,10 @@ import { useCallback, useMemo } from "react";
 type Props = {
   data: PaymentDto[];
   type: "receivable" | "payable";
-  currency?: {
-    state: AvailableCurrency | "";
-    onChange: (value: AvailableCurrency | "") => void;
-  };
 };
 
 export default function PaymentTable(props: Props) {
-  const { data, type, currency } = props;
+  const { data, type } = props;
 
   const { openDialog } = useDialog();
 
@@ -110,7 +106,7 @@ export default function PaymentTable(props: Props) {
       },
       {
         accessorKey: "amount",
-        id: `Gelen Miktar`,
+        id: `${type === "receivable" ? "Gelen" : "Giden"} Miktar`,
         header: ({ column }: { column: Column<any> }) => (
           <SortableColumnHeader column={column} title={column.id} />
         ),
@@ -129,12 +125,43 @@ export default function PaymentTable(props: Props) {
         header: ({ column }) => (
           <SortableColumnHeader column={column} title={column.id} />
         ),
-        cell: ({ row, column }) => (
-          <ClickToCopyText
-            value={row.getValue(column.id) || "-"}
-            column={column}
-          />
-        ),
+        cell: ({ row, column }) => {
+          switch (row.getValue(column.id)) {
+            case "TRY":
+              return (
+                <Badge
+                  className="bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Havale")}
+                >
+                  TRY
+                </Badge>
+              );
+            case "USD":
+              return (
+                <Badge
+                  className="bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Nakit")}
+                >
+                  USD
+                </Badge>
+              );
+            case "EUR":
+              return (
+                <Badge
+                  className="bg-purple-100 dark:bg-purple-950/30 text-purple-800 dark:text-purple-300 select-none hover:cursor-copy"
+                  onClick={() => copyToClipboard("Kart")}
+                >
+                  EUR
+                </Badge>
+              );
+          }
+        },
+        filterFn: (row, columnId, filterValue) => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
+          const rawValue = row.getValue(columnId);
+          return filterValue.includes(rawValue);
+        },
       },
       {
         accessorKey: "exchange_rate",
@@ -207,7 +234,8 @@ export default function PaymentTable(props: Props) {
           }
         },
         filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
           const rawValue = row.getValue(columnId);
           let displayValue = "";
           switch (rawValue) {
@@ -314,27 +342,28 @@ export default function PaymentTable(props: Props) {
         ),
       },
     ],
-    [handleDelete, onEdit],
+    [handleDelete, onEdit, type],
   );
 
-  const tags = useMemo(() => [
-    { column: "Ödeme Yöntemi", value: "Nakit" },
-    { column: "Ödeme Yöntemi", value: "Havale" },
-    { column: "Ödeme Yöntemi", value: "Çek" },
-    { column: "Ödeme Yöntemi", value: "Kart" },
-  ], []);
+  const tags = useMemo(
+    () => [
+      { column: "Ödeme Yöntemi", value: "Nakit", color: "green" },
+      { column: "Ödeme Yöntemi", value: "Havale", color: "blue" },
+      { column: "Ödeme Yöntemi", value: "Çek", color: "yellow" },
+      { column: "Ödeme Yöntemi", value: "Kart", color: "purple" },
+      { column: "Para Birimi", value: "TRY", color: "red" },
+      { column: "Para Birimi", value: "USD", color: "green" },
+      { column: "Para Birimi", value: "EUR", color: "purple" },
+    ],
+    [],
+  );
 
   return (
     <HksTable
-      data={
-        currency?.state
-          ? data.filter((item) => item.currency === currency.state)
-          : data
-      }
+      data={data}
       columns={PaymentTableColumns}
       searchColumn="Müşteri"
       tags={tags}
-      currency={currency}
     />
   );
 }

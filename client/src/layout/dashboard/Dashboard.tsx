@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type {
-  AvailableCurrency,
-  CustomerDto,
-  OverviewViewType,
-} from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@/lib/types";
 import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -16,7 +12,6 @@ export default function Dashboard() {
     [],
   );
   const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
-  const [selectedCurrency] = useState<AvailableCurrency | "">("");
   const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
 
   const handleTabChange = useCallback((value: string) => {
@@ -77,17 +72,9 @@ export default function Dashboard() {
           </TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-4">
-          <OverviewCards
-            type="receivable"
-            align="stretch"
-            currency={selectedCurrency}
-          />
+          <OverviewCards type="receivable" align="stretch" />
           <Separator orientation="vertical" className="!h-20 w-full" />
-          <OverviewCards
-            type="payable"
-            align="stretch"
-            currency={selectedCurrency}
-          />
+          <OverviewCards type="payable" align="stretch" />
         </div>
         <TabsContent value="receivable">
           <CustomerTable

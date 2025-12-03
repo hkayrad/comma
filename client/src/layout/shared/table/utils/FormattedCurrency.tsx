@@ -1,11 +1,10 @@
-import type { AvailableCurrency } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import type { Column, Row } from "@tanstack/react-table";
 
 type Props = {
   row: Row<any>;
   column: Column<any, any>;
-  currency: AvailableCurrency;
+  currency: "TRY" | "USD" | "EUR";
 };
 
 export default function FormattedCurrency(props: Props) {

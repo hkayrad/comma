@@ -1,4 +1,8 @@
 {
+  "name": "hks-io",
+  "private": true,
+  "version": "1.12.2",
+  "type": "module",
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
@@ -19,7 +23,6 @@
     "ws": "^8.18.3",
     "xml2js": "^0.6.2"
   },
-  "type": "module",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
