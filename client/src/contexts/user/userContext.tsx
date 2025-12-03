@@ -11,6 +11,7 @@ interface UserContextType {
   getUser: () => User | null;
   login: (username: string, password: string) => Promise<User | null>;
   clearUser: () => void;
+  isLoading: boolean;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(

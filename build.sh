@@ -29,6 +29,7 @@ echo "Building server project..."
 cd "$SERVER_DIR" || handle_error "Failed to change to server directory."
 $SERVER_BUILD_CMD || handle_error "Server build failed."
 $SERVER_POSTBUILD_CMD || handle_error "Server postbuild failed."
+sed -i '/"type": "module",/d' dist/package.json || handle_error "Failed to remove type: module from package.json"
 cd - > /dev/null # Go back to the original directory
 
 echo "Both client and server projects built successfully."

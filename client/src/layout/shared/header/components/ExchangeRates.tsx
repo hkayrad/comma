@@ -62,7 +62,7 @@ export default function ExchangeRates() {
                       copyToClipboard(exchangeRates.usd.forexBuying)
                     }
                   >
-                    {exchangeRates.usd.forexBuying.slice(0, 5)}
+                    {exchangeRates.usd.forexBuying}
                   </span>
                 </p>
                 <p className="text-sm">
@@ -73,7 +73,7 @@ export default function ExchangeRates() {
                       copyToClipboard(exchangeRates.usd.forexSelling)
                     }
                   >
-                    {exchangeRates.usd.forexSelling.slice(0, 5)}
+                    {exchangeRates.usd.forexSelling}
                   </span>
                 </p>
               </div>
@@ -95,7 +95,7 @@ export default function ExchangeRates() {
                       copyToClipboard(exchangeRates.eur.forexBuying)
                     }
                   >
-                    {exchangeRates.eur.forexBuying.slice(0, 5)}
+                    {exchangeRates.eur.forexBuying}
                   </span>
                 </p>
                 <p className="text-sm">
@@ -106,7 +106,7 @@ export default function ExchangeRates() {
                       copyToClipboard(exchangeRates.eur.forexSelling)
                     }
                   >
-                    {exchangeRates.eur.forexSelling.slice(0, 5)}
+                    {exchangeRates.eur.forexSelling}
                   </span>
                 </p>
               </div>

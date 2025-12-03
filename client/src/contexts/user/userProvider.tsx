@@ -9,6 +9,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUserData] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getUser = () => {
     Logger.info("Getting user data");
@@ -39,7 +40,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, []);
 
   const refreshUser = useCallback(async () => {
-
     try {
       const response = await AuthApi.Refresh();
 
@@ -51,6 +51,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       }
     } catch (error) {
       Logger.error("Failed to refresh user", error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -59,7 +61,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, [refreshUser]);
 
   return (
-    <UserContext.Provider value={{ user, getUser, login, clearUser }}>
+    <UserContext.Provider value={{ user, getUser, login, clearUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );

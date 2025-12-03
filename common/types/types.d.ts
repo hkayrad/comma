@@ -112,17 +112,14 @@ export type CustomerStatement = {
 
 export type ExchangeRates = {
 	date: string;
+	unixtime: string;
 	usd: {
 		forexBuying: string;
 		forexSelling: string;
-		banknoteBuying: string;
-		banknoteSelling: string;
 	};
 	eur: {
 		forexBuying: string;
 		forexSelling: string;
-		banknoteBuying: string;
-		banknoteSelling: string;
 	};
 };
 

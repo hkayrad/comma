@@ -1,25 +1,29 @@
 import express from "express";
-import { parseStringPromise } from "xml2js";
 import { ExchangeRates } from "@common/types";
 import { Logger } from "../lib/utils";
 import { authMiddleware } from "../lib/middleware";
 
+function formatDate(date: Date): string {
+	return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+}
+
 const router = express.Router();
 
-interface CurrencyData {
-	$: { Kod: string };
-	ForexBuying: string[];
-	ForexSelling: string[];
-	BanknoteBuying: string[];
-	BanknoteSelling: string[];
+interface TcmbJsonResult {
+	totalCount: number;
+	items: {
+		Tarih: string;
+		TP_DK_USD_A_YTL: string;
+		TP_DK_USD_S_YTL: string;
+		TP_DK_EUR_A_YTL: string;
+		TP_DK_EUR_S_YTL: string;
+		UNIXTIME: {
+			$numberLong: string;
+		};
+	}[];
 }
 
-interface TcmbXmlResult {
-	Tarih_Date: {
-		$: { Tarih: string };
-		Currency: CurrencyData[];
-	};
-}
+const series = ["TP.DK.USD.A.YTL", "TP.DK.USD.S.YTL", "TP.DK.EUR.A.YTL", "TP.DK.EUR.S.YTL"];
 
 router.use(authMiddleware);
 
@@ -27,23 +31,51 @@ router.get("/", async (req, res) => {
 	try {
 		Logger.debug("[TCMB] Fetching exchange rates from TCMB");
 
-		const response = await fetch("https://www.tcmb.gov.tr/kurlar/today.xml");
+		const today = new Date(Date.now());
+		const fourteenDaysAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+		const tcmbTodayDate = formatDate(today);
+		Logger.debug(`TCMB date: ${tcmbTodayDate}`);
+		const tcmbFourteenDaysAgoDate = formatDate(fourteenDaysAgo);
+		Logger.debug(`TCMB date: ${tcmbFourteenDaysAgoDate}`);
+
+		const response = await fetch(
+			`https://evds2.tcmb.gov.tr/service/evds/series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
+			{
+				headers: {
+					Key: process.env.TCMB_API_KEY || "",
+				},
+			},
+		);
 
 		if (!response.ok) {
 			Logger.error("[TCMB] Failed to fetch from TCMB API", {
+				response: response,
 				status: response.status,
 				statusText: response.statusText,
 			});
 			return res.status(500).json({ success: false, message: "Error fetching TCMB data" });
 		}
 
-		const xmlData = await response.text();
-		const result = (await parseStringPromise(xmlData)) as TcmbXmlResult;
+		const result: TcmbJsonResult = await response.json();
+		Logger.debug(result);
 
-		const currencies = result.Tarih_Date.Currency;
+		if (!result) {
+			Logger.error("[TCMB] Failed to parse response from TCMB API");
+			return res.status(500).json({ success: false, message: "Failed to parse response from TCMB API" });
+		}
 
-		const usd = currencies.find((c: CurrencyData) => c.$.Kod === "USD");
-		const eur = currencies.find((c: CurrencyData) => c.$.Kod === "EUR");
+		const latest = result.items[result.totalCount - 1];
+		Logger.debug(latest);
+
+		const usd = {
+			buy: latest.TP_DK_USD_A_YTL,
+			sell: latest.TP_DK_USD_S_YTL,
+		};
+		const eur = {
+			buy: latest.TP_DK_EUR_A_YTL,
+			sell: latest.TP_DK_EUR_S_YTL,
+		};
 
 		if (!usd || !eur) {
 			Logger.error("[TCMB] Missing required currency data", { hasUsd: !!usd, hasEur: !!eur });
@@ -51,18 +83,15 @@ router.get("/", async (req, res) => {
 		}
 
 		const data: ExchangeRates = {
-			date: result.Tarih_Date.$.Tarih,
+			date: latest.Tarih,
+			unixtime: latest.UNIXTIME.$numberLong,
 			usd: {
-				forexBuying: usd.ForexBuying[0],
-				forexSelling: usd.ForexSelling[0],
-				banknoteBuying: usd.BanknoteBuying[0],
-				banknoteSelling: usd.BanknoteSelling[0],
+				forexBuying: usd.buy,
+				forexSelling: usd.sell,
 			},
 			eur: {
-				forexBuying: eur.ForexBuying[0],
-				forexSelling: eur.ForexSelling[0],
-				banknoteBuying: eur.BanknoteBuying[0],
-				banknoteSelling: eur.BanknoteSelling[0],
+				forexBuying: eur.buy,
+				forexSelling: eur.sell,
 			},
 		};
 
