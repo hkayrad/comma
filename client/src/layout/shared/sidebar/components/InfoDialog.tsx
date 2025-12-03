@@ -20,7 +20,7 @@ export default function InfoDialog() {
         </ItemContent>
         <ItemActions>
           <NavLink
-            to="https://semver.org/"
+            to="https://semver.org/lang/tr/"
             target="_blank"
             className="text-xs text-muted-foreground flex items-center gap-1"
           >
