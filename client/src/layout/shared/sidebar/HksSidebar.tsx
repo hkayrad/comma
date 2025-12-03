@@ -91,17 +91,17 @@ export default function HksSidebar() {
     smallLogo: "",
     largeLogo: "",
   });
-
+  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
   const logoSrc = useMemo(
     () => ({
       small: logos.smallLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}`
+        ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
         : "/hks-icon.png",
       large: logos.largeLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}`
+        ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
         : "/hks-logo.png",
     }),
-    [logos.largeLogo, logos.smallLogo],
+    [logos.largeLogo, logos.smallLogo, cacheBuster],
   );
 
   const fetchLogos = useCallback(async () => {
@@ -151,6 +151,14 @@ export default function HksSidebar() {
       window.removeEventListener("logo:refresh", fetchLogos);
     };
   }, [fetchLogos]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCacheBuster(Date.now());
+    }, 4 * 60 * 60 * 1000); // 4 hours
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Sidebar className="no-print" variant="inset" collapsible="icon">
