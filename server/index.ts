@@ -69,6 +69,10 @@ app.use(
 	}),
 );
 
+app.get("/health", (req, res) => {
+	res.status(200).json({ status: "ok" });
+});
+
 app.get("/logo-proxy/:filename", (req, res) => {
 	const filename = req.params.filename;
 	// Security check: prevent directory traversal
