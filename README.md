@@ -24,7 +24,7 @@ To get the project up and running on your local machine, please follow these ste
 
 - Node.js (v14 or later)
 - npm (v6 or later)
-- PostgreSQL
+- MariaDB
 
 ### Installation
 
@@ -47,17 +47,24 @@ To get the project up and running on your local machine, please follow these ste
 ### Configuration
 
 1.  **Set up the database:**
-    - Create a PostgreSQL database for the application.
+    - Create a MariaDB database for the application.
     - You will need to create a `.env` file in the `server` directory and add the database connection details.
 2.  **Configure environment variables:**
     - In the `server` directory, create a `.env` file and add the following variables:
       ```
-      DB_USER=your_database_user
-      DB_HOST=your_database_host
-      DB_DATABASE=your_database_name
-      DB_PASSWORD=your_database_password
-      DB_PORT=your_database_port
-      JWT_SECRET=your_jwt_secret
+      SERVER_PORT=<your_server_port>
+      DB_USER=<your_database_user>
+      DB_HOST=<your_database_host>
+      DB_DATABASE=<your_database_name>
+      DB_PASSWORD=<your_database_password>
+      DB_PORT=<your_database_port>
+      JWT_SECRET=<your_jwt_secret>
+      JWT_EXPIRES_IN=<jwt_expiry_in_days>
+      JWT_ISSUER=<jwt_issuer>
+      JWT_AUDIENCE=<jwt_audience>
+      NODE_ENV=<development | production>
+      CLIENT_URL=<client_url>
+      TCMB_API_KEY=<your_tcmb_evds2_api_key>
       ```
 
 ### Running the Application
@@ -113,7 +120,6 @@ The project is organized into a monorepo structure with two main packages: `clie
 ## API Documentation
 
 For detailed information about the API endpoints, please refer to the [API Documentation](API.md).
-
 
 ## License
 

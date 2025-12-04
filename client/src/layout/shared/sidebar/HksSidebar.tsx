@@ -280,7 +280,7 @@ export default function HksSidebar() {
             <SidebarMenu>
               <SidebarMenuButton onClick={handleInfo}>
                 <Info />
-                Hakkında
+                <span className="select-none">Hakkında</span>
               </SidebarMenuButton>
             </SidebarMenu>
           </TooltipTrigger>

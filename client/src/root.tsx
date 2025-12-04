@@ -3,8 +3,8 @@ import { ConfigProvider } from "@/contexts/config";
 import { UserProvider } from "@/contexts/user";
 import { DialogProvider } from "@/contexts/dialog";
 import { WebSocketProvider } from "@/contexts/webSocket";
-import { ThemeProvider } from "./components/theme-provider";
-import { Toaster } from "./components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { StrictMode } from "react";
 
 export default function Root() {
