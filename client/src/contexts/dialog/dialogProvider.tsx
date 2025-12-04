@@ -1,7 +1,14 @@
 import type { CustomerDto } from "@/lib/types";
 import { useState, type ReactNode } from "react";
 import { DialogContext } from "./dialogContext";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export interface DialogConfig {
   title?: string;
@@ -93,7 +100,7 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
       {children}
       <Dialog open={isOpen} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent
-          className={`${getSizeClass(config.size)}`}
+          className={`${getSizeClass(config.size)} selection:text-background selection:bg-foreground`}
           style={getWidthStyle(config.size)}
         >
           {(config.title || config.description) && (

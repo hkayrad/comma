@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Slot } from "radix-ui";
+import { Slot } from "@/components/animate-ui/primitives/animate/slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import { type Transition } from "motion/react";
@@ -453,7 +453,7 @@ function SidebarGroupLabel({
   asChild = false,
   ...props
 }: SidebarGroupLabelProps) {
-  const Comp = asChild ? Slot.Root : "div";
+  const Comp = asChild ? Slot : "div";
 
   return (
     <Comp
@@ -464,7 +464,7 @@ function SidebarGroupLabel({
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className,
       )}
-      {...props}
+      {...(props as any)}
     />
   );
 }
@@ -478,7 +478,7 @@ function SidebarGroupAction({
   asChild = false,
   ...props
 }: SidebarGroupActionProps) {
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -491,7 +491,7 @@ function SidebarGroupAction({
         "group-data-[collapsible=icon]:hidden",
         className,
       )}
-      {...props}
+      {...(props as any)}
     />
   );
 }
@@ -592,7 +592,7 @@ function SidebarMenuButton({
   className,
   ...props
 }: SidebarMenuButtonProps) {
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
   const { isMobile, state } = useSidebar();
 
   const button = (
@@ -605,7 +605,7 @@ function SidebarMenuButton({
         data-size={size}
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-        {...props}
+        {...(props as any)}
       />
     </HighlightItem>
   );
@@ -639,7 +639,7 @@ function SidebarMenuAction({
   showOnHover = false,
   ...props
 }: SidebarMenuActionProps) {
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -654,10 +654,10 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className,
       )}
-      {...props}
+      {...(props as any)}
     />
   );
 }
@@ -766,7 +766,7 @@ function SidebarMenuSubButton({
   className,
   ...props
 }: SidebarMenuSubButtonProps) {
-  const Comp = asChild ? Slot.Root : "a";
+  const Comp = asChild ? Slot : "a";
 
   return (
     <HighlightItem activeClassName="bg-sidebar-accent text-sidebar-accent-foreground rounded-md">
@@ -783,7 +783,7 @@ function SidebarMenuSubButton({
           "group-data-[collapsible=icon]:hidden",
           className,
         )}
-        {...props}
+        {...(props as any)}
       />
     </HighlightItem>
   );

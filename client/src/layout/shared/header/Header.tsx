@@ -89,7 +89,7 @@ export default function Header() {
         <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />
 
         <Breadcrumb>
-          <BreadcrumbList>
+          <BreadcrumbList className="select-none">
             {breadcrumbItems.map((item) => (
               <React.Fragment key={item.path}>
                 <BreadcrumbItem>

@@ -11,7 +11,7 @@ import { AuthApi } from "@/lib/api";
 import { toast } from "sonner";
 import { useUser } from "@/contexts/user";
 import { useRole } from "@/hooks/useRole";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { useWebSocket } from "@/contexts/webSocket";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -65,6 +65,7 @@ import InfoDialog from "./components/InfoDialog";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, setTheme } = useTheme();
   const { state } = useSidebar();
   const { user, clearUser } = useUser();
@@ -169,6 +170,11 @@ export default function HksSidebar() {
       <SidebarHeader>
         <NavLink
           to="/"
+          onClick={(e) => {
+            if (location.pathname === "/") {
+              e.preventDefault();
+            }
+          }}
           className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-9"
         >
           <AnimatePresence mode="wait">
