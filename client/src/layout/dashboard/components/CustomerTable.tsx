@@ -301,12 +301,11 @@ export default function CustomerTable(props: Props) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    sessionStorage.setItem("current_page", "Borç Dökümü");
+                  onClick={() =>
                     navigate(
                       `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
-                    );
-                  }}
+                    )
+                  }
                 >
                   <Paperclip />
                 </Button>

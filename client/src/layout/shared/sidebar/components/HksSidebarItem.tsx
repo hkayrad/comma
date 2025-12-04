@@ -35,7 +35,6 @@ export default function HksSidebarItem(props: Props) {
                   e.preventDefault();
                   return;
                 }
-                sessionStorage.setItem("current_page", item.title);
               }}
             >
               <item.icon />

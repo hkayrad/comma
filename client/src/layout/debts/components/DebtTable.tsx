@@ -242,7 +242,17 @@ export default function DebtTable(props: Props) {
           <SortableColumnHeader column={column} title={column.id} />
         ),
         cell: ({ row, column }) => (
-          <ClickToCopyText value={row.getValue(column.id) || "-"} />
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger className="text-left flex">
+              <ClickToCopyText
+                value={row.getValue(column.id) || "-"}
+                column={column}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {row.getValue(column.id) || "-"}
+            </TooltipContent>
+          </Tooltip>
         ),
       },
       {

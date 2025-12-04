@@ -153,21 +153,23 @@ export default function HksSidebar() {
   }, [fetchLogos]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCacheBuster(Date.now());
-    }, 4 * 60 * 60 * 1000); // 4 hours
+    const interval = setInterval(
+      () => {
+        setCacheBuster(Date.now());
+      },
+      4 * 60 * 60 * 1000,
+    ); // 4 hours
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <Sidebar className="no-print" variant="inset" collapsible="icon">
-      <SidebarRail className={state === "collapsed" ? "w-2" : "w-4"} />
+      <SidebarRail className="w-3" />
       <SidebarHeader>
         <NavLink
           to="/"
-          onClick={() => sessionStorage.setItem("current_page", "Genel Bakış")}
-          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-8"
+          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-9"
         >
           <AnimatePresence mode="wait">
             {state === "collapsed" ? (
@@ -226,7 +228,6 @@ export default function HksSidebar() {
           </AnimatePresence>
         </NavLink>
       </SidebarHeader>
-
       {/* SIDEBAR CONTENT */}
       <NonSystemAdminOnly>
         <NonSystemAdminSidebarContent />

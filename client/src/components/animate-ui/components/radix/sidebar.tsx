@@ -31,8 +31,7 @@ import {
 } from '@/components/animate-ui/primitives/effects/highlight';
 import { getStrictContext } from '@/lib/get-strict-context';
 
-const SIDEBAR_COOKIE_NAME = 'sidebar_state';
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const SIDEBAR_LOCAL_STORAGE_KEY = 'sidebar_state';
 const SIDEBAR_WIDTH = '12rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
@@ -71,7 +70,15 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen);
+  const [_open, _setOpen] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(SIDEBAR_LOCAL_STORAGE_KEY);
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    }
+    return defaultOpen;
+  });
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -83,7 +90,7 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      localStorage.setItem(SIDEBAR_LOCAL_STORAGE_KEY, String(openState));
     },
     [setOpenProp, open],
   );
@@ -261,7 +268,7 @@ function Sidebar({
             : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
           // Adjust the padding for floating and inset variants.
           variant === 'floating' || variant === 'inset'
-            ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]'
+            ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]'
             : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l',
           className,
         )}

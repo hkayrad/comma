@@ -140,10 +140,7 @@ export default function CustomerStatement() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => {
-                sessionStorage.setItem("current_page", "Genel Bakış");
-                navigate(-1);
-              }}
+              onClick={() => navigate(-1)}
               className="px-2"
             >
               <ArrowLeft className="h-4 w-4" />
