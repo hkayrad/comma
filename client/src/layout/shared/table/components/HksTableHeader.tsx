@@ -28,6 +28,7 @@ import {
   FilterX,
   RefreshCw,
   Rows3,
+  UserRound,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -186,6 +187,11 @@ export default function HksTableHeader(props: Props) {
         <Tooltip>
           <TooltipTrigger asChild>
             <InputGroup className="max-w-2xs bg-background min-w-48">
+              <InputGroupAddon>
+                <UserRound className={
+                  searchInputRef.current?.value === "" ? "text-muted-foreground" : "text-primary"
+                } />
+              </InputGroupAddon>
               <InputGroupInput
                 ref={searchInputRef}
                 placeholder="İsim ile Müşteri Ara..."

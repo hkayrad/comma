@@ -17,7 +17,7 @@ export default function ColumnSortingArrow(props: Props) {
           <ArrowUp />
         )
       ) : (
-        <ArrowUpDown />
+        <ArrowUpDown className="text-muted-foreground" />
       )}
     </span>
   );
