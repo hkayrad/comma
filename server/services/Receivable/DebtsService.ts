@@ -110,41 +110,21 @@ export default class ReceivableDebtsService {
 			Logger.debug("[ReceivableDebts] Fetching totals", { companyId, currency });
 
 			const query = `
-				WITH debts_summary AS (
-			    SELECT
-						COALESCE(SUM(d.total), 0) AS total,
-						COALESCE(SUM(d.total_in_try), 0) AS total_in_try
-			    FROM receivable_debts d
-			    INNER JOIN receivable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
-			    WHERE d.company_id = ?
-		        AND d.deleted_at IS NULL
-		        AND d.deleted_by IS NULL
-		        AND c.deleted_at IS NULL
-		        AND c.deleted_by IS NULL
-				),
-				payments_summary AS (
-		    	SELECT
-						COALESCE(SUM(p.amount), 0) AS total,
-						COALESCE(SUM(p.amount_in_try), 0) AS total_in_try
-			    FROM receivable_payments p
-			    INNER JOIN receivable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
-			    WHERE p.company_id = ?
-		        AND p.deleted_at IS NULL
-		        AND p.deleted_by IS NULL
-		        AND c.deleted_at IS NULL
-		        AND c.deleted_by IS NULL
-				)
 				SELECT
-			    debts_summary.total_in_try AS total_debts,
-			    payments_summary.total_in_try AS total_payments,
-			    debts_summary.total_in_try - payments_summary.total_in_try AS remaining_debt
-				FROM
-			    debts_summary,
-			    payments_summary;
+			    COALESCE(d.total_in_try, 0) AS total_debts,
+			    COALESCE(p.total_in_try, 0) AS total_payments,
+			    COALESCE(d.total_in_try, 0) - COALESCE(p.total_in_try, 0) AS remaining_debt
+				FROM (SELECT ? AS company_id) AS input
+				-- Join Receivable Debt View
+				LEFT JOIN vw_receivable_total_debt_by_company d
+			    ON d.company_id = input.company_id
+				-- Join Receivable Payment View
+				LEFT JOIN vw_receivable_total_payments_by_company p
+			    ON p.company_id = input.company_id;
       `;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId, companyId])) as Totals[];
+			const result = (await conn.query(query, [companyId])) as Totals[];
 
 			Logger.debug("[ReceivableDebts] Totals fetched successfully", { companyId, currency, totals: result[0] });
 

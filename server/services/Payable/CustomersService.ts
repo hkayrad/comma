@@ -17,8 +17,8 @@ export default class PayableCustomersService {
 			}
 
 			const query = `
-                INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+        INSERT INTO payable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
             `;
 
 			conn = await pool.getConnection();
@@ -60,42 +60,28 @@ export default class PayableCustomersService {
 			Logger.debug("[PayableCustomers] Fetching all customers", { companyId });
 
 			const query = `
-				WITH debt_summary AS (
-			    SELECT
-			        customer_id,
-			        SUM(total_in_try) AS total_debt
-			    FROM payable_debts
-			    WHERE company_id = ?
-		        AND deleted_at IS NULL
-		        AND deleted_by IS NULL
-			    GROUP BY customer_id
-				),
-				payment_summary AS (
-			    SELECT
-		        customer_id,
-		        SUM(amount_in_try) AS total_payments
-			    FROM payable_payments
-			    WHERE company_id = ?
-		        AND deleted_at IS NULL
-		        AND deleted_by IS NULL
-			    GROUP BY customer_id
-				)
 				SELECT
 			    c.*,
-			    COALESCE(debt_summary.total_debt, 0) AS total_debt,
-			    COALESCE(payment_summary.total_payments, 0) AS total_payments,
-			    COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0) AS remaining_debt
+			    COALESCE(d.total_debt, 0) AS total_debt,
+			    COALESCE(p.total_payments, 0) AS total_payments,
+			    COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0) AS remaining_debt
 				FROM payable_customers c
-				LEFT JOIN debt_summary ON c.id = debt_summary.customer_id
-				LEFT JOIN payment_summary ON c.id = payment_summary.customer_id
+				-- Join with the Debt View
+				LEFT JOIN vw_payable_debt_summary d
+			    ON c.id = d.customer_id
+			    AND c.company_id = d.company_id
+				-- Join with the Payment View
+				LEFT JOIN vw_payable_payment_summary p
+			    ON c.id = p.customer_id
+			    AND c.company_id = p.company_id
 				WHERE c.company_id = ?
-			    AND c.deleted_at IS NULL
-			    AND c.deleted_by IS NULL
+				  AND c.deleted_at IS NULL
+				  AND c.deleted_by IS NULL
 				ORDER BY c.created_at DESC;
       `;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId, companyId, companyId])) as CustomerDto[];
+			const result = (await conn.query(query, [companyId])) as CustomerDto[];
 
 			Logger.debug("[PayableCustomers] Customers fetched successfully", { companyId, count: result.length });
 
@@ -132,49 +118,29 @@ export default class PayableCustomersService {
 			conn = await pool.getConnection();
 
 			const customerQuery = `
-				WITH debt_summary AS (
-					SELECT
-						customer_id,
-						SUM(total_in_try) AS total_debt
-					FROM payable_debts
-					WHERE customer_id = ?
-						AND company_id = ?
-						AND deleted_at IS NULL
-						AND deleted_by IS NULL
-					GROUP BY customer_id
-				),
-				payment_summary AS (
-					SELECT
-						customer_id,
-						SUM(amount_in_try) AS total_payments
-					FROM payable_payments
-					WHERE customer_id = ?
-						AND company_id = ?
-						AND deleted_at IS NULL
-						AND deleted_by IS NULL
-					GROUP BY customer_id
-				)
 				SELECT
-					c.*,
-					COALESCE(ds.total_debt, 0) AS total_debt,
-					COALESCE(ps.total_payments, 0) AS total_payments,
-					COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
+			    c.*,
+			    COALESCE(ds.total_debt, 0) AS total_debt,
+			    COALESCE(ps.total_payments, 0) AS total_payments,
+			    COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
 				FROM payable_customers c
-				LEFT JOIN debt_summary ds ON c.id = ds.customer_id
-				LEFT JOIN payment_summary ps ON c.id = ps.customer_id
+				-- Join Debt View (Matches on Customer ID and Company ID)
+				LEFT JOIN vw_payable_debt_summary ds
+			    ON c.id = ds.customer_id
+			    AND c.company_id = ds.company_id
+				-- Join Payment View (Matches on Customer ID and Company ID)
+				LEFT JOIN vw_payable_payment_summary ps
+			    ON c.id = ps.customer_id
+			    AND c.company_id = ps.company_id
 				WHERE c.id = ?
-					AND c.company_id = ?
-					AND c.deleted_at IS NULL
-					AND c.deleted_by IS NULL;
+				  AND c.company_id = ?
+				  AND c.deleted_at IS NULL
+				  AND c.deleted_by IS NULL;
 			`;
 
 			const customerResult = (await conn.query(customerQuery, [
 				customerId,
-				companyId,
-				customerId,
-				companyId,
-				customerId,
-				companyId,
+				companyId
 			])) as CustomerDto[];
 
 			if (customerResult.length === 0) {
@@ -293,8 +259,8 @@ export default class PayableCustomersService {
 			Logger.debug("[PayableCustomers] Fetching customer IDs and names", { companyId });
 
 			const query = `
-                SELECT id, name FROM payable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-            `;
+        SELECT id, name FROM payable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [companyId])) as CustomerIdName[];
@@ -337,9 +303,9 @@ export default class PayableCustomersService {
 			}
 
 			const query = `
-                UPDATE payable_customers
-                SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-                WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+        UPDATE payable_customers
+        SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
             `;
 
 			conn = await pool.getConnection();
@@ -389,9 +355,9 @@ export default class PayableCustomersService {
 			}
 
 			const query = `
-                UPDATE payable_customers
-                SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
-                WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+        UPDATE payable_customers
+        SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
             `;
 
 			conn = await pool.getConnection();

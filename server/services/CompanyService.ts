@@ -28,7 +28,7 @@ export class CompanyService {
 				SELECT *
 				FROM companies
 				WHERE id = ? AND deleted_at IS NULL
-				`;
+			`;
 
 			const rows = (await conn.query(query, [companyId])) as CompanyDto[];
 

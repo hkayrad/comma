@@ -20,10 +20,10 @@ export class CompanyManagementService {
 			}
 
 			const query = `
-					INSERT INTO companies (name, phone, is_company, tax_number, tax_office, mersis_no, email, address)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-					RETURNING id;
-				`;
+				INSERT INTO companies (name, phone, is_company, tax_number, tax_office, mersis_no, email, address)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+				RETURNING id;
+			`;
 
 			conn = await pool.getConnection();
 

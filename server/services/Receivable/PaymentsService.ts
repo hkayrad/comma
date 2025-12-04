@@ -9,7 +9,8 @@ export default class ReceivablePaymentsService {
 		try {
 			Logger.info("[ReceivablePayments] Creating payment", { companyId, customerId: payment.customer_id, userId });
 
-			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } = payment;
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+				payment;
 
 			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
 				Logger.error("[ReceivablePayments] Missing required fields", {
@@ -24,9 +25,9 @@ export default class ReceivablePaymentsService {
 			}
 
 			const query = `
-                INSERT INTO receivable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-            `;
+        INSERT INTO receivable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+      `;
 
 			conn = await pool.getConnection();
 
@@ -101,7 +102,8 @@ export default class ReceivablePaymentsService {
 				return ApiResponse.error("Missing payment ID");
 			}
 
-			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } = payment;
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+				payment;
 
 			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
 				Logger.error("[ReceivablePayments] Missing required fields", {

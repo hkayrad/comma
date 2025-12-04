@@ -17,9 +17,9 @@ export default class ReceivableCustomersService {
 			}
 
 			const query = `
-                INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-            `;
+        INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+      `;
 
 			conn = await pool.getConnection();
 
@@ -60,34 +60,20 @@ export default class ReceivableCustomersService {
 			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId });
 
 			const query = `
-				WITH debt_summary AS (
-			    SELECT
-			      customer_id,
-			      SUM(total_in_try) AS total_debt
-			    FROM receivable_debts
-			    WHERE company_id = ?
-		        AND deleted_at IS NULL
-		        AND deleted_by IS NULL
-			    GROUP BY customer_id
-				),
-				payment_summary AS (
-			    SELECT
-			      customer_id,
-			      SUM(amount_in_try) AS total_payments
-			    FROM receivable_payments
-			    WHERE company_id = ?
-		        AND deleted_at IS NULL
-		        AND deleted_by IS NULL
-			    GROUP BY customer_id
-				)
 				SELECT
 			    c.*,
-			    COALESCE(debt_summary.total_debt, 0) AS total_debt,
-			    COALESCE(payment_summary.total_payments, 0) AS total_payments,
-			    COALESCE(debt_summary.total_debt, 0) - COALESCE(payment_summary.total_payments, 0) AS remaining_debt
+			    COALESCE(d.total_debt, 0) AS total_debt,
+			    COALESCE(p.total_payments, 0) AS total_payments,
+			    COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0) AS remaining_debt
 				FROM receivable_customers c
-				LEFT JOIN debt_summary ON c.id = debt_summary.customer_id
-				LEFT JOIN payment_summary ON c.id = payment_summary.customer_id
+				-- Join Receivable Debt View
+				LEFT JOIN vw_receivable_debt_summary d
+			    ON c.id = d.customer_id
+			    AND c.company_id = d.company_id
+				-- Join Receivable Payment View
+				LEFT JOIN vw_receivable_payment_summary p
+			    ON c.id = p.customer_id
+			    AND c.company_id = p.company_id
 				WHERE c.company_id = ?
 			    AND c.deleted_at IS NULL
 			    AND c.deleted_by IS NULL
@@ -95,7 +81,7 @@ export default class ReceivableCustomersService {
       `;
 
 			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId, companyId, companyId])) as CustomerDto[];
+			const result = (await conn.query(query, [companyId])) as CustomerDto[];
 
 			Logger.debug("[ReceivableCustomers] Customers fetched successfully", { companyId, count: result.length });
 
@@ -132,50 +118,27 @@ export default class ReceivableCustomersService {
 			conn = await pool.getConnection();
 
 			const customerQuery = `
-				WITH debt_summary AS (
-					SELECT
-						customer_id,
-						SUM(total_in_try) AS total_debt
-					FROM receivable_debts
-					WHERE customer_id = ?
-						AND company_id = ?
-						AND deleted_at IS NULL
-						AND deleted_by IS NULL
-					GROUP BY customer_id
-				),
-				payment_summary AS (
-					SELECT
-						customer_id,
-						SUM(amount_in_try) AS total_payments
-					FROM receivable_payments
-					WHERE customer_id = ?
-						AND company_id = ?
-						AND deleted_at IS NULL
-						AND deleted_by IS NULL
-					GROUP BY customer_id
-				)
 				SELECT
-					c.*,
-					COALESCE(ds.total_debt, 0) AS total_debt,
-					COALESCE(ps.total_payments, 0) AS total_payments,
-					COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
+			    c.*,
+			    COALESCE(ds.total_debt, 0) AS total_debt,
+			    COALESCE(ps.total_payments, 0) AS total_payments,
+			    COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
 				FROM receivable_customers c
-				LEFT JOIN debt_summary ds ON c.id = ds.customer_id
-				LEFT JOIN payment_summary ps ON c.id = ps.customer_id
+				-- Join Receivable Debt View
+				LEFT JOIN vw_receivable_debt_summary ds
+			    ON c.id = ds.customer_id
+			    AND c.company_id = ds.company_id
+				-- Join Receivable Payment View
+				LEFT JOIN vw_receivable_payment_summary ps
+			    ON c.id = ps.customer_id
+			    AND c.company_id = ps.company_id
 				WHERE c.id = ?
-					AND c.company_id = ?
-					AND c.deleted_at IS NULL
-					AND c.deleted_by IS NULL;
+				  AND c.company_id = ?
+				  AND c.deleted_at IS NULL
+				  AND c.deleted_by IS NULL;
 			`;
 
-			const customerResult = (await conn.query(customerQuery, [
-				customerId,
-				companyId,
-				customerId,
-				companyId,
-				customerId,
-				companyId,
-			])) as CustomerDto[];
+			const customerResult = (await conn.query(customerQuery, [customerId, companyId])) as CustomerDto[];
 
 			if (customerResult.length === 0) {
 				Logger.error("[ReceivableCustomers] Customer not found", { customerId, companyId });
@@ -220,25 +183,25 @@ export default class ReceivableCustomersService {
 			debtsQuery += ` ORDER BY d.issue_date DESC, d.created_at DESC`;
 
 			let paymentsQuery = `
-			 SELECT
-        p.id,
-        p.invoice_no,
-        p.amount,
-        p.currency,
-        p.exchange_rate,
-        p.amount_in_try,
-        p.payment_method,
-        p.description,
-        p.payment_date,
-        p.created_at
-	    FROM receivable_payments p
-	    INNER JOIN receivable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
-	    WHERE p.customer_id = ?
-        AND p.company_id = ?
-        AND p.deleted_at IS NULL
-        AND p.deleted_by IS NULL
-        AND c.deleted_at IS NULL
-        AND c.deleted_by IS NULL
+				 SELECT
+	        p.id,
+	        p.invoice_no,
+	        p.amount,
+	        p.currency,
+	        p.exchange_rate,
+	        p.amount_in_try,
+	        p.payment_method,
+	        p.description,
+	        p.payment_date,
+	        p.created_at
+		    FROM receivable_payments p
+		    INNER JOIN receivable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+		    WHERE p.customer_id = ?
+	        AND p.company_id = ?
+	        AND p.deleted_at IS NULL
+	        AND p.deleted_by IS NULL
+	        AND c.deleted_at IS NULL
+	        AND c.deleted_by IS NULL
       `;
 
 			const paymentParams: any[] = [customerId, companyId];
@@ -293,8 +256,8 @@ export default class ReceivableCustomersService {
 			Logger.debug("[ReceivableCustomers] Fetching customer IDs and names", { companyId });
 
 			const query = `
-                SELECT id, name FROM receivable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-            `;
+        SELECT id, name FROM receivable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
 			const result = (await conn.query(query, [companyId])) as CustomerIdName[];
@@ -337,10 +300,10 @@ export default class ReceivableCustomersService {
 			}
 
 			const query = `
-                UPDATE receivable_customers
-                SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-                WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-            `;
+        UPDATE receivable_customers
+        SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
+        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
+      `;
 
 			conn = await pool.getConnection();
 

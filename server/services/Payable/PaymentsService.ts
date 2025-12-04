@@ -25,9 +25,9 @@ export default class PayablePaymentsService {
 			}
 
 			const query = `
-                INSERT INTO payable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-            `;
+        INSERT INTO payable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+      `;
 
 			conn = await pool.getConnection();
 
