@@ -101,7 +101,7 @@ export default function DebtDialog(props: Props) {
       amount: debt?.amount ? Number(debt.amount) : 0,
       vat: debt?.vat ? Number(debt.vat) : 0,
       currency: debt?.currency || "TRY",
-      exchange_rate: debt?.exchange_rate || 1,
+      exchange_rate: debt?.exchange_rate ? Number(debt.exchange_rate) : 1,
       issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
       invoice_no: debt?.invoice_no || "",
       description: debt?.description || "",

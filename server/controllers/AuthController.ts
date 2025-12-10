@@ -2,12 +2,13 @@ import express from "express";
 import { AuthService } from "../services/AuthService";
 import { ApiResponse, Logger } from "../lib/utils";
 import dotenv from "dotenv";
+import { authRateLimiter } from "../lib/middleware/rateLimiter";
 
 dotenv.config();
 
 const router = express.Router();
 
-router.post("/login", async (req, res) => {
+router.post("/login", authRateLimiter, async (req, res) => {
 	const { username, password } = req.body;
 	Logger.info("[AuthController] Login attempt", { username: username });
 
@@ -28,21 +29,21 @@ router.post("/login", async (req, res) => {
 
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
-		secure: true,
+		secure: process.env.NODE_ENV === "production",
 		sameSite: "strict",
 		maxAge: 15 * 60 * 1000, // 15 minutes
 	});
 	res.cookie("refresh_token", refreshToken, {
 		httpOnly: true,
-		secure: true,
+		secure: process.env.NODE_ENV === "production",
 		sameSite: "strict",
 		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
-		path: "/refresh",
+		path: "/",
 	});
 	return res.json({ username: user?.username, role: user?.role });
 });
 
-router.post("/refresh", async (req, res) => {
+router.post("/refresh", authRateLimiter, async (req, res) => {
 	const reqRefreshToken = req.cookies.refresh_token;
 
 	if (!reqRefreshToken) {
@@ -63,18 +64,32 @@ router.post("/refresh", async (req, res) => {
 
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
-		secure: true,
+		secure: process.env.NODE_ENV === "production",
 		sameSite: "strict",
-		maxAge: 8 * 60 * 60 * 1000, // 8 hours
+		maxAge: 15 * 60 * 1000, // 15 minutes
+	});
+
+	res.cookie("refresh_token", refreshToken, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		sameSite: "strict",
+		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
+		path: "/",
 	});
 
 	return res.json({ username: user?.username, role: user?.role });
 });
 
 router.post("/logout", async (req, res) => {
+	const refreshToken = req.cookies.refresh_token;
+
+	if (refreshToken) {
+		await AuthService.Logout(refreshToken);
+	}
+
 	res.clearCookie("access_token");
 	res.clearCookie("refresh_token", {
-		path: "/refresh",
+		path: "/",
 	});
 	return res.json({ message: "Logged out successfully" });
 });

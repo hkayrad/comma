@@ -8,12 +8,25 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/animate-ui/components/radix/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/animate-ui/primitives/radix/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/animate-ui/components/radix/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   BanknoteArrowDown,
   BanknoteArrowUp,
@@ -26,10 +39,11 @@ import {
   TestTubeDiagonal,
 } from "lucide-react";
 import { useMemo } from "react";
-import { NavLink, useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export default function NonSystemAdminSidebarContent() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const financialItems = useMemo(
     () => [
@@ -90,17 +104,62 @@ export default function NonSystemAdminSidebarContent() {
   );
 
   const navList = useMemo(
-    () => [
-      {
-        title: "Finans",
-        items: financialItems,
-      },
-      {
-        title: "Geliştirme",
-        items: devItems,
-      },
-    ],
+    () =>
+      [
+        {
+          title: "Finans",
+          items: financialItems,
+        },
+        import.meta.env.DEV
+          ? {
+            title: "Geliştirme",
+            items: devItems,
+          }
+          : null,
+      ].filter((item) => item !== null),
     [financialItems, devItems],
+  );
+
+  const { state } = useSidebar();
+
+  const renderCollapsedItem = (item: any, isActive: boolean) => (
+    <SidebarMenuItem key={item.title}>
+      <DropdownMenu>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton isActive={isActive}>
+                {item.icon && <item.icon />}
+                <span className="select-none">{item.title}</span>
+                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="right" hidden={state !== "collapsed"}>
+            {item.title}
+          </TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent side="right" align="start" sideOffset={4}>
+          <DropdownMenuLabel className="text-muted-foreground select-none">
+            {item.title}
+          </DropdownMenuLabel>
+          {item.items.map((subItem: any) => (
+            <DropdownMenuItem
+              key={subItem.title}
+              onClick={() => {
+                if (subItem.url !== location.pathname) {
+                  navigate(subItem.url);
+                }
+              }}
+              className="w-full cursor-pointer flex items-center"
+            >
+              {subItem.icon && <subItem.icon className="mr-2 h-4 w-4" />}
+              <span>{subItem.title}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </SidebarMenuItem>
   );
 
   return (
@@ -116,6 +175,10 @@ export default function NonSystemAdminSidebarContent() {
                   : location.pathname.startsWith(item.url);
 
               if (item.items && item.items.length > 0) {
+                if (state === "collapsed") {
+                  return renderCollapsedItem(item, isActive);
+                }
+
                 return (
                   <Collapsible
                     key={item.title}
@@ -142,21 +205,16 @@ export default function NonSystemAdminSidebarContent() {
                             return (
                               <SidebarMenuSubItem key={subItem.title}>
                                 <SidebarMenuSubButton
-                                  asChild
                                   isActive={isSubActive}
+                                  onClick={() => {
+                                    if (subItem.url !== location.pathname) {
+                                      navigate(subItem.url);
+                                    }
+                                  }}
+                                  className="cursor-pointer"
                                 >
-                                  <NavLink
-                                    to={subItem.url}
-                                    className="select-none"
-                                    onClick={(e) => {
-                                      if (subItem.url === location.pathname) {
-                                        e.preventDefault();
-                                      }
-                                    }}
-                                  >
-                                    {subItem.icon && <subItem.icon />}
-                                    <span>{subItem.title}</span>
-                                  </NavLink>
+                                  {subItem.icon && <subItem.icon />}
+                                  <span>{subItem.title}</span>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
                             );
@@ -170,24 +228,25 @@ export default function NonSystemAdminSidebarContent() {
 
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={isActive}
-                  >
-                    <NavLink
-                      to={item.url}
-                      className="select-none"
-                      onClick={(e) => {
-                        if (item.url === location.pathname) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        onClick={() => {
+                          if (item.url !== location.pathname) {
+                            navigate(item.url);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" hidden={state !== "collapsed"}>
+                      {item.title}
+                    </TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
               );
             })}

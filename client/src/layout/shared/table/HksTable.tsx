@@ -81,6 +81,7 @@ export default function HksTable(props: Props) {
                           ${header.id === "Vergi Dairesi" && "w-36"}
                           ${header.id === "İşlemler" && "w-1"}
                           ${header.id === "Borç Durumu" && "w-32"}
+                          ${header.id === "Fatura No" && "w-36"}
                           ${header.id === "Tür" && "w-32"}
                           `}
                       >
@@ -112,6 +113,7 @@ export default function HksTable(props: Props) {
                           ${cell.column.id === "Müşteri" && "w-36 overflow-hidden"}
                           ${cell.column.id === "Açıklama" && "w-36 overflow-hidden"}
                           ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "Fatura No" && "w-36 overflow-hidden"}
                           ${cell.column.id === "İşlemler" && "w-fit"}
                           `}
                       >

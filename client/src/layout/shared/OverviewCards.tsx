@@ -135,7 +135,11 @@ export default function OverviewCards(props: Props) {
             className="text-xl select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_debts)}
           >
-            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.total_debts}
+            {isLoading ? (
+              <Skeleton className="h-7 w-full" />
+            ) : (
+              formattedTotals.total_debts
+            )}
           </CardTitle>
           <CardAction>{currencyBadges[currency]}</CardAction>
         </CardHeader>
@@ -149,7 +153,11 @@ export default function OverviewCards(props: Props) {
             className="text-xl text-green-600 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.total_payments)}
           >
-            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.total_payments}
+            {isLoading ? (
+              <Skeleton className="h-7 w-full" />
+            ) : (
+              formattedTotals.total_payments
+            )}
           </CardTitle>
           <CardAction>
             <BadgeCheck className="text-green-600 hidden 2xl:block" />
@@ -165,7 +173,11 @@ export default function OverviewCards(props: Props) {
             className="text-xl text-red-500 select-none hover:cursor-copy"
             onClick={() => copyToClipboard(formattedTotals.remaining_debt)}
           >
-            {isLoading ? <Skeleton className="h-7 w-full" /> : formattedTotals.remaining_debt}
+            {isLoading ? (
+              <Skeleton className="h-7 w-full" />
+            ) : (
+              formattedTotals.remaining_debt
+            )}
           </CardTitle>
           <CardAction>
             <BadgeAlert className="text-red-500 hidden 2xl:block" />

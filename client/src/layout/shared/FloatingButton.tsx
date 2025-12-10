@@ -125,7 +125,7 @@ export default function FloatingButton() {
           {(location.pathname === "/" ||
             location.pathname.startsWith("/alacaklar")) && (
             <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
-              <DropdownMenuLabel className="relative z-10">
+              <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
                 Alacak Eylemleri
               </DropdownMenuLabel>
               <DropdownMenuItem onClick={handleAddReceivableCustomer}>
@@ -145,7 +145,7 @@ export default function FloatingButton() {
           {(location.pathname === "/" ||
             location.pathname.startsWith("/verecekler")) && (
             <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
-              <DropdownMenuLabel className="relative z-10">
+              <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
                 Borç Eylemleri
               </DropdownMenuLabel>
               <DropdownMenuItem onClick={handleAddPayableCustomer}>

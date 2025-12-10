@@ -108,7 +108,7 @@ export default function PaymentDialog(props: Props) {
       customer_id: payment?.customer_id || "",
       amount: payment?.amount ? Number(payment.amount) : 0,
       currency: payment?.currency || "TRY",
-      exchange_rate: payment?.exchange_rate || 1,
+      exchange_rate: payment?.exchange_rate ? Number(payment.exchange_rate) : 1,
       payment_date: payment?.payment_date
         ? new Date(payment.payment_date)
         : new Date(),

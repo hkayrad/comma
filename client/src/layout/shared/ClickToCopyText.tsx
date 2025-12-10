@@ -16,6 +16,7 @@ export default function ClickToCopyText(props: Props) {
                 ${column?.id === "Müşteri" && "w-36 text-ellipsis overflow-hidden"}
                 ${column?.id === "Vergi Dairesi" && "w-36 text-ellipsis overflow-hidden"}
                 ${column?.id === "Açıklama" && "w-36 text-ellipsis overflow-hidden"}
+                ${column?.id === "Fatura No" && "w-36 text-ellipsis overflow-hidden"}
                 ${className}
             `}
       onClick={() => copyToClipboard(value)}

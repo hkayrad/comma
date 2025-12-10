@@ -188,9 +188,13 @@ export default function HksTableHeader(props: Props) {
           <TooltipTrigger asChild>
             <InputGroup className="max-w-2xs bg-background min-w-48">
               <InputGroupAddon>
-                <UserRound className={
-                  searchInputRef.current?.value === "" ? "text-muted-foreground" : "text-primary"
-                } />
+                <UserRound
+                  className={
+                    searchInputRef.current?.value === ""
+                      ? "text-muted-foreground"
+                      : "text-primary"
+                  }
+                />
               </InputGroupAddon>
               <InputGroupInput
                 ref={searchInputRef}
@@ -322,6 +326,7 @@ export default function HksTableHeader(props: Props) {
           <DropdownMenuContent align="end">
             {rowCounts.map((rowCount) => (
               <DropdownMenuCheckboxItem
+                key={`row-count-${rowCount}`}
                 checked={table.getState().pagination.pageSize === rowCount}
                 onCheckedChange={() => table.setPageSize(rowCount)}
               >
