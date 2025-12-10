@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:dev": "tsc -b && NODE_ENV=development vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -16,8 +16,12 @@ export default defineConfig(({ mode }) => {
 		},
 		plugins: [react(), tailwindcss()],
 		server: {
-			host: env.NODE_ENV === "production" ? "https://io.orhandogan.com.tr" : "localhost",
-			port: env.NODE_ENV === "production" ? 443 : 4000,
+			host: true,
+			port: 4000,
+		},
+		preview: {
+			host: true,
+			port: 4000,
 		},
 		resolve: {
 			alias: {
