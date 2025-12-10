@@ -24,27 +24,60 @@ export interface DialogConfig {
 export const DialogProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [config, setConfig] = useState<DialogConfig>({});
-  const [customerInfo, setCustomerInfo] = useState<CustomerDto | null>(null);
+  type DialogInstance = DialogConfig & {
+    id: string;
+    isOpen: boolean;
+    customerInfo: CustomerDto | null;
+  };
+
+  const [dialogs, setDialogs] = useState<DialogInstance[]>([]);
 
   const openDialog = (
     dialogConfig: DialogConfig,
     customerInfo: CustomerDto | null = null,
   ) => {
-    setConfig(dialogConfig);
-    setCustomerInfo(customerInfo);
-    setIsOpen(true);
+    const newDialog: DialogInstance = {
+      ...dialogConfig,
+      id: crypto.randomUUID(),
+      isOpen: true,
+      customerInfo,
+    };
+    setDialogs((prev) => [...prev, newDialog]);
   };
 
   const closeDialog = () => {
-    setIsOpen(false);
+    setDialogs((prev) => {
+      // Find the last dialog that is currently open
+      let lastOpenIndex = -1;
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].isOpen) {
+          lastOpenIndex = i;
+          break;
+        }
+      }
 
-    if (config.onClose) {
-      config.onClose();
-    }
-    // Clear config after a brief delay to allow for closing animation
-    setTimeout(() => setConfig({}), 200);
+      if (lastOpenIndex === -1) return prev;
+
+      const dialogToClose = prev[lastOpenIndex];
+
+      // Trigger onClose callback if exists
+      if (dialogToClose.onClose) {
+        dialogToClose.onClose();
+      }
+
+      // Create new array with the target dialog set to isOpen: false
+      const newDialogs = [...prev];
+      newDialogs[lastOpenIndex] = { ...dialogToClose, isOpen: false };
+
+      // Schedule removal of this dialog after animation
+      setTimeout(() => {
+        setDialogs((currentDialogs) =>
+          currentDialogs.filter((d) => d.id !== dialogToClose.id),
+        );
+      }, 0);
+
+      return newDialogs;
+    });
   };
 
   const getSizeClass = (size?: string) => {
@@ -93,30 +126,59 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Derived state for context consumers
+  // We use the last dialog (top of stack) for context values to maintain backward compatibility
+  // or checks like "is there any dialog open?"
+  const activeDialog = dialogs.length > 0 ? dialogs[dialogs.length - 1] : null;
+  const isAnyOpen = dialogs.some((d) => d.isOpen);
+
   return (
     <DialogContext.Provider
-      value={{ openDialog, closeDialog, isOpen, customerInfo }}
+      value={{
+        openDialog,
+        closeDialog,
+        isOpen: isAnyOpen,
+        customerInfo: activeDialog?.customerInfo ?? null,
+      }}
     >
       {children}
-      <Dialog open={isOpen} onOpenChange={(open) => !open && closeDialog()}>
-        <DialogContent
-          className={`${getSizeClass(config.size)} selection:text-background selection:bg-foreground`}
-          style={getWidthStyle(config.size)}
-        >
-          {(config.title || config.description) && (
-            <DialogHeader>
-              {config.title && <DialogTitle>{config.title}</DialogTitle>}
-              {config.description && (
-                <DialogDescription>{config.description}</DialogDescription>
+      {dialogs.map((dialog, index) => {
+        const offset = dialogs.length - 1 - index;
+        const scale = 1 - offset * 0.05;
+        const translateY = offset * -16; // Raise slighty (16px per level)
+
+        return (
+          <Dialog
+            key={dialog.id}
+            open={dialog.isOpen}
+            onOpenChange={(open) => {
+              if (!open) closeDialog();
+            }}
+          >
+            <DialogContent
+              className={`${getSizeClass(dialog.size)} selection:text-background selection:bg-foreground`}
+              style={{
+                ...getWidthStyle(dialog.size),
+                transform: `scale(${scale}) translateY(${translateY * 2}px)`,
+                transition: "all 0.1s ease-in-out",
+              }}
+            >
+              {(dialog.title || dialog.description) && (
+                <DialogHeader>
+                  {dialog.title && <DialogTitle>{dialog.title}</DialogTitle>}
+                  {dialog.description && (
+                    <DialogDescription>{dialog.description}</DialogDescription>
+                  )}
+                </DialogHeader>
               )}
-            </DialogHeader>
-          )}
 
-          {config.content && <div className="pt-4">{config.content}</div>}
+              {dialog.content && <div className="pt-4">{dialog.content}</div>}
 
-          {config.footer && <DialogFooter>{config.footer}</DialogFooter>}
-        </DialogContent>
-      </Dialog>
+              {dialog.footer && <DialogFooter>{dialog.footer}</DialogFooter>}
+            </DialogContent>
+          </Dialog>
+        );
+      })}
     </DialogContext.Provider>
   );
 };

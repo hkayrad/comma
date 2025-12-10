@@ -39,6 +39,7 @@ import z from "zod";
 type Props = {
   customer?: CustomerDto;
   type?: OverviewViewType;
+  onSuccess?: () => void;
 };
 
 const CustomerFormSchema = z.object({
@@ -84,7 +85,7 @@ const CustomerFormSchema = z.object({
 });
 
 export default function CustomerDialog(props: Props) {
-  const { customer, type = "receivable" } = props;
+  const { customer, type = "receivable", onSuccess } = props;
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -126,6 +127,7 @@ export default function CustomerDialog(props: Props) {
           form.reset();
           closeDialog();
           sendRefreshEvent();
+          if (onSuccess) onSuccess();
           return customer
             ? "Müşteri başarıyla güncellendi"
             : "Müşteri başarıyla eklendi";
@@ -135,7 +137,7 @@ export default function CustomerDialog(props: Props) {
           : "Müşteri eklenirken hata oluştu",
       });
     },
-    [form, closeDialog, API, customer],
+    [form, closeDialog, API, customer, onSuccess],
   );
 
   return (

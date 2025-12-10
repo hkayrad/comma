@@ -38,10 +38,17 @@ type Props = {
   form: UseFormReturn<any>;
   customerIdAndNames: CustomerIdName[];
   addNewCustomer?: boolean;
+  onRefresh?: () => void;
 };
 
 export default function CustomerSelect(props: Props) {
-  const { type, form, customerIdAndNames, addNewCustomer = false } = props;
+  const {
+    type,
+    form,
+    customerIdAndNames,
+    addNewCustomer = false,
+    onRefresh,
+  } = props;
 
   const { openDialog } = useDialog();
 
@@ -75,8 +82,8 @@ export default function CustomerSelect(props: Props) {
                       <IdCard className="!text-muted-foreground" />
                       {field.value
                         ? customerIdAndNames.find(
-                            (customer) => customer.id === field.value,
-                          )?.name
+                          (customer) => customer.id === field.value,
+                        )?.name
                         : "Müşteri seçin"}
                     </span>
                     <ChevronsUpDown className="opacity-50" />
@@ -125,7 +132,9 @@ export default function CustomerSelect(props: Props) {
                       title: "Müşteri Ekle",
                       description: "Yeni müşteri ekleyin",
                       size: "3xl",
-                      content: <CustomerDialog type={type} />,
+                      content: (
+                        <CustomerDialog type={type} onSuccess={onRefresh} />
+                      ),
                       showCloseButton: true,
                     });
                   }}

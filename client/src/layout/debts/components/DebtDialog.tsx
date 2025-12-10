@@ -209,6 +209,7 @@ export default function DebtDialog(props: Props) {
           form={form}
           customerIdAndNames={customerIdAndNames}
           addNewCustomer
+          onRefresh={handleFetchCustomerIdAndNames}
         />
         <FormField
           control={form.control}
