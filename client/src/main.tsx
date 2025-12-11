@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
+import "./i18n";
 import App from "./layout/App";
 import { RequireAuth, RequireNoAuth } from "./layout/auth/AuthCheck";
 import Login from "./layout/auth/Login";

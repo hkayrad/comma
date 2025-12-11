@@ -110,7 +110,6 @@ export default function Header() {
             ))}
           </BreadcrumbList>
         </Breadcrumb>
-
         <div className="ml-auto mr-2">
           <ExchangeRates />
         </div>

@@ -62,6 +62,7 @@ import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog"
 import { useDialog } from "@/contexts/dialog";
 import { Logger } from "@/lib/utils/logger";
 import InfoDialog from "./components/InfoDialog";
+import LanguageButton from "./components/LanguageButton";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -234,6 +235,7 @@ export default function HksSidebar() {
           </AnimatePresence>
         </NavLink>
       </SidebarHeader>
+
       {/* SIDEBAR CONTENT */}
       <NonSystemAdminOnly>
         <NonSystemAdminSidebarContent />
@@ -335,7 +337,12 @@ export default function HksSidebar() {
                       Hesap Ayarları
                     </TooltipContent>
                   </Tooltip>
-                  <DropdownMenuContent side="right" align="end" sideOffset={4}>
+                  <DropdownMenuContent
+                    side="right"
+                    align="end"
+                    sideOffset={4}
+                    className="overflow-hidden"
+                  >
                     <DropdownMenuItem
                       onClick={() =>
                         setTheme(theme === "dark" ? "light" : "dark")
@@ -350,6 +357,7 @@ export default function HksSidebar() {
                         {theme === "dark" ? "Açık Tema" : "Koyu Tema"}
                       </span>
                     </DropdownMenuItem>
+                    <LanguageButton />
                     <DropdownMenuItem
                       onClick={handleLogout}
                       variant="destructive"
