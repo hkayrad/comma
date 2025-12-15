@@ -1,0 +1,67 @@
+{
+  "dialog": {
+    "accountDetails": {
+      "description": "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
+      "title": "Hesap Detayları"
+    },
+    "info": {
+      "description": "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
+      "developer": "Geliştirici",
+      "exchangeInfo": "Döviz Verileri",
+      "title": "Hakkında",
+      "version": "Uygulama Versiyonu"
+    }
+  },
+  "header": {
+    "exchange": {
+      "buy": "Alış",
+      "eur": "Euro (EUR)",
+      "lastUpdate": "Son Güncelleme: {{date}}",
+      "lastUpdate.hover": "{{date}} günü için, {{tcmb}} tarafından belirlenmiş kur bilgileri",
+      "noData": "{{tcmb}} verileri mevcut değildir.",
+      "sell": "Satış",
+      "usd": "Amerikan Doları (USD)"
+    }
+  },
+  "notification": {
+    "auth": {
+      "logout": {
+        "error": "Çıkış yapılırken bir hata oluştu",
+        "pending": "Çıkış yapılıyor...",
+        "success": "Çıkış başarılı!"
+      }
+    }
+  },
+  "sidebar": {
+    "footer": {
+      "account": {
+        "label": "Hesap",
+        "language": "Dil",
+        "logout": "Çıkış Yap",
+        "theme": {
+          "dark": "Koyu Tema",
+          "light": "Açık Tema"
+        }
+      },
+      "companyManagement": {
+        "accountDetails": {
+          "label": "Hesap Detayları"
+        },
+        "label": "Yönetim"
+      },
+      "info": {
+        "label": "Hakkında"
+      }
+    }
+  },
+  "user": {
+    "role": {
+      "admin": "Admin",
+      "manager": "Yönetici",
+      "user": "Kullanıcı"
+    }
+  },
+  "vars": {
+    "tcmb": "Türkiye Cumhuriyeti Merkez Bankası"
+  }
+}

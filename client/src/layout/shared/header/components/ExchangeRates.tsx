@@ -11,12 +11,14 @@ import { DollarSign, Euro } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Logger } from "@/lib/utils/logger";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export default function ExchangeRates() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(
     null,
   );
+  const { t } = useTranslation();
 
   const fetchExchangeRates = useCallback(async () => {
     try {
@@ -48,13 +50,18 @@ export default function ExchangeRates() {
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
               <p className="text-muted-foreground text-[10px] my-auto mr-1 select-none">
-                Son Güncelleme: {exchangeRates.date.replaceAll("-", "/")}
+                {t("header.exchange.lastUpdate")}:{" "}
+                {exchangeRates.date.replaceAll("-", "/")}
               </p>
             </TooltipTrigger>
             <TooltipContent side="left">
               <span>
-                {exchangeRates.date.replaceAll("-", "/")} günü için, Türkiye
-                Cumhuriyeti Merkez Bankası tarafından belirlenmiş kur bilgileri
+                {t("header.exchange.lastUpdate.hover", {
+                  replace: {
+                    date: exchangeRates.date.replaceAll("-", "/"),
+                    tcmb: t("vars.tcmb"),
+                  },
+                })}
               </span>
             </TooltipContent>
           </Tooltip>
@@ -63,7 +70,7 @@ export default function ExchangeRates() {
               <div className="flex gap-2 select-none">
                 <DollarSign size={20} />
                 <p className="text-sm">
-                  Alış:&nbsp;
+                  {t("header.exchange.buy")}:&nbsp;
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
@@ -74,7 +81,7 @@ export default function ExchangeRates() {
                   </span>
                 </p>
                 <p className="text-sm">
-                  Satış:&nbsp;
+                  {t("header.exchange.sell")}:&nbsp;
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
@@ -87,7 +94,7 @@ export default function ExchangeRates() {
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <span>Amerikan Doları (USD)</span>
+              <span>{t("header.exchange.usd")}</span>
             </TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="w-px mx-2 !h-4" />
@@ -96,7 +103,7 @@ export default function ExchangeRates() {
               <div className="flex gap-2 select-none">
                 <Euro size={20} />
                 <p className="text-sm">
-                  Alış:&nbsp;
+                  {t("header.exchange.buy")}:&nbsp;
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
@@ -107,7 +114,7 @@ export default function ExchangeRates() {
                   </span>
                 </p>
                 <p className="text-sm">
-                  Satış:&nbsp;
+                  {t("header.exchange.sell")}:&nbsp;
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
@@ -120,13 +127,17 @@ export default function ExchangeRates() {
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <span>Euro (EUR)</span>
+              <span>{t("header.exchange.eur")}</span>
             </TooltipContent>
           </Tooltip>
         </>
       ) : (
         <p className="text-muted-foreground text-[10px] select-none">
-          Merkez Bankası verileri mevcut değildir.
+          {t("header.exchange.noData", {
+            replace: {
+              tcmb: t("vars.tcmb"),
+            },
+          })}
         </p>
       )}
     </div>

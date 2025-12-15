@@ -20,11 +20,14 @@ export default function LanguageButton() {
     <DropdownMenuSub>
       <DropdownMenuSubTrigger className="gap-2">
         <Globe size={16} />
-        <span>{t("language")}</span>
+        <span>{t("sidebar.footer.account.language")}</span>
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent>
         {supportedLanguages.map((lang) => (
-          <DropdownMenuItem onClick={() => i18n.changeLanguage(lang.code)}>
+          <DropdownMenuItem
+            key={lang.code}
+            onClick={() => i18n.changeLanguage(lang.code)}
+          >
             {lang.flag}
             {lang.label}
           </DropdownMenuItem>

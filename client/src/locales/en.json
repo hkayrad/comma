@@ -1,0 +1,67 @@
+{
+  "dialog": {
+    "accountDetails": {
+      "description": "See and edit your account information.",
+      "title": "Account Details"
+    },
+    "info": {
+      "description": "See the information about IO system.",
+      "developer": "Developer",
+      "exchangeInfo": "Exchange Information",
+      "title": "About",
+      "version": "Application Version"
+    }
+  },
+  "header": {
+    "exchange": {
+      "buy": "Buy",
+      "eur": "Euro (EUR)",
+      "lastUpdate": "Last Update: {{date}}",
+      "lastUpdate.hover": "Exchange rates decided by {{tcmb}} for {{date}}",
+      "noData": "{{tcmb}} data is not available.",
+      "sell": "Sell",
+      "usd": "United States Dolar (USD)"
+    }
+  },
+  "notification": {
+    "auth": {
+      "logout": {
+        "error": "There was an error while trying to logout",
+        "pending": "Logging out...",
+        "success": "Logged out successfully!"
+      }
+    }
+  },
+  "sidebar": {
+    "footer": {
+      "account": {
+        "label": "Account",
+        "language": "Language",
+        "logout": "Log Out",
+        "theme": {
+          "dark": "Dark Mode",
+          "light": "Light Mode"
+        }
+      },
+      "companyManagement": {
+        "accountDetails": {
+          "label": "Account Details"
+        },
+        "label": "Management"
+      },
+      "info": {
+        "label": "About"
+      }
+    }
+  },
+  "user": {
+    "role": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "user": "User"
+    }
+  },
+  "vars": {
+    "tcmb": "Central Bank of the Republic of Türkiye"
+  }
+}

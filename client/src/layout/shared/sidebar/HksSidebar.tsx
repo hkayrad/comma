@@ -63,6 +63,7 @@ import { useDialog } from "@/contexts/dialog";
 import { Logger } from "@/lib/utils/logger";
 import InfoDialog from "./components/InfoDialog";
 import LanguageButton from "./components/LanguageButton";
+import { useTranslation } from "react-i18next";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -73,20 +74,21 @@ export default function HksSidebar() {
   const { role } = useRole();
   const { reloadConnection } = useWebSocket();
   const { openDialog } = useDialog();
+  const { t } = useTranslation();
 
   const handleLogout = useCallback(async () => {
     const promise = AuthApi.Logout();
     toast.promise(promise, {
-      loading: "Çıkış yapılıyor...",
+      loading: t("notification.auth.logout.pending"),
       success: () => {
         clearUser();
         navigate("/login");
         reloadConnection();
-        return "Çıkış başarılı!";
+        return t("notification.auth.logout.success");
       },
-      error: "Çıkış yapılırken bir hata oluştu",
+      error: t("notification.auth.logout.error"),
     });
-  }, [navigate, reloadConnection, clearUser]);
+  }, [navigate, reloadConnection, clearUser, t]);
 
   const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
   const [logos, setLogos] = useState<{ smallLogo: string; largeLogo: string }>({
@@ -119,24 +121,23 @@ export default function HksSidebar() {
 
   const handleCompanyDetails = useCallback(async () => {
     openDialog({
-      title: "Hesap Detayları",
-      description: "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
+      title: t("dialog.accountDetails.title"),
+      description: t("dialog.accountDetails.description"),
       size: "3xl",
       content: <CompanyDetailsDialog />,
       showCloseButton: true,
     });
-  }, [openDialog]);
+  }, [openDialog, t]);
 
   const handleInfo = useCallback(async () => {
     openDialog({
-      title: "Hakkında",
-      description:
-        "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
-      size: "lg",
+      title: t("dialog.info.title"),
+      description: t("dialog.info.description"),
+      size: "xl",
       content: <InfoDialog />,
       showCloseButton: true,
     });
-  }, [openDialog]);
+  }, [openDialog, t]);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -255,12 +256,14 @@ export default function HksSidebar() {
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuButton>
                         <Wrench />
-                        <span className="select-none">Yönetim</span>
+                        <span className="select-none">
+                          {t("sidebar.footer.companyManagement.label")}
+                        </span>
                       </SidebarMenuButton>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
                   <TooltipContent side="right" hidden={state !== "collapsed"}>
-                    Yönetim
+                    {t("sidebar.footer.companyManagement.label")}
                   </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent side="right" align="end" sideOffset={4}>
@@ -276,7 +279,11 @@ export default function HksSidebar() {
                     className="!justify-start"
                   >
                     <Building2 className="text-inherit bg-inherit select-none" />
-                    <span>Hesap Detayları</span>
+                    <span>
+                      {t(
+                        "sidebar.footer.companyManagement.accountDetails.label",
+                      )}
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -288,12 +295,14 @@ export default function HksSidebar() {
             <SidebarMenu>
               <SidebarMenuButton onClick={handleInfo}>
                 <Info />
-                <span className="select-none">Hakkında</span>
+                <span className="select-none">
+                  {t("sidebar.footer.info.label")}
+                </span>
               </SidebarMenuButton>
             </SidebarMenu>
           </TooltipTrigger>
           <TooltipContent side="right" hidden={state !== "collapsed"}>
-            Hakkında
+            {t("sidebar.footer.info.label")}
           </TooltipContent>
         </Tooltip>
         <SidebarSeparator className="!mx-0" />
@@ -326,7 +335,7 @@ export default function HksSidebar() {
                               {user?.username}
                             </span>
                             <span className="text-muted-foreground truncate text-xs select-none">
-                              {UserRole[(role ?? 0) as UserRoleType]}
+                              {t(`user.role.${UserRole[(role ?? 0) as UserRoleType]}`)}
                             </span>
                           </div>
                           <EllipsisVertical className="ml-auto size-4" />
@@ -334,7 +343,7 @@ export default function HksSidebar() {
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
                     <TooltipContent side="right" hidden={state !== "collapsed"}>
-                      Hesap Ayarları
+                      {t("sidebar.footer.info.label")}
                     </TooltipContent>
                   </Tooltip>
                   <DropdownMenuContent
@@ -354,17 +363,21 @@ export default function HksSidebar() {
                         <Moon className="text-inherit bg-inherit select-none" />
                       )}
                       <span>
-                        {theme === "dark" ? "Açık Tema" : "Koyu Tema"}
+                        {theme === "dark"
+                          ? t("sidebar.footer.account.theme.light")
+                          : t("sidebar.footer.account.theme.dark")}
                       </span>
                     </DropdownMenuItem>
+
                     <LanguageButton />
+
                     <DropdownMenuItem
                       onClick={handleLogout}
                       variant="destructive"
                       className="!justify-start"
                     >
                       <LogOut className="text-inherit bg-inherit select-none" />
-                      <span>Çıkış Yap</span>
+                      <span>{t("sidebar.footer.account.logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
