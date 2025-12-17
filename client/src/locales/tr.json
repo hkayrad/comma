@@ -8,9 +8,29 @@
       "overcharge": "Bu müşteriden fazladan tahsilat yapılmıştır.",
       "overpay": "Bu müşteriye fazladan ödeme yapılmıştır."
     },
+    "floatingButton": {
+      "actions": {
+        "payable": "Borç Eylemleri",
+        "payable.addCustomer": "Müşteri Ekle",
+        "payable.addPayable": "Borç Ekle",
+        "payable.addPayment": "Ödeme Ekle",
+        "receivable": "Alacak Eylemleri",
+        "receivable.addCustomer": "Müşteri Ekle",
+        "receivable.addPayment": "Ödeme Ekle",
+        "receivable.addReceivable": "Alacak Ekle"
+      },
+      "hover": "İşlem menüsünü aç"
+    },
     "table": {
       "column": {
         "actions": "İşlemler",
+        "actions.delete": "Müşteriyi sil",
+        "actions.delete.confirm": "Müşteriyi Sil",
+        "actions.delete.description": "Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?",
+        "actions.delete.title": "Emin misiniz?",
+        "actions.edit_details": "Müşteri bilgilerini düzenle",
+        "actions.show_details": "Müşteri detaylarını görüntüle",
+        "actions.show_statement": "Borç dökümünü görüntüle",
         "debt_status": "Borç Durumu",
         "is_company": "Tür",
         "mersis_no": "Mersis No",
@@ -20,26 +40,47 @@
         "tax_office": "Vergi Dairesi",
         "total_debt": "Toplam",
         "total_payments": "Ödenmiş"
-      },
-      "columns": {
-        "actions": {
-          "delete": "Müşteriyi sil",
-          "delete.confirm": "Müşteriyi Sil",
-          "delete.description": "Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?",
-          "delete.title": "Emin misiniz?",
-          "edit_details": "Müşteri bilgilerini düzenle",
-          "show_details": "Müşteri detaylarını görüntüle",
-          "show_statement": "Borç dökümünü görüntüle"
-        }
+      }
+    }
+  },
+  "debt": {
+    "table": {
+      "column": {
+        "actions": "İşlemler",
+        "actions.delete": "Borcu sil",
+        "actions.delete.confirm": "Borcu sil",
+        "actions.delete.description": "Bu işlem borç kaydını silecektir. Onaylıyor musunuz?",
+        "actions.delete.title": "Emin misiniz?",
+        "actions.edit": "Borç bilgilerini düzenle",
+        "amount": "Tutar",
+        "currency": "Para Birimi",
+        "customer_name": "Müşteri",
+        "description": "Açıklama",
+        "exchange_rate": "Kur",
+        "invoice_no": "Fatura No",
+        "issue_date": "Oluşturma Tarihi",
+        "total": "Toplam",
+        "total_in_try": "Ödenecek Miktar",
+        "vat": "KDV"
       }
     }
   },
   "dialog": {
     "accountDetails": {
+      "accountInformation": "Hesap Bilgileri",
       "description": "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
+      "logos": "Logolar",
+      "logos.form.acceptedFormats": "Kabul edilen formatlar: png, jpg, jpeg",
+      "logos.form.dragNDrop": "Dosyayı sürükleyip bırakın",
+      "logos.form.upload": "Dosya Yükle",
+      "logos.form.upload.confirm": "Logoları Yükle",
+      "logos.large": "Büyük Logo",
+      "logos.small": "Küçük Logo",
       "title": "Hesap Detayları"
     },
     "customer": {
+      "add": "Müşteri Ekle",
+      "add.description": "Yeni müşteri ekleyin",
       "couldNotFind": "Müşteri bulunamadı",
       "details": {
         "description": "{{tax_no_label}}: {{tax_no}} | Vergi Dairesi: {{tax_office}}",
@@ -48,7 +89,16 @@
       "edit": {
         "description": "Müşteri bilgilerini düzenleyin",
         "title": "Müşteri Düzenle"
-      }
+      },
+      "update": "Müşteriyi Güncelle"
+    },
+    "debt": {
+      "add": "Borç Ekle",
+      "edit": {
+        "description": "Borç bilgilerini düzenleyin",
+        "title": "Borç Düzenle"
+      },
+      "update": "Borcu Güncelle"
     },
     "info": {
       "description": "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
@@ -70,6 +120,209 @@
         "title": "Planlı Bakım Başlat"
       },
       "startTime": "Başlangıç Zamanı"
+    },
+    "payable": {
+      "add": {
+        "description": "Yeni borç ekleyin",
+        "title": "Borç Ekle"
+      }
+    },
+    "payableCustomer": {
+      "add": {
+        "description": "Borcunuz olan bir müşteri ekleyin",
+        "title": "Müşteri Ekle"
+      }
+    },
+    "payablePayment": {
+      "add": {
+        "description": "Yeni borç ödemesi ekleyin",
+        "title": "Borç Ödemesi Ekle"
+      }
+    },
+    "payment": {
+      "add": "Ödeme Ekle",
+      "edit": {
+        "description": "Ödeme bilgilerini düzenleyin",
+        "title": "Ödeme Düzenle"
+      },
+      "update": "Ödemeyi Güncelle"
+    },
+    "receivable": {
+      "add": {
+        "description": "Yeni alacak ekleyin",
+        "title": "Alacak Ekle"
+      }
+    },
+    "receivableCustomer": {
+      "add": {
+        "description": "Alacağınız olan bir müşteri ekleyin",
+        "title": "Müşteri Ekle"
+      }
+    },
+    "receivablePayment": {
+      "add": {
+        "description": "Yeni alacak ödemesi ekleyin",
+        "title": "Alacak Ödemesi Ekle"
+      }
+    }
+  },
+  "form": {
+    "company": {
+      "address": "Adres",
+      "address.description": "Firma adresi",
+      "address.validation.invalid": "Geçersiz adres",
+      "address.validation.max": "Adres en fazla {{charCount}} karakter olabilir",
+      "address.validation.min": "Adres en az {{charCount}} karakter olabilir",
+      "email": "E-posta Adresi",
+      "email.description": "Firma e-posta adresi",
+      "email.validation.invalid": "Geçersiz e-posta adresi",
+      "email.validation.max": "E-posta adresi en fazla {{charCount}} karakter olabilir",
+      "email.validation.min": "E-posta adresi en az {{charCount}} karakter olabilir",
+      "is_company": "Hesap Türü",
+      "is_company.description": "Hesap türünü seçin",
+      "mersis_no": "MERSİS No",
+      "mersis_no.description": "Firma MERSİS numarası",
+      "mersis_no.validation.invalid": "Geçersiz MERSİS numarası",
+      "mersis_no.validation.max": "MERSİS numarası en fazla {{charCount}} karakter olabilir",
+      "mersis_no.validation.min": "MERSİS numarası en az {{charCount}} karakter olabilir",
+      "name": "Şirket Adı",
+      "name.description": "Şirketinizin tam adı",
+      "name.validation.invalid": "Geçersiz şirket adı",
+      "name.validation.max": "Şirket adı en fazla {{charCount}} karakter olabilir",
+      "name.validation.min": "Şirket adı en az {{charCount}} karakter olabilir",
+      "phone": "Telefon Numarası",
+      "phone.description": "İletişim telefon numarası",
+      "phone.validation.invalid": "Geçersiz telefon numarası",
+      "phone.validation.max": "Telefon numarası en fazla {{charCount}} karakter olabilir",
+      "phone.validation.min": "Telefon numarası en az {{charCount}} karakter olabilir",
+      "tax_number": "Vergi",
+      "tax_number.description": "{{tax_number_text}} numarası",
+      "tax_number.validation.invalid": "Geçersiz vergi numarası",
+      "tax_number.validation.max": "Vergi numarası en fazla {{charCount}} karakter olabilir",
+      "tax_number.validation.min": "Vergi numarası en az {{charCount}} karakter olabilir",
+      "tax_number_alternative": "TC Kimlik",
+      "tax_office": "Vergi Dairesi",
+      "tax_office.description": "Bağlı olduğunuz vergi dairesi",
+      "tax_office.validation.invalid": "Geçersiz vergi dairesi",
+      "tax_office.validation.max": "Vergi dairesi en fazla {{charCount}} karakter olabilir",
+      "tax_office.validation.min": "Vergi dairesi en az {{charCount}} karakter olabilir"
+    },
+    "customer": {
+      "address": "Adres",
+      "address.description": "Müşterinin adresi",
+      "address.validation.invalid": "Geçersiz adres",
+      "address.validation.max": "Adres en fazla {{charCount}} karakter olabilir",
+      "address.validation.min": "Adres en az {{charCount}} karakter olabilir",
+      "email": "E-posta Adresi",
+      "email.description": "Müşterinin e-posta adresi",
+      "email.validation.invalid": "Geçersiz e-posta adresi",
+      "email.validation.max": "E-posta adresi en fazla {{charCount}} karakter olabilir",
+      "email.validation.min": "E-posta adresi en az {{charCount}} karakter olabilir",
+      "is_company": "Müşteri Türü",
+      "is_company.description": "Müşteri türünü seçin",
+      "mersis_no": "MERSİS No",
+      "mersis_no.description": "Müşterinin MERSİS numarası",
+      "mersis_no.validation.invalid": "Geçersiz MERSİS numarası",
+      "mersis_no.validation.max": "MERSİS numarası en fazla {{charCount}} karakter olabilir",
+      "mersis_no.validation.min": "MERSİS numarası en az {{charCount}} karakter olabilir",
+      "name": "Müşteri Adı",
+      "name.description": "Şirket veya birey adı",
+      "name.validation.invalid": "Geçersiz müşteri adı",
+      "name.validation.max": "Müşteri adı en fazla {{charCount}} karakter olabilir",
+      "name.validation.min": "Müşteri adı en az {{charCount}} karakter olabilir",
+      "phone": "Telefon Numarası",
+      "phone.description": "Müşterinin telefon numarası",
+      "phone.validation.invalid": "Geçersiz telefon numarası",
+      "phone.validation.max": "Telefon numarası en fazla {{charCount}} karakter olabilir",
+      "phone.validation.min": "Telefon numarası en az {{charCount}} karakter olabilir",
+      "select": "Müşteri",
+      "select.add": "Yeni Müşteri Ekle",
+      "select.couldNotFind": "Müşteri bulunamadı.",
+      "select.description": "İşlem yapılacak müşteri",
+      "select.placeholder": "Müşteri seçin",
+      "select.search": "Ara...",
+      "tax_number": "Vergi",
+      "tax_number.description": "Müşterinin {{tax_number_text}} numarası",
+      "tax_number.validation.invalid": "Geçersiz vergi numarası",
+      "tax_number.validation.max": "Vergi numarası en fazla {{charCount}} karakter olabilir",
+      "tax_number.validation.min": "Vergi numarası en az {{charCount}} karakter olabilir",
+      "tax_number_alternative": "TC Kimlik",
+      "tax_office": "Vergi Dairesi",
+      "tax_office.description": "Müşterinin vergi dairesi",
+      "tax_office.validation.invalid": "Geçersiz vergi dairesi",
+      "tax_office.validation.max": "Vergi dairesi en fazla {{charCount}} karakter olabilir",
+      "tax_office.validation.min": "Vergi dairesi en az {{charCount}} karakter olabilir"
+    },
+    "debt": {
+      "amount": "Tutar",
+      "amount.description": "Borç tutarı",
+      "amount.validation.invalid": "Geçersiz tutar",
+      "amount.validation.min": "Tutar en az {{min}} olmalıdır",
+      "currency": "Para Birimi",
+      "currency.description": "Borç para birimi",
+      "currency.validation.invalid": "Geçersiz para birimi",
+      "customer_id": {
+        "validation": {
+          "required": "Müşteri seçilmesi zorunludur"
+        }
+      },
+      "description": "Açıklama",
+      "description.description": "Ek bilgiler (varsa)",
+      "description.validation.invalid": "Geçersiz açıklama",
+      "description.validation.max": "Açıklama en fazla {{charCount}} karakter olmalıdır",
+      "exchange_rate": "Kur",
+      "exchange_rate.description": "Döviz kuru",
+      "exchange_rate.set.label": "TCMB Kuru",
+      "exchange_rate.set.tooltip": "Kur olarak TCMB günlük kurunu kullan",
+      "exchange_rate.validation.invalid": "Geçersiz kur",
+      "exchange_rate.validation.min": "Kur en az {{min}} olmalıdır",
+      "invoice_no": "Fatura No",
+      "invoice_no.description": "Fatura numarası (varsa)",
+      "invoice_no.validation.invalid": "Geçersiz fatura no",
+      "invoice_no.validation.max": "Fatura numarası en fazla {{charCount}} karakter olmalıdır",
+      "issue_date": "Kesim Tarihi",
+      "issue_date.description": "Borç kesim tarihi",
+      "issue_date.validation.invalid": "Geçersiz tarih",
+      "vat": "KDV",
+      "vat.description": "Borç KDV'si",
+      "vat.set.10%": "Tutarın %10'unu KDV olarak ayarla",
+      "vat.set.20%": "Tutarın %20'sini KDV olarak ayarla",
+      "vat.validation.invalid": "Geçersiz KDV tutarı",
+      "vat.validation.min": "KDV en az {{min}} olmalıdır"
+    },
+    "payment": {
+      "amount": "Miktar",
+      "amount.description": "Ödeme tutarı",
+      "amount.validation.invalid": "Geçersiz tutar",
+      "amount.validation.min": "Tutar en az {{min}} olmalıdır",
+      "currency": "Para Birimi",
+      "currency.description": "Borç para birimi",
+      "currency.validation.invalid": "Geçersiz para birimi",
+      "customer_id": {
+        "validation": {
+          "required": "Müşteri seçilmesi zorunludur"
+        }
+      },
+      "description": "Açıklama",
+      "description.description": "Ek bilgiler (varsa)",
+      "description.validation.invalid": "Geçersiz açıklama",
+      "description.validation.max": "Açıklama en fazla {{charCount}} karakter olmalıdır",
+      "exchange_rate": "Kur",
+      "exchange_rate.description": "Döviz kuru",
+      "exchange_rate.set.label": "TCMB Kuru",
+      "exchange_rate.set.tooltip": "Kur olarak TCMB günlük kurunu kullan",
+      "exchange_rate.validation.invalid": "Geçersiz kur",
+      "exchange_rate.validation.min": "Kur en az {{min}} olmalıdır",
+      "invoice_no": "Fatura No",
+      "invoice_no.description": "Fatura numarası (varsa)",
+      "invoice_no.validation.invalid": "Geçersiz fatura no",
+      "invoice_no.validation.max": "Fatura numarası en fazla {{charCount}} karakter olmalıdır",
+      "payment_date": "Ödeme Tarihi",
+      "payment_date.description": "Borç ödeme tarihi",
+      "payment_date.validation.invalid": "Geçersiz tarih",
+      "payment_method": "Ödeme Yöntemi",
+      "payment_method.description": "Ödeme yöntemini seçin",
+      "payment_method.validation.invalid": "Geçersiz ödeme yöntemi"
     }
   },
   "header": {
@@ -109,6 +362,20 @@
     "title": "Giriş Yap"
   },
   "notification": {
+    "accountDetails": {
+      "logos": {
+        "delete": {
+          "error": "Logo silinirken bir hata oluştu",
+          "pending": "Logo siliniyor...",
+          "success": "Logo başarıyla silindi!"
+        },
+        "upload": {
+          "error": "Logolar yüklenirken bir hata oluştu",
+          "pending": "Logolar yükleniyor...",
+          "success": "Logolar başarıyla yüklendi!"
+        }
+      }
+    },
     "activeUserCount": "Aktif Kullanıcı Sayısı: {{count}}",
     "admin": {
       "endMaintenance": {
@@ -135,21 +402,74 @@
         "success": "Çıkış başarılı!"
       }
     },
+    "companyDetails": {
+      "update": {
+        "error": "Şirket detayları güncellenirken bir hata oluştu.",
+        "pending": "Şirket detayları güncelleniyor...",
+        "success": "Şirket detayları başarıyla güncellendi!"
+      }
+    },
     "copy": {
       "error": "Panoya kopyalanamadı",
       "success": "Panoya kopyalandı"
     },
     "customer": {
+      "add": {
+        "error": "Müşteri eklenirken hata oluştu",
+        "pending": "Müşteri ekleniyor...",
+        "success": "Müşteri başarıyla eklendi"
+      },
       "delete": {
         "error": "Müşteri silinirken hata oluştu",
         "pending": "Müşteri siliniyor...",
         "succes": "Müşteri başarıyla silindi"
+      },
+      "update": {
+        "error": "Müşteri güncellenirken hata oluştu",
+        "pending": "Müşteri güncelleniyor...",
+        "success": "Müşteri başarıyla güncellendi"
+      }
+    },
+    "debt": {
+      "add": {
+        "error": "Borç eklenirken hata oluştu",
+        "pending": "Borç ekleniyor...",
+        "success": "Borç başarıyla eklendi"
+      },
+      "couldNotFind": "Borç bulunamadı",
+      "delete": {
+        "error": "Borç silinirken hata oluştu",
+        "pending": "Borç siliniyor...",
+        "success": "Borç başarıyla silindi!"
+      },
+      "update": {
+        "error": "Borç güncellenirken hata oluştu",
+        "pending": "Borç güncelleniyor...",
+        "success": "Borç başarıyla güncellendi"
       }
     },
     "endMaintenance": {
       "title": "Sistem bakımı tamamlandı, {{refreshTime}} saniye içinde sayfa yenilenecek."
     },
     "notImplemented": "Bu özellik henüz geliştirilmedi",
+    "payment": {
+      "add": {
+        "error": "Ödeme eklenirken hata oluştu",
+        "pending": "Ödeme ekleniyor...",
+        "success": "Ödeme başarıyla eklendi"
+      },
+      "couldNotFind": "Ödeme bulunamadı",
+      "delete": {
+        "error": "Ödeme silinirken hata oluştu",
+        "pending": "Ödeme siliniyor...",
+        "success": "Ödeme başarıyla silindi"
+      },
+      "update": {
+        "error": "Ödeme güncellenirken hata oluştu",
+        "pending": "Ödeme güncelleniyor...",
+        "success": "Ödeme başarıyla güncellendi"
+      }
+    },
     "startMaintenance": {
       "body": "Planlı bakım çalışması nedeniyle otomatik olarak çıkış yapacaksınız. Lütfen yapılan işlemleri kaydedin.",
       "estimatedMaintenanceInterval": "Tahmini Bakım Aralığı: {{start}} - {{end}}",
@@ -160,6 +480,27 @@
     "paid": "Ödenmiş {{state}}",
     "remaning": "Kalan {{state}}",
     "total": "Toplam {{state}}"
+  },
+  "payment": {
+    "table": {
+      "column": {
+        "actions": "İşlemler",
+        "actions.delete": "Ödemeyi sil",
+        "actions.delete.confirm": "Ödemeyi Sil",
+        "actions.delete.description": "Bu işlem ödeme kaydını silecektir. Onaylıyor musunuz?",
+        "actions.delete.title": "Emin misiniz?",
+        "actions.edit": "Ödeme bilgilerini düzenle",
+        "amount": "Miktar",
+        "amount_in_try": "Ödenen Miktar",
+        "currency": "Para Birimi",
+        "customer_name": "Müşteri",
+        "description": "Açıklama",
+        "exchange_rate": "Kur",
+        "invoice_no": "Fatura No",
+        "payment_date": "Ödeme Tarihi",
+        "payment_method": "Ödeme Yöntemi"
+      }
+    }
   },
   "sidebar": {
     "footer": {
@@ -238,14 +579,20 @@
   },
   "vars": {
     "address": "Adres",
+    "bank_transfer": "Havale",
     "cancel": "İptal",
+    "card": "Kart",
+    "cash": "Nakit",
+    "check": "Çek",
     "creation_date": "Oluşturma Tarihi",
+    "customer": "Müşteri",
     "debt_status": {
       "has_debt": "Alacağınız Var",
       "has_no_debt": "Alacağınız Yok",
       "has_no_receivable": "Borcunuz Yok",
       "has_receivable": "Borcunuz Var"
     },
+    "delete": "Sil",
     "details": "Detaylar",
     "email": "E-posta",
     "eur": "Euro (EUR)",
@@ -253,11 +600,15 @@
       "false": "Birey",
       "true": "Şirket"
     },
+    "large": "Büyük",
     "payable": "Borç",
     "payables": "Borçlar",
+    "payment": "Ödeme",
     "phone": "Telefon",
     "receivable": "Alacak",
     "receivables": "Alacaklar",
+    "save": "Kaydet",
+    "small": "Küçük",
     "tax_number": "Vergi No",
     "tckn": "TC Kimlik No",
     "tcmb": "Türkiye Cumhuriyeti Merkez Bankası",

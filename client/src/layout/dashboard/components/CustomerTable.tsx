@@ -3,21 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Info, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
@@ -34,486 +34,534 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  data: CustomerDto[];
-  type?: OverviewViewType;
+    data: CustomerDto[];
+    type?: OverviewViewType;
 };
 
 export default function CustomerTable(props: Props) {
-  const { data, type = "receivable" } = props;
+    const { data, type = "receivable" } = props;
 
-  const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
+    const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const { openDialog } = useDialog();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
+    const { openDialog } = useDialog();
+    const navigate = useNavigate();
+    const { t } = useTranslation();
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      const promise = API.Delete(id);
-      toast.promise(promise, {
-        loading: t("notification.customer.delete.pending"),
-        success: () => {
-          sendRefreshEvent();
-          return t("notification.customer.delete.succes");
+    const handleDelete = useCallback(
+        (id: string) => {
+            const promise = API.Delete(id);
+            toast.promise(promise, {
+                loading: t("notification.customer.delete.pending"),
+                success: () => {
+                    sendRefreshEvent();
+                    return t("notification.customer.delete.succes");
+                },
+                error: t("notification.customer.delete.error"),
+            });
         },
-        error: t("notification.customer.delete.error"),
-      });
-    },
-    [API, t],
-  );
+        [API, t],
+    );
 
-  const onEdit = useCallback(
-    (customerId: string) => {
-      const customer = data.find((c) => c.id === customerId);
+    const onEdit = useCallback(
+        (customerId: string) => {
+            const customer = data.find((c) => c.id === customerId);
 
-      if (!customer) {
-        toast.error(t("dialog.customer.couldNotFind"));
-        return;
-      }
+            if (!customer) {
+                toast.error(t("dialog.customer.couldNotFind"));
+                return;
+            }
 
-      openDialog({
-        title: t("dialog.customer.edit.title"),
-        description: t("dialog.customer.edit.description"),
-        size: "3xl",
-        content: <CustomerDialog customer={customer} type={type} />,
-        showCloseButton: true,
-      });
-    },
-    [data, openDialog, type, t],
-  );
-
-  const onDetails = useCallback(
-    (customerId: string) => {
-      const customer = data.find((c) => c.id === customerId);
-
-      if (!customer) {
-        toast.error(t("dialog.customer.couldNotFind"));
-        return;
-      }
-
-      openDialog({
-        title: t("dialog.customer.details.title"),
-        description: t("dialog.customer.details.description", {
-          tax_no_label: customer.is_company
-            ? t("vars.tax_number")
-            : t("vars.tckn"),
-          tax_no: customer.tax_number,
-          tax_office: customer.tax_office,
-        }),
-        size: "3xl",
-        content: <CustomerDetails customer={customer} type={type} />,
-        showCloseButton: true,
-      });
-    },
-    [data, type, openDialog, t],
-  );
-
-  const CustomerTableColumns: ColumnDef<CustomerDto>[] = useMemo(
-    () => [
-      {
-        id: "#",
-        header: ({ column }) => column.id,
-        cell: ({ row }) => row.index + 1,
-      },
-      {
-        accessorKey: "name",
-        header: ({ column }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.name")}
-          />
-        ),
-        cell: ({ row, column }) => (
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger className="text-left flex">
-              <ClickToCopyText
-                value={row.getValue(column.id) || "-"}
-                column={column}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {row.getValue(column.id) || "-"}
-            </TooltipContent>
-          </Tooltip>
-        ),
-      },
-      {
-        accessorKey: "is_company",
-        header: ({ column }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.is_company")}
-          />
-        ),
-        cell: ({ row, column }) => {
-          const isCompany = row.getValue(column.id);
-          return isCompany ? (
-            <Badge
-              className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy"
-              onClick={() => copyToClipboard(t("vars.is_company.true"), t)}
-            >
-              {t("vars.is_company.true")}
-            </Badge>
-          ) : (
-            <Badge
-              className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100 select-none hover:cursor-copy"
-              onClick={() => copyToClipboard(t("vars.is_company.false"), t)}
-            >
-              {t("vars.is_company.false")}
-            </Badge>
-          );
+            openDialog({
+                title: t("dialog.customer.edit.title"),
+                description: t("dialog.customer.edit.description"),
+                size: "3xl",
+                content: <CustomerDialog customer={customer} type={type} />,
+                showCloseButton: true,
+            });
         },
-        filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0)
-            return true;
-          const cellValue = row.getValue(columnId)
-            ? t("vars.is_company.true")
-            : t("vars.is_company.false");
-          return filterValue.includes(cellValue);
-        },
-      },
-      {
-        accessorKey: "tax_office",
-        header: ({ column }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.tax_office")}
-          />
-        ),
-        cell: ({ row, column }) => (
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger className="text-left flex">
-              <ClickToCopyText
-                value={row.getValue(column.id) || "-"}
-                column={column}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {row.getValue(column.id) || "-"}
-            </TooltipContent>
-          </Tooltip>
-        ),
-      },
-      {
-        accessorKey: "tax_number",
-        header: ({ column }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.tax_number")}
-          />
-        ),
-        cell: ({ row, column }) => (
-          <ClickToCopyText value={row.getValue(column.id) || "-"} />
-        ),
-      },
-      {
-        accessorKey: "mersis_no",
-        header: ({ column }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.mersis_no")}
-          />
-        ),
-        cell: ({ row, column }) => (
-          <ClickToCopyText value={row.getValue(column.id) || "-"} />
-        ),
-      },
-      {
-        accessorKey: `total_debt`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.total_debt")}
-          />
-        ),
-        cell: ({ row, column }: { row: any; column: any }) => (
-          <FormattedCurrency row={row} column={column} currency={"TRY"} />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: `total_payments`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.total_payments")}
-          />
-        ),
-        cell: ({ row, column }: { row: any; column: any }) => (
-          <FormattedCurrency row={row} column={column} currency={"TRY"} />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: `remaining_debt`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("dashboard.table.column.remaining_debt")}
-          />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency row={row} column={column} currency={"TRY"} />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        id: "debt_status",
-        header: t("dashboard.table.column.debt_status"),
-        cell: ({ row }: { row: Row<any> }) => {
-          const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
-          if (remaining_debt > 0)
-            return (
-              <Badge
-                className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
-                onClick={() =>
-                  copyToClipboard(
-                    type === "receivable"
-                      ? t("vars.debt_status.has_debt")
-                      : t("vars.debt_status.has_receivable"),
-                    t,
-                  )
-                }
-              >
-                {type === "receivable"
-                  ? t("vars.debt_status.has_debt")
-                  : t("vars.debt_status.has_receivable")}
-              </Badge>
-            );
-          else if (remaining_debt < 0)
-            return (
-              <Badge
-                className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
-                onClick={() =>
-                  copyToClipboard(
-                    type === "receivable"
-                      ? t("vars.debt_status.has_receivable")
-                      : t("vars.debt_status.has_debt"),
-                    t,
-                  )
-                }
-              >
-                {type === "receivable"
-                  ? t("vars.debt_status.has_receivable")
-                  : t("vars.debt_status.has_debt")}
-              </Badge>
-            );
-          else
-            return (
-              <Badge
-                className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
-                onClick={() =>
-                  copyToClipboard(
-                    type === "receivable"
-                      ? t("vars.debt_status.has_no_debt")
-                      : t("vars.debt_status.has_no_receivable"),
-                    t,
-                  )
-                }
-              >
-                {type === "receivable"
-                  ? t("vars.debt_status.has_no_debt")
-                  : t("vars.debt_status.has_no_receivable")}
-              </Badge>
-            );
-        },
-        filterFn: (row, _columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0)
-            return true;
-          const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
-          let status = "";
-          if (remaining_debt > 0) {
-            status =
-              type === "receivable"
-                ? t("vars.debt_status.has_debt")
-                : t("vars.debt_status.has_receivable");
-          } else if (remaining_debt < 0) {
-            status =
-              type === "receivable"
-                ? t("vars.debt_status.has_receivable")
-                : t("vars.debt_status.has_debt");
-          } else {
-            status =
-              type === "receivable"
-                ? t("vars.debt_status.has_no_debt")
-                : t("vars.debt_status.has_no_receivable");
-          }
-          return filterValue.includes(status);
-        },
-      },
-      {
-        id: "actions",
-        header: t("dashboard.table.column.actions"),
-        cell: ({ row }: { row: Row<CustomerDto> }) => (
-          <div className="flex gap-2">
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() =>
-                    navigate(
-                      `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
-                    )
-                  }
-                >
-                  <Paperclip />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("dashboard.table.columns.actions.show_statement")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDetails(row.original.id!)}
-                >
-                  <Info />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("dashboard.table.columns.actions.show_details")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(row.original.id!)}
-                >
-                  <Pencil />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {t("dashboard.table.columns.actions.edit_details")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                    >
-                      <Trash2 />
-                    </Button>
-                  </TooltipTrigger>
-                </DialogTrigger>
-                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  {t("dashboard.table.columns.actions.delete")}
-                </TooltipContent>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {t("dashboard.table.columns.actions.delete.title")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("dashboard.table.columns.actions.delete.description")}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">{t("vars.cancel")}</Button>
-                    </DialogClose>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(row.original.id!)}
-                    >
-                      {t("dashboard.table.columns.actions.delete.confirm")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </Tooltip>
-          </div>
-        ),
-      },
-    ],
-    [handleDelete, navigate, onDetails, onEdit, type, t],
-  );
+        [data, openDialog, type, t],
+    );
 
-  const tags = useMemo(
-    () =>
-      type === "receivable"
-        ? [
-            {
-              column: "is_company",
-              column_label: t("dashboard.table.column.is_company"),
-              value: t("vars.is_company.true"),
-              color: "violet",
-            },
-            {
-              column: "is_company",
-              column_label: t("dashboard.table.column.is_company"),
-              value: t("vars.is_company.false"),
-              color: "orange",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_debt"),
-              color: "red",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_no_debt"),
-              color: "green",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_receivable"),
-              color: "blue",
-            },
-          ]
-        : [
-            {
-              column: "is_company",
-              column_label: t("dashboard.table.column.is_company"),
-              value: t("vars.is_company.true"),
-              color: "violet",
-            },
-            {
-              column: "is_company",
-              column_label: t("dashboard.table.column.is_company"),
-              value: t("vars.is_company.false"),
-              color: "orange",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_debt"),
-              color: "blue",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_no_receivable"),
-              color: "green",
-            },
-            {
-              column: "debt_status",
-              column_label: t("dashboard.table.column.debt_status"),
-              value: t("vars.debt_status.has_receivable"),
-              color: "red",
-            },
-          ],
-    [type, t],
-  );
+    const onDetails = useCallback(
+        (customerId: string) => {
+            const customer = data.find((c) => c.id === customerId);
 
-  return (
-    <HksTable
-      data={data}
-      columns={CustomerTableColumns}
-      searchColumn="name"
-      tags={tags}
-    />
-  );
+            if (!customer) {
+                toast.error(t("dialog.customer.couldNotFind"));
+                return;
+            }
+
+            openDialog({
+                title: t("dialog.customer.details.title"),
+                description: t("dialog.customer.details.description", {
+                    tax_no_label: customer.is_company
+                        ? t("vars.tax_number")
+                        : t("vars.tckn"),
+                    tax_no: customer.tax_number,
+                    tax_office: customer.tax_office,
+                }),
+                size: "3xl",
+                content: <CustomerDetails customer={customer} type={type} />,
+                showCloseButton: true,
+            });
+        },
+        [data, type, openDialog, t],
+    );
+
+    const CustomerTableColumns: ColumnDef<CustomerDto>[] = useMemo(
+        () => [
+            {
+                id: "#",
+                header: ({ column }) => column.id,
+                cell: ({ row }) => row.index + 1,
+            },
+            {
+                accessorKey: "name",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.name")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger className="text-left flex">
+                            <ClickToCopyText
+                                value={row.getValue(column.id) || "-"}
+                                column={column}
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {row.getValue(column.id) || "-"}
+                        </TooltipContent>
+                    </Tooltip>
+                ),
+            },
+            {
+                accessorKey: "is_company",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.is_company")}
+                    />
+                ),
+                cell: ({ row, column }) => {
+                    const isCompany = row.getValue(column.id);
+                    return isCompany ? (
+                        <Badge
+                            className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy"
+                            onClick={() =>
+                                copyToClipboard(t("vars.is_company.true"), t)
+                            }
+                        >
+                            {t("vars.is_company.true")}
+                        </Badge>
+                    ) : (
+                        <Badge
+                            className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100 select-none hover:cursor-copy"
+                            onClick={() =>
+                                copyToClipboard(t("vars.is_company.false"), t)
+                            }
+                        >
+                            {t("vars.is_company.false")}
+                        </Badge>
+                    );
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    if (!Array.isArray(filterValue) || filterValue.length === 0)
+                        return true;
+                    const cellValue = row.getValue(columnId)
+                        ? t("vars.is_company.true")
+                        : t("vars.is_company.false");
+                    return filterValue.includes(cellValue);
+                },
+            },
+            {
+                accessorKey: "tax_office",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.tax_office")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger className="text-left flex">
+                            <ClickToCopyText
+                                value={row.getValue(column.id) || "-"}
+                                column={column}
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {row.getValue(column.id) || "-"}
+                        </TooltipContent>
+                    </Tooltip>
+                ),
+            },
+            {
+                accessorKey: "tax_number",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.tax_number")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <ClickToCopyText value={row.getValue(column.id) || "-"} />
+                ),
+            },
+            {
+                accessorKey: "mersis_no",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.mersis_no")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <ClickToCopyText value={row.getValue(column.id) || "-"} />
+                ),
+            },
+            {
+                accessorKey: `total_debt`,
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.total_debt")}
+                    />
+                ),
+                cell: ({ row, column }: { row: any; column: any }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={"TRY"}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: `total_payments`,
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.total_payments")}
+                    />
+                ),
+                cell: ({ row, column }: { row: any; column: any }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={"TRY"}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: `remaining_debt`,
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("dashboard.table.column.remaining_debt")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={"TRY"}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                id: "debt_status",
+                header: t("dashboard.table.column.debt_status"),
+                cell: ({ row }: { row: Row<any> }) => {
+                    const remaining_debt = parseFloat(
+                        row.getValue(`remaining_debt`),
+                    );
+                    if (remaining_debt > 0)
+                        return (
+                            <Badge
+                                className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        type === "receivable"
+                                            ? t("vars.debt_status.has_debt")
+                                            : t(
+                                                  "vars.debt_status.has_receivable",
+                                              ),
+                                        t,
+                                    )
+                                }
+                            >
+                                {type === "receivable"
+                                    ? t("vars.debt_status.has_debt")
+                                    : t("vars.debt_status.has_receivable")}
+                            </Badge>
+                        );
+                    else if (remaining_debt < 0)
+                        return (
+                            <Badge
+                                className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        type === "receivable"
+                                            ? t(
+                                                  "vars.debt_status.has_receivable",
+                                              )
+                                            : t("vars.debt_status.has_debt"),
+                                        t,
+                                    )
+                                }
+                            >
+                                {type === "receivable"
+                                    ? t("vars.debt_status.has_receivable")
+                                    : t("vars.debt_status.has_debt")}
+                            </Badge>
+                        );
+                    else
+                        return (
+                            <Badge
+                                className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        type === "receivable"
+                                            ? t("vars.debt_status.has_no_debt")
+                                            : t(
+                                                  "vars.debt_status.has_no_receivable",
+                                              ),
+                                        t,
+                                    )
+                                }
+                            >
+                                {type === "receivable"
+                                    ? t("vars.debt_status.has_no_debt")
+                                    : t("vars.debt_status.has_no_receivable")}
+                            </Badge>
+                        );
+                },
+                filterFn: (row, _columnId, filterValue) => {
+                    if (!Array.isArray(filterValue) || filterValue.length === 0)
+                        return true;
+                    const remaining_debt = parseFloat(
+                        row.getValue(`remaining_debt`),
+                    );
+                    let status = "";
+                    if (remaining_debt > 0) {
+                        status =
+                            type === "receivable"
+                                ? t("vars.debt_status.has_debt")
+                                : t("vars.debt_status.has_receivable");
+                    } else if (remaining_debt < 0) {
+                        status =
+                            type === "receivable"
+                                ? t("vars.debt_status.has_receivable")
+                                : t("vars.debt_status.has_debt");
+                    } else {
+                        status =
+                            type === "receivable"
+                                ? t("vars.debt_status.has_no_debt")
+                                : t("vars.debt_status.has_no_receivable");
+                    }
+                    return filterValue.includes(status);
+                },
+            },
+            {
+                id: "actions",
+                header: t("dashboard.table.column.actions"),
+                cell: ({ row }: { row: Row<CustomerDto> }) => (
+                    <div className="flex gap-2">
+                        <Tooltip disableHoverableContent>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                        navigate(
+                                            `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
+                                        )
+                                    }
+                                >
+                                    <Paperclip />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {t(
+                                    "dashboard.table.column.actions.show_statement",
+                                )}
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip disableHoverableContent>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onDetails(row.original.id!)}
+                                >
+                                    <Info />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {t(
+                                    "dashboard.table.column.actions.show_details",
+                                )}
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip disableHoverableContent>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onEdit(row.original.id!)}
+                                >
+                                    <Pencil />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {t(
+                                    "dashboard.table.column.actions.edit_details",
+                                )}
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip disableHoverableContent>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                                        >
+                                            <Trash2 />
+                                        </Button>
+                                    </TooltipTrigger>
+                                </DialogTrigger>
+                                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                                    {t("dashboard.table.column.actions.delete")}
+                                </TooltipContent>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            {t(
+                                                "dashboard.table.column.actions.delete.title",
+                                            )}
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {t(
+                                                "dashboard.table.column.actions.delete.description",
+                                            )}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">
+                                                {t("vars.cancel")}
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() =>
+                                                handleDelete(row.original.id!)
+                                            }
+                                        >
+                                            {t(
+                                                "dashboard.table.column.actions.delete.confirm",
+                                            )}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </Tooltip>
+                    </div>
+                ),
+            },
+        ],
+        [handleDelete, navigate, onDetails, onEdit, type, t],
+    );
+
+    const tags = useMemo(
+        () =>
+            type === "receivable"
+                ? [
+                      {
+                          column: "is_company",
+                          column_label: t("dashboard.table.column.is_company"),
+                          value: t("vars.is_company.true"),
+                          color: "violet",
+                      },
+                      {
+                          column: "is_company",
+                          column_label: t("dashboard.table.column.is_company"),
+                          value: t("vars.is_company.false"),
+                          color: "orange",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_debt"),
+                          color: "red",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_no_debt"),
+                          color: "green",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_receivable"),
+                          color: "blue",
+                      },
+                  ]
+                : [
+                      {
+                          column: "is_company",
+                          column_label: t("dashboard.table.column.is_company"),
+                          value: t("vars.is_company.true"),
+                          color: "violet",
+                      },
+                      {
+                          column: "is_company",
+                          column_label: t("dashboard.table.column.is_company"),
+                          value: t("vars.is_company.false"),
+                          color: "orange",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_debt"),
+                          color: "blue",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_no_receivable"),
+                          color: "green",
+                      },
+                      {
+                          column: "debt_status",
+                          column_label: t("dashboard.table.column.debt_status"),
+                          value: t("vars.debt_status.has_receivable"),
+                          color: "red",
+                      },
+                  ],
+        [type, t],
+    );
+
+    return (
+        <HksTable
+            data={data}
+            columns={CustomerTableColumns}
+            searchColumn="name"
+            tags={tags}
+        />
+    );
 }

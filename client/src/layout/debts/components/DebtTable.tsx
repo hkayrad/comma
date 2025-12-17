@@ -2,20 +2,20 @@ import type { DebtDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
@@ -33,331 +33,399 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  data: DebtDto[];
-  type: "receivable" | "payable";
+    data: DebtDto[];
+    type: "receivable" | "payable";
 };
 
 export default function DebtTable(props: Props) {
-  const { data, type } = props;
+    const { data, type } = props;
 
-  const { openDialog } = useDialog();
-  const { t } = useTranslation();
+    const { openDialog } = useDialog();
+    const { t } = useTranslation();
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
-      const promise = API.Delete(id);
-      toast.promise(promise, {
-        loading: "Borç siliniyor...",
-        success: () => {
-          sendRefreshEvent();
-          return "Borç başarıyla silindi";
+    const handleDelete = useCallback(
+        (id: string) => {
+            const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
+            const promise = API.Delete(id);
+            toast.promise(promise, {
+                loading: t("notification.debt.delete.pending"),
+                success: () => {
+                    sendRefreshEvent();
+                    return t("notification.debt.delete.success");
+                },
+                error: t("notification.debt.delete.error"),
+            });
         },
-        error: "Borç silinirken hata oluştu",
-      });
-    },
-    [type],
-  );
+        [type, t],
+    );
 
-  const onEdit = useCallback(
-    (debtId: string) => {
-      const debt = data.find((d) => d.id === debtId);
+    const onEdit = useCallback(
+        (debtId: string) => {
+            const debt = data.find((d) => d.id === debtId);
 
-      if (!debt) {
-        toast.error("Borç bulunamadı");
-        return;
-      }
+            if (!debt) {
+                toast.error(t("notification.debt.couldNotFind"));
+                return;
+            }
 
-      openDialog({
-        title: "Borç Düzenle",
-        description: "Borç bilgilerini düzenleyin",
-        size: "3xl",
-        content: <DebtDialog debt={debt} type={type} />,
-        showCloseButton: true,
-      });
-    },
-    [data, type, openDialog],
-  );
-
-  const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(
-    () => [
-      {
-        id: "#",
-        header: ({ column }) => column.id,
-        cell: ({ row }) => row.index + 1,
-      },
-      {
-        accessorKey: "customer_name",
-        id: "Müşteri",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => (
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger className="text-left flex">
-              <ClickToCopyText
-                value={row.getValue(column.id) || "-"}
-                column={column}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {row.getValue(column.id) || "-"}
-            </TooltipContent>
-          </Tooltip>
-        ),
-      },
-      {
-        accessorKey: "amount",
-        id: `Tutar`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency
-            row={row}
-            column={column}
-            currency={row.getValue("Para Birimi")}
-          />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: "vat",
-        id: `KDV`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency
-            row={row}
-            column={column}
-            currency={row.getValue("Para Birimi")}
-          />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: "total",
-        id: `Toplam`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency
-            row={row}
-            column={column}
-            currency={row.getValue("Para Birimi")}
-          />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: "currency",
-        id: "Para Birimi",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => {
-          switch (row.getValue(column.id)) {
-            case "TRY":
-              return (
-                <Badge
-                  className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("TRY", t)}
-                >
-                  TRY
-                </Badge>
-              );
-            case "USD":
-              return (
-                <Badge
-                  className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("USD", t)}
-                >
-                  USD
-                </Badge>
-              );
-            case "EUR":
-              return (
-                <Badge
-                  className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("EUR", t)}
-                >
-                  EUR
-                </Badge>
-              );
-          }
+            openDialog({
+                title: t("dialog.debt.edit.title"),
+                description: t("dialog.debt.edit.description"),
+                size: "3xl",
+                content: <DebtDialog debt={debt} type={type} />,
+                showCloseButton: true,
+            });
         },
-        filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0)
-            return true;
-          const rawValue = row.getValue(columnId);
-          return filterValue.includes(rawValue);
-        },
-      },
-      {
-        accessorKey: "exchange_rate",
-        id: "Kur",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => (
-          <ClickToCopyText
-            value={row.getValue(column.id) == 1 ? "-" : row.getValue(column.id)}
-            column={column}
-          />
-        ),
-      },
-      {
-        accessorKey: "total_in_try",
-        id: `Ödenecek Miktar`,
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency row={row} column={column} currency="TRY" />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
-        accessorKey: "issue_date",
-        id: "Düzenlenme Tarihi",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
-      },
-      {
-        accessorKey: "invoice_no",
-        id: "Fatura No",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => (
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger className="text-left flex">
-              <ClickToCopyText
-                value={row.getValue(column.id) || "-"}
-                column={column}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {row.getValue(column.id) || "-"}
-            </TooltipContent>
-          </Tooltip>
-        ),
-      },
-      {
-        accessorKey: "description",
-        id: "Açıklama",
-        header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
-        ),
-        cell: ({ row, column }) => (
-          <Tooltip disableHoverableContent>
-            <TooltipTrigger className="text-left flex">
-              <ClickToCopyText
-                value={row.getValue(column.id) || "-"}
-                column={column}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {row.getValue(column.id) || "-"}
-            </TooltipContent>
-          </Tooltip>
-        ),
-      },
-      {
-        id: "İşlemler",
-        header: ({ column }) => column.id,
-        cell: ({ row }) => (
-          <div className="flex gap-2">
-            <Tooltip disableHoverableContent>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(row.original.id!)}
-                >
-                  <Pencil />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Borç bilgilerini düzenle</TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverableContent>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                    >
-                      <Trash2 />
-                    </Button>
-                  </TooltipTrigger>
-                </DialogTrigger>
-                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  Borcu sil
-                </TooltipContent>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Emin misiniz?</DialogTitle>
-                    <DialogDescription>
-                      Bu işlem borç kaydını silecektir. Onaylıyor musunuz?
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">İptal</Button>
-                    </DialogClose>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(row.original.id!)}
-                    >
-                      Borcu Sil
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </Tooltip>
-          </div>
-        ),
-      },
-    ],
-    [onEdit, handleDelete, t],
-  );
+        [data, type, openDialog, t],
+    );
 
-  const tags = useMemo(
-    () => [
-      {
-        column: "Para Birimi",
-        column_label: "Para Birimi",
-        value: "TRY",
-        color: "red",
-      },
-      {
-        column: "Para Birimi",
-        column_label: "Para Birimi",
-        value: "USD",
-        color: "green",
-      },
-      {
-        column: "Para Birimi",
-        column_label: "Para Birimi",
-        value: "EUR",
-        color: "purple",
-      },
-    ],
-    [],
-  );
+    const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(
+        () => [
+            {
+                id: "#",
+                header: ({ column }) => column.id,
+                cell: ({ row }) => row.index + 1,
+            },
+            {
+                accessorKey: "customer_name",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.customer_name")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger className="text-left flex">
+                            <ClickToCopyText
+                                value={row.getValue(column.id) || "-"}
+                                column={column}
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {row.getValue(column.id) || "-"}
+                        </TooltipContent>
+                    </Tooltip>
+                ),
+            },
+            {
+                accessorKey: "amount",
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.amount")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={row.getValue("currency")}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "vat",
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.vat")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={row.getValue("currency")}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "total",
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.total")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency={row.getValue("currency")}
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "currency",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.currency")}
+                    />
+                ),
+                cell: ({ row, column }) => {
+                    switch (row.getValue(column.id)) {
+                        case "TRY":
+                            return (
+                                <Badge
+                                    className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
+                                    onClick={() => copyToClipboard("TRY", t)}
+                                >
+                                    TRY
+                                </Badge>
+                            );
+                        case "USD":
+                            return (
+                                <Badge
+                                    className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
+                                    onClick={() => copyToClipboard("USD", t)}
+                                >
+                                    USD
+                                </Badge>
+                            );
+                        case "EUR":
+                            return (
+                                <Badge
+                                    className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
+                                    onClick={() => copyToClipboard("EUR", t)}
+                                >
+                                    EUR
+                                </Badge>
+                            );
+                    }
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    if (!Array.isArray(filterValue) || filterValue.length === 0)
+                        return true;
+                    const rawValue = row.getValue(columnId);
+                    return filterValue.includes(rawValue);
+                },
+            },
+            {
+                accessorKey: "exchange_rate",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.exchange_rate")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <ClickToCopyText
+                        value={
+                            row.getValue(column.id) == 1
+                                ? "-"
+                                : row.getValue(column.id)
+                        }
+                        column={column}
+                    />
+                ),
+            },
+            {
+                accessorKey: "total_in_try",
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.total_in_try")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) => (
+                    <FormattedCurrency
+                        row={row}
+                        column={column}
+                        currency="TRY"
+                    />
+                ),
+                sortingFn: formattedNumber,
+            },
+            {
+                accessorKey: "issue_date",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.issue_date")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <FormattedDate row={row} column={column} />
+                ),
+            },
+            {
+                accessorKey: "invoice_no",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.invoice_no")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger className="text-left flex">
+                            <ClickToCopyText
+                                value={row.getValue(column.id) || "-"}
+                                column={column}
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {row.getValue(column.id) || "-"}
+                        </TooltipContent>
+                    </Tooltip>
+                ),
+            },
+            {
+                accessorKey: "description",
+                header: ({ column }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.description")}
+                    />
+                ),
+                cell: ({ row, column }) => (
+                    <Tooltip disableHoverableContent>
+                        <TooltipTrigger className="text-left flex">
+                            <ClickToCopyText
+                                value={row.getValue(column.id) || "-"}
+                                column={column}
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            {row.getValue(column.id) || "-"}
+                        </TooltipContent>
+                    </Tooltip>
+                ),
+            },
+            {
+                id: "actions",
+                header: t("debt.table.column.actions"),
+                cell: ({ row }) => (
+                    <div className="flex gap-2">
+                        <Tooltip disableHoverableContent>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onEdit(row.original.id!)}
+                                >
+                                    <Pencil />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {t("debt.table.column.actions.edit")}
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip disableHoverableContent>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                                        >
+                                            <Trash2 />
+                                        </Button>
+                                    </TooltipTrigger>
+                                </DialogTrigger>
+                                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                                    {t("debt.table.column.actions.delete")}
+                                </TooltipContent>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            {t(
+                                                "debt.table.column.actions.delete.title",
+                                            )}
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            {t(
+                                                "debt.table.column.actions.delete.description",
+                                            )}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">
+                                                {t("vars.cancel")}
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() =>
+                                                handleDelete(row.original.id!)
+                                            }
+                                        >
+                                            {t(
+                                                "debt.table.column.actions.delete.confirm",
+                                            )}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </Tooltip>
+                    </div>
+                ),
+            },
+        ],
+        [onEdit, handleDelete, t],
+    );
 
-  return (
-    <HksTable
-      data={data}
-      columns={DebtTableColumns}
-      tags={tags}
-      searchColumn="Müşteri"
-    />
-  );
+    const tags = useMemo(
+        () => [
+            {
+                column: "currency",
+                column_label: t("debt.table.column.currency"),
+                value: "TRY",
+                color: "red",
+            },
+            {
+                column: "currency",
+                column_label: t("debt.table.column.currency"),
+                value: "USD",
+                color: "green",
+            },
+            {
+                column: "currency",
+                column_label: t("debt.table.column.currency"),
+                value: "EUR",
+                color: "purple",
+            },
+        ],
+        [t],
+    );
+
+    return (
+        <HksTable
+            data={data}
+            columns={DebtTableColumns}
+            tags={tags}
+            searchColumn="customer_name"
+        />
+    );
 }

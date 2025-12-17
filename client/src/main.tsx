@@ -15,88 +15,89 @@ import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
 
 const router = createBrowserRouter([
-  {
-    Component: Root,
-    children: [
-      {
-        path: "login",
-        Component: RequireNoAuth,
+    {
+        Component: Root,
         children: [
-          {
-            index: true,
-            Component: Login,
-          },
-        ],
-      },
-      {
-        path: "/",
-        Component: RequireAuth,
-        children: [
-          {
-            Component: App,
-            children: [
-              {
-                Component: NonSystemAdminOnly,
+            {
+                path: "login",
+                Component: RequireNoAuth,
                 children: [
-                  {
-                    index: true,
-                    Component: Dashboard,
-                  },
-                  {
-                    path: "alacaklar",
-                    children: [
-                      {
+                    {
                         index: true,
-                        Component: Debts,
-                      },
-                      {
-                        path: "odemeler",
-                        Component: Payments,
-                      },
-                      {
-                        path: "borc_dokumu/:customerId",
-                        Component: CustomerStatement,
-                      },
-                    ],
-                  },
-                  {
-                    path: "borclar",
-                    children: [
-                      {
-                        index: true,
-                        Component: Debts,
-                      },
-                      {
-                        path: "odemeler",
-                        Component: Payments,
-                      },
-                      {
-                        path: "borc_dokumu/:customerId",
-                        Component: CustomerStatement,
-                      },
-                    ],
-                  },
-                  {
-                    path: "dev",
-                    Component:
-                      import.meta.env.VITE_NODE_ENV === "development"
-                        ? Dev
-                        : null,
-                  },
+                        Component: Login,
+                    },
                 ],
-              },
-            ],
-          },
+            },
+            {
+                path: "/",
+                Component: RequireAuth,
+                children: [
+                    {
+                        Component: App,
+                        children: [
+                            {
+                                Component: NonSystemAdminOnly,
+                                children: [
+                                    {
+                                        index: true,
+                                        Component: Dashboard,
+                                    },
+                                    {
+                                        path: "alacaklar",
+                                        children: [
+                                            {
+                                                index: true,
+                                                Component: Debts,
+                                            },
+                                            {
+                                                path: "odemeler",
+                                                Component: Payments,
+                                            },
+                                            {
+                                                path: "borc_dokumu/:customerId",
+                                                Component: CustomerStatement,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        path: "borclar",
+                                        children: [
+                                            {
+                                                index: true,
+                                                Component: Debts,
+                                            },
+                                            {
+                                                path: "odemeler",
+                                                Component: Payments,
+                                            },
+                                            {
+                                                path: "borc_dokumu/:customerId",
+                                                Component: CustomerStatement,
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        path: "dev",
+                                        Component:
+                                            import.meta.env.VITE_NODE_ENV ===
+                                            "development"
+                                                ? Dev
+                                                : null,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                path: "*",
+                Component: NotFound,
+            },
         ],
-      },
-      {
-        path: "*",
-        Component: NotFound,
-      },
-    ],
-  },
+    },
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={router} />,
+    <RouterProvider router={router} />,
 );

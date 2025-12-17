@@ -11,7 +11,7 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { NonSystemAdminOnly, SystemAdminOnly } from "./auth/RoleGuard";
 import Admin from "./admin/Admin";
-import { BreadcrumbProvider } from "@/contexts/BreadcrumbContext";
+import { BreadcrumbProvider } from "@/contexts/breadcrumb/breadcrumbProvider";
 
 export default function App() {
   const location = useLocation();
