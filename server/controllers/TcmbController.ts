@@ -1,6 +1,6 @@
 import express from "express";
 import { ExchangeRates } from "@common/types";
-import { Logger } from "../lib/utils";
+import { Logger } from "../lib/utils/logger";
 import { authMiddleware } from "../lib/middleware";
 
 function formatDate(date: Date): string {
@@ -32,11 +32,11 @@ router.get("/", async (req, res) => {
 		Logger.debug("[TCMB] Fetching exchange rates from TCMB");
 
 		const today = new Date(Date.now());
-		const fourteenDaysAgo = new Date(today.getTime() - 14 * 24 * 60 * 60 * 1000);
+		const threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
 
 		const tcmbTodayDate = formatDate(today);
 		Logger.debug(`TCMB date: ${tcmbTodayDate}`);
-		const tcmbFourteenDaysAgoDate = formatDate(fourteenDaysAgo);
+		const tcmbFourteenDaysAgoDate = formatDate(threeDaysAgo);
 		Logger.debug(`TCMB date: ${tcmbFourteenDaysAgoDate}`);
 
 		const response = await fetch(

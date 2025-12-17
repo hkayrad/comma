@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import PayableDebtsService from "../../services/Payable/DebtsService";
 import { authMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils";
+import { Logger } from "../../lib/utils/logger";
 import { DebtDto } from "@common/types";
 
 const router = express.Router();

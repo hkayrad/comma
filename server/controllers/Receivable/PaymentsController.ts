@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import ReceivablePaymentsService from "../../services/Receivable/PaymentsService";
-import { Logger } from "../../lib/utils";
+import { Logger } from "../../lib/utils/logger";
 import { authMiddleware } from "../../lib/middleware";
 
 const router = express.Router();

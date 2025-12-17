@@ -1,6 +1,7 @@
 import express from "express";
 import { AuthService } from "../services/AuthService";
-import { ApiResponse, Logger } from "../lib/utils";
+import { Logger } from "../lib/utils/logger";
+import { ApiResponse } from "../lib/utils/apiResponse";
 import dotenv from "dotenv";
 import { authRateLimiter } from "../lib/middleware/rateLimiter";
 

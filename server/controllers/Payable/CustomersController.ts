@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import PayableCustomersService from "../../services/Payable/CustomersService";
 import { authMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils";
+import { Logger } from "../../lib/utils/logger";
 import { CustomerDto } from "@common/types";
 
 const router = express.Router();

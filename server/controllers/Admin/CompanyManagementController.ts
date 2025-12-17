@@ -1,6 +1,7 @@
 import express from "express";
 import { adminMiddleware } from "../../lib/middleware";
-import { ApiResponse, Logger } from "../../lib/utils";
+import { Logger } from "../../lib/utils/logger";
+import { ApiResponse } from "../../lib/utils/apiResponse";
 import { CompanyManagementService } from "../../services/Admin/CompanyManagementService";
 
 const router = express.Router();

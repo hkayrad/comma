@@ -1,11 +1,12 @@
-import { InsertResult, PaymentDto, UUID } from "@common/types";
-import { pool } from "../../lib/db/pool";
-import { ApiResponse, Logger } from "../../lib/utils";
+import { PaymentDto, UUID } from "@common/types";
+import { Logger } from "../../lib/utils/logger";
+import { ApiResponse } from "../../lib/utils/apiResponse";
+import { PayablePayments } from "../../models";
+import { sequelize } from "../../lib/db/sequelize";
+import { QueryTypes } from "sequelize";
 
 export default class PayablePaymentsService {
 	static async Create(payment: PaymentDto, userId: UUID, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[PayablePayments] Creating payment", { companyId, customerId: payment.customer_id });
 
@@ -24,46 +25,28 @@ export default class PayablePaymentsService {
 				return ApiResponse.error("Missing required fields");
 			}
 
-			const query = `
-        INSERT INTO payable_payments (customer_id, amount, currency, exchange_rate, invoice_no, description, payment_date, payment_method, company_id, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-      `;
-
-			conn = await pool.getConnection();
-
-			const result = (await conn.query(query, [
+			const newPayment = await PayablePayments.create({
 				customer_id,
 				amount,
 				currency,
 				exchange_rate,
-				invoice_no || null,
-				description || null,
+				invoice_no: invoice_no || null,
+				description: description || null,
 				payment_date,
 				payment_method,
-				companyId,
-				userId,
-			])) as InsertResult[];
+				company_id: companyId,
+				created_by: userId,
+			});
 
-			Logger.debug("[PayablePayments] Payment creation result", { result });
-
-			if (!result || result.length === 0) {
-				Logger.error("[PayablePayments] Failed to create payment - no result returned");
-				return ApiResponse.error("Failed to create payment");
-			}
-
-			Logger.info("[PayablePayments] Payment created successfully", { paymentId: result[0].id, companyId });
-			return ApiResponse.success(result[0], "Payment created successfully");
+			Logger.info("[PayablePayments] Payment created successfully", { paymentId: newPayment.id, companyId });
+			return ApiResponse.success(newPayment, "Payment created successfully");
 		} catch (error: any) {
 			Logger.error("[PayablePayments] Error creating payment", { companyId, error: error.message });
 			return ApiResponse.error("Error creating payment");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async GetAll(companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.debug("[PayablePayments] Fetching all payments", { companyId });
 
@@ -78,22 +61,20 @@ export default class PayablePaymentsService {
         ORDER BY p.payment_date DESC
       `;
 
-			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId])) as PaymentDto[];
+			const result = (await sequelize.query(query, {
+				replacements: [companyId],
+				type: QueryTypes.SELECT,
+			})) as PaymentDto[];
 
 			Logger.debug("[PayablePayments] Payments fetched successfully", { companyId, count: result.length });
 			return ApiResponse.success(result, "Payments retrieved successfully");
 		} catch (error: any) {
 			Logger.error("[PayablePayments] Error fetching payments", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve payments");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async Update(paymentId: UUID, payment: PaymentDto, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[PayablePayments] Updating payment", { paymentId, companyId });
 
@@ -117,32 +98,28 @@ export default class PayablePaymentsService {
 				return ApiResponse.error("Missing required fields");
 			}
 
-			const query = `
-        UPDATE payable_payments
-        SET customer_id = ?, amount = ?, currency = ?, exchange_rate = ?, invoice_no = ?, description = ?, payment_date = ?, payment_method = ?
-        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-      `;
+			const [affectedRows] = await PayablePayments.update(
+				{
+					customer_id,
+					amount,
+					currency,
+					exchange_rate,
+					invoice_no: invoice_no || null,
+					description: description || null,
+					payment_date,
+					payment_method,
+				},
+				{
+					where: { id: paymentId, company_id: companyId },
+				}
+			);
 
-			conn = await pool.getConnection();
-
-			const result = (await conn.query(query, [
-				customer_id,
-				amount,
-				currency,
-				exchange_rate,
-				invoice_no || null,
-				description || null,
-				payment_date,
-				payment_method,
-				paymentId,
-				companyId,
-			])) as { affectedRows: number };
-
-			Logger.debug("[PayablePayments] Payment update result", { paymentId, affectedRows: result.affectedRows });
-
-			if (result.affectedRows === 0) {
-				Logger.error("[PayablePayments] No payment found with provided ID", { paymentId, companyId });
-				return ApiResponse.error("No payment found with the provided ID");
+			if (affectedRows === 0) {
+				const exists = await PayablePayments.findOne({ where: { id: paymentId, company_id: companyId } });
+				if (!exists) {
+					Logger.error("[PayablePayments] No payment found with provided ID", { paymentId, companyId });
+					return ApiResponse.error("No payment found with the provided ID");
+				}
 			}
 
 			Logger.info("[PayablePayments] Payment updated successfully", { paymentId, companyId });
@@ -150,14 +127,10 @@ export default class PayablePaymentsService {
 		} catch (error: any) {
 			Logger.error("[PayablePayments] Error updating payment", { paymentId, companyId, error: error.message });
 			return ApiResponse.error("Failed to update payment");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async Delete(paymentId: UUID, userId: UUID, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[PayablePayments] Deleting payment", { paymentId, companyId });
 
@@ -166,18 +139,16 @@ export default class PayablePaymentsService {
 				return ApiResponse.error("Missing payment ID");
 			}
 
-			const query = `
-				UPDATE payable_payments
-				SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
-				WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-			`;
+			await PayablePayments.update(
+				{ deleted_by: userId },
+				{ where: { id: paymentId, company_id: companyId } }
+			);
 
-			conn = await pool.getConnection();
-			const result = (await conn.query(query, [userId, paymentId, companyId])) as { affectedRows: number };
+			const deletedCount = await PayablePayments.destroy({
+				where: { id: paymentId, company_id: companyId },
+			});
 
-			Logger.debug("[PayablePayments] Payment deletion result", { paymentId, affectedRows: result.affectedRows });
-
-			if (result.affectedRows === 0) {
+			if (deletedCount === 0) {
 				Logger.error("[PayablePayments] No payment found with given ID", { paymentId, companyId });
 				return ApiResponse.error("No payment found with the given ID");
 			}
@@ -187,8 +158,6 @@ export default class PayablePaymentsService {
 		} catch (error: any) {
 			Logger.error("[PayablePayments] Error deleting payment", { paymentId, companyId, error: error.message });
 			return ApiResponse.error("Failed to delete payment");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 }

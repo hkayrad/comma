@@ -1,18 +1,16 @@
 import { UploadedFile } from "express-fileupload";
 import path from "path";
-import { ApiResponse } from "../lib/utils/apiResponse";
 import { Logger } from "../lib/utils/logger";
+import { ApiResponse } from "../lib/utils/apiResponse";
 import fs from "fs";
-import { pool } from "../lib/db/pool";
 import { CompanyDto, LogoSize, UUID } from "@common/types";
+import { Companies } from "../models";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve(process.cwd(), "uploads", "logos");
 
 export class CompanyService {
 	static async GetCompanyById(companyId: UUID) {
-		let conn;
-
 		Logger.info("[CompanyService] GetCompanyById called", { companyId });
 
 		if (!companyId) {
@@ -21,20 +19,11 @@ export class CompanyService {
 		}
 
 		try {
-			conn = await pool.getConnection();
 			Logger.debug("[CompanyService] Fetching company details", { companyId });
 
-			const query = `
-				SELECT *
-				FROM companies
-				WHERE id = ? AND deleted_at IS NULL
-			`;
+			const company = await Companies.findByPk(companyId);
 
-			const rows = (await conn.query(query, [companyId])) as CompanyDto[];
-
-			if (Array.isArray(rows) && rows.length > 0) {
-				const company = rows[0];
-
+			if (company) {
 				Logger.info("[CompanyService] Company details fetched successfully", { companyId });
 
 				return ApiResponse.success(
@@ -60,14 +49,10 @@ export class CompanyService {
 		} catch (error: any) {
 			Logger.error("[CompanyService] Error fetching company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch company details");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async UpdateCompanyDetails(companyId: UUID, details: CompanyDto) {
-		let conn;
-
 		Logger.info("[CompanyService] UpdateCompanyDetails called", { companyId });
 
 		if (!companyId || !details.name || details.is_company === undefined || details.is_company === null) {
@@ -76,31 +61,37 @@ export class CompanyService {
 		}
 
 		try {
-			conn = await pool.getConnection();
 			Logger.debug("[CompanyService] Updating company details", { companyId });
-			await conn.query(
-				`UPDATE companies SET name = ?, is_company = ?, address = ?, phone = ?, email = ?, tax_number = ?, tax_office = ?, mersis_no = ? WHERE id = ?`,
-				[
-					details.name,
-					details.is_company,
-					details.address || null,
-					details.phone || null,
-					details.email || null,
-					details.tax_number || null,
-					details.tax_office || null,
-					details.mersis_no || null,
-					companyId,
-				],
+
+			const [affectedRows] = await Companies.update(
+				{
+					name: details.name,
+					is_company: details.is_company,
+					address: details.address || null,
+					phone: details.phone || null,
+					email: details.email || null,
+					tax_number: details.tax_number || null,
+					tax_office: details.tax_office || null,
+					mersis_no: details.mersis_no || null,
+				},
+				{
+					where: { id: companyId },
+				}
 			);
 
-			Logger.info("[CompanyService] Company details updated successfully", { companyId });
-
-			return ApiResponse.success(null, "Company details updated successfully");
+			if (affectedRows > 0) {
+				Logger.info("[CompanyService] Company details updated successfully", { companyId });
+				return ApiResponse.success(null, "Company details updated successfully");
+			} else {
+				Logger.warn("[CompanyService] Company not found or no changes made", { companyId });
+				// Even if no changes, we can return success if it exists, but update returns 0 if nothing changed.
+				// Just returning success is usually fine, or check existence first.
+				// Given legacy behavior, if no error thrown, it's mostly success.
+				return ApiResponse.success(null, "Company details updated successfully");
+			}
 		} catch (error: any) {
 			Logger.error("[CompanyService] Error updating company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to update company details");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
@@ -130,9 +121,10 @@ export class CompanyService {
 			// Move file to uploads directory
 			await logo.mv(filePath);
 
-			const conn = await pool.getConnection();
-			await conn.query(`UPDATE companies SET ${logoSize}_logo_path = ? WHERE id = ?`, [fileName, companyId]);
-			conn.release();
+			await Companies.update(
+				{ [`${logoSize}_logo_path`]: fileName },
+				{ where: { id: companyId } }
+			);
 
 			Logger.info("[CompanyService] Logo uploaded successfully", { logoSize, companyId, fileName });
 
@@ -150,19 +142,14 @@ export class CompanyService {
 	}
 
 	static async GetLogos(companyId: UUID) {
-		let conn;
-
 		Logger.debug("[CompanyService] Fetching logos", { companyId });
 
 		try {
-			conn = await pool.getConnection();
-			const rows = (await conn.query("SELECT small_logo_path, large_logo_path FROM companies WHERE id = ?", [
-				companyId,
-			])) as { small_logo_path: string | null; large_logo_path: string | null }[];
+			const company = await Companies.findByPk(companyId, {
+				attributes: ["small_logo_path", "large_logo_path"],
+			});
 
-			if (Array.isArray(rows) && rows.length > 0) {
-				const company = rows[0];
-
+			if (company) {
 				Logger.debug("[CompanyService] Logos fetched successfully", { companyId });
 
 				return ApiResponse.success(
@@ -179,22 +166,19 @@ export class CompanyService {
 		} catch (error: any) {
 			Logger.error("[CompanyService] Error fetching logos", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch logos");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async DeleteLogo(logoSize: LogoSize, companyId: UUID) {
-		let conn;
-
 		Logger.info("[CompanyService] Deleting logo", { logoSize, companyId });
 
 		try {
-			conn = await pool.getConnection();
-			const rows = (await conn.query(`SELECT ${logoSize}_logo_path FROM companies WHERE id = ?`, [companyId])) as any[];
+			const company = await Companies.findByPk(companyId, {
+				attributes: [`${logoSize}_logo_path`],
+			});
 
-			if (Array.isArray(rows) && rows.length > 0) {
-				const company = rows[0];
+			if (company) {
+				// @ts-ignore - dynamic access
 				const logoPath = company[`${logoSize}_logo_path`];
 
 				if (logoPath) {
@@ -206,7 +190,10 @@ export class CompanyService {
 						fs.unlinkSync(fullPath);
 					}
 
-					await conn.query(`UPDATE companies SET ${logoSize}_logo_path = NULL WHERE id = ?`, [companyId]);
+					await Companies.update(
+						{ [`${logoSize}_logo_path`]: null },
+						{ where: { id: companyId } }
+					);
 
 					Logger.info("[CompanyService] Logo deleted successfully", { logoSize, companyId });
 
@@ -222,8 +209,6 @@ export class CompanyService {
 		} catch (error: any) {
 			Logger.error("[CompanyService] Error deleting logo", { logoSize, companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to delete logo");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 }

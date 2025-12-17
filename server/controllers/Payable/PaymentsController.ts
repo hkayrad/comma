@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import PayablePaymentsService from "../../services/Payable/PaymentsService";
 import { authMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils";
+import { Logger } from "../../lib/utils/logger";
 import { PaymentDto } from "@common/types";
 
 const router = express.Router();

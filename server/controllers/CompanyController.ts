@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import { authMiddleware } from "../lib/middleware";
 import { CompanyService } from "../services/CompanyService";
-import { Logger } from "../lib/utils";
+import { Logger } from "../lib/utils/logger";
 import { UploadedFile } from "express-fileupload";
 import { CompanyDto } from "@common/types";
 

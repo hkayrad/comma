@@ -1,11 +1,12 @@
-import { CustomerDto, CustomerIdName, DebtDto, InsertResult, PaymentDto, UUID } from "@common/types";
-import { pool } from "../../lib/db/pool";
-import { ApiResponse, Logger } from "../../lib/utils";
+import { CustomerDto, CustomerIdName, DebtDto, PaymentDto, UUID } from "@common/types";
+import { Logger } from "../../lib/utils/logger";
+import { ApiResponse } from "../../lib/utils/apiResponse";
+import { ReceivableCustomers } from "../../models";
+import { sequelize } from "../../lib/db/sequelize";
+import { QueryTypes } from "sequelize";
 
 export default class ReceivableCustomersService {
 	static async Create(customer: CustomerDto, userId: UUID, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[ReceivableCustomers] Creating customer", { companyId, customerName: customer.name, userId });
 
@@ -16,46 +17,28 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const query = `
-        INSERT INTO receivable_customers (name, phone, is_company, tax_number, tax_office, mersis_no, email, address, company_id, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
-      `;
-
-			conn = await pool.getConnection();
-
-			const result = (await conn.query(query, [
+			const newCustomer = await ReceivableCustomers.create({
 				name,
-				phone || null,
+				phone: phone || null,
 				is_company,
-				tax_number || null,
-				tax_office || null,
-				mersis_no || null,
-				email || null,
-				address || null,
-				companyId,
-				userId,
-			])) as InsertResult[];
+				tax_number: tax_number || null,
+				tax_office: tax_office || null,
+				mersis_no: mersis_no || null,
+				email: email || null,
+				address: address || null,
+				company_id: companyId,
+				created_by: userId,
+			});
 
-			Logger.debug("[ReceivableCustomers] Customer creation result", { result });
-
-			if (!result || result.length === 0) {
-				Logger.error("[ReceivableCustomers] Failed to create customer - no result returned");
-				return ApiResponse.error("Failed to create customer");
-			}
-
-			Logger.info("[ReceivableCustomers] Customer created successfully", { customerId: result[0].id, companyId });
-			return ApiResponse.success(result[0].id, "Customer created successfully");
+			Logger.info("[ReceivableCustomers] Customer created successfully", { customerId: newCustomer.id, companyId });
+			return ApiResponse.success(newCustomer.id, "Customer created successfully");
 		} catch (error: any) {
 			Logger.error("[ReceivableCustomers] Error creating customer", { companyId, error: error.message });
 			return ApiResponse.error("Error creating customer");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async GetAll(companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId });
 
@@ -76,12 +59,13 @@ export default class ReceivableCustomersService {
 			    AND c.company_id = p.company_id
 				WHERE c.company_id = ?
 			    AND c.deleted_at IS NULL
-			    AND c.deleted_by IS NULL
 				ORDER BY c.created_at DESC;
       `;
 
-			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId])) as CustomerDto[];
+			const result = (await sequelize.query(query, {
+				replacements: [companyId],
+				type: QueryTypes.SELECT,
+			})) as CustomerDto[];
 
 			Logger.debug("[ReceivableCustomers] Customers fetched successfully", { companyId, count: result.length });
 
@@ -94,14 +78,10 @@ export default class ReceivableCustomersService {
 		} catch (error: any) {
 			Logger.error("[ReceivableCustomers] Error fetching customers", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve customers");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async GetStatement(customerId: UUID, companyId: UUID, startDate?: string, endDate?: string) {
-		let conn;
-
 		try {
 			Logger.debug("[ReceivableCustomers] Fetching customer statement", {
 				customerId,
@@ -114,8 +94,6 @@ export default class ReceivableCustomersService {
 				Logger.error("[ReceivableCustomers] Missing customer ID");
 				return ApiResponse.error("Customer ID is required");
 			}
-
-			conn = await pool.getConnection();
 
 			const customerQuery = `
 				SELECT
@@ -134,11 +112,13 @@ export default class ReceivableCustomersService {
 			    AND c.company_id = ps.company_id
 				WHERE c.id = ?
 				  AND c.company_id = ?
-				  AND c.deleted_at IS NULL
-				  AND c.deleted_by IS NULL;
+				  AND c.deleted_at IS NULL;
 			`;
 
-			const customerResult = (await conn.query(customerQuery, [customerId, companyId])) as CustomerDto[];
+			const customerResult = (await sequelize.query(customerQuery, {
+				replacements: [customerId, companyId],
+				type: QueryTypes.SELECT,
+			})) as CustomerDto[];
 
 			if (customerResult.length === 0) {
 				Logger.error("[ReceivableCustomers] Customer not found", { customerId, companyId });
@@ -163,9 +143,7 @@ export default class ReceivableCustomersService {
 		    WHERE d.customer_id = ?
           AND d.company_id = ?
           AND d.deleted_at IS NULL
-          AND d.deleted_by IS NULL
           AND c.deleted_at IS NULL
-          AND c.deleted_by IS NULL
       `;
 
 			const debtParams: any[] = [customerId, companyId];
@@ -199,9 +177,7 @@ export default class ReceivableCustomersService {
 		    WHERE p.customer_id = ?
 	        AND p.company_id = ?
 	        AND p.deleted_at IS NULL
-	        AND p.deleted_by IS NULL
 	        AND c.deleted_at IS NULL
-	        AND c.deleted_by IS NULL
       `;
 
 			const paymentParams: any[] = [customerId, companyId];
@@ -219,8 +195,8 @@ export default class ReceivableCustomersService {
 			paymentsQuery += ` ORDER BY p.payment_date DESC, p.created_at DESC`;
 
 			const [debtsResult, paymentsResult] = await Promise.all([
-				conn.query(debtsQuery, debtParams) as Promise<DebtDto[]>,
-				conn.query(paymentsQuery, paymentParams) as Promise<PaymentDto[]>,
+				sequelize.query(debtsQuery, { replacements: debtParams, type: QueryTypes.SELECT }) as Promise<DebtDto[]>,
+				sequelize.query(paymentsQuery, { replacements: paymentParams, type: QueryTypes.SELECT }) as Promise<PaymentDto[]>,
 			]);
 
 			Logger.debug("[ReceivableCustomers] Customer statement fetched successfully", {
@@ -244,23 +220,17 @@ export default class ReceivableCustomersService {
 				error: error.message,
 			});
 			return ApiResponse.error("Failed to retrieve customer statement");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async GetIdAndName(companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.debug("[ReceivableCustomers] Fetching customer IDs and names", { companyId });
 
-			const query = `
-        SELECT id, name FROM receivable_customers WHERE company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-      `;
-
-			conn = await pool.getConnection();
-			const result = (await conn.query(query, [companyId])) as CustomerIdName[];
+			const result = await ReceivableCustomers.findAll({
+				attributes: ["id", "name"],
+				where: { company_id: companyId },
+			});
 
 			Logger.debug("[ReceivableCustomers] Customer IDs and names fetched successfully", {
 				companyId,
@@ -276,14 +246,10 @@ export default class ReceivableCustomersService {
 		} catch (error: any) {
 			Logger.error("[ReceivableCustomers] Error fetching customer IDs and names", { companyId, error: error.message });
 			return ApiResponse.error("Error retrieving customers");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async Update(id: UUID, customer: CustomerDto, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[ReceivableCustomers] Updating customer", { customerId: id, companyId });
 
@@ -299,38 +265,31 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const query = `
-        UPDATE receivable_customers
-        SET name = ?, phone = ?, is_company = ?, tax_number = ?, tax_office = ?, mersis_no = ?, email = ?, address = ?
-        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-      `;
+			const [affectedRows] = await ReceivableCustomers.update(
+				{
+					name,
+					phone: phone || null,
+					is_company,
+					tax_number: tax_number || null,
+					tax_office: tax_office || null,
+					mersis_no: mersis_no || null,
+					email: email || null,
+					address: address || null,
+				},
+				{
+					where: { id, company_id: companyId },
+				}
+			);
 
-			conn = await pool.getConnection();
-
-			const result = (await conn.query(query, [
-				name,
-				phone || null,
-				is_company,
-				tax_number || null,
-				tax_office || null,
-				mersis_no || null,
-				email || null,
-				address || null,
-				id,
-				companyId,
-			])) as { affectedRows: number };
-
-			Logger.debug("[ReceivableCustomers] Customer update result", {
-				customerId: id,
-				affectedRows: result.affectedRows,
-			});
-
-			if (result.affectedRows === 0) {
-				Logger.error("[ReceivableCustomers] Failed to update customer or customer not found", {
-					customerId: id,
-					companyId,
-				});
-				return ApiResponse.error("Failed to update customer or customer not found");
+			if (affectedRows === 0) {
+				const exists = await ReceivableCustomers.findOne({ where: { id, company_id: companyId } });
+				if (!exists) {
+					Logger.error("[ReceivableCustomers] Failed to update customer or customer not found", {
+						customerId: id,
+						companyId,
+					});
+					return ApiResponse.error("Failed to update customer or customer not found");
+				}
 			}
 
 			Logger.info("[ReceivableCustomers] Customer updated successfully", { customerId: id, companyId });
@@ -342,14 +301,10 @@ export default class ReceivableCustomersService {
 				error: error.message,
 			});
 			return ApiResponse.error("Error updating customer");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 
 	static async Delete(id: UUID, userId: UUID, companyId: UUID) {
-		let conn;
-
 		try {
 			Logger.info("[ReceivableCustomers] Deleting customer", { customerId: id, companyId });
 
@@ -358,22 +313,16 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Customer ID is required");
 			}
 
-			const query = `
-				UPDATE receivable_customers
-        SET deleted_at = CURRENT_TIMESTAMP(), deleted_by = ?
-        WHERE id = ? AND company_id = ? AND deleted_at IS NULL AND deleted_by IS NULL
-      `;
+			await ReceivableCustomers.update(
+				{ deleted_by: userId },
+				{ where: { id, company_id: companyId } }
+			);
 
-			conn = await pool.getConnection();
-
-			const result = (await conn.query(query, [userId, id, companyId])) as { affectedRows: number };
-
-			Logger.debug("[ReceivableCustomers] Customer deletion result", {
-				customerId: id,
-				affectedRows: result.affectedRows,
+			const deletedCount = await ReceivableCustomers.destroy({
+				where: { id, company_id: companyId },
 			});
 
-			if (result.affectedRows === 0) {
+			if (deletedCount === 0) {
 				Logger.error("[ReceivableCustomers] Failed to delete customer or customer not found", {
 					customerId: id,
 					companyId,
@@ -390,8 +339,6 @@ export default class ReceivableCustomersService {
 				error: error.message,
 			});
 			return ApiResponse.error("Error deleting customer");
-		} finally {
-			if (conn) conn.release();
 		}
 	}
 }
