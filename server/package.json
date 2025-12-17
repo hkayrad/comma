@@ -2,7 +2,6 @@
   "name": "hks-io",
   "private": true,
   "version": "1.12.2",
-  "type": "module",
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
