@@ -7,7 +7,7 @@ import NonSystemAdminSidebarContent from "./NonSystemAdminSidebar";
 import SystemAdminSidebarContent from "./SystemAdminSidebar";
 import { useTheme } from "@/components/theme-provider";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AuthApi } from "@/lib/api";
+import { AuthApi } from "@/lib/api/auth";
 import { toast } from "sonner";
 import { useUser } from "@/contexts/user";
 import { useRole } from "@/hooks/useRole";
@@ -335,7 +335,9 @@ export default function HksSidebar() {
                               {user?.username}
                             </span>
                             <span className="text-muted-foreground truncate text-xs select-none">
-                              {t(`user.role.${UserRole[(role ?? 0) as UserRoleType]}`)}
+                              {t(
+                                `user.role.${UserRole[(role ?? 0) as UserRoleType]}`,
+                              )}
                             </span>
                           </div>
                           <EllipsisVertical className="ml-auto size-4" />
@@ -343,7 +345,7 @@ export default function HksSidebar() {
                       </DropdownMenuTrigger>
                     </TooltipTrigger>
                     <TooltipContent side="right" hidden={state !== "collapsed"}>
-                      {t("sidebar.footer.info.label")}
+                      {t("sidebar.footer.account.label")}
                     </TooltipContent>
                   </Tooltip>
                   <DropdownMenuContent

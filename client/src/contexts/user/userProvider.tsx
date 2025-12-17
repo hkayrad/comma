@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { UserContext, type User } from "./userContext";
 import { Logger } from "@/lib/utils/logger";
-import { AuthApi } from "@/lib/api";
+import { AuthApi } from "@/lib/api/auth";
 
 interface UserProviderProps {
   children: ReactNode;
@@ -61,7 +61,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, [refreshUser]);
 
   return (
-    <UserContext.Provider value={{ user, getUser, login, clearUser, isLoading }}>
+    <UserContext.Provider
+      value={{ user, getUser, login, clearUser, isLoading }}
+    >
       {children}
     </UserContext.Provider>
   );

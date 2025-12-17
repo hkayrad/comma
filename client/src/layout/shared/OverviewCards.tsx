@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type { OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
 import {
@@ -17,6 +17,7 @@ import {
   BadgeTurkishLiraIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   type: OverviewViewType;
@@ -27,6 +28,8 @@ type Props = {
 export default function OverviewCards(props: Props) {
   const { type, width = "full", align = "center" } = props;
   const currency = "TRY";
+
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(true);
   const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
@@ -129,11 +132,16 @@ export default function OverviewCards(props: Props) {
       <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
-            Toplam {type === "receivable" ? "Alacak" : "Borç"}
+            {t("overviewCards.total", {
+              state:
+                type === "receivable"
+                  ? t("vars.receivable")
+                  : t("vars.payable"),
+            })}
           </CardDescription>
           <CardTitle
             className="text-xl select-none hover:cursor-copy"
-            onClick={() => copyToClipboard(formattedTotals.total_debts)}
+            onClick={() => copyToClipboard(formattedTotals.total_debts, t)}
           >
             {isLoading ? (
               <Skeleton className="h-7 w-full" />
@@ -147,11 +155,16 @@ export default function OverviewCards(props: Props) {
       <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
-            Ödenmiş {type === "receivable" ? "Alacak" : "Borç"}
+            {t("overviewCards.paid", {
+              state:
+                type === "receivable"
+                  ? t("vars.receivable")
+                  : t("vars.payable"),
+            })}
           </CardDescription>
           <CardTitle
             className="text-xl text-green-600 select-none hover:cursor-copy"
-            onClick={() => copyToClipboard(formattedTotals.total_payments)}
+            onClick={() => copyToClipboard(formattedTotals.total_payments, t)}
           >
             {isLoading ? (
               <Skeleton className="h-7 w-full" />
@@ -167,11 +180,16 @@ export default function OverviewCards(props: Props) {
       <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm select-none">
-            Kalan {type === "receivable" ? "Alacak" : "Borç"}
+            {t("overviewCards.remaning", {
+              state:
+                type === "receivable"
+                  ? t("vars.receivable")
+                  : t("vars.payable"),
+            })}
           </CardDescription>
           <CardTitle
             className="text-xl text-red-500 select-none hover:cursor-copy"
-            onClick={() => copyToClipboard(formattedTotals.remaining_debt)}
+            onClick={() => copyToClipboard(formattedTotals.remaining_debt, t)}
           >
             {isLoading ? (
               <Skeleton className="h-7 w-full" />

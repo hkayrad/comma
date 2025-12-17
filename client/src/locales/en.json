@@ -1,8 +1,54 @@
 {
+  "dashboard": {
+    "customer_info": {
+      "contact_info": "Contact Information",
+      "credit_balance": "You have a balance to pay to this customer.",
+      "financial_summary": "Financial Summary",
+      "outstanding_balance": "You have outstanding balance to collect from this customer.",
+      "overcharge": "This customer has been overcharged.",
+      "overpay": "This customer has been overpaid."
+    },
+    "table": {
+      "column": {
+        "actions": "Actions",
+        "debt_status": "Debt Status",
+        "is_company": "Type",
+        "mersis_no": "Mersis No",
+        "name": "Customer",
+        "remaining_debt": "Remaining",
+        "tax_number": "Tax No",
+        "tax_office": "Tax Office",
+        "total_debt": "Total",
+        "total_payments": "Paid"
+      },
+      "columns": {
+        "actions": {
+          "delete": "Delete customer",
+          "delete.confirm": "Delete Customer",
+          "delete.description": "This action will delete the customer record. Do you accept?",
+          "delete.title": "Are you sure?",
+          "edit_details": "Edit customer information",
+          "show_details": "Display customer information",
+          "show_statement": "Display customer statement"
+        }
+      }
+    }
+  },
   "dialog": {
     "accountDetails": {
       "description": "See and edit your account information.",
       "title": "Account Details"
+    },
+    "customer": {
+      "couldNotFind": "Could not find the customer",
+      "details": {
+        "description": "{{tax_no_label}}: {{tax_no}} | Tax Office: {{tax_office}}",
+        "title": "Customer Details"
+      },
+      "edit": {
+        "description": "Edit customer information",
+        "title": "Edit Customer"
+      }
     },
     "info": {
       "description": "See the information about IO system.",
@@ -10,27 +56,110 @@
       "exchangeInfo": "Exchange Information",
       "title": "About",
       "version": "Application Version"
+    },
+    "maintenanceMode": {
+      "end": {
+        "button": "End Maintenance",
+        "description": "Are you sure you want to end the maintenance?",
+        "title": "End the Planned Maintenance"
+      },
+      "endTime": "Finish Time",
+      "start": {
+        "button": "Start Maintenance",
+        "description": "Are you sure you want to start the maintenance mode? This action will cause all users to be logged out.",
+        "title": "Start Planned Maintenance"
+      },
+      "startTime": "Start Time"
     }
   },
   "header": {
+    "breadcrumb": {
+      "finance": {
+        "overview": "Overview",
+        "receivables": "Receivables"
+      }
+    },
+    "breadcrumbs": {
+      "finance": {
+        "customerStatement": "Customer Statement",
+        "payables": "Payables",
+        "payments": "Payments"
+      }
+    },
     "exchange": {
       "buy": "Buy",
-      "eur": "Euro (EUR)",
       "lastUpdate": "Last Update: {{date}}",
       "lastUpdate.hover": "Exchange rates decided by {{tcmb}} for {{date}}",
       "noData": "{{tcmb}} data is not available.",
-      "sell": "Sell",
-      "usd": "United States Dolar (USD)"
-    }
+      "sell": "Sell"
+    },
+    "maintenanceBanner": "System is in maintenance mode. Please do not do any operation."
+  },
+  "login": {
+    "changeLanguage": "Change Language",
+    "changeTheme": "Change Theme",
+    "form": {
+      "password": "Password",
+      "password.maxCharError": "Password can be a maximum of 50 characters.",
+      "submit": "Login",
+      "submit.pending": "Logging In...",
+      "username": "Username",
+      "username.maxCharError": "Username can be a maximum of 20 characters."
+    },
+    "title": "Login"
   },
   "notification": {
+    "activeUserCount": "Active User Count: {{count}}",
+    "admin": {
+      "endMaintenance": {
+        "error": "Could not end the maintenance mode.",
+        "pending": "Ending maintenance mode...",
+        "success": "Maintenance mode ended."
+      },
+      "startMaintenance": {
+        "error": "Could not start the maintenance mode.",
+        "pending": "Starting maintenance mode...",
+        "success": "Maintenance mode started."
+      }
+    },
     "auth": {
+      "login": {
+        "error": "Login failed, please check your credentials",
+        "fillEmptyFields": "Please fill all fields",
+        "pending": "Logging in...",
+        "success": "Logged in successfully!"
+      },
       "logout": {
         "error": "There was an error while trying to logout",
         "pending": "Logging out...",
         "success": "Logged out successfully!"
       }
+    },
+    "copy": {
+      "error": "Could not copy to clipboard",
+      "success": "Copied to clipboard"
+    },
+    "customer": {
+      "delete": {
+        "error": "There was an error while deleting the customer",
+        "pending": "Deleting customer...",
+        "succes": "Customer deleted successfully"
+      }
+    },
+    "endMaintenance": {
+      "title": "System maintenance has been completed, the page will refresh in {{refreshTime}} seconds."
+    },
+    "notImplemented": "This feature has not been developed yet",
+    "startMaintenance": {
+      "body": "You will be logged out due to a planned maintenance. Please save the work you're doing.",
+      "estimatedMaintenanceInterval": "Estimated Maintenance Interval: {{start}} - {{end}}",
+      "title": "Planned Maintenance"
     }
+  },
+  "overviewCards": {
+    "paid": "Paid {{state}}",
+    "remaning": "Remaining {{state}}",
+    "total": "Total {{state}}"
   },
   "sidebar": {
     "footer": {
@@ -52,6 +181,52 @@
       "info": {
         "label": "About"
       }
+    },
+    "nonSysAdmin": {
+      "finance": "Finance",
+      "finance.overview": "Overview",
+      "finance.payableInfo": "Payable Information",
+      "finance.payableInfo.outgoingPayments": "Outgoing Payments",
+      "finance.payableInfo.payables": "Payables",
+      "finance.receivableInfo": "Receivable Information",
+      "finance.receivableInfo.incomingPayments": "Incoming Payments",
+      "finance.receivableInfo.receivables": "Receivables"
+    },
+    "sysAdmin": {
+      "actions": "Admin Actions",
+      "actions.activeUsers": "Active Users",
+      "actions.maintenanceMode": "Maintenance Mode"
+    },
+    "toggle": "{{action}} Sidebar",
+    "toggle.close": "Close",
+    "toggle.open": "Open"
+  },
+  "table": {
+    "header": {
+      "filters": "Filters",
+      "filters.clear": "Clear Filters",
+      "filters.clear.hover": "Clear all filters",
+      "filters.hover": "Show filtering options",
+      "pagination": {
+        "next": "Next",
+        "next.hover": "Go to next page",
+        "page": "Page {{currentPage}} / {{totalPages}}",
+        "prev": "Previous",
+        "prev.hover": "Go to previous page"
+      },
+      "refresh": "Refresh",
+      "refresh.hover": "Refresh the table",
+      "rowCount": "Row Count",
+      "rowCount.hover": "Select row count",
+      "rowCount.row": "{{rowCount}} Rows",
+      "search": "Search by Customer Name...",
+      "search.hover": "Search by Customer Name",
+      "showHideCols": "Show/Hide Columns",
+      "showHideCols.hover": "Show or hide desired columns",
+      "sorting": {
+        "clear": "Reset Sorting",
+        "clear.hover": "Reset the sorting"
+      }
     }
   },
   "user": {
@@ -62,6 +237,32 @@
     }
   },
   "vars": {
-    "tcmb": "Central Bank of the Republic of Türkiye"
+    "address": "Address",
+    "cancel": "Cancel",
+    "creation_date": "Creation Date",
+    "debt_status": {
+      "has_debt": "Credit Balance",
+      "has_no_debt": "No Credit",
+      "has_no_receivable": "No Balance Due",
+      "has_receivable": "Outstanding Balance"
+    },
+    "details": "Details",
+    "email": "E-mail",
+    "eur": "Euro (EUR)",
+    "is_company": {
+      "false": "Individual",
+      "true": "Company"
+    },
+    "payable": "Payable",
+    "payables": "Payables",
+    "phone": "Phone",
+    "receivable": "Receivable",
+    "receivables": "Receivables",
+    "tax_number": "Tax No",
+    "tckn": "TR Identity No",
+    "tcmb": "Central Bank of the Republic of Türkiye",
+    "try": "Turkish Lira (TRY)",
+    "unspecified": "Unspecified",
+    "usd": "United States Dolar (USD)"
   }
 }

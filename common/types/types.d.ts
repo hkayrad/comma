@@ -2,6 +2,7 @@
 
 export type OverviewViewType = "receivable" | "payable";
 export type AvailablePaymentMethod = "cash" | "bank_transfer" | "check" | "card";
+export type AvailableCurrency = "TRY" | "USD" | "EUR";
 
 export type ApiResponse<T> = {
 	status: number;
@@ -50,6 +51,7 @@ export type CustomerDto = {
 
 export type DebtDto = {
 	id?: UUID;
+	company_id?: UUID;
 	customer_id: UUID;
 	invoice_no?: string;
 	amount: number;
@@ -61,7 +63,10 @@ export type DebtDto = {
 	description?: string;
 	issue_date: Date;
 	created_at?: Date;
+	created_by?: UUID;
 	updated_at?: Date;
+	deleted_at?: Date;
+	deleted_by?: UUID;
 };
 
 export type PaymentDto = {

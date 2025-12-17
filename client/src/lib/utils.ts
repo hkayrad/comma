@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
@@ -6,18 +7,18 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function notImplemented() {
-	toast.error("Bu özellik henüz geliştirilmedi");
+export function notImplemented(t: TFunction) {
+	toast.error(t("notification.notImplemented"));
 }
 
-export function copyToClipboard(text: string) {
+export function copyToClipboard(text: string, t: TFunction) {
 	navigator.clipboard
 		.writeText(text)
 		.then(() => {
-			toast.success("Panoya kopyalandı");
+			toast.success(t("notification.copy.success"));
 		})
 		.catch(() => {
-			toast.error("Panoya kopyalanamadı");
+			toast.error(t("notification.copy.success"));
 		});
 }
 

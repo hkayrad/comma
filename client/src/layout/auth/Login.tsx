@@ -5,7 +5,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Eye, EyeOff, Loader, LogIn, Moon, Sun } from "lucide-react";
+import { Eye, EyeOff, Globe, Loader, LogIn, Moon, Sun } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useCallback, useState } from "react";
 import { Form } from "@/components/ui/form";
@@ -25,19 +25,33 @@ import {
 } from "@/components/ui/tooltip";
 import { useUser } from "@/contexts/user";
 import { Logger } from "@/lib/utils/logger";
-
-const formSchema = z.object({
-  username: z
-    .string()
-    .max(20, { error: "Kullanıcı adı en fazla 20 karakter olabilir." }),
-  password: z
-    .string()
-    .max(50, { error: "Şifre en fazla 50 karakter olabilir." }),
-});
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/animate-ui/components/radix/dropdown-menu";
+import { supportedLanguages } from "@/lib/supportedLanguages";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { reloadConnection } = useWebSocket();
+  const { theme, setTheme } = useTheme();
+  const { login } = useUser();
+  const { t, i18n } = useTranslation();
+
+  const formSchema = z.object({
+    username: z
+      .string()
+      .max(20, { error: t("login.form.username.maxCharError") }),
+    password: z
+      .string()
+      .max(50, { error: t("login.form.password.maxCharError") }),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,10 +59,6 @@ export default function Login() {
       password: "",
     },
   });
-  const navigate = useNavigate();
-  const { reloadConnection } = useWebSocket();
-  const { theme, setTheme } = useTheme();
-  const { login } = useUser();
 
   const togglePasswordVisibility = useCallback(() => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -59,31 +69,35 @@ export default function Login() {
       const { username, password } = values;
 
       if (!username || !password) {
-        toast.error("Lütfen tüm alanları doldurun");
+        toast.error(t("notification.auth.login.fillEmptyFields"));
         return;
       }
 
       setLoading(true);
-      const promise = login(username, password);
       const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
-      setTimeout(() => {
-        toast.promise(promise, {
-          loading: "Giriş yapılıyor...",
-          success: () => {
-            setLoading(false);
-            reloadConnection();
-            navigate("/");
-            return "Giriş başarılı!";
-          },
-          error: (error) => {
-            Logger.error(error);
-            setLoading(false);
-            return "Giriş başarısız, lütfen bilgilerinizi kontrol edin";
-          },
-        });
-      }, timeout);
+
+      const loginPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          login(username, password).then(resolve).catch(reject);
+        }, timeout);
+      });
+
+      toast.promise(loginPromise, {
+        loading: t("notification.auth.login.pending"),
+        success: () => {
+          setLoading(false);
+          reloadConnection();
+          navigate("/");
+          return t("notification.auth.login.success");
+        },
+        error: (error) => {
+          Logger.error(error);
+          setLoading(false);
+          return t("notification.auth.login.error");
+        },
+      });
     },
-    [navigate, reloadConnection, login],
+    [navigate, reloadConnection, login, t],
   );
 
   //WARN DEBUG LOGIN
@@ -125,10 +139,40 @@ export default function Login() {
               )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="left">Tema Değiştir</TooltipContent>
+          <TooltipContent side="left">{t("login.changeTheme")}</TooltipContent>
         </Tooltip>
+        <DropdownMenu>
+          <Tooltip disableHoverableContent>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger
+                className="absolute bottom-16 right-4"
+                asChild
+              >
+                <Button size="icon">
+                  <Globe />
+                </Button>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              {t("login.changeLanguage")}
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end">
+            {supportedLanguages.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => i18n.changeLanguage(lang.code)}
+              >
+                {lang.flag}
+                {lang.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
-          <h1 className="text-4xl font-bold text-center mb-8">Giriş Yap</h1>
+          <h1 className="text-4xl font-bold text-center mb-8">
+            {t("login.title")}
+          </h1>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -139,7 +183,7 @@ export default function Login() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kullanıcı Adı</FormLabel>
+                    <FormLabel>{t("login.form.username")}</FormLabel>
                     <FormControl>
                       <Input placeholder="hkayrad" {...field} />
                     </FormControl>
@@ -152,7 +196,7 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Şifre</FormLabel>
+                    <FormLabel>{t("login.form.password")}</FormLabel>
                     <FormControl>
                       <div className="flex gap-2">
                         <Input
@@ -183,12 +227,12 @@ export default function Login() {
                 {loading ? (
                   <>
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Giriş Yapılıyor...
+                    {t("login.form.submit.pending")}
                   </>
                 ) : (
                   <>
                     <LogIn className="mr-2 h-4 w-4" />
-                    Giriş Yap
+                    {t("login.form.submit")}
                   </>
                 )}
               </Button>

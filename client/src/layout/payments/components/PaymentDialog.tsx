@@ -9,17 +9,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useDialog } from "@/contexts/dialog";
-import {
-  PayableCustomerApi,
-  PayablePaymentApi,
-  ReceivableCustomerApi,
-  ReceivablePaymentApi,
-} from "@/lib/api";
-import type {
-  CustomerIdName,
-  OverviewViewType,
-  PaymentDto,
-} from "@/lib/types";
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
+import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
+import type { CustomerIdName, OverviewViewType, PaymentDto } from "@/lib/types";
 import { sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";

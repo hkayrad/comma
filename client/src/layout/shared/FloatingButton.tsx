@@ -41,7 +41,7 @@ export default function FloatingButton() {
       title: "Müşteri Ekle",
       description: "Yeni müşteri ekleyin",
       size: "3xl",
-      content: <CustomerDialog />,
+      content: <CustomerDialog type="receivable" />,
       showCloseButton: true,
     });
   }, [openDialog, toggleFloatingMenu]);
@@ -52,7 +52,7 @@ export default function FloatingButton() {
       title: "Borç Ekle",
       description: "Yeni borç ekleyin",
       size: "3xl",
-      content: <DebtDialog />,
+      content: <DebtDialog type="receivable" />,
       showCloseButton: true,
     });
   }, [openDialog, toggleFloatingMenu]);
@@ -63,7 +63,7 @@ export default function FloatingButton() {
       title: "Ödeme Ekle",
       description: "Yeni ödeme ekleyin",
       size: "3xl",
-      content: <PaymentDialog />,
+      content: <PaymentDialog type="receivable" />,
       showCloseButton: true,
     });
   }, [openDialog, toggleFloatingMenu]);

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CustomerDto, OverviewViewType } from "@/lib/types";
-import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api";
+import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api/customer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
 import { Logger } from "@/lib/utils/logger";
+import { useTranslation } from "react-i18next";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
@@ -13,6 +14,8 @@ export default function Dashboard() {
   );
   const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
   const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
+
+  const { t } = useTranslation();
 
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as OverviewViewType);
@@ -62,13 +65,13 @@ export default function Dashboard() {
             value="receivable"
             className="data-[state=active]:text-green-600 data-[state=active]:bg-green-50"
           >
-            Alacaklar
+            {t("vars.receivables")}
           </TabsTrigger>
           <TabsTrigger
             value="payable"
             className="data-[state=active]:text-red-600 data-[state=active]:bg-red-50"
           >
-            Borçlar
+            {t("vars.payables")}
           </TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-4">

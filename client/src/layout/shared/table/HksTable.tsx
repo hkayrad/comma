@@ -26,6 +26,7 @@ type Props = {
   searchColumn: string;
   tags?: {
     column: string;
+    column_label: string;
     value: string;
     color: string;
   }[];
@@ -76,13 +77,13 @@ export default function HksTable(props: Props) {
                       <TableHead
                         key={header.id}
                         className={`
-                          ${header.id === "Müşteri" && "w-36"}
-                          ${header.id === "Açıklama" && "w-36"}
-                          ${header.id === "Vergi Dairesi" && "w-36"}
-                          ${header.id === "İşlemler" && "w-1"}
-                          ${header.id === "Borç Durumu" && "w-32"}
-                          ${header.id === "Fatura No" && "w-36"}
-                          ${header.id === "Tür" && "w-32"}
+                          ${header.id === "name" && "w-36"}
+                          ${header.id === "desciption " && "w-36"}
+                          ${header.id === "tax_office" && "w-36"}
+                          ${header.id === "actions" && "w-1"}
+                          ${header.id === "debt_status" && "w-32"}
+                          ${header.id === "invoice_no" && "w-36"}
+                          ${header.id === "is_company" && "w-32"}
                           `}
                       >
                         {header.isPlaceholder
@@ -110,11 +111,11 @@ export default function HksTable(props: Props) {
                         key={cell.id}
                         className={`
                           py-1.5 select-none
-                          ${cell.column.id === "Müşteri" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "Açıklama" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "Vergi Dairesi" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "Fatura No" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "İşlemler" && "w-fit"}
+                          ${cell.column.id === "name" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "desciption" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "tax_office" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "invoice_no" && "w-36 overflow-hidden"}
+                          ${cell.column.id === "actions" && "w-fit"}
                           `}
                       >
                         {flexRender(

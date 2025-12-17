@@ -39,8 +39,7 @@ instance.interceptors.response.use(
 				return new Promise(function (resolve, reject) {
 					failedQueue.push({ resolve, reject });
 				})
-					.then((_token) => {
-						// originalRequest.headers["Authorization"] = "Bearer " + token; // Not needed with cookies
+					.then(() => {
 						return instance(originalRequest);
 					})
 					.catch((err) => {
@@ -53,11 +52,7 @@ instance.interceptors.response.use(
 
 			try {
 				// Attempt to refresh the token
-				await axios.post(
-					`${import.meta.env.VITE_API_URL}/refresh`,
-					{},
-					{ withCredentials: true }
-				);
+				await axios.post(`${import.meta.env.VITE_API_URL}/refresh`, {}, { withCredentials: true });
 
 				processQueue(null); // Resolve queued requests
 				return instance(originalRequest);
@@ -65,8 +60,8 @@ instance.interceptors.response.use(
 				processQueue(refreshError, null); // Reject queued requests
 
 				// If refresh fails, redirect to login unless we're already there
-				if (!window.location.pathname.includes("/auth/login")) {
-					window.location.href = "/auth/login";
+				if (!window.location.pathname.includes("/login")) {
+					window.location.href = "/login";
 				}
 				return Promise.reject(refreshError);
 			} finally {
@@ -75,7 +70,7 @@ instance.interceptors.response.use(
 		}
 
 		return Promise.reject(error);
-	}
+	},
 );
 
 export default instance;

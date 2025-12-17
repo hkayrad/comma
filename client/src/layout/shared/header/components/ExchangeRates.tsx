@@ -50,17 +50,16 @@ export default function ExchangeRates() {
           <Tooltip disableHoverableContent>
             <TooltipTrigger asChild>
               <p className="text-muted-foreground text-[10px] my-auto mr-1 select-none">
-                {t("header.exchange.lastUpdate")}:{" "}
-                {exchangeRates.date.replaceAll("-", "/")}
+                {t("header.exchange.lastUpdate", {
+                  date: exchangeRates.date.replaceAll("-", "/"),
+                })}
               </p>
             </TooltipTrigger>
             <TooltipContent side="left">
               <span>
                 {t("header.exchange.lastUpdate.hover", {
-                  replace: {
-                    date: exchangeRates.date.replaceAll("-", "/"),
-                    tcmb: t("vars.tcmb"),
-                  },
+                  date: exchangeRates.date.replaceAll("-", "/"),
+                  tcmb: t("vars.tcmb"),
                 })}
               </span>
             </TooltipContent>
@@ -74,7 +73,7 @@ export default function ExchangeRates() {
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
-                      copyToClipboard(exchangeRates.usd.forexBuying)
+                      copyToClipboard(exchangeRates.usd.forexBuying, t)
                     }
                   >
                     {exchangeRates.usd.forexBuying}
@@ -85,7 +84,7 @@ export default function ExchangeRates() {
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
-                      copyToClipboard(exchangeRates.usd.forexSelling)
+                      copyToClipboard(exchangeRates.usd.forexSelling, t)
                     }
                   >
                     {exchangeRates.usd.forexSelling}
@@ -94,7 +93,7 @@ export default function ExchangeRates() {
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <span>{t("header.exchange.usd")}</span>
+              <span>{t("vars.usd")}</span>
             </TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="w-px mx-2 !h-4" />
@@ -107,7 +106,7 @@ export default function ExchangeRates() {
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
-                      copyToClipboard(exchangeRates.eur.forexBuying)
+                      copyToClipboard(exchangeRates.eur.forexBuying, t)
                     }
                   >
                     {exchangeRates.eur.forexBuying}
@@ -118,7 +117,7 @@ export default function ExchangeRates() {
                   <span
                     className="hover:cursor-copy"
                     onClick={() =>
-                      copyToClipboard(exchangeRates.eur.forexSelling)
+                      copyToClipboard(exchangeRates.eur.forexSelling, t)
                     }
                   >
                     {exchangeRates.eur.forexSelling}
@@ -127,16 +126,14 @@ export default function ExchangeRates() {
               </div>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <span>{t("header.exchange.eur")}</span>
+              <span>{t("vars.eur")}</span>
             </TooltipContent>
           </Tooltip>
         </>
       ) : (
         <p className="text-muted-foreground text-[10px] select-none">
           {t("header.exchange.noData", {
-            replace: {
-              tcmb: t("vars.tcmb"),
-            },
+            tcmb: t("vars.tcmb"),
           })}
         </p>
       )}

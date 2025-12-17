@@ -20,17 +20,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
 import CustomerDetails from "./CustomerDetails";
-import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
-import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
+import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
+import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
-import { formattedNumber } from "@/lib/utils/table";
+import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   data: CustomerDto[];
@@ -44,20 +45,21 @@ export default function CustomerTable(props: Props) {
 
   const { openDialog } = useDialog();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleDelete = useCallback(
     (id: string) => {
       const promise = API.Delete(id);
       toast.promise(promise, {
-        loading: "Müşteri siliniyor...",
+        loading: t("notification.customer.delete.pending"),
         success: () => {
           sendRefreshEvent();
-          return "Müşteri başarıyla silindi";
+          return t("notification.customer.delete.succes");
         },
-        error: "Müşteri silinirken hata oluştu",
+        error: t("notification.customer.delete.error"),
       });
     },
-    [API],
+    [API, t],
   );
 
   const onEdit = useCallback(
@@ -65,19 +67,19 @@ export default function CustomerTable(props: Props) {
       const customer = data.find((c) => c.id === customerId);
 
       if (!customer) {
-        toast.error("Müşteri bulunamadı");
+        toast.error(t("dialog.customer.couldNotFind"));
         return;
       }
 
       openDialog({
-        title: "Müşteri Düzenle",
-        description: "Müşteri bilgilerini düzenleyin",
+        title: t("dialog.customer.edit.title"),
+        description: t("dialog.customer.edit.description"),
         size: "3xl",
         content: <CustomerDialog customer={customer} type={type} />,
         showCloseButton: true,
       });
     },
-    [data, openDialog, type],
+    [data, openDialog, type, t],
   );
 
   const onDetails = useCallback(
@@ -85,19 +87,25 @@ export default function CustomerTable(props: Props) {
       const customer = data.find((c) => c.id === customerId);
 
       if (!customer) {
-        toast.error("Müşteri bulunamadı");
+        toast.error(t("dialog.customer.couldNotFind"));
         return;
       }
 
       openDialog({
-        title: `Müşteri Bilgileri`,
-        description: `${customer.is_company ? "Vergi No" : "TC Kimlik No"}: ${customer.tax_number || "-"} | Vergi Dairesi: ${customer.tax_office || "-"}`,
+        title: t("dialog.customer.details.title"),
+        description: t("dialog.customer.details.description", {
+          tax_no_label: customer.is_company
+            ? t("vars.tax_number")
+            : t("vars.tckn"),
+          tax_no: customer.tax_number,
+          tax_office: customer.tax_office,
+        }),
         size: "3xl",
         content: <CustomerDetails customer={customer} type={type} />,
         showCloseButton: true,
       });
     },
-    [data, type, openDialog],
+    [data, type, openDialog, t],
   );
 
   const CustomerTableColumns: ColumnDef<CustomerDto>[] = useMemo(
@@ -109,9 +117,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: "name",
-        id: "Müşteri",
         header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.name")}
+          />
         ),
         cell: ({ row, column }) => (
           <Tooltip disableHoverableContent>
@@ -129,40 +139,46 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: "is_company",
-        id: "Tür",
         header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.is_company")}
+          />
         ),
         cell: ({ row, column }) => {
           const isCompany = row.getValue(column.id);
           return isCompany ? (
             <Badge
               className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy"
-              onClick={() => copyToClipboard("Şirket")}
+              onClick={() => copyToClipboard(t("vars.is_company.true"), t)}
             >
-              Şirket
+              {t("vars.is_company.true")}
             </Badge>
           ) : (
             <Badge
               className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-100 select-none hover:cursor-copy"
-              onClick={() => copyToClipboard("Birey")}
+              onClick={() => copyToClipboard(t("vars.is_company.false"), t)}
             >
-              Birey
+              {t("vars.is_company.false")}
             </Badge>
           );
         },
         filterFn: (row, columnId, filterValue) => {
           if (!Array.isArray(filterValue) || filterValue.length === 0)
             return true;
-          const cellValue = row.getValue(columnId) ? "Şirket" : "Birey";
+          const cellValue = row.getValue(columnId)
+            ? t("vars.is_company.true")
+            : t("vars.is_company.false");
           return filterValue.includes(cellValue);
         },
       },
       {
         accessorKey: "tax_office",
-        id: "Vergi Dairesi",
         header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.tax_office")}
+          />
         ),
         cell: ({ row, column }) => (
           <Tooltip disableHoverableContent>
@@ -180,9 +196,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: "tax_number",
-        id: "Vergi No",
         header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.tax_number")}
+          />
         ),
         cell: ({ row, column }) => (
           <ClickToCopyText value={row.getValue(column.id) || "-"} />
@@ -190,9 +208,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: "mersis_no",
-        id: "Mersis No",
         header: ({ column }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.mersis_no")}
+          />
         ),
         cell: ({ row, column }) => (
           <ClickToCopyText value={row.getValue(column.id) || "-"} />
@@ -200,9 +220,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: `total_debt`,
-        id: `Toplam`,
         header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.total_debt")}
+          />
         ),
         cell: ({ row, column }: { row: any; column: any }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
@@ -211,9 +233,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: `total_payments`,
-        id: `Ödenmiş`,
         header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.total_payments")}
+          />
         ),
         cell: ({ row, column }: { row: any; column: any }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
@@ -222,9 +246,11 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: `remaining_debt`,
-        id: `Kalan`,
         header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader column={column} title={column.id} />
+          <SortableColumnHeader
+            column={column}
+            title={t("dashboard.table.column.remaining_debt")}
+          />
         ),
         cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
@@ -232,21 +258,26 @@ export default function CustomerTable(props: Props) {
         sortingFn: formattedNumber,
       },
       {
-        id: `Borç Durumu`,
-        header: ({ column }: { column: Column<any> }) => column.id,
+        id: "debt_status",
+        header: t("dashboard.table.column.debt_status"),
         cell: ({ row }: { row: Row<any> }) => {
-          const remaining_debt = parseFloat(row.getValue(`Kalan`));
+          const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
           if (remaining_debt > 0)
             return (
               <Badge
                 className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
                 onClick={() =>
                   copyToClipboard(
-                    type === "receivable" ? "Alacağınız Var" : "Borcunuz Var",
+                    type === "receivable"
+                      ? t("vars.debt_status.has_debt")
+                      : t("vars.debt_status.has_receivable"),
+                    t,
                   )
                 }
               >
-                {type === "receivable" ? "Alacağınız Var" : "Borcunuz Var"}
+                {type === "receivable"
+                  ? t("vars.debt_status.has_debt")
+                  : t("vars.debt_status.has_receivable")}
               </Badge>
             );
           else if (remaining_debt < 0)
@@ -255,11 +286,16 @@ export default function CustomerTable(props: Props) {
                 className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
                 onClick={() =>
                   copyToClipboard(
-                    type === "receivable" ? "Borcunuz Var" : "Alacağınız Var",
+                    type === "receivable"
+                      ? t("vars.debt_status.has_receivable")
+                      : t("vars.debt_status.has_debt"),
+                    t,
                   )
                 }
               >
-                {type === "receivable" ? "Borcunuz Var" : "Alacağınız Var"}
+                {type === "receivable"
+                  ? t("vars.debt_status.has_receivable")
+                  : t("vars.debt_status.has_debt")}
               </Badge>
             );
           else
@@ -268,32 +304,46 @@ export default function CustomerTable(props: Props) {
                 className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
                 onClick={() =>
                   copyToClipboard(
-                    type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok",
+                    type === "receivable"
+                      ? t("vars.debt_status.has_no_debt")
+                      : t("vars.debt_status.has_no_receivable"),
+                    t,
                   )
                 }
               >
-                {type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok"}
+                {type === "receivable"
+                  ? t("vars.debt_status.has_no_debt")
+                  : t("vars.debt_status.has_no_receivable")}
               </Badge>
             );
         },
         filterFn: (row, _columnId, filterValue) => {
           if (!Array.isArray(filterValue) || filterValue.length === 0)
             return true;
-          const remaining_debt = parseFloat(row.getValue(`Kalan`));
+          const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
           let status = "";
           if (remaining_debt > 0) {
-            status = type === "receivable" ? "Alacağınız Var" : "Borcunuz Var";
+            status =
+              type === "receivable"
+                ? t("vars.debt_status.has_debt")
+                : t("vars.debt_status.has_receivable");
           } else if (remaining_debt < 0) {
-            status = type === "receivable" ? "Borcunuz Var" : "Alacağınız Var";
+            status =
+              type === "receivable"
+                ? t("vars.debt_status.has_receivable")
+                : t("vars.debt_status.has_debt");
           } else {
-            status = type === "receivable" ? "Alacağınız Yok" : "Borcunuz Yok";
+            status =
+              type === "receivable"
+                ? t("vars.debt_status.has_no_debt")
+                : t("vars.debt_status.has_no_receivable");
           }
           return filterValue.includes(status);
         },
       },
       {
-        id: "İşlemler",
-        header: ({ column }) => column.id,
+        id: "actions",
+        header: t("dashboard.table.column.actions"),
         cell: ({ row }: { row: Row<CustomerDto> }) => (
           <div className="flex gap-2">
             <Tooltip disableHoverableContent>
@@ -310,7 +360,9 @@ export default function CustomerTable(props: Props) {
                   <Paperclip />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Borç dökümünü görüntüle</TooltipContent>
+              <TooltipContent>
+                {t("dashboard.table.columns.actions.show_statement")}
+              </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverableContent>
               <TooltipTrigger asChild>
@@ -322,7 +374,9 @@ export default function CustomerTable(props: Props) {
                   <Info />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Müşteri detaylarını görüntüle</TooltipContent>
+              <TooltipContent>
+                {t("dashboard.table.columns.actions.show_details")}
+              </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverableContent>
               <TooltipTrigger asChild>
@@ -334,7 +388,9 @@ export default function CustomerTable(props: Props) {
                   <Pencil />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Müşteri bilgilerini düzenle</TooltipContent>
+              <TooltipContent>
+                {t("dashboard.table.columns.actions.edit_details")}
+              </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverableContent>
               <Dialog>
@@ -350,24 +406,26 @@ export default function CustomerTable(props: Props) {
                   </TooltipTrigger>
                 </DialogTrigger>
                 <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  Müşteriyi sil
+                  {t("dashboard.table.columns.actions.delete")}
                 </TooltipContent>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Emin misiniz?</DialogTitle>
+                    <DialogTitle>
+                      {t("dashboard.table.columns.actions.delete.title")}
+                    </DialogTitle>
                     <DialogDescription>
-                      Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?
+                      {t("dashboard.table.columns.actions.delete.description")}
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant="outline">İptal</Button>
+                      <Button variant="outline">{t("vars.cancel")}</Button>
                     </DialogClose>
                     <Button
                       variant="destructive"
                       onClick={() => handleDelete(row.original.id!)}
                     >
-                      Müşteriyi Sil
+                      {t("dashboard.table.columns.actions.delete.confirm")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -377,34 +435,84 @@ export default function CustomerTable(props: Props) {
         ),
       },
     ],
-    [handleDelete, navigate, onDetails, onEdit, type],
+    [handleDelete, navigate, onDetails, onEdit, type, t],
   );
 
   const tags = useMemo(
     () =>
       type === "receivable"
         ? [
-            { column: "Tür", value: "Şirket", color: "violet" },
-            { column: "Tür", value: "Birey", color: "orange" },
-            { column: "Borç Durumu", value: "Alacağınız Var", color: "red" },
-            { column: "Borç Durumu", value: "Alacağınız Yok", color: "green" },
-            { column: "Borç Durumu", value: "Borcunuz Var", color: "blue" },
+            {
+              column: "is_company",
+              column_label: t("dashboard.table.column.is_company"),
+              value: t("vars.is_company.true"),
+              color: "violet",
+            },
+            {
+              column: "is_company",
+              column_label: t("dashboard.table.column.is_company"),
+              value: t("vars.is_company.false"),
+              color: "orange",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_debt"),
+              color: "red",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_no_debt"),
+              color: "green",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_receivable"),
+              color: "blue",
+            },
           ]
         : [
-            { column: "Tür", value: "Şirket", color: "violet" },
-            { column: "Tür", value: "Birey", color: "orange" },
-            { column: "Borç Durumu", value: "Alacağınız Var", color: "blue" },
-            { column: "Borç Durumu", value: "Borcunuz Yok", color: "green" },
-            { column: "Borç Durumu", value: "Borcunuz Var", color: "red" },
+            {
+              column: "is_company",
+              column_label: t("dashboard.table.column.is_company"),
+              value: t("vars.is_company.true"),
+              color: "violet",
+            },
+            {
+              column: "is_company",
+              column_label: t("dashboard.table.column.is_company"),
+              value: t("vars.is_company.false"),
+              color: "orange",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_debt"),
+              color: "blue",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_no_receivable"),
+              color: "green",
+            },
+            {
+              column: "debt_status",
+              column_label: t("dashboard.table.column.debt_status"),
+              value: t("vars.debt_status.has_receivable"),
+              color: "red",
+            },
           ],
-    [type],
+    [type, t],
   );
 
   return (
     <HksTable
       data={data}
       columns={CustomerTableColumns}
-      searchColumn="Müşteri"
+      searchColumn="name"
       tags={tags}
     />
   );

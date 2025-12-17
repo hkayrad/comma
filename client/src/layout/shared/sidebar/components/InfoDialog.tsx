@@ -63,7 +63,7 @@ export default function InfoDialog() {
             target="_blank"
             className="text-xs text-muted-foreground flex items-center gap-1"
           >
-            {t("dialog.info.exchangeInfo.source")}
+            {t("vars.tcmb")}
             <ExternalLink size={12} />
           </NavLink>
         </ItemActions>

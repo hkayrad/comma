@@ -21,21 +21,23 @@ import React from "react";
 
 import { useBreadcrumb } from "@/contexts/BreadcrumbContext";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const PATH_MAP: Record<string, string> = {
-  alacaklar: "Alacaklar",
-  borclar: "Borçlar",
-  odemeler: "Ödemeler",
-  dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
-  borc_dokumu: "Borç Dökümü",
-};
+import { useTranslation } from "react-i18next";
 
 export default function Header() {
   const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
   const { labels } = useBreadcrumb();
+  const { t } = useTranslation();
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
+
+  const PATH_MAP: Record<string, string> = {
+    alacaklar: t("header.breadcrumb.finance.receivables"),
+    borclar: t("header.breadcrumbs.finance.payables"),
+    odemeler: t("header.breadcrumbs.finance.payments"),
+    dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
+    borc_dokumu: t("header.breadcrumbs.finance.customerStatement"),
+  };
 
   const breadcrumbItems = pathSegments.map((segment, index) => {
     const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
@@ -62,7 +64,7 @@ export default function Header() {
   // If we are at root, show "Genel Bakış"
   if (breadcrumbItems.length === 0) {
     breadcrumbItems.push({
-      name: "Genel Bakış",
+      name: t("sidebar.nonSysAdmin.finance.overview"),
       path: "/",
       isLast: true,
     });
@@ -83,7 +85,12 @@ export default function Header() {
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
-            Kenarlığı {state === "collapsed" ? "Aç" : "Kapat"}
+            {t("sidebar.toggle", {
+              action:
+                state === "collapsed"
+                  ? t("sidebar.toggle.open")
+                  : t("sidebar.toggle.close"),
+            })}
           </TooltipContent>
         </Tooltip>
         <Separator orientation="vertical" className="w-px mr-4 ml-3 !h-4" />

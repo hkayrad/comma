@@ -34,12 +34,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   table: Table<any>;
   searchColumn: string;
   tags?: {
     column: string;
+    column_label: string;
     value: string;
     color: string;
   }[];
@@ -47,6 +49,8 @@ type Props = {
 
 export default function HksTableHeader(props: Props) {
   const { table, searchColumn, tags } = props;
+
+  const { t } = useTranslation();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -135,14 +139,19 @@ export default function HksTableHeader(props: Props) {
     });
 
     // Get unique columns from tags
-    const uniqueColumns = new Set(tags.map((tag) => tag.column));
+    const uniqueColumns = new Set(
+      tags.map((tag) => ({
+        column: tag.column,
+        column_label: tag.column_label,
+      })),
+    );
 
     // Apply filters to each column
     uniqueColumns.forEach((columnId) => {
-      const column = table.getColumn(columnId);
+      const column = table.getColumn(columnId.column);
       if (!column) return;
 
-      const values = filtersByColumn.get(columnId);
+      const values = filtersByColumn.get(columnId.column);
       if (values && values.length > 0) {
         // Set filter value as array - Tanstack Table will use arrIncludesSome by default
         column.setFilterValue(values);
@@ -165,18 +174,28 @@ export default function HksTableHeader(props: Props) {
     if (!tags)
       return new Map<
         string,
-        Array<{ column: string; value: string; color: string }>
+        Array<{
+          column: string;
+          column_label: string;
+          value: string;
+          color: string;
+        }>
       >();
 
     const groups = new Map<
       string,
-      Array<{ column: string; value: string; color: string }>
+      Array<{
+        column: string;
+        column_label: string;
+        value: string;
+        color: string;
+      }>
     >();
     tags.forEach((tag) => {
-      if (!groups.has(tag.column)) {
-        groups.set(tag.column, []);
+      if (!groups.has(tag.column_label)) {
+        groups.set(tag.column_label, []);
       }
-      groups.get(tag.column)!.push(tag);
+      groups.get(tag.column_label)!.push(tag);
     });
     return groups;
   }, [tags]);
@@ -186,7 +205,7 @@ export default function HksTableHeader(props: Props) {
       <ButtonGroup>
         <Tooltip>
           <TooltipTrigger asChild>
-            <InputGroup className="max-w-2xs bg-background min-w-48">
+            <InputGroup className="bg-background min-w-[304px]">
               <InputGroupAddon>
                 <UserRound
                   className={
@@ -198,7 +217,7 @@ export default function HksTableHeader(props: Props) {
               </InputGroupAddon>
               <InputGroupInput
                 ref={searchInputRef}
-                placeholder="İsim ile Müşteri Ara..."
+                placeholder={t("table.header.search")}
                 value={
                   (table.getColumn(searchColumn)?.getFilterValue() as string) ??
                   ""
@@ -225,7 +244,7 @@ export default function HksTableHeader(props: Props) {
               </InputGroupAddon>
             </InputGroup>
           </TooltipTrigger>
-          <TooltipContent>İsim ile müşteri ara</TooltipContent>
+          <TooltipContent>{t("table.header.search.hover")}</TooltipContent>
         </Tooltip>
         {tags && (
           <DropdownMenu>
@@ -234,14 +253,14 @@ export default function HksTableHeader(props: Props) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="select-none relative">
                     <Filter />
-                    <span>Filtreler</span>
+                    <span>{t("table.header.filters")}</span>
                     {activeFilterCount > 0 && (
                       <Badge variant="default">{activeFilterCount}</Badge>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Filtreleme seçeneklerini göster</TooltipContent>
+              <TooltipContent>{t("table.header.filters.hover")}</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" className="max-w-xs">
               {Array.from(groupedTags.entries()).map(
@@ -282,12 +301,12 @@ export default function HksTableHeader(props: Props) {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="select-none">
                   <Columns3Cog />
-                  <span>Sütunları Göster/Gizle</span>
+                  <span>{t("table.header.showHideCols")}</span>
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              İstenilen sütunları gizle veya göster
+              {t("table.header.showHideCols.hover")}
             </TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end">
@@ -305,7 +324,9 @@ export default function HksTableHeader(props: Props) {
                     }
                     onSelect={(e) => e.preventDefault()}
                   >
-                    {column.id}
+                    {column.id === "#"
+                      ? "#"
+                      : t(`dashboard.table.column.${column.id}`, { defaultValue: column.id })}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -317,11 +338,11 @@ export default function HksTableHeader(props: Props) {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="select-none">
                   <Rows3 />
-                  <span>Satır Sayısı</span>
+                  <span>{t("table.header.rowCount")}</span>
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent>Satır sayısını seç</TooltipContent>
+            <TooltipContent>{t("table.header.rowCount.hover")}</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="end">
             {rowCounts.map((rowCount) => (
@@ -330,7 +351,9 @@ export default function HksTableHeader(props: Props) {
                 checked={table.getState().pagination.pageSize === rowCount}
                 onCheckedChange={() => table.setPageSize(rowCount)}
               >
-                {rowCount} Satır
+                {t("table.header.rowCount.row", {
+                  rowCount: rowCount,
+                })}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
@@ -345,10 +368,12 @@ export default function HksTableHeader(props: Props) {
               onClick={onFilterReset}
             >
               <FilterX />
-              Filtreleri Temizle
+              {t("table.header.filters.clear")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Tüm filtreleri kaldır</TooltipContent>
+          <TooltipContent>
+            {t("table.header.filters.clear.hover")}
+          </TooltipContent>
         </Tooltip>
         <Tooltip disableHoverableContent>
           <TooltipTrigger asChild>
@@ -358,10 +383,12 @@ export default function HksTableHeader(props: Props) {
               onClick={onSortReset}
             >
               <ArrowUpDown />
-              Sıralamayı Sıfırla
+              {t("table.header.sorting.clear")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Tüm sıralamaları kaldır</TooltipContent>
+          <TooltipContent>
+            {t("table.header.sorting.clear.hover")}
+          </TooltipContent>
         </Tooltip>
       </ButtonGroup>
       <div className="flex gap-4 ml-auto ">
@@ -376,10 +403,10 @@ export default function HksTableHeader(props: Props) {
               <RefreshCw
                 className={`${isRefreshing ? "animate-spin" : ""} shadow-xs`}
               />
-              Yenile
+              {t("table.header.refresh")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Tabloyu yenile</TooltipContent>
+          <TooltipContent>{t("table.header.refresh.hover")}</TooltipContent>
         </Tooltip>
       </div>
     </div>

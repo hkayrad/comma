@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PaymentDto } from "@/lib/types";
-import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
+import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import PaymentTable from "./components/PaymentTable";
 import { useLocation } from "react-router";
@@ -33,10 +33,7 @@ export default function Payments() {
     <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 flex flex-col gap-2">
       <OverviewCards type={type} />
       <div>
-        <PaymentTable
-          data={payments}
-          type={type}
-        />
+        <PaymentTable data={payments} type={type} />
       </div>
     </div>
   );

@@ -12,12 +12,14 @@ import { ConfigApi } from "@/lib/api/config";
 import { Logger } from "@/lib/utils/logger";
 import { Clock } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 export default function MaintenanceDialog() {
   const { configs } = useConfig();
   const { sendStartMaintenanceNotification, sendEndMaintenanceNotification } =
     useWebSocket();
+  const { t } = useTranslation();
 
   const DEFAULT_START_TIME = new Date(Date.now() + 60000)
     .toTimeString()
@@ -47,41 +49,41 @@ export default function MaintenanceDialog() {
   const handleEndMaintenance = useCallback(async () => {
     const promise = await ConfigApi.EndMaintenanceMode();
     toast.promise(promise, {
-      loading: "Bakım modu sonlandırılıyor...",
+      loading: t("notification.admin.endMaintenance.pending"),
       success: () => {
         sendEndMaintenanceNotification();
-        return "Bakım modu sonlandırıldı.";
+        return t("notification.admin.endMaintenance.success");
       },
-      error: "Bakım modu sonlandırılamadı.",
+      error: t("notification.admin.endMaintenance.error"),
     });
-  }, [sendEndMaintenanceNotification]);
+  }, [sendEndMaintenanceNotification, t]);
 
   const handleStartMaintenance = useCallback(async () => {
     const promise = await ConfigApi.StartMaintenanceMode();
     toast.promise(promise, {
-      loading: "Bakım modu başlatılıyor...",
+      loading: t("notification.admin.startMaintenance.pending"),
       success: () => {
         sendStartMaintenanceNotification(startTime, endTime);
-        return "Bakım modu başlatıldı.";
+        return t("notification.admin.startMaintenance.success");
       },
-      error: "Bakım modu başlatılamadı.",
+      error: t("notification.admin.startMaintenance.error"),
     });
     Logger.debug("MaintenanceDialog: Starting maintenance mode", {
       startTime,
       endTime,
     });
-  }, [startTime, endTime, sendStartMaintenanceNotification]);
+  }, [startTime, endTime, sendStartMaintenanceNotification, t]);
 
   return (
     <>
       {configs?.maintenanceMode === "active" ? (
         <div className="flex justify-end gap-2">
           <DialogClose asChild>
-            <Button variant="ghost">İptal</Button>
+            <Button variant="ghost">{t("vars.cancel")}</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button className="bg-green-600" onClick={handleEndMaintenance}>
-              Bakımı Bitir
+              {t("dialog.maintenanceMode.end.button")}
             </Button>
           </DialogClose>
         </div>
@@ -89,7 +91,7 @@ export default function MaintenanceDialog() {
         <div className="grid grid-cols-2">
           <div className="flex flex-col space-y-2 mr-4">
             <Label htmlFor="startTime" className="font-medium">
-              Başlangıç Zamanı
+              {t("dialog.maintenanceMode.startTime")}
             </Label>
             <InputGroup>
               <InputGroupInput
@@ -107,7 +109,7 @@ export default function MaintenanceDialog() {
           </div>
           <div className="flex flex-col space-y-2">
             <Label htmlFor="endTime" className="font-medium">
-              Bitiş Zamanı
+              {t("dialog.maintenanceMode.endTime")}
             </Label>
             <InputGroup>
               <InputGroupInput
@@ -125,11 +127,11 @@ export default function MaintenanceDialog() {
           </div>
           <div className="col-span-2 flex justify-end mt-8 gap-2">
             <DialogClose asChild>
-              <Button variant="ghost">İptal</Button>
+              <Button variant="ghost">{t("vars.cancel")}</Button>
             </DialogClose>
             <DialogClose asChild>
               <Button variant="destructive" onClick={handleStartMaintenance}>
-                Bakımı Başlat
+                {t("dialog.maintenanceMode.start.button")}
               </Button>
             </DialogClose>
           </div>

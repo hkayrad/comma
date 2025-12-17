@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { Table } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   table: Table<any>;
@@ -14,6 +15,7 @@ type Props = {
 
 export default function HksTablePagination(props: Props) {
   const { table } = props;
+  const { t } = useTranslation();
 
   return (
     <ButtonGroup>
@@ -27,16 +29,16 @@ export default function HksTablePagination(props: Props) {
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft />
-            Önceki
+            {t("table.header.pagination.prev")}
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Önceki sayfaya git</TooltipContent>
+        <TooltipContent>{t("table.header.pagination.prev.hover")}</TooltipContent>
       </Tooltip>
       <ButtonGroupText className="bg-background whitespace-nowrap select-none">
-        Sayfa
-        <span className="font-normal mx-0.5">
-          {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
-        </span>
+        { t("table.header.pagination.page", {
+          currentPage: table.getState().pagination.pageIndex + 1,
+          totalPages: table.getPageCount()
+        })}
       </ButtonGroupText>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -47,11 +49,11 @@ export default function HksTablePagination(props: Props) {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Sonraki
+            {t("table.header.pagination.next")}
             <ChevronRight />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Sonraki sayfaya git</TooltipContent>
+        <TooltipContent>{t("table.header.pagination.next.hover")}</TooltipContent>
       </Tooltip>
     </ButtonGroup>
   );

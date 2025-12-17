@@ -18,18 +18,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api";
+import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import type { Column, ColumnDef, Row } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
-import FormattedCurrency from "@/layout/shared/table/utils/FormattedCurrency";
-import FormattedDate from "@/layout/shared/table/utils/FormattedDate";
-import SortableColumnHeader from "@/layout/shared/table/utils/SortableColumnHeader";
+import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
+import FormattedDate from "@/layout/shared/table/components/FormattedDate";
+import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
-import { formattedNumber } from "@/lib/utils/table";
+import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   data: PaymentDto[];
@@ -40,6 +41,7 @@ export default function PaymentTable(props: Props) {
   const { data, type } = props;
 
   const { openDialog } = useDialog();
+  const { t } = useTranslation();
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -131,7 +133,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("TRY")}
+                  onClick={() => copyToClipboard("TRY", t)}
                 >
                   TRY
                 </Badge>
@@ -140,7 +142,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("USD")}
+                  onClick={() => copyToClipboard("USD", t)}
                 >
                   USD
                 </Badge>
@@ -149,7 +151,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("EUR")}
+                  onClick={() => copyToClipboard("EUR", t)}
                 >
                   EUR
                 </Badge>
@@ -199,7 +201,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Nakit")}
+                  onClick={() => copyToClipboard("Nakit", t)}
                 >
                   Nakit
                 </Badge>
@@ -208,7 +210,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Havale")}
+                  onClick={() => copyToClipboard("Havale", t)}
                 >
                   Havale
                 </Badge>
@@ -217,7 +219,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Çek")}
+                  onClick={() => copyToClipboard("Çek", t)}
                 >
                   Çek
                 </Badge>
@@ -226,7 +228,7 @@ export default function PaymentTable(props: Props) {
               return (
                 <Badge
                   className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 select-none hover:cursor-copy"
-                  onClick={() => copyToClipboard("Kart")}
+                  onClick={() => copyToClipboard("Kart", t)}
                 >
                   Kart
                 </Badge>
@@ -361,18 +363,53 @@ export default function PaymentTable(props: Props) {
         ),
       },
     ],
-    [handleDelete, onEdit, type],
+    [handleDelete, onEdit, type, t],
   );
 
   const tags = useMemo(
     () => [
-      { column: "Ödeme Yöntemi", value: "Nakit", color: "green" },
-      { column: "Ödeme Yöntemi", value: "Havale", color: "blue" },
-      { column: "Ödeme Yöntemi", value: "Çek", color: "yellow" },
-      { column: "Ödeme Yöntemi", value: "Kart", color: "purple" },
-      { column: "Para Birimi", value: "TRY", color: "red" },
-      { column: "Para Birimi", value: "USD", color: "green" },
-      { column: "Para Birimi", value: "EUR", color: "purple" },
+      {
+        column: "Ödeme Yöntemi",
+        column_label: "Ödeme Yöntemi",
+        value: "Nakit",
+        color: "green",
+      },
+      {
+        column: "Ödeme Yöntemi",
+        column_label: "Ödeme Yöntemi",
+        value: "Havale",
+        color: "blue",
+      },
+      {
+        column: "Ödeme Yöntemi",
+        column_label: "Ödeme Yöntemi",
+        value: "Çek",
+        color: "yellow",
+      },
+      {
+        column: "Ödeme Yöntemi",
+        column_label: "Ödeme Yöntemi",
+        value: "Kart",
+        color: "purple",
+      },
+      {
+        column: "Para Birimi",
+        column_label: "Para Birimi",
+        value: "TRY",
+        color: "red",
+      },
+      {
+        column: "Para Birimi",
+        column_label: "Para Birimi",
+        value: "USD",
+        color: "green",
+      },
+      {
+        column: "Para Birimi",
+        column_label: "Para Birimi",
+        value: "EUR",
+        color: "purple",
+      },
     ],
     [],
   );

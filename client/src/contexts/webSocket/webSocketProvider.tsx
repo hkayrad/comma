@@ -8,10 +8,11 @@ import {
 import { WebSocketContext } from "./webSocketContext";
 import { toast } from "sonner";
 import { Logger } from "@/lib/utils/logger";
-import { AuthApi } from "@/lib/api";
+import { AuthApi } from "@/lib/api/auth";
 import { TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useConfig } from "@/contexts/config";
+import { useTranslation } from "react-i18next";
 
 interface WebSocketProviderProps {
   children: ReactNode;
@@ -32,6 +33,7 @@ export const WebSocketProvider = ({
   const navigate = useNavigate();
   const refreshConfigsRef = useRef(refreshConfigs);
   const navigateRef = useRef(navigate);
+  const { t } = useTranslation();
 
   // Keep refs up to date
   useEffect(() => {
@@ -53,15 +55,15 @@ export const WebSocketProvider = ({
 
     ws.current.onopen = () => {
       setIsConnected(true);
-      Logger.info("WebSocket connected on ", url);
+      Logger.debug("WebSocket connected on ", url);
     };
 
     ws.current.onclose = () => {
       setIsConnected(false);
-      Logger.info("WebSocket disconnected");
+      Logger.debug("WebSocket disconnected");
       if (shouldReconnect.current) {
         reconnectTimeout.current = setTimeout(() => {
-          Logger.info("Reconnecting WebSocket...");
+          Logger.debug("Reconnecting WebSocket...");
           connect();
         }, 3000);
       }
@@ -89,15 +91,18 @@ export const WebSocketProvider = ({
                   endTime ||
                   `${new Date(Date.now() + 300000).getHours().toString().padStart(2, "0")}:${new Date(Date.now() + 300000).getMinutes().toString().padStart(2, "0")}`;
                 refreshConfigsRef.current();
-                toast.error(title, {
+                toast.error(t("notification.startMaintenance.title"), {
                   description: (
                     <>
                       <span>
-                        {body} <br />
-                        <br />{" "}
+                        {t("notification.startMaintenance.body")} <br />
+                        <br />
                         {start &&
                           end &&
-                          `Tahmini Bakım Aralığı: ${start} - ${end}`}
+                          t(
+                            "notification.startMaintenance.estimatedMaintenanceInterval",
+                            { start, end },
+                          )}
                       </span>
                       <StartMaintenanceProgressBar duration={60000} />
                     </>
@@ -122,15 +127,20 @@ export const WebSocketProvider = ({
               case "end_maintenance": {
                 refreshConfigsRef.current();
                 toast.dismiss("maintenance_mode_toast");
-                toast.success(title, {
-                  duration: refreshTime,
-                  closeButton: false,
-                  dismissible: false,
-                  description: (
-                    <EndMaintenanceProgressBar duration={refreshTime} />
-                  ),
-                  className: "relative overflow-hidden",
-                });
+                toast.success(
+                  t("notification.endMaintenance.title", {
+                    refreshTime: refreshTime / 1000,
+                  }),
+                  {
+                    duration: refreshTime,
+                    closeButton: false,
+                    dismissible: false,
+                    description: (
+                      <EndMaintenanceProgressBar duration={refreshTime} />
+                    ),
+                    className: "relative overflow-hidden",
+                  },
+                );
                 setTimeout(() => {
                   window.location.reload();
                 }, refreshTime);
@@ -142,9 +152,14 @@ export const WebSocketProvider = ({
             }
             break;
           case "ACTIVE_USERS":
-            toast.success(`Aktif Kullanıcı Sayısı: ${data.userCount}`, {
-              duration: 5000,
-            });
+            toast.success(
+              t("notification.activeUserCount", {
+                count: data.userCount,
+              }),
+              {
+                duration: 5000,
+              },
+            );
             break;
           default:
             Logger.warn("Unknown message type:", data.type);
@@ -153,7 +168,7 @@ export const WebSocketProvider = ({
         Logger.error("Error parsing WebSocket message:", error);
       }
     };
-  }, [url]);
+  }, [url, t]);
 
   const disconnect = useCallback(() => {
     shouldReconnect.current = false;
@@ -176,8 +191,6 @@ export const WebSocketProvider = ({
       if (ws.current && isConnected) {
         const message = {
           type: "SEND_NOTIFICATION",
-          title: "Planlı Bakım",
-          body: "Planlı bakım çalışması nedeniyle otomatik olarak çıkış yapacaksınız. Lütfen yapılan işlemleri kaydedin.",
           notificationType: "start_maintenance",
           startTime:
             startTime ||
@@ -196,7 +209,6 @@ export const WebSocketProvider = ({
     if (ws.current && isConnected) {
       const message = {
         type: "SEND_NOTIFICATION",
-        title: `Sistem bakımı tamamlandı, ${refreshTime / 1000} saniye içinde sayfa yenilenecek.`,
         notificationType: "end_maintenance",
       };
       ws.current.send(JSON.stringify(message));

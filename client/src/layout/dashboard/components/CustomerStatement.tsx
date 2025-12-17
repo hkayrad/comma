@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
-import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import type {
   CustomerStatement as CustomerStatementType,
   DebtDto,

@@ -18,7 +18,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
-import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api";
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import type { CustomerDto, OverviewViewType } from "@/lib/types";
 import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -258,7 +258,7 @@ export default function CustomerDialog(props: Props) {
                 </InputGroup>
               </FormControl>
               <FormDescription>
-                Müşteri {form.watch("is_company") ? "vergi" : "TC Kimlik"}{" "}
+                Müşteri {form.watch("is_company") ? "Vergi" : "TC Kimlik"}{" "}
                 numarası.
               </FormDescription>
               <FormMessage />

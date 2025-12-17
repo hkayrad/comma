@@ -9,12 +9,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useDialog } from "@/contexts/dialog";
-import {
-  PayableCustomerApi,
-  PayableDebtApi,
-  ReceivableCustomerApi,
-  ReceivableDebtApi,
-} from "@/lib/api";
+import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type { CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types";
 import { sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";

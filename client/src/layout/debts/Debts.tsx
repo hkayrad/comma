@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { DebtDto } from "@/lib/types";
-import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api";
+import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import DebtTable from "./components/DebtTable";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import { useLocation } from "react-router";

@@ -40,55 +40,61 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export default function NonSystemAdminSidebarContent() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const financialItems = useMemo(
     () => [
       {
-        title: "Genel Bakış",
+        title: t("sidebar.nonSysAdmin.finance.overview"),
         url: "/",
         icon: Component,
         items: [],
       },
       {
-        title: "Alacak Bilgileri",
+        title: t("sidebar.nonSysAdmin.finance.receivableInfo"),
         url: "/alacaklar",
         icon: PiggyBank,
         items: [
           {
-            title: "Alacaklar",
+            title: t("sidebar.nonSysAdmin.finance.receivableInfo.receivables"),
             url: "/alacaklar",
             icon: ScrollText,
           },
           {
-            title: "Gelen Ödemeler",
+            title: t(
+              "sidebar.nonSysAdmin.finance.receivableInfo.incomingPayments",
+            ),
             url: "/alacaklar/odemeler",
             icon: BanknoteArrowDown,
           },
         ],
       },
       {
-        title: "Borç Bilgileri",
+        title: t("sidebar.nonSysAdmin.finance.payableInfo"),
         url: "/borclar",
         icon: HandCoins,
         items: [
           {
-            title: "Borçlar",
+            title: t("sidebar.nonSysAdmin.finance.payableInfo.payables"),
             url: "/borclar",
             icon: Scroll,
           },
           {
-            title: "Giden Ödemeler",
+            title: t(
+              "sidebar.nonSysAdmin.finance.payableInfo.outgoingPayments",
+            ),
             url: "/borclar/odemeler",
             icon: BanknoteArrowUp,
           },
         ],
       },
     ],
-    [],
+    [t],
   );
 
   const devItems = useMemo(
@@ -107,17 +113,17 @@ export default function NonSystemAdminSidebarContent() {
     () =>
       [
         {
-          title: "Finans",
+          title: t("sidebar.nonSysAdmin.finance"),
           items: financialItems,
         },
         import.meta.env.DEV
           ? {
-            title: "Geliştirme",
-            items: devItems,
-          }
+              title: "Geliştirme",
+              items: devItems,
+            }
           : null,
       ].filter((item) => item !== null),
-    [financialItems, devItems],
+    [financialItems, devItems, t],
   );
 
   const { state } = useSidebar();

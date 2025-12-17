@@ -1,8 +1,54 @@
 {
+  "dashboard": {
+    "customer_info": {
+      "contact_info": "İletişim Bilgileri",
+      "credit_balance": "Bu müşteriye ödemeniz gereken bakiye bulunmaktadır.",
+      "financial_summary": "Finansal Özet",
+      "outstanding_balance": "Bu müşteriden tahsil etmeniz gereken bakiye bulunmaktadır.",
+      "overcharge": "Bu müşteriden fazladan tahsilat yapılmıştır.",
+      "overpay": "Bu müşteriye fazladan ödeme yapılmıştır."
+    },
+    "table": {
+      "column": {
+        "actions": "İşlemler",
+        "debt_status": "Borç Durumu",
+        "is_company": "Tür",
+        "mersis_no": "Mersis No",
+        "name": "Müşteri",
+        "remaining_debt": "Kalan",
+        "tax_number": "Vergi No",
+        "tax_office": "Vergi Dairesi",
+        "total_debt": "Toplam",
+        "total_payments": "Ödenmiş"
+      },
+      "columns": {
+        "actions": {
+          "delete": "Müşteriyi sil",
+          "delete.confirm": "Müşteriyi Sil",
+          "delete.description": "Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?",
+          "delete.title": "Emin misiniz?",
+          "edit_details": "Müşteri bilgilerini düzenle",
+          "show_details": "Müşteri detaylarını görüntüle",
+          "show_statement": "Borç dökümünü görüntüle"
+        }
+      }
+    }
+  },
   "dialog": {
     "accountDetails": {
       "description": "Hesap bilgilerinizi görüntüleyin ve düzenleyin.",
       "title": "Hesap Detayları"
+    },
+    "customer": {
+      "couldNotFind": "Müşteri bulunamadı",
+      "details": {
+        "description": "{{tax_no_label}}: {{tax_no}} | Vergi Dairesi: {{tax_office}}",
+        "title": "Müşteri Bilgileri"
+      },
+      "edit": {
+        "description": "Müşteri bilgilerini düzenleyin",
+        "title": "Müşteri Düzenle"
+      }
     },
     "info": {
       "description": "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
@@ -10,27 +56,110 @@
       "exchangeInfo": "Döviz Verileri",
       "title": "Hakkında",
       "version": "Uygulama Versiyonu"
+    },
+    "maintenanceMode": {
+      "end": {
+        "button": "Bakımı Bitir",
+        "description": "Bakımı sonlandırmak istediğinize emin misiniz?",
+        "title": "Planlı Bakımı Bitir"
+      },
+      "endTime": "Bitiş Zamanı",
+      "start": {
+        "button": "Bakımı Başlat",
+        "description": "Sistemi bakım moduna almak istediğinize emin misiniz? Bu işlem tüm kullanıcıların sistemden çıkış yapmasına neden olacaktır.",
+        "title": "Planlı Bakım Başlat"
+      },
+      "startTime": "Başlangıç Zamanı"
     }
   },
   "header": {
+    "breadcrumb": {
+      "finance": {
+        "overview": "Genel Bakış",
+        "receivables": "Alacaklar"
+      }
+    },
+    "breadcrumbs": {
+      "finance": {
+        "customerStatement": "Borç Dökümü",
+        "payables": "Borçlar",
+        "payments": "Ödemeler"
+      }
+    },
     "exchange": {
       "buy": "Alış",
-      "eur": "Euro (EUR)",
       "lastUpdate": "Son Güncelleme: {{date}}",
       "lastUpdate.hover": "{{date}} günü için, {{tcmb}} tarafından belirlenmiş kur bilgileri",
       "noData": "{{tcmb}} verileri mevcut değildir.",
-      "sell": "Satış",
-      "usd": "Amerikan Doları (USD)"
-    }
+      "sell": "Satış"
+    },
+    "maintenanceBanner": "Sistem bakım modundadır. Lütfen sistem üzerinde işlem yapmayın."
+  },
+  "login": {
+    "changeLanguage": "Dil Değiştir",
+    "changeTheme": "Tema Değiştir",
+    "form": {
+      "password": "Şifre",
+      "password.maxCharError": "Şifre en fazla 50 karakter olabilir.",
+      "submit": "Giriş Yap",
+      "submit.pending": "Giriş Yapılıyor...",
+      "username": "Kullanıcı Adı",
+      "username.maxCharError": "Kullanıcı adı en fazla 20 karakter olabilir."
+    },
+    "title": "Giriş Yap"
   },
   "notification": {
+    "activeUserCount": "Aktif Kullanıcı Sayısı: {{count}}",
+    "admin": {
+      "endMaintenance": {
+        "error": "Bakım modu sonlandırılamadı.",
+        "pending": "Bakım modu sonlandırılıyor...",
+        "success": "Bakım modu sonlandırıldı."
+      },
+      "startMaintenance": {
+        "error": "Bakım modu başlatılamadı.",
+        "pending": "Bakım modu başlatılıyor...",
+        "success": "Bakım modu başlatıldı."
+      }
+    },
     "auth": {
+      "login": {
+        "error": "Giriş başarısız, lütfen bilgilerinizi kontrol edin",
+        "fillEmptyFields": "Lütfen tüm alanları doldurun",
+        "pending": "Giriş yapılıyor...",
+        "success": "Giriş başarılı!"
+      },
       "logout": {
         "error": "Çıkış yapılırken bir hata oluştu",
         "pending": "Çıkış yapılıyor...",
         "success": "Çıkış başarılı!"
       }
+    },
+    "copy": {
+      "error": "Panoya kopyalanamadı",
+      "success": "Panoya kopyalandı"
+    },
+    "customer": {
+      "delete": {
+        "error": "Müşteri silinirken hata oluştu",
+        "pending": "Müşteri siliniyor...",
+        "succes": "Müşteri başarıyla silindi"
+      }
+    },
+    "endMaintenance": {
+      "title": "Sistem bakımı tamamlandı, {{refreshTime}} saniye içinde sayfa yenilenecek."
+    },
+    "notImplemented": "Bu özellik henüz geliştirilmedi",
+    "startMaintenance": {
+      "body": "Planlı bakım çalışması nedeniyle otomatik olarak çıkış yapacaksınız. Lütfen yapılan işlemleri kaydedin.",
+      "estimatedMaintenanceInterval": "Tahmini Bakım Aralığı: {{start}} - {{end}}",
+      "title": "Planlı Bakım"
     }
+  },
+  "overviewCards": {
+    "paid": "Ödenmiş {{state}}",
+    "remaning": "Kalan {{state}}",
+    "total": "Toplam {{state}}"
   },
   "sidebar": {
     "footer": {
@@ -52,6 +181,52 @@
       "info": {
         "label": "Hakkında"
       }
+    },
+    "nonSysAdmin": {
+      "finance": "Finans",
+      "finance.overview": "Genel Bakış\n",
+      "finance.payableInfo": "Borç Bilgileri",
+      "finance.payableInfo.outgoingPayments": "Giden Ödemeler",
+      "finance.payableInfo.payables": "Borçlar",
+      "finance.receivableInfo": "Alacak Bilgileri",
+      "finance.receivableInfo.incomingPayments": "Gelen Ödemeler",
+      "finance.receivableInfo.receivables": "Alacaklar"
+    },
+    "sysAdmin": {
+      "actions": "Admin Eylemleri",
+      "actions.activeUsers": "Aktif Kullanıcılar",
+      "actions.maintenanceMode": "Bakım Modu"
+    },
+    "toggle": "Kenarlığı {{action}}",
+    "toggle.close": "Kapat",
+    "toggle.open": "Aç"
+  },
+  "table": {
+    "header": {
+      "filters": "Filtreler",
+      "filters.clear": "Filtreleri Temizle",
+      "filters.clear.hover": "Tüm filtreleri kaldır",
+      "filters.hover": "Filtreleme seçeneklerini göster",
+      "pagination": {
+        "next": "Sonraki",
+        "next.hover": "Sonraki sayfaya git",
+        "page": "Sayfa {{currentPage}} / {{totalPages}}",
+        "prev": "Önceki",
+        "prev.hover": "Önceki sayfaya git"
+      },
+      "refresh": "Yenile",
+      "refresh.hover": "Tabloyu yenile",
+      "rowCount": "Satır Sayısı",
+      "rowCount.hover": "Satır sayısını seç",
+      "rowCount.row": "{{rowCount}} Satır",
+      "search": "İsim ile Müşteri Ara...",
+      "search.hover": "İsim ile Müşteri Ara",
+      "showHideCols": "Sütunları Göster/Gizle",
+      "showHideCols.hover": "İstenilen sütunları gizle veya göster",
+      "sorting": {
+        "clear": "Sıralamayı Sıfırla",
+        "clear.hover": "Tüm sıralamaları kaldır"
+      }
     }
   },
   "user": {
@@ -62,6 +237,32 @@
     }
   },
   "vars": {
-    "tcmb": "Türkiye Cumhuriyeti Merkez Bankası"
+    "address": "Adres",
+    "cancel": "İptal",
+    "creation_date": "Oluşturma Tarihi",
+    "debt_status": {
+      "has_debt": "Alacağınız Var",
+      "has_no_debt": "Alacağınız Yok",
+      "has_no_receivable": "Borcunuz Yok",
+      "has_receivable": "Borcunuz Var"
+    },
+    "details": "Detaylar",
+    "email": "E-posta",
+    "eur": "Euro (EUR)",
+    "is_company": {
+      "false": "Birey",
+      "true": "Şirket"
+    },
+    "payable": "Borç",
+    "payables": "Borçlar",
+    "phone": "Telefon",
+    "receivable": "Alacak",
+    "receivables": "Alacaklar",
+    "tax_number": "Vergi No",
+    "tckn": "TC Kimlik No",
+    "tcmb": "Türkiye Cumhuriyeti Merkez Bankası",
+    "try": "Türk Lirası (TRY)",
+    "unspecified": "Belirtilmemiş",
+    "usd": "Amerikan Doları (USD)"
   }
 }
