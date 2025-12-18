@@ -27,11 +27,13 @@ router.post("/payments", async (req: Request<{}, {}, PaymentDto>, res: Response)
 
 router.get("/payments", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const page = parseInt(req.query.page as string) || 0;
+	const limit = parseInt(req.query.limit as string) || 20;
 
-	Logger.debug("[PayablePaymentsController] Get all payments request", { companyId });
+	Logger.debug("[PayablePaymentsController] Get all payments request", { companyId, page, limit });
 
 	try {
-		const response = await PayablePaymentsService.GetAll(companyId);
+		const response = await PayablePaymentsService.GetAll(companyId, page, limit);
 
 		Logger.debug("[PayablePaymentsController] Get all payments result", { companyId, success: response.success });
 		return res.json(response);

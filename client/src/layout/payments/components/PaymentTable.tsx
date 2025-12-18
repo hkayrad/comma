@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
-import type { Column, ColumnDef, Row } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
@@ -35,10 +35,13 @@ import { useTranslation } from "react-i18next";
 type Props = {
     data: PaymentDto[];
     type: "receivable" | "payable";
+    rowCount?: number;
+    pagination?: PaginationState;
+    onPaginationChange?: OnChangeFn<PaginationState>;
 };
 
 export default function PaymentTable(props: Props) {
-    const { data, type } = props;
+    const { data, type, rowCount, pagination, onPaginationChange } = props;
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -486,6 +489,9 @@ export default function PaymentTable(props: Props) {
             columns={PaymentTableColumns}
             searchColumn="customer_name"
             tags={tags}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
         />
     );
 }

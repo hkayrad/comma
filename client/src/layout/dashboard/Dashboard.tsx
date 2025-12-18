@@ -7,6 +7,7 @@ import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
+import type { PaginationState } from "@tanstack/react-table";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
@@ -15,30 +16,43 @@ export default function Dashboard() {
   const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
   const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
 
+  const [receivableRowCount, setReceivableRowCount] = useState(0);
+  const [receivablePagination, setReceivablePagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+
+  const [payableRowCount, setPayableRowCount] = useState(0);
+  const [payablePagination, setPayablePagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+
   const { t } = useTranslation();
 
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as OverviewViewType);
   }, []);
 
-  // const handleCurrencyChange = useCallback(
-  //   (value: AvailableCurrency | "") => {
-  //     setSelectedCurrency(value);
-  //   },
-  //   [setSelectedCurrency],
-  // );
-
   const fetchReceivableCustomers = useCallback(async () => {
-    const response = await ReceivableCustomerApi.GetAll();
-    if (response) setReceivableCustomers(response);
-    else Logger.error("Müşteriler getirilirken bir hata oluştu", response);
-  }, []);
+    const response = await ReceivableCustomerApi.GetAll(receivablePagination.pageIndex, receivablePagination.pageSize);
+    if (response) {
+      setReceivableCustomers(response.rows);
+      setReceivableRowCount(response.count);
+    } else {
+      Logger.error("Müşteriler getirilirken bir hata oluştu", response);
+    }
+  }, [receivablePagination]);
 
   const fetchPayableCustomers = useCallback(async () => {
-    const response = await PayableCustomerApi.GetAll();
-    if (response) setPayableCustomers(response);
-    else Logger.error("Müşteriler getirilirken bir hata oluştu", response);
-  }, []);
+    const response = await PayableCustomerApi.GetAll(payablePagination.pageIndex, payablePagination.pageSize);
+    if (response) {
+      setPayableCustomers(response.rows);
+      setPayableRowCount(response.count);
+    } else {
+      Logger.error("Müşteriler getirilirken bir hata oluştu", response);
+    }
+  }, [payablePagination]);
 
   const handleRefresh = useCallback(() => {
     fetchReceivableCustomers();
@@ -80,10 +94,22 @@ export default function Dashboard() {
           <OverviewCards type="payable" align="stretch" />
         </div>
         <TabsContent value="receivable">
-          <CustomerTable type="receivable" data={receivableCustomers} />
+          <CustomerTable
+            type="receivable"
+            data={receivableCustomers}
+            rowCount={receivableRowCount}
+            pagination={receivablePagination}
+            onPaginationChange={setReceivablePagination}
+          />
         </TabsContent>
         <TabsContent value="payable">
-          <CustomerTable type="payable" data={payableCustomers} />
+          <CustomerTable
+            type="payable"
+            data={payableCustomers}
+            rowCount={payableRowCount}
+            pagination={payablePagination}
+            onPaginationChange={setPayablePagination}
+          />
         </TabsContent>
       </Tabs>
     </div>

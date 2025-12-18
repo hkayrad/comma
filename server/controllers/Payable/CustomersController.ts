@@ -36,11 +36,13 @@ router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Respons
 
 router.get("/customers", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const page = parseInt(req.query.page as string) || 0;
+	const limit = parseInt(req.query.limit as string) || 20;
 
-	Logger.debug("[PayableCustomersController] Get all customers request", { companyId });
+	Logger.debug("[PayableCustomersController] Get all customers request", { companyId, page, limit });
 
 	try {
-		const response = await PayableCustomersService.GetAll(companyId);
+		const response = await PayableCustomersService.GetAll(companyId, page, limit);
 
 		Logger.debug("[PayableCustomersController] Get all customers result", { companyId, success: response.success });
 		return res.json(response);

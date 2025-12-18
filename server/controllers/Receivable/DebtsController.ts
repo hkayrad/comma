@@ -52,11 +52,13 @@ router.get("/debts/totals", async (req: Request<{}, {}, {}, { currency?: string 
 
 router.get("/debts", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const page = parseInt(req.query.page as string) || 0;
+	const limit = parseInt(req.query.limit as string) || 20;
 
-	Logger.debug("[ReceivableDebtsController] Get all debts request", { companyId });
+	Logger.debug("[ReceivableDebtsController] Get all debts request", { companyId, page, limit });
 
 	try {
-		const response = await ReceivableDebtsService.GetAll(companyId);
+		const response = await ReceivableDebtsService.GetAll(companyId, page, limit);
 
 		Logger.debug("[ReceivableDebtsController] Get all debts result", { companyId, success: response.success });
 		return res.json(response);

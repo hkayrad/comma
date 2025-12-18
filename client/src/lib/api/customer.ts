@@ -19,12 +19,12 @@ export class ReceivableCustomerApi {
 		}
 	}
 
-	static async GetAll(): Promise<CustomerDto[]> {
+	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: CustomerDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/receivables/customers");
+			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(`/receivables/customers?page=${page}&limit=${pageSize}`);
 
 			if (response.status === 200) {
-				return Promise.resolve(response.data || []);
+				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
 			Logger.error("Error fetching customers:", response.message);
@@ -127,12 +127,12 @@ export class PayableCustomerApi {
 		}
 	}
 
-	static async GetAll(): Promise<CustomerDto[]> {
+	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: CustomerDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payables/customers");
+			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(`/payables/customers?page=${page}&limit=${pageSize}`);
 
 			if (response.status === 200) {
-				return Promise.resolve(response.data || []);
+				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
 			Logger.error("Error fetching customers:", response.message);

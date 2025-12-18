@@ -17,6 +17,8 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
+  type PaginationState,
+  type OnChangeFn,
 } from "@tanstack/react-table";
 import HksTableHeader from "./components/HksTableHeader";
 
@@ -30,33 +32,61 @@ type Props = {
     value: string;
     color: string;
   }[];
+  rowCount?: number;
+  pagination?: PaginationState;
+  onPaginationChange?: OnChangeFn<PaginationState>;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
+  columnFilters?: ColumnFiltersState;
+  onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
 };
 
 export default function HksTable(props: Props) {
-  const { data, columns, searchColumn, tags } = props;
+  const {
+    data,
+    columns,
+    searchColumn,
+    tags,
+    rowCount,
+    pagination: controlledPagination,
+    onPaginationChange,
+    sorting: controlledSorting,
+    onSortingChange,
+    columnFilters: controlledColumnFilters,
+    onColumnFiltersChange,
+  } = props;
 
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const [internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     "Mersis No": false,
   });
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
+  const [internalPagination, setInternalPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+
+  const isServerSide = !!rowCount || !!controlledPagination;
 
   const table = useReactTable({
     data,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    rowCount,
+    onSortingChange: isServerSide && onSortingChange ? onSortingChange : setInternalSorting,
+    onColumnFiltersChange: isServerSide && onColumnFiltersChange ? onColumnFiltersChange : setInternalColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onPaginationChange: setPagination,
+    onPaginationChange: isServerSide ? onPaginationChange : setInternalPagination,
+    manualPagination: isServerSide,
+    manualSorting: isServerSide,
+    manualFiltering: isServerSide,
     state: {
-      pagination,
-      sorting,
-      columnFilters,
+      pagination: isServerSide ? controlledPagination : internalPagination,
+      sorting: isServerSide && controlledSorting ? controlledSorting : internalSorting,
+      columnFilters: isServerSide && controlledColumnFilters ? controlledColumnFilters : internalColumnFilters,
       columnVisibility,
     },
   });
@@ -71,7 +101,7 @@ export default function HksTable(props: Props) {
           <table className="w-full caption-bottom text-sm">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="hover:!bg-background">
+                <TableRow key={headerGroup.id} className="hover:bg-background!">
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead

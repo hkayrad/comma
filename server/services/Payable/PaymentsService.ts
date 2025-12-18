@@ -46,9 +46,24 @@ export default class PayablePaymentsService {
 		}
 	}
 
-	static async GetAll(companyId: UUID) {
+	static async GetAll(companyId: UUID, page: number, limit: number) {
 		try {
-			Logger.debug("[PayablePayments] Fetching all payments", { companyId });
+			Logger.debug("[PayablePayments] Fetching all payments", { companyId, page, limit });
+
+			const offset = page * limit;
+
+			const countQuery = `
+				SELECT COUNT(*) as count
+				FROM payable_payments p
+				WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL
+			`;
+
+			const countResult = (await sequelize.query(countQuery, {
+				replacements: [companyId],
+				type: QueryTypes.SELECT,
+			})) as { count: number }[];
+
+			const totalCount = countResult[0]?.count || 0;
 
 			const query = `
         SELECT
@@ -59,15 +74,16 @@ export default class PayablePaymentsService {
         JOIN payable_customers c ON p.customer_id = c.id
         WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL
         ORDER BY p.payment_date DESC
+				LIMIT ? OFFSET ?
       `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId],
+				replacements: [companyId, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as PaymentDto[];
 
-			Logger.debug("[PayablePayments] Payments fetched successfully", { companyId, count: result.length });
-			return ApiResponse.success(result, "Payments retrieved successfully");
+			Logger.debug("[PayablePayments] Payments fetched successfully", { companyId, count: result.length, totalCount });
+			return ApiResponse.success({ rows: result, count: totalCount }, "Payments retrieved successfully");
 		} catch (error: any) {
 			Logger.error("[PayablePayments] Error fetching payments", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve payments");

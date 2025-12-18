@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
-import type { Column, ColumnDef, Row } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import { useDialog } from "@/contexts/dialog";
@@ -35,10 +35,13 @@ import { useTranslation } from "react-i18next";
 type Props = {
     data: DebtDto[];
     type: "receivable" | "payable";
+    rowCount?: number;
+    pagination?: PaginationState;
+    onPaginationChange?: OnChangeFn<PaginationState>;
 };
 
 export default function DebtTable(props: Props) {
-    const { data, type } = props;
+    const { data, type, rowCount, pagination, onPaginationChange } = props;
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -426,6 +429,9 @@ export default function DebtTable(props: Props) {
             columns={DebtTableColumns}
             tags={tags}
             searchColumn="customer_name"
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
         />
     );
 }

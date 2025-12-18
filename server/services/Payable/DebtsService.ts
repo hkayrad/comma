@@ -47,9 +47,27 @@ export default class PayableDebtsService {
 		}
 	}
 
-	static async GetAll(companyId: UUID) {
+	static async GetAll(companyId: UUID, page: number, limit: number) {
 		try {
-			Logger.debug("[PayableDebts] Fetching all debts", { companyId });
+			Logger.debug("[PayableDebts] Fetching all debts", { companyId, page, limit });
+
+			const offset = page * limit;
+
+			const countQuery = `
+				SELECT COUNT(*) as count
+				FROM payable_debts d
+				JOIN payable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+				WHERE d.company_id = ?
+			    AND d.deleted_at IS NULL
+			    AND c.deleted_at IS NULL
+			`;
+
+			const countResult = (await sequelize.query(countQuery, {
+				replacements: [companyId],
+				type: QueryTypes.SELECT,
+			})) as { count: number }[];
+
+			const totalCount = countResult[0]?.count || 0;
 
 			const query = `
 				SELECT
@@ -61,16 +79,17 @@ export default class PayableDebtsService {
 				WHERE d.company_id = ?
 			    AND d.deleted_at IS NULL
 			    AND c.deleted_at IS NULL
-				ORDER BY d.issue_date DESC;
+				ORDER BY d.issue_date DESC
+				LIMIT ? OFFSET ?;
       `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId],
+				replacements: [companyId, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as DebtDto[];
 
-			Logger.debug("[PayableDebts] Debts fetched successfully", { companyId, count: result.length });
-			return ApiResponse.success(result, "Debts retrieved successfully");
+			Logger.debug("[PayableDebts] Debts fetched successfully", { companyId, count: result.length, totalCount });
+			return ApiResponse.success({ rows: result, count: totalCount }, "Debts retrieved successfully");
 		} catch (error: any) {
 			Logger.error("[PayableDebts] Error fetching debts", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve debts");

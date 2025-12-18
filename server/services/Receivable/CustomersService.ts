@@ -38,9 +38,25 @@ export default class ReceivableCustomersService {
 		}
 	}
 
-	static async GetAll(companyId: UUID) {
+	static async GetAll(companyId: UUID, page: number, limit: number) {
 		try {
-			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId });
+			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId, page, limit });
+
+			const offset = page * limit;
+
+			const countQuery = `
+				SELECT COUNT(*) as count
+				FROM receivable_customers c
+				WHERE c.company_id = ?
+			    AND c.deleted_at IS NULL
+			`;
+
+			const countResult = (await sequelize.query(countQuery, {
+				replacements: [companyId],
+				type: QueryTypes.SELECT,
+			})) as { count: number }[];
+
+			const totalCount = countResult[0]?.count || 0;
 
 			const query = `
 				SELECT
@@ -59,22 +75,18 @@ export default class ReceivableCustomersService {
 			    AND c.company_id = p.company_id
 				WHERE c.company_id = ?
 			    AND c.deleted_at IS NULL
-				ORDER BY c.created_at DESC;
+				ORDER BY c.created_at DESC
+				LIMIT ? OFFSET ?;
       `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId],
+				replacements: [companyId, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as CustomerDto[];
 
-			Logger.debug("[ReceivableCustomers] Customers fetched successfully", { companyId, count: result.length });
+			Logger.debug("[ReceivableCustomers] Customers fetched successfully", { companyId, count: result.length, totalCount });
 
-			if (result.length === 0) {
-				Logger.debug("[ReceivableCustomers] No customers found", { companyId });
-				return ApiResponse.success([], "No customers found");
-			}
-
-			return ApiResponse.success(result, "Customers retrieved successfully");
+			return ApiResponse.success({ rows: result, count: totalCount }, "Customers retrieved successfully");
 		} catch (error: any) {
 			Logger.error("[ReceivableCustomers] Error fetching customers", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve customers");

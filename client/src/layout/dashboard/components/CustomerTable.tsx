@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
-import type { Column, ColumnDef, Row } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -36,10 +36,13 @@ import { useTranslation } from "react-i18next";
 type Props = {
     data: CustomerDto[];
     type?: OverviewViewType;
+    rowCount?: number;
+    pagination?: PaginationState;
+    onPaginationChange?: OnChangeFn<PaginationState>;
 };
 
 export default function CustomerTable(props: Props) {
-    const { data, type = "receivable" } = props;
+    const { data, type = "receivable", rowCount, pagination, onPaginationChange } = props;
 
     const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -562,6 +565,9 @@ export default function CustomerTable(props: Props) {
             columns={CustomerTableColumns}
             searchColumn="name"
             tags={tags}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
         />
     );
 }
