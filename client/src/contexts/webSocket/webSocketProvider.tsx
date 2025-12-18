@@ -108,7 +108,7 @@ export const WebSocketProvider = ({
                     </>
                   ),
                   duration: 180000,
-                  icon: <TriangleAlert size={20} />,
+                  icon: <TriangleAlert size={16} />,
                   dismissible: false,
                   closeButton: false,
                   id: "maintenance_mode_toast",

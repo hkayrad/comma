@@ -6,12 +6,14 @@ export class Logger {
 
 	private static getFormattedDate() {
 		const now = new Date();
-		return now.toISOString().replace(/T/, " ").replace(/\..+/, "");
+		const utc3 = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+		return utc3.toISOString().replace(/T/, " ").replace(/\..+/, "").concat(" UTC+3");
 	}
 
 	private static getLogFileName() {
 		const now = new Date();
-		const date = now.toISOString().split("T")[0];
+		const utc3 = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+		const date = utc3.toISOString().split("T")[0];
 		return `${date}.log`;
 	}
 
