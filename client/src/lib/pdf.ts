@@ -4,6 +4,7 @@ import type { CompanyDto, CustomerStatement } from "../../../common/types";
 import { format } from "date-fns";
 import { formatCurrency } from "./utils";
 import "./lexend-regular";
+import i18n from "../i18n";
 
 async function loadLogo(url: string): Promise<{ dataUrl: string; width: number; height: number } | null> {
 	try {
@@ -100,14 +101,24 @@ export async function exportCustomerStatementPDF(
 	const infoX = marginX + logoWidth + 28; // left boundary of info area
 	const infoWidth = pageWidth - infoX - MARGIN_RIGHT; // available width for right block
 	const infoRightX = pageWidth - MARGIN_RIGHT; // right alignment x
+
+	const isAllTime =
+		dateRange.from.getTime() === 0 &&
+		dateRange.to.getFullYear() === 2100 &&
+		dateRange.to.getMonth() === 0 &&
+		dateRange.to.getDate() === 1;
+
 	doc.setFontSize(11);
 	doc.setTextColor(40);
-	const infoLines: string[] = [
-		companyAddress,
-		`${companyTaxOffice} | ${companyTaxNo}`,
-		`Tarih Aralığı: ${format(dateRange.from, "dd.MM.yyyy")} - ${format(dateRange.to, "dd.MM.yyyy")}`,
-		`Oluşturma: ${today}`,
-	];
+	const infoLines: string[] = [companyAddress, `${companyTaxOffice}`, `${companyTaxNo}`];
+
+	infoLines.push(`Oluşturma: ${today}`);
+
+	if (!isAllTime) {
+		const dateRangeStr = `${format(dateRange.from, "dd.MM.yyyy")} - ${format(dateRange.to, "dd.MM.yyyy")}`;
+		infoLines.push(`${i18n.t("vars.date_range")}: ${dateRangeStr}`);
+	}
+
 	let infoLineY = cursorY + 4;
 	infoLines.forEach((l) => {
 		const maxChars = 70;

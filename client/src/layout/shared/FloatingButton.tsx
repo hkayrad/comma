@@ -168,7 +168,7 @@ export default function FloatingButton() {
                         </DropdownMenuGroup>
                     )}
                     {(location.pathname === "/" ||
-                        location.pathname.startsWith("/verecekler")) && (
+                        location.pathname.startsWith("/borclar")) && (
                         <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
                             <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
                                 {t("dashboard.floatingButton.actions.payable")}

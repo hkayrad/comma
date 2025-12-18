@@ -24,14 +24,16 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import type { DateRange } from "react-day-picker";
+import type { DateRange, Locale } from "react-day-picker";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { tr, enUS } from "date-fns/locale";
 import { exportCustomerStatementPDF } from "@/lib/pdf";
 import { Logger } from "@/lib/utils/logger";
 import { useBreadcrumb } from "@/contexts/breadcrumb/useBreadcrumb";
+import { useTranslation } from "react-i18next";
 
 export default function CustomerStatement() {
+    const { t, i18n } = useTranslation();
     const location = useLocation();
     const type: "payable" | "receivable" =
         location.pathname.split("/")[1] === "alacaklar"
@@ -40,6 +42,11 @@ export default function CustomerStatement() {
     const { customerId } = useParams();
     const navigate = useNavigate();
     const { setLabel } = useBreadcrumb();
+
+    const langMap: Record<string, Locale> = {
+        tr: tr,
+        en: enUS,
+    };
 
     const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -72,9 +79,11 @@ export default function CustomerStatement() {
                     setLabel(customerId, res.customer.name);
                 }
             })
-            .catch(() => toast.error("Borç dökümü getirilirken hata oluştu"))
+            .catch(() =>
+                toast.error(t("dashboard.customerStatement.error.fetchStatement")),
+            )
             .finally(() => setLoading(false));
-    }, [customerId, API, date, setLabel]);
+    }, [customerId, API, date, setLabel, t]);
 
     const getRemainingColor = (amount: number) => {
         if (amount > 0) return "text-red-600";
@@ -84,7 +93,8 @@ export default function CustomerStatement() {
 
     const exportStatement = useCallback(async () => {
         if (!data || !company) {
-            if (!company) toast.error("Şirket bilgileri yüklenemedi");
+            if (!company)
+                toast.error(t("dashboard.customerStatement.error.companyInfo"));
             return;
         }
         try {
@@ -94,14 +104,14 @@ export default function CustomerStatement() {
                 to: date?.to || new Date("2100-01-01"),
             };
             await exportCustomerStatementPDF(data, company, pdfDateRange);
-            toast.success("PDF indirildi");
+            toast.success(t("dashboard.customerStatement.success.pdfExport"));
         } catch (e) {
             Logger.error(e);
-            toast.error("PDF oluşturulurken hata oluştu");
+            toast.error(t("dashboard.customerStatement.error.pdfExport"));
         } finally {
             setExporting(false);
         }
-    }, [data, company, date]);
+    }, [data, company, date, t]);
 
     if (loading) {
         return (
@@ -119,14 +129,17 @@ export default function CustomerStatement() {
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2"
                 >
-                    <ArrowLeft className="h-4 w-4" /> Geri Dön
+                    <ArrowLeft className="h-4 w-4" />{" "}
+                    {t("dashboard.customerStatement.back")}
                 </Button>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Veri bulunamadı</CardTitle>
+                        <CardTitle>
+                            {t("dashboard.customerStatement.notFound.title")}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        Müşteri veya borç dökümü bulunamadı.
+                        {t("dashboard.customerStatement.notFound.description")}
                     </CardContent>
                 </Card>
             </div>
@@ -161,7 +174,7 @@ export default function CustomerStatement() {
                         ) : (
                             <FileDown className="h-4 w-4" />
                         )}{" "}
-                        PDF Dışa Aktar
+                        {t("dashboard.customerStatement.exportPdf")}
                     </Button>
                 </div>
             </div>
@@ -173,7 +186,7 @@ export default function CustomerStatement() {
                         variant="outline"
                         onClick={() => setDate(undefined)}
                     >
-                        Tarih seçimini sıfırla
+                        {t("dashboard.customerStatement.resetDate")}
                     </Button>
                     <Popover>
                         <PopoverTrigger asChild>
@@ -186,25 +199,39 @@ export default function CustomerStatement() {
                                 )}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {date?.from ? (
-                                    date.to ? (
-                                        <>
-                                            {format(date.from, "dd LLL y", {
-                                                locale: tr,
-                                            })}{" "}
-                                            -{" "}
-                                            {format(date.to, "dd LLL y", {
-                                                locale: tr,
-                                            })}
-                                        </>
-                                    ) : (
-                                        format(date.from, "dd LLL y", {
-                                            locale: tr,
-                                        })
-                                    )
-                                ) : (
-                                    <span>Tarih aralığı seçin</span>
-                                )}
+                                {(() => {
+                                    const isAllTime =
+                                        date?.from?.getTime() === 0 &&
+                                        date?.to?.getFullYear() === 2100 &&
+                                        date?.to?.getMonth() === 0 &&
+                                        date?.to?.getDate() === 1;
+
+                                    if (!date?.from || isAllTime) {
+                                        return <span>{t("vars.all")}</span>;
+                                    }
+
+                                    if (date.to) {
+                                        return (
+                                            <>
+                                                {format(date.from, "dd LLL y", {
+                                                    locale: langMap[
+                                                        i18n.language
+                                                    ] as any,
+                                                })}{" "}
+                                                -{" "}
+                                                {format(date.to, "dd LLL y", {
+                                                    locale: langMap[
+                                                        i18n.language
+                                                    ] as any,
+                                                })}
+                                            </>
+                                        );
+                                    }
+
+                                    return format(date.from, "dd LLL y", {
+                                        locale: langMap[i18n.language] as any,
+                                    });
+                                })()}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="end">
@@ -214,7 +241,7 @@ export default function CustomerStatement() {
                                 selected={date}
                                 onSelect={setDate}
                                 numberOfMonths={2}
-                                locale={tr}
+                                locale={langMap[i18n.language] as any}
                             />
                         </PopoverContent>
                     </Popover>
@@ -225,7 +252,7 @@ export default function CustomerStatement() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Toplam Borç
+                            {t("overviewCards.total", { state: "" }).trim()}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-1">
@@ -237,7 +264,7 @@ export default function CustomerStatement() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Ödenen
+                            {t("overviewCards.paid", { state: "" }).trim()}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-1">
@@ -252,7 +279,7 @@ export default function CustomerStatement() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Kalan
+                            {t("overviewCards.remaning", { state: "" }).trim()}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-1">
@@ -271,7 +298,9 @@ export default function CustomerStatement() {
             <div className="grid gap-6 md:grid-cols-2 px-12">
                 <Card className="overflow-hidden">
                     <CardHeader>
-                        <CardTitle>Borçlar</CardTitle>
+                        <CardTitle>
+                            {t("dashboard.customerStatement.debts")}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="max-h-[400px] overflow-auto">
@@ -279,28 +308,30 @@ export default function CustomerStatement() {
                                 <thead className="bg-muted sticky top-0">
                                     <tr className="text-left">
                                         <th className="py-2 px-3 font-medium">
-                                            Tarih
+                                            {t("debt.table.column.issue_date")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Fatura No
+                                            {t("debt.table.column.invoice_no")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Tutar
+                                            {t("debt.table.column.amount")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            KDV
+                                            {t("debt.table.column.vat")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Toplam
+                                            {t("debt.table.column.total")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Para Birimi
+                                            {t("debt.table.column.currency")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Kur
+                                            {t(
+                                                "debt.table.column.exchange_rate",
+                                            )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Net Toplam
+                                            {t("debt.table.column.total_in_try")}
                                         </th>
                                     </tr>
                                 </thead>
@@ -308,10 +339,12 @@ export default function CustomerStatement() {
                                     {debts.length === 0 && (
                                         <tr>
                                             <td
-                                                colSpan={6}
+                                                colSpan={8}
                                                 className="py-4 px-3 text-center text-muted-foreground"
                                             >
-                                                Borç bulunamadı
+                                                {t(
+                                                    "dashboard.customerStatement.noDebts",
+                                                )}
                                             </td>
                                         </tr>
                                     )}
@@ -366,7 +399,9 @@ export default function CustomerStatement() {
                 </Card>
                 <Card className="overflow-hidden">
                     <CardHeader>
-                        <CardTitle>Ödemeler</CardTitle>
+                        <CardTitle>
+                            {t("dashboard.customerStatement.payments")}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="max-h-[400px] overflow-auto">
@@ -374,25 +409,35 @@ export default function CustomerStatement() {
                                 <thead className="bg-muted sticky top-0">
                                     <tr className="text-left">
                                         <th className="py-2 px-3 font-medium">
-                                            Tarih
+                                            {t(
+                                                "payment.table.column.payment_date",
+                                            )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Fatura No
+                                            {t(
+                                                "payment.table.column.invoice_no",
+                                            )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Tutar
+                                            {t("payment.table.column.amount")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Para Birimi
+                                            {t("payment.table.column.currency")}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Kur
+                                            {t(
+                                                "payment.table.column.exchange_rate",
+                                            )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Net Tutar
+                                            {t(
+                                                "payment.table.column.amount_in_try",
+                                            )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            Yöntem
+                                            {t(
+                                                "payment.table.column.payment_method",
+                                            )}
                                         </th>
                                     </tr>
                                 </thead>
@@ -400,10 +445,12 @@ export default function CustomerStatement() {
                                     {payments.length === 0 && (
                                         <tr>
                                             <td
-                                                colSpan={5}
+                                                colSpan={7}
                                                 className="py-4 px-3 text-center text-muted-foreground"
                                             >
-                                                Ödeme bulunamadı
+                                                {t(
+                                                    "dashboard.customerStatement.noPayments",
+                                                )}
                                             </td>
                                         </tr>
                                     )}
@@ -440,18 +487,7 @@ export default function CustomerStatement() {
                                                 )}
                                             </td>
                                             <td className="py-1.5 px-3 whitespace-nowrap">
-                                                {p.payment_method === "cash"
-                                                    ? "Nakit"
-                                                    : p.payment_method ===
-                                                        "bank_transfer"
-                                                      ? "Havale"
-                                                      : p.payment_method ===
-                                                          "check"
-                                                        ? "Çek"
-                                                        : p.payment_method ===
-                                                            "card"
-                                                          ? "Kart"
-                                                          : p.payment_method}
+                                                {t(`vars.${p.payment_method}`)}
                                             </td>
                                         </tr>
                                     ))}

@@ -21,6 +21,27 @@
       },
       "hover": "Open action menu"
     },
+    "customerStatement": {
+      "back": "Back",
+      "debts": "Debts",
+      "error": {
+        "companyInfo": "Could not load company information",
+        "fetchStatement": "An error occurred while fetching the customer statement",
+        "pdfExport": "An error occurred while generating the PDF"
+      },
+      "exportPdf": "Export PDF",
+      "noDebts": "No debts found",
+      "noPayments": "No payments found",
+      "notFound": {
+        "description": "Customer or statement not found.",
+        "title": "Data not found"
+      },
+      "payments": "Payments",
+      "resetDate": "Reset date selection",
+      "success": {
+        "pdfExport": "PDF downloaded"
+      }
+    },
     "table": {
       "column": {
         "actions": "Actions",
@@ -585,6 +606,7 @@
   },
   "vars": {
     "address": "Address",
+    "all": "All",
     "bank_transfer": "Bank Transfer",
     "cancel": "Cancel",
     "card": "Card",
@@ -592,6 +614,7 @@
     "check": "Check",
     "creation_date": "Creation Date",
     "customer": "Customer",
+    "date_range": "Date Range",
     "debt_status": {
       "has_debt": "Credit Balance",
       "has_no_debt": "No Credit",

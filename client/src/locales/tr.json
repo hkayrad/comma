@@ -21,6 +21,27 @@
       },
       "hover": "İşlem menüsünü aç"
     },
+    "customerStatement": {
+      "back": "Geri Dön",
+      "debts": "Borçlar",
+      "error": {
+        "companyInfo": "Şirket bilgileri yüklenemedi",
+        "fetchStatement": "Borç dökümü getirilirken hata oluştu",
+        "pdfExport": "PDF oluşturulurken hata oluştu"
+      },
+      "exportPdf": "PDF Dışa Aktar",
+      "noDebts": "Borç bulunamadı",
+      "noPayments": "Ödeme bulunamadı",
+      "notFound": {
+        "description": "Müşteri veya borç dökümü bulunamadı.",
+        "title": "Veri bulunamadı"
+      },
+      "payments": "Ödemeler",
+      "resetDate": "Tarih seçimini sıfırla",
+      "success": {
+        "pdfExport": "PDF indirildi"
+      }
+    },
     "table": {
       "column": {
         "actions": "İşlemler",
@@ -579,6 +600,7 @@
   },
   "vars": {
     "address": "Adres",
+    "all": "Tümü",
     "bank_transfer": "Havale",
     "cancel": "İptal",
     "card": "Kart",
@@ -586,6 +608,7 @@
     "check": "Çek",
     "creation_date": "Oluşturma Tarihi",
     "customer": "Müşteri",
+    "date_range": "Tarih Aralığı",
     "debt_status": {
       "has_debt": "Alacağınız Var",
       "has_no_debt": "Alacağınız Yok",
