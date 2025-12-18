@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router";
 
 type Props = {
   table: Table<any>;
@@ -51,12 +52,24 @@ export default function HksTableHeader(props: Props) {
   const { table, searchColumn, tags } = props;
 
   const { t } = useTranslation();
+  const location = useLocation();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
     new Set(),
   );
+
+  const translationPrefix = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes("odemeler")) {
+      return "payment";
+    }
+    if (path.includes("alacaklar") || path.includes("borclar")) {
+      return "debt";
+    }
+    return "dashboard";
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -326,7 +339,7 @@ export default function HksTableHeader(props: Props) {
                   >
                     {column.id === "#"
                       ? "#"
-                      : t(`dashboard.table.column.${column.id}`, { defaultValue: column.id })}
+                      : t(`${translationPrefix}.table.column.${column.id}`, { defaultValue: column.id })}
                   </DropdownMenuCheckboxItem>
                 );
               })}
