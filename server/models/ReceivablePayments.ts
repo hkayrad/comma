@@ -69,7 +69,7 @@ ReceivablePayments.init(
 		},
 		amount_in_try: {
 			type: DataTypes.VIRTUAL(DataTypes.DECIMAL(16, 2)),
-			allowNull: false,
+			allowNull: true,
 			get() {
 				return this.amount * this.exchange_rate;
 			},
