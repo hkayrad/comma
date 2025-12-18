@@ -73,19 +73,22 @@ export async function exportCustomerStatementPDF(
 
 	// Header
 	doc.setFont("Lexend-Regular");
-	// Original logo size: 608x139 -> aspect ratio width/height ≈ 4.373
-	// We'll choose a display width that fits left side nicely while leaving room for title on the right.
 
-	const targetLogoHeight = 48;
-	let targetLogoWidth = 140; // default fallback
+	const MAX_LOGO_WIDTH = 120;
+	const MAX_LOGO_HEIGHT = 60;
+	let targetLogoWidth = MAX_LOGO_WIDTH;
+	let targetLogoHeight = MAX_LOGO_HEIGHT;
 
 	if (logoData) {
 		const aspect = logoData.width / logoData.height;
-		targetLogoWidth = targetLogoHeight * aspect;
-		try {
-			doc.addImage(logoData.dataUrl, "PNG", marginX, cursorY, targetLogoWidth, targetLogoHeight);
-		} catch {
-			/* ignore */
+		if (aspect > MAX_LOGO_WIDTH / MAX_LOGO_HEIGHT) {
+			// constrained by width
+			targetLogoWidth = MAX_LOGO_WIDTH;
+			targetLogoHeight = MAX_LOGO_WIDTH / aspect;
+		} else {
+			// constrained by height
+			targetLogoHeight = MAX_LOGO_HEIGHT;
+			targetLogoWidth = MAX_LOGO_HEIGHT * aspect;
 		}
 	}
 
@@ -119,23 +122,46 @@ export async function exportCustomerStatementPDF(
 		infoLines.push(`${i18n.t("vars.date_range")}: ${dateRangeStr}`);
 	}
 
-	let infoLineY = cursorY + 4;
+	// Calculate text block height for centering
+	const LINE_HEIGHT = 12;
+	const MAX_CHARS = 70;
+	let totalTextHeight = 0;
 	infoLines.forEach((l) => {
-		const maxChars = 70;
-		if (l.length > maxChars) {
-			const chunks = l.match(new RegExp(`.{1,${maxChars}}`, "g")) || [l];
+		if (l.length > MAX_CHARS) {
+			const numChunks = Math.ceil(l.length / MAX_CHARS);
+			totalTextHeight += numChunks * LINE_HEIGHT;
+		} else {
+			totalTextHeight += LINE_HEIGHT;
+		}
+	});
+
+	const headerHeight = Math.max(targetLogoHeight, totalTextHeight);
+	const logoY = cursorY + (headerHeight - targetLogoHeight) / 2;
+	let infoLineY = cursorY + (headerHeight - totalTextHeight) / 2 + 10; // +10 for baseline alignment
+
+	if (logoData) {
+		try {
+			doc.addImage(logoData.dataUrl, "PNG", marginX, logoY, targetLogoWidth, targetLogoHeight);
+		} catch {
+			/* ignore */
+		}
+	}
+
+	infoLines.forEach((l) => {
+		if (l.length > MAX_CHARS) {
+			const chunks = l.match(new RegExp(`.{1,${MAX_CHARS}}`, "g")) || [l];
 			chunks.forEach((ch) => {
 				doc.text(ch, infoRightX, infoLineY, { maxWidth: infoWidth, align: "right" });
-				infoLineY += 12;
+				infoLineY += LINE_HEIGHT;
 			});
 		} else {
 			doc.text(l, infoRightX, infoLineY, { maxWidth: infoWidth, align: "right" });
-			infoLineY += 12;
+			infoLineY += LINE_HEIGHT;
 		}
 	});
 
 	// Customer name FULL WIDTH under the header (with wrapping)
-	const nameTopY = Math.max(cursorY + targetLogoHeight, infoLineY) + 14;
+	const nameTopY = cursorY + headerHeight + 24;
 	const fullWidth = pageWidth - MARGIN_LEFT - MARGIN_RIGHT;
 	doc.setFontSize(14);
 	doc.setTextColor(0, 0, 0);
