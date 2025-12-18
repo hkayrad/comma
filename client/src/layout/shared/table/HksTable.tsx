@@ -30,6 +30,7 @@ type Props = {
     column: string;
     column_label: string;
     value: string;
+    label?: string;
     color: string;
   }[];
   rowCount?: number;

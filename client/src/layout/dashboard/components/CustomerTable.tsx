@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -39,10 +39,14 @@ type Props = {
     rowCount?: number;
     pagination?: PaginationState;
     onPaginationChange?: OnChangeFn<PaginationState>;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
+    columnFilters?: ColumnFiltersState;
+    onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
 };
 
 export default function CustomerTable(props: Props) {
-    const { data, type = "receivable", rowCount, pagination, onPaginationChange } = props;
+    const { data, type = "receivable", rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange } = props;
 
     const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -496,31 +500,36 @@ export default function CustomerTable(props: Props) {
                       {
                           column: "is_company",
                           column_label: t("dashboard.table.column.is_company"),
-                          value: t("vars.is_company.true"),
+                          value: "true",
+                          label: t("vars.is_company.true"),
                           color: "violet",
                       },
                       {
                           column: "is_company",
                           column_label: t("dashboard.table.column.is_company"),
-                          value: t("vars.is_company.false"),
+                          value: "false",
+                          label: t("vars.is_company.false"),
                           color: "orange",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_debt"),
+                          value: "HAS_DEBT",
+                          label: t("vars.debt_status.has_debt"),
                           color: "red",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_no_debt"),
+                          value: "HAS_NO_DEBT",
+                          label: t("vars.debt_status.has_no_debt"),
                           color: "green",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_receivable"),
+                          value: "HAS_RECEIVABLE",
+                          label: t("vars.debt_status.has_receivable"),
                           color: "blue",
                       },
                   ]
@@ -528,32 +537,37 @@ export default function CustomerTable(props: Props) {
                       {
                           column: "is_company",
                           column_label: t("dashboard.table.column.is_company"),
-                          value: t("vars.is_company.true"),
+                          value: "true",
+                          label: t("vars.is_company.true"),
                           color: "violet",
                       },
                       {
                           column: "is_company",
                           column_label: t("dashboard.table.column.is_company"),
-                          value: t("vars.is_company.false"),
+                          value: "false",
+                          label: t("vars.is_company.false"),
                           color: "orange",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_debt"),
-                          color: "blue",
+                          value: "HAS_DEBT",
+                          label: t("vars.debt_status.has_receivable"),
+                          color: "red",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_no_receivable"),
+                          value: "HAS_NO_RECEIVABLE",
+                          label: t("vars.debt_status.has_no_receivable"),
                           color: "green",
                       },
                       {
                           column: "debt_status",
                           column_label: t("dashboard.table.column.debt_status"),
-                          value: t("vars.debt_status.has_receivable"),
-                          color: "red",
+                          value: "HAS_RECEIVABLE",
+                          label: t("vars.debt_status.has_debt"),
+                          color: "blue",
                       },
                   ],
         [type, t],
@@ -568,6 +582,10 @@ export default function CustomerTable(props: Props) {
             rowCount={rowCount}
             pagination={pagination}
             onPaginationChange={onPaginationChange}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            columnFilters={columnFilters}
+            onColumnFiltersChange={onColumnFiltersChange}
         />
     );
 }

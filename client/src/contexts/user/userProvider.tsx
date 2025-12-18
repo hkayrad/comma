@@ -17,7 +17,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   const setUser = (user: User | null) => {
-    Logger.info("Setting user data", user);
+    Logger.debug("Setting user data", user);
     setUserData(user);
   };
 

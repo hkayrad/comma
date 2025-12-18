@@ -21,7 +21,7 @@ i18n
 	.init({
 		resources,
 		fallbackLng: "tr",
-		debug: true,
+		debug: import.meta.env.VITE_NODE_ENV === "development",
 		interpolation: {
 			escapeValue: false, // not needed for react as it escapes by default
 		},

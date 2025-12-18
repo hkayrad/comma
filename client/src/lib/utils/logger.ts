@@ -6,7 +6,9 @@ export class Logger {
 	}
 
 	static debug(message: any, ...optionalParams: any[]) {
-		console.debug(`[DEBUG] [${new Date().toString()}]`, message, ...optionalParams);
+		if (import.meta.env.VITE_NODE_ENV === "development") {
+			console.log(`[DEBUG] [${new Date().toString()}]`, message, ...optionalParams);
+		}
 	}
 
 	static info(message: any, ...optionalParams: any[]) {

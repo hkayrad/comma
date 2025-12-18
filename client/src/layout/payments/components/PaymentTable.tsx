@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
@@ -38,10 +38,14 @@ type Props = {
     rowCount?: number;
     pagination?: PaginationState;
     onPaginationChange?: OnChangeFn<PaginationState>;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
+    columnFilters?: ColumnFiltersState;
+    onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
 };
 
 export default function PaymentTable(props: Props) {
-    const { data, type, rowCount, pagination, onPaginationChange } = props;
+    const { data, type, rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange } = props;
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -492,6 +496,10 @@ export default function PaymentTable(props: Props) {
             rowCount={rowCount}
             pagination={pagination}
             onPaginationChange={onPaginationChange}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            columnFilters={columnFilters}
+            onColumnFiltersChange={onColumnFiltersChange}
         />
     );
 }

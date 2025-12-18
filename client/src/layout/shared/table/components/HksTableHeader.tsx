@@ -38,19 +38,19 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 
 type Props = {
-    table: Table<any>;
-    searchColumn: string;
-    tags?: {
-        column: string;
-        column_label: string;
-        value: string;
-        color: string;
-    }[];
+  table: Table<any>;
+  searchColumn: string;
+  tags?: {
+    column: string;
+    column_label: string;
+    value: string;
+    label?: string;
+    color: string;
+  }[];
 };
 
 export default function HksTableHeader(props: Props) {
-    const { table, searchColumn, tags } = props;
-
+  const { table, searchColumn, tags } = props;
     const { t } = useTranslation();
     const location = useLocation();
 
@@ -203,38 +203,39 @@ export default function HksTableHeader(props: Props) {
 
     const rowCounts = useMemo(() => [5, 10, 20, 50, 100], []);
 
-    // Group tags by column
-    const groupedTags = useMemo(() => {
+      // Group tags by column
+      const groupedTags = useMemo(() => {
         if (!tags)
-            return new Map<
-                string,
-                Array<{
-                    column: string;
-                    column_label: string;
-                    value: string;
-                    color: string;
-                }>
-            >();
-
-        const groups = new Map<
+          return new Map<
             string,
             Array<{
-                column: string;
-                column_label: string;
-                value: string;
-                color: string;
+              column: string;
+              column_label: string;
+              value: string;
+              label?: string;
+              color: string;
             }>
+          >();
+    
+        const groups = new Map<
+          string,
+          Array<{
+            column: string;
+            column_label: string;
+            value: string;
+            label?: string;
+            color: string;
+          }>
         >();
         tags.forEach((tag) => {
-            if (!groups.has(tag.column_label)) {
-                groups.set(tag.column_label, []);
-            }
-            groups.get(tag.column_label)!.push(tag);
+          if (!groups.has(tag.column_label)) {
+            groups.set(tag.column_label, []);
+          }
+          groups.get(tag.column_label)!.push(tag);
         });
         return groups;
-    }, [tags]);
-
-    return (
+      }, [tags]);
+        return (
         <div className="flex items-center gap-2">
             <ButtonGroup>
                 <Tooltip>
@@ -325,11 +326,12 @@ export default function HksTableHeader(props: Props) {
                                                         e.preventDefault()
                                                     }
                                                 >
-                                                    <Badge
-                                                        className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
-                                                    >
-                                                        {tag.value}
-                                                    </Badge>
+                                                                              <Badge
+                                                                                className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
+                                                                              >
+                                                                                {tag.label ?? tag.value}
+                                                                              </Badge>
+                                                    
                                                 </DropdownMenuCheckboxItem>
                                             );
                                         })}

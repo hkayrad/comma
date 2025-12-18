@@ -4,7 +4,7 @@ import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import DebtTable from "./components/DebtTable";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import { useLocation } from "react-router";
-import type { PaginationState } from "@tanstack/react-table";
+import type { PaginationState, SortingState, ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 
 export default function Debts() {
   const location = useLocation();
@@ -16,11 +16,18 @@ export default function Debts() {
     pageIndex: 0,
     pageSize: 20,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
+    setColumnFilters(updaterOrValue);
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
 
   useEffect(() => {
     const fetchDebts = async () => {
       const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
-      const response = await API.GetAll(pagination.pageIndex, pagination.pageSize);
+      const response = await API.GetAll(pagination.pageIndex, pagination.pageSize, sorting, columnFilters);
       if (response) {
         setDebts(response.rows);
         setRowCount(response.count);
@@ -36,7 +43,7 @@ export default function Debts() {
     return () => {
       window.removeEventListener("global:refresh", handleRefresh);
     };
-  }, [type, pagination]);
+  }, [type, pagination, sorting, columnFilters]);
 
   return (
     <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 flex flex-col gap-2">
@@ -48,6 +55,10 @@ export default function Debts() {
           rowCount={rowCount}
           pagination={pagination}
           onPaginationChange={setPagination}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          columnFilters={columnFilters}
+          onColumnFiltersChange={onColumnFiltersChange}
         />
       </div>
     </div>

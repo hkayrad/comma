@@ -46,20 +46,65 @@ export default class PayablePaymentsService {
 		}
 	}
 
-	static async GetAll(companyId: UUID, page: number, limit: number) {
+	static async GetAll(companyId: UUID, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
 		try {
-			Logger.debug("[PayablePayments] Fetching all payments", { companyId, page, limit });
+			Logger.debug("[PayablePayments] Fetching all payments", { companyId, page, limit, sorting, filters });
 
 			const offset = page * limit;
+
+            const colMap: Record<string, string> = {
+                "customer_name": "c.name",
+                "amount": "p.amount",
+                "currency": "p.currency",
+                "exchange_rate": "p.exchange_rate",
+                "payment_method": "p.payment_method",
+                "payment_date": "p.payment_date",
+                "invoice_no": "p.invoice_no",
+                "description": "p.description",
+                "amount_in_try": "p.amount_in_try"
+            };
+
+            let whereClause = "WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL";
+            const replacements: any[] = [companyId];
+
+            if (filters && filters.length > 0) {
+                filters.forEach((filter) => {
+                    const { id, value } = filter;
+                    const dbCol = colMap[id];
+                    if (!dbCol) return;
+
+                    if (Array.isArray(value) && value.length > 0) {
+                        whereClause += ` AND ${dbCol} IN (?)`;
+                        replacements.push(value);
+                    } else if (typeof value === "string" && value.trim() !== "") {
+                        whereClause += ` AND ${dbCol} LIKE ?`;
+                        replacements.push(`%${value}%`);
+                    }
+                });
+            }
+
+            let orderClause = "ORDER BY p.payment_date DESC";
+            if (sorting && sorting.length > 0) {
+                const sortParts = sorting.map((sort) => {
+                    const dbCol = colMap[sort.id];
+                    if (!dbCol) return null;
+                    return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
+                }).filter(Boolean);
+                
+                if (sortParts.length > 0) {
+                    orderClause = `ORDER BY ${sortParts.join(", ")}`;
+                }
+            }
 
 			const countQuery = `
 				SELECT COUNT(*) as count
 				FROM payable_payments p
-				WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL
+                JOIN payable_customers c ON p.customer_id = c.id
+				${whereClause}
 			`;
 
 			const countResult = (await sequelize.query(countQuery, {
-				replacements: [companyId],
+				replacements,
 				type: QueryTypes.SELECT,
 			})) as { count: number }[];
 
@@ -72,13 +117,13 @@ export default class PayablePaymentsService {
             c.tax_number AS customer_tax_number
         FROM payable_payments p
         JOIN payable_customers c ON p.customer_id = c.id
-        WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL
-        ORDER BY p.payment_date DESC
-				LIMIT ? OFFSET ?
+        ${whereClause}
+        ${orderClause}
+		LIMIT ? OFFSET ?
       `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId, limit, offset],
+				replacements: [...replacements, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as PaymentDto[];
 

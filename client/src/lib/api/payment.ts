@@ -1,6 +1,7 @@
 import instance from "../instance";
 import type { ApiResponse, PaymentDto, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
+import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 
 export class ReceivablePaymentApi {
 	static async Create(data: PaymentDto): Promise<UUID | null> {
@@ -19,9 +20,22 @@ export class ReceivablePaymentApi {
 		}
 	}
 
-	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: PaymentDto[]; count: number } | null> {
+	static async GetAll(
+		page: number = 0,
+		pageSize: number = 20,
+		sorting?: SortingState,
+		filters?: ColumnFiltersState,
+	): Promise<{ rows: PaymentDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<{ rows: PaymentDto[]; count: number }>>(`/receivables/payments?page=${page}&limit=${pageSize}`);
+			const params = new URLSearchParams();
+			params.append("page", page.toString());
+			params.append("limit", pageSize.toString());
+			if (sorting) params.append("sorting", JSON.stringify(sorting));
+			if (filters) params.append("filters", JSON.stringify(filters));
+
+			const { data: response } = await instance.get<ApiResponse<{ rows: PaymentDto[]; count: number }>>(
+				`/receivables/payments?${params.toString()}`,
+			);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
@@ -85,9 +99,22 @@ export class PayablePaymentApi {
 		}
 	}
 
-	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: PaymentDto[]; count: number } | null> {
+	static async GetAll(
+		page: number = 0,
+		pageSize: number = 20,
+		sorting?: SortingState,
+		filters?: ColumnFiltersState,
+	): Promise<{ rows: PaymentDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<{ rows: PaymentDto[]; count: number }>>(`/payables/payments?page=${page}&limit=${pageSize}`);
+			const params = new URLSearchParams();
+			params.append("page", page.toString());
+			params.append("limit", pageSize.toString());
+			if (sorting) params.append("sorting", JSON.stringify(sorting));
+			if (filters) params.append("filters", JSON.stringify(filters));
+
+			const { data: response } = await instance.get<ApiResponse<{ rows: PaymentDto[]; count: number }>>(
+				`/payables/payments?${params.toString()}`,
+			);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });

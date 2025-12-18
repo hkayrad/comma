@@ -7,7 +7,7 @@ import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
-import type { PaginationState } from "@tanstack/react-table";
+import type { PaginationState, SortingState, ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
@@ -21,12 +21,26 @@ export default function Dashboard() {
     pageIndex: 0,
     pageSize: 20,
   });
+  const [receivableSorting, setReceivableSorting] = useState<SortingState>([]);
+  const [receivableFilters, setReceivableFilters] = useState<ColumnFiltersState>([]);
 
   const [payableRowCount, setPayableRowCount] = useState(0);
   const [payablePagination, setPayablePagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   });
+  const [payableSorting, setPayableSorting] = useState<SortingState>([]);
+  const [payableFilters, setPayableFilters] = useState<ColumnFiltersState>([]);
+
+  const onReceivableFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
+    setReceivableFilters(updaterOrValue);
+    setReceivablePagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const onPayableFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
+    setPayableFilters(updaterOrValue);
+    setPayablePagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
 
   const { t } = useTranslation();
 
@@ -35,24 +49,34 @@ export default function Dashboard() {
   }, []);
 
   const fetchReceivableCustomers = useCallback(async () => {
-    const response = await ReceivableCustomerApi.GetAll(receivablePagination.pageIndex, receivablePagination.pageSize);
+    const response = await ReceivableCustomerApi.GetAll(
+      receivablePagination.pageIndex,
+      receivablePagination.pageSize,
+      receivableSorting,
+      receivableFilters
+    );
     if (response) {
       setReceivableCustomers(response.rows);
       setReceivableRowCount(response.count);
     } else {
       Logger.error("Müşteriler getirilirken bir hata oluştu", response);
     }
-  }, [receivablePagination]);
+  }, [receivablePagination, receivableSorting, receivableFilters]);
 
   const fetchPayableCustomers = useCallback(async () => {
-    const response = await PayableCustomerApi.GetAll(payablePagination.pageIndex, payablePagination.pageSize);
+    const response = await PayableCustomerApi.GetAll(
+      payablePagination.pageIndex,
+      payablePagination.pageSize,
+      payableSorting,
+      payableFilters
+    );
     if (response) {
       setPayableCustomers(response.rows);
       setPayableRowCount(response.count);
     } else {
       Logger.error("Müşteriler getirilirken bir hata oluştu", response);
     }
-  }, [payablePagination]);
+  }, [payablePagination, payableSorting, payableFilters]);
 
   const handleRefresh = useCallback(() => {
     fetchReceivableCustomers();
@@ -90,7 +114,7 @@ export default function Dashboard() {
         </TabsList>
         <div className="flex items-center gap-4">
           <OverviewCards type="receivable" align="stretch" />
-          <Separator orientation="vertical" className="!h-20 w-full" />
+          <Separator orientation="vertical" className="h-20! w-full" />
           <OverviewCards type="payable" align="stretch" />
         </div>
         <TabsContent value="receivable">
@@ -100,6 +124,10 @@ export default function Dashboard() {
             rowCount={receivableRowCount}
             pagination={receivablePagination}
             onPaginationChange={setReceivablePagination}
+            sorting={receivableSorting}
+            onSortingChange={setReceivableSorting}
+            columnFilters={receivableFilters}
+            onColumnFiltersChange={onReceivableFiltersChange}
           />
         </TabsContent>
         <TabsContent value="payable">
@@ -109,6 +137,10 @@ export default function Dashboard() {
             rowCount={payableRowCount}
             pagination={payablePagination}
             onPaginationChange={setPayablePagination}
+            sorting={payableSorting}
+            onSortingChange={setPayableSorting}
+            columnFilters={payableFilters}
+            onColumnFiltersChange={onPayableFiltersChange}
           />
         </TabsContent>
       </Tabs>

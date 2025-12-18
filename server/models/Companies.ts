@@ -67,12 +67,12 @@ Companies.init(
 			defaultValue: null,
 		},
 		small_logo_path: {
-			type: DataTypes.CHAR(1024),
+			type: DataTypes.STRING(1024),
 			allowNull: true,
 			defaultValue: null,
 		},
 		large_logo_path: {
-			type: DataTypes.CHAR(1024),
+			type: DataTypes.STRING(1024),
 			allowNull: true,
 			defaultValue: null,
 		},

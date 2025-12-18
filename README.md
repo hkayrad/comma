@@ -51,21 +51,21 @@ To get the project up and running on your local machine, please follow these ste
     - You will need to create a `.env` file in the `server` directory and add the database connection details.
 2.  **Configure environment variables:**
     - In the `server` directory, create a `.env` file and add the following variables:
-      ```
-      SERVER_PORT=<your_server_port>
-      DB_USER=<your_database_user>
-      DB_HOST=<your_database_host>
-      DB_DATABASE=<your_database_name>
-      DB_PASSWORD=<your_database_password>
-      DB_PORT=<your_database_port>
-      JWT_SECRET=<your_jwt_secret>
-      JWT_EXPIRES_IN=<jwt_expiry_in_days>
-      JWT_ISSUER=<jwt_issuer>
-      JWT_AUDIENCE=<jwt_audience>
-      NODE_ENV=<development | production>
-      CLIENT_URL=<client_url>
-      TCMB_API_KEY=<your_tcmb_evds2_api_key>
-      ```
+        ```
+        SERVER_PORT=<your_server_port>
+        DB_USER=<your_database_user>
+        DB_HOST=<your_database_host>
+        DB_DATABASE=<your_database_name>
+        DB_PASSWORD=<your_database_password>
+        DB_PORT=<your_database_port>
+        JWT_SECRET=<your_jwt_secret>
+        JWT_EXPIRES_IN=<jwt_expiry_in_days>
+        JWT_ISSUER=<jwt_issuer>
+        JWT_AUDIENCE=<jwt_audience>
+        NODE_ENV=<development | production>
+        CLIENT_URL=<client_url>
+        TCMB_API_KEY=<your_tcmb_evds2_api_key>
+        ```
 
 ### Running the Application
 
@@ -105,17 +105,17 @@ To get the project up and running on your local machine, please follow these ste
 The project is organized into a monorepo structure with two main packages: `client` and `server`.
 
 - **`client/`**: The frontend application built with React.
-  - **`src/`**: Contains the main source code for the client.
-    - **`components/`**: Reusable UI components, including both custom components and components from the Shadcn/ui library.
-    - **`contexts/`**: React Context providers for managing global state, such as user authentication and application configuration.
-    - **`hooks/`**: Custom React hooks for encapsulating and reusing component logic.
-    - **`layout/`**: The main application layout, including pages for different routes.
-    - **`lib/`**: Utility functions, API service clients, and type definitions.
+    - **`src/`**: Contains the main source code for the client.
+        - **`components/`**: Reusable UI components, including both custom components and components from the Shadcn/ui library.
+        - **`contexts/`**: React Context providers for managing global state, such as user authentication and application configuration.
+        - **`hooks/`**: Custom React hooks for encapsulating and reusing component logic.
+        - **`layout/`**: The main application layout, including pages for different routes.
+        - **`lib/`**: Utility functions, API service clients, and type definitions.
 - **`server/`**: The backend application built with Node.js and Express.
-  - **`src/`**: Contains the main source code for the server.
-    - **`controllers/`**: Express route handlers that process incoming requests and send responses.
-    - **`services/`**: The business logic of the application, which is called by the controllers.
-    - **`lib/`**: Utility functions, middleware, and the database connection pool.
+    - **`src/`**: Contains the main source code for the server.
+        - **`controllers/`**: Express route handlers that process incoming requests and send responses.
+        - **`services/`**: The business logic of the application, which is called by the controllers.
+        - **`lib/`**: Utility functions, middleware, and the database connection pool.
 
 ## API Documentation
 

@@ -54,23 +54,68 @@ export default class ReceivableDebtsService {
 		}
 	}
 
-	static async GetAll(companyId: string, page: number, limit: number) {
+	static async GetAll(companyId: string, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
 		try {
-			Logger.debug("[ReceivableDebts] Fetching all debts", { companyId, page, limit });
+			Logger.debug("[ReceivableDebts] Fetching all debts", { companyId, page, limit, sorting, filters });
 
 			const offset = page * limit;
+
+			const colMap: Record<string, string> = {
+				customer_name: "c.name",
+				amount: "d.amount",
+				vat: "d.vat",
+				total: "(d.amount + d.vat)",
+				currency: "d.currency",
+				exchange_rate: "d.exchange_rate",
+				total_in_try: "((d.amount + d.vat) * d.exchange_rate)",
+				issue_date: "d.issue_date",
+				invoice_no: "d.invoice_no",
+				description: "d.description",
+			};
+
+			let whereClause = "WHERE d.company_id = ? AND d.deleted_at IS NULL AND c.deleted_at IS NULL";
+			const replacements: any[] = [companyId];
+
+			if (filters && filters.length > 0) {
+				filters.forEach((filter) => {
+					const { id, value } = filter;
+					const dbCol = colMap[id];
+					if (!dbCol) return;
+
+					if (Array.isArray(value) && value.length > 0) {
+						whereClause += ` AND ${dbCol} IN (?)`;
+						replacements.push(value);
+					} else if (typeof value === "string" && value.trim() !== "") {
+						whereClause += ` AND ${dbCol} LIKE ?`;
+						replacements.push(`%${value}%`);
+					}
+				});
+			}
+
+			let orderClause = "ORDER BY d.issue_date DESC";
+			if (sorting && sorting.length > 0) {
+				const sortParts = sorting
+					.map((sort) => {
+						const dbCol = colMap[sort.id];
+						if (!dbCol) return null;
+						return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
+					})
+					.filter(Boolean);
+
+				if (sortParts.length > 0) {
+					orderClause = `ORDER BY ${sortParts.join(", ")}`;
+				}
+			}
 
 			const countQuery = `
 				SELECT COUNT(*) as count
 				FROM receivable_debts d
 				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
-				WHERE d.company_id = ?
-			    AND d.deleted_at IS NULL
-			    AND c.deleted_at IS NULL
+				${whereClause}
 			`;
 
 			const countResult = (await sequelize.query(countQuery, {
-				replacements: [companyId],
+				replacements,
 				type: QueryTypes.SELECT,
 			})) as { count: number }[];
 
@@ -83,15 +128,13 @@ export default class ReceivableDebtsService {
 			    c.tax_number AS customer_tax_number
 				FROM receivable_debts d
 				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
-				WHERE d.company_id = ?
-			    AND d.deleted_at IS NULL
-			    AND c.deleted_at IS NULL
-				ORDER BY d.issue_date DESC
+				${whereClause}
+				${orderClause}
 				LIMIT ? OFFSET ?;
             `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId, limit, offset],
+				replacements: [...replacements, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as DebtDto[];
 
@@ -178,7 +221,7 @@ export default class ReceivableDebtsService {
 				},
 				{
 					where: { id, company_id: companyId },
-				}
+				},
 			);
 
 			if (affectedRows === 0) {
@@ -206,10 +249,7 @@ export default class ReceivableDebtsService {
 				return ApiResponse.error("Debt ID is required");
 			}
 
-			await ReceivableDebts.update(
-				{ deleted_by: userId },
-				{ where: { id, company_id: companyId } }
-			);
+			await ReceivableDebts.update({ deleted_by: userId }, { where: { id, company_id: companyId } });
 
 			const deletedCount = await ReceivableDebts.destroy({
 				where: { id, company_id: companyId },

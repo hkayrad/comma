@@ -1,5 +1,7 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "../lib/db/sequelize";
+import { Companies } from "./Companies";
+import { Users } from "./Users";
 
 export class ReceivableCustomers extends Model<
 	InferAttributes<ReceivableCustomers>,
@@ -35,7 +37,7 @@ ReceivableCustomers.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Companies",
+				model: Companies,
 				key: "id",
 			},
 		},
@@ -88,7 +90,7 @@ ReceivableCustomers.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},
@@ -107,7 +109,7 @@ ReceivableCustomers.init(
 			allowNull: true,
 			defaultValue: null,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},

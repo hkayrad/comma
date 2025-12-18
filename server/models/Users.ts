@@ -1,5 +1,6 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { sequelize } from "../lib/db/sequelize";
+import { Companies } from "./Companies";
 
 export class Users extends Model<InferAttributes<Users>, InferCreationAttributes<Users>> {
 	declare id: string;
@@ -27,7 +28,7 @@ Users.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Companies",
+				model: Companies,
 				key: "id",
 			},
 		},
@@ -53,7 +54,7 @@ Users.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},
@@ -72,7 +73,7 @@ Users.init(
 			allowNull: true,
 			defaultValue: null,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},

@@ -29,11 +29,13 @@ router.get("/customers", async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
 	const page = parseInt(req.query.page as string) || 0;
 	const limit = parseInt(req.query.limit as string) || 20;
+	const sorting = req.query.sorting ? JSON.parse(req.query.sorting as string) : [];
+	const filters = req.query.filters ? JSON.parse(req.query.filters as string) : [];
 
-	Logger.debug("[ReceivableCustomersController] Get all customers request", { companyId, page, limit });
+	Logger.debug("[ReceivableCustomersController] Get all customers request", { companyId, page, limit, sorting, filters });
 
 	try {
-		const response = await ReceivableCustomersService.GetAll(companyId, page, limit);
+		const response = await ReceivableCustomersService.GetAll(companyId, page, limit, sorting, filters);
 
 		Logger.debug("[ReceivableCustomersController] Get all customers result", { companyId, success: response.success });
 		return res.json(response);

@@ -1,6 +1,7 @@
 import instance from "../instance";
 import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "../../../../common/types";
 import { Logger } from "../utils/logger";
+import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 
 export class ReceivableCustomerApi {
 	static async Create(data: CustomerDto): Promise<UUID | null> {
@@ -19,9 +20,22 @@ export class ReceivableCustomerApi {
 		}
 	}
 
-	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: CustomerDto[]; count: number } | null> {
+	static async GetAll(
+		page: number = 0,
+		pageSize: number = 20,
+		sorting?: SortingState,
+		filters?: ColumnFiltersState,
+	): Promise<{ rows: CustomerDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(`/receivables/customers?page=${page}&limit=${pageSize}`);
+			const params = new URLSearchParams();
+			params.append("page", page.toString());
+			params.append("limit", pageSize.toString());
+			if (sorting) params.append("sorting", JSON.stringify(sorting));
+			if (filters) params.append("filters", JSON.stringify(filters));
+
+			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(
+				`/receivables/customers?${params.toString()}`,
+			);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
@@ -127,12 +141,41 @@ export class PayableCustomerApi {
 		}
 	}
 
-	static async GetAll(page: number = 0, pageSize: number = 20): Promise<{ rows: CustomerDto[]; count: number } | null> {
+	static async GetAll(
+		page: number = 0,
+		pageSize: number = 20,
+		sorting?: SortingState,
+		filters?: ColumnFiltersState,
+	): Promise<{ rows: CustomerDto[]; count: number } | null> {
 		try {
-			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(`/payables/customers?page=${page}&limit=${pageSize}`);
+			const params = new URLSearchParams();
+			params.append("page", page.toString());
+			params.append("limit", pageSize.toString());
+			if (sorting) params.append("sorting", JSON.stringify(sorting));
+			if (filters) params.append("filters", JSON.stringify(filters));
+
+			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(
+				`/payables/customers?${params.toString()}`,
+			);
 
 			if (response.status === 200) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
+			}
+
+			Logger.error("Error fetching customers:", response.message);
+			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error fetching customers:", error);
+			return Promise.reject("Müşteriler getirilirken hata oluştu");
+		}
+	}
+
+	static async GetAll2(): Promise<CustomerDto[]> {
+		try {
+			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payables/customers");
+
+			if (response.status === 200) {
+				return Promise.resolve(response.data || []);
 			}
 
 			Logger.error("Error fetching customers:", response.message);

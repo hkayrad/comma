@@ -38,21 +38,103 @@ export default class ReceivableCustomersService {
 		}
 	}
 
-	static async GetAll(companyId: UUID, page: number, limit: number) {
+	static async GetAll(companyId: UUID, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
 		try {
-			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId, page, limit });
+			Logger.debug("[ReceivableCustomers] Fetching all customers", { companyId, page, limit, sorting, filters });
 
 			const offset = page * limit;
+
+            const colMap: Record<string, string> = {
+                "name": "c.name",
+                "is_company": "c.is_company",
+                "tax_office": "c.tax_office",
+                "tax_number": "c.tax_number",
+                "mersis_no": "c.mersis_no",
+                "total_debt": "d.total_debt",
+                "total_payments": "p.total_payments",
+                "remaining_debt": "(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0))"
+            };
+
+            let whereClause = "WHERE c.company_id = ? AND c.deleted_at IS NULL";
+            const replacements: any[] = [companyId];
+
+            if (filters && filters.length > 0) {
+                filters.forEach((filter) => {
+                    const { id, value } = filter;
+                    
+                    if (id === "is_company") {
+                         const boolValues = Array.isArray(value) ? value : [value];
+                         // 'true' -> 1, 'false' -> 0
+                         const mapped = boolValues.map((v: string) => v === "true" ? 1 : 0);
+                         if (mapped.length > 0) {
+                             whereClause += ` AND c.is_company IN (?)`;
+                             replacements.push(mapped);
+                         }
+                         return;
+                    }
+
+                    if (id === "debt_status") {
+                        const statuses = Array.isArray(value) ? value : [value];
+                        const conditions: string[] = [];
+                        statuses.forEach((status: string) => {
+                            if (status === "HAS_DEBT") conditions.push(`(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) > 0.005`); // Use tolerance for floats
+                            if (status === "HAS_RECEIVABLE") conditions.push(`(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) < -0.005`);
+                            if (status === "HAS_NO_DEBT" || status === "HAS_NO_RECEIVABLE") conditions.push(`ABS(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) <= 0.005`);
+                        });
+                        
+                        if (conditions.length > 0) {
+                            whereClause += ` AND (${conditions.join(" OR ")})`;
+                        }
+                        return;
+                    }
+
+                    const dbCol = colMap[id];
+                    if (!dbCol) return;
+
+                    if (Array.isArray(value) && value.length > 0) {
+                        whereClause += ` AND ${dbCol} IN (?)`;
+                        replacements.push(value);
+                    } else if (typeof value === "string" && value.trim() !== "") {
+                        whereClause += ` AND ${dbCol} LIKE ?`;
+                        replacements.push(`%${value}%`);
+                    }
+                });
+            }
+
+            let orderClause = "ORDER BY c.created_at DESC";
+            if (sorting && sorting.length > 0) {
+                const sortParts = sorting.map((sort) => {
+                    const dbCol = colMap[sort.id];
+                    if (!dbCol) return null;
+                    return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
+                }).filter(Boolean);
+                
+                if (sortParts.length > 0) {
+                    orderClause = `ORDER BY ${sortParts.join(", ")}`;
+                }
+            }
+
+            // JOINs needed for filtering/sorting
+            const joins = `
+				-- Join Receivable Debt View
+				LEFT JOIN vw_receivable_debt_summary d
+			    ON c.id = d.customer_id
+			    AND c.company_id = d.company_id
+				-- Join Receivable Payment View
+				LEFT JOIN vw_receivable_payment_summary p
+			    ON c.id = p.customer_id
+			    AND c.company_id = p.company_id
+            `;
 
 			const countQuery = `
 				SELECT COUNT(*) as count
 				FROM receivable_customers c
-				WHERE c.company_id = ?
-			    AND c.deleted_at IS NULL
+                ${joins}
+				${whereClause}
 			`;
 
 			const countResult = (await sequelize.query(countQuery, {
-				replacements: [companyId],
+				replacements,
 				type: QueryTypes.SELECT,
 			})) as { count: number }[];
 
@@ -65,22 +147,14 @@ export default class ReceivableCustomersService {
 			    COALESCE(p.total_payments, 0) AS total_payments,
 			    COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0) AS remaining_debt
 				FROM receivable_customers c
-				-- Join Receivable Debt View
-				LEFT JOIN vw_receivable_debt_summary d
-			    ON c.id = d.customer_id
-			    AND c.company_id = d.company_id
-				-- Join Receivable Payment View
-				LEFT JOIN vw_receivable_payment_summary p
-			    ON c.id = p.customer_id
-			    AND c.company_id = p.company_id
-				WHERE c.company_id = ?
-			    AND c.deleted_at IS NULL
-				ORDER BY c.created_at DESC
+                ${joins}
+				${whereClause}
+				${orderClause}
 				LIMIT ? OFFSET ?;
       `;
 
 			const result = (await sequelize.query(query, {
-				replacements: [companyId, limit, offset],
+				replacements: [...replacements, limit, offset],
 				type: QueryTypes.SELECT,
 			})) as CustomerDto[];
 

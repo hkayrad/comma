@@ -1,5 +1,8 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "../lib/db/sequelize";
+import { Companies } from "./Companies";
+import { ReceivableCustomers } from "./ReceivableCustomers";
+import { Users } from "./Users";
 
 export class ReceivableDebts extends Model<InferAttributes<ReceivableDebts>, InferCreationAttributes<ReceivableDebts>> {
 	declare id: CreationOptional<string>;
@@ -34,7 +37,7 @@ ReceivableDebts.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Companies",
+				model: Companies,
 				key: "id",
 			},
 		},
@@ -43,7 +46,7 @@ ReceivableDebts.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "ReceivableCustomers",
+				model: ReceivableCustomers,
 				key: "id",
 			},
 		},
@@ -102,7 +105,7 @@ ReceivableDebts.init(
 			allowNull: false,
 			defaultValue: DataTypes.UUIDV4,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},
@@ -121,7 +124,7 @@ ReceivableDebts.init(
 			allowNull: true,
 			defaultValue: null,
 			references: {
-				model: "Users",
+				model: Users,
 				key: "id",
 			},
 		},
