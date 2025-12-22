@@ -19,7 +19,16 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState } from "@tanstack/react-table";
+import type {
+    Column,
+    ColumnDef,
+    Row,
+    PaginationState,
+    OnChangeFn,
+    SortingState,
+    ColumnFiltersState,
+    VisibilityState,
+} from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import { useDialog } from "@/contexts/dialog";
@@ -42,10 +51,24 @@ type Props = {
     onSortingChange?: OnChangeFn<SortingState>;
     columnFilters?: ColumnFiltersState;
     onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+    columnVisibility?: VisibilityState;
+    onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
 };
 
 export default function DebtTable(props: Props) {
-    const { data, type, rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange } = props;
+    const {
+        data,
+        type,
+        rowCount,
+        pagination,
+        onPaginationChange,
+        sorting,
+        onSortingChange,
+        columnFilters,
+        onColumnFiltersChange,
+        columnVisibility,
+        onColumnVisibilityChange,
+    } = props;
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -440,6 +463,8 @@ export default function DebtTable(props: Props) {
             onSortingChange={onSortingChange}
             columnFilters={columnFilters}
             onColumnFiltersChange={onColumnFiltersChange}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={onColumnVisibilityChange}
         />
     );
 }

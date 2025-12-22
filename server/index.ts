@@ -20,6 +20,7 @@ import TcmbController from "./controllers/TcmbController";
 import CompanyController from "./controllers/CompanyController";
 import CompanyManagementController from "./controllers/Admin/CompanyManagementController";
 import { Logger } from "./lib/utils/logger";
+import { sequelize } from "./lib/db/sequelize";
 
 declare global {
 	namespace Express {
@@ -34,7 +35,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 new NotificationWebSocket(server);
 
@@ -120,8 +121,16 @@ const listenPort =
 		throw new Error("SERVER_PORT not defined");
 	})();
 
-server.listen(listenPort, () => {
+server.listen(listenPort, async () => {
 	Logger.info(`Server has been started`);
+
+	try {
+		await sequelize.authenticate();
+		Logger.info("Database connection established successfully.");
+	} catch (error) {
+		Logger.error("Unable to connect to the database:", error);
+	}
+
 	Logger.table({
 		"Server Port": listenPort,
 		"Client URL": process.env.CLIENT_URL,

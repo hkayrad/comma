@@ -1,7 +1,7 @@
 {
   "name": "hks-io",
   "private": true,
-  "version": "1.16.1",
+  "version": "1.17.0",
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.3",
     "mariadb": "^3.4.5",
     "sequelize": "^6.37.7",
+    "sharp": "^0.34.5",
     "ws": "^8.18.3",
     "xml2js": "^0.6.2"
   },

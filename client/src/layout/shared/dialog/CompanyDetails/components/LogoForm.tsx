@@ -140,7 +140,9 @@ export default function LogoForm() {
                         )}
                     </div>
                     <Dropzone
-                        accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
+                        accept={{
+                            "image/*": [".png", ".jpg", ".jpeg", ".webp"],
+                        }}
                         src={
                             smallLogo
                                 ? [smallLogo]
@@ -210,7 +212,9 @@ export default function LogoForm() {
                         )}
                     </div>
                     <Dropzone
-                        accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
+                        accept={{
+                            "image/*": [".png", ".jpg", ".jpeg", ".webp"],
+                        }}
                         src={
                             largeLogo
                                 ? [largeLogo]

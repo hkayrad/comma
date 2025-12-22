@@ -5,6 +5,7 @@ import { ApiResponse } from "../lib/utils/apiResponse";
 import fs from "fs";
 import { CompanyDto, LogoSize, UUID } from "@common/types";
 import { Companies } from "../models";
+import sharp from "sharp";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve(process.cwd(), "uploads", "logos");
@@ -105,21 +106,28 @@ export class CompanyService {
 			}
 
 			// Validate file type
-			const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+			const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 			if (!allowedTypes.includes(logo.mimetype)) {
 				Logger.error("[CompanyService] Invalid file type", { logoSize, companyId, mimetype: logo.mimetype });
-				return ApiResponse.error("Invalid file type. Only JPG and PNG are allowed.");
+				return ApiResponse.error("Invalid file type. Only JPG, PNG and WebP are allowed.");
 			}
 
 			// Generate unique filename
-			const fileExtension = path.extname(logo.name);
-			const fileName = `${logoSize}-logo-${companyId}${fileExtension}`;
+			const fileName = `${logoSize}-logo-${companyId}.webp`;
 			const filePath = path.join(uploadDir, fileName);
 
-			Logger.debug("[CompanyService] Moving file to uploads directory", { fileName, filePath });
+			Logger.debug("[CompanyService] Processing and moving file to uploads directory", { fileName, filePath });
 
-			// Move file to uploads directory
-			await logo.mv(filePath);
+			// Process with Sharp
+			const transformer = sharp(logo.tempFilePath);
+
+			if (logoSize === "small") {
+				transformer.resize(200);
+			} else if (logoSize === "large") {
+				transformer.resize(500);
+			}
+
+			await transformer.webp({ quality: 80 }).toFile(filePath);
 
 			await Companies.update(
 				{ [`${logoSize}_logo_path`]: fileName },

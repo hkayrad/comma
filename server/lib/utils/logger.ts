@@ -3,6 +3,8 @@ import path from "path";
 
 export class Logger {
 	private static logDir = path.join(process.cwd(), "./", "logs");
+	private static currentStream: fs.WriteStream | null = null;
+	private static currentStreamDate: string = "";
 
 	private static getFormattedDate() {
 		const now = new Date();
@@ -23,10 +25,33 @@ export class Logger {
 		}
 	}
 
-	private static writeToFile(message: string) {
+	private static getStream(): fs.WriteStream {
+		const fileName = Logger.getLogFileName();
+
+		if (Logger.currentStream && Logger.currentStreamDate === fileName) {
+			return Logger.currentStream;
+		}
+
+		if (Logger.currentStream) {
+			Logger.currentStream.end();
+		}
+
 		Logger.ensureLogDirectory();
-		const logFile = path.join(Logger.logDir, Logger.getLogFileName());
-		fs.appendFileSync(logFile, message + "\n", "utf8");
+		const logPath = path.join(Logger.logDir, fileName);
+		
+		Logger.currentStream = fs.createWriteStream(logPath, { flags: 'a' });
+		Logger.currentStreamDate = fileName;
+
+		return Logger.currentStream;
+	}
+
+	private static writeToFile(message: string) {
+		try {
+			const stream = Logger.getStream();
+			stream.write(message + "\n");
+		} catch (error) {
+			console.error("Failed to write to log file:", error);
+		}
 	}
 
 	static table(data: any) {

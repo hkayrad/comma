@@ -7,7 +7,8 @@ import OverviewCards from "@/layout/shared/OverviewCards";
 import CustomerTable from "./components/CustomerTable";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
-import type { PaginationState, SortingState, ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
+import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
+import { useTableState } from "@/hooks/use-table-state";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
@@ -17,20 +18,29 @@ export default function Dashboard() {
   const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
 
   const [receivableRowCount, setReceivableRowCount] = useState(0);
-  const [receivablePagination, setReceivablePagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [receivableSorting, setReceivableSorting] = useState<SortingState>([]);
-  const [receivableFilters, setReceivableFilters] = useState<ColumnFiltersState>([]);
-
   const [payableRowCount, setPayableRowCount] = useState(0);
-  const [payablePagination, setPayablePagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [payableSorting, setPayableSorting] = useState<SortingState>([]);
-  const [payableFilters, setPayableFilters] = useState<ColumnFiltersState>([]);
+
+  const {
+    pagination: receivablePagination,
+    setPagination: setReceivablePagination,
+    sorting: receivableSorting,
+    setSorting: setReceivableSorting,
+    columnFilters: receivableFilters,
+    setColumnFilters: setReceivableFilters,
+    columnVisibility: receivableVisibility,
+    setColumnVisibility: setReceivableVisibility,
+  } = useTableState({ key: "dashboard-receivable" });
+
+  const {
+    pagination: payablePagination,
+    setPagination: setPayablePagination,
+    sorting: payableSorting,
+    setSorting: setPayableSorting,
+    columnFilters: payableFilters,
+    setColumnFilters: setPayableFilters,
+    columnVisibility: payableVisibility,
+    setColumnVisibility: setPayableVisibility,
+  } = useTableState({ key: "dashboard-payable" });
 
   const onReceivableFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
     setReceivableFilters(updaterOrValue);
@@ -128,6 +138,8 @@ export default function Dashboard() {
             onSortingChange={setReceivableSorting}
             columnFilters={receivableFilters}
             onColumnFiltersChange={onReceivableFiltersChange}
+            columnVisibility={receivableVisibility}
+            onColumnVisibilityChange={setReceivableVisibility}
           />
         </TabsContent>
         <TabsContent value="payable">
@@ -141,6 +153,8 @@ export default function Dashboard() {
             onSortingChange={setPayableSorting}
             columnFilters={payableFilters}
             onColumnFiltersChange={onPayableFiltersChange}
+            columnVisibility={payableVisibility}
+            onColumnVisibilityChange={setPayableVisibility}
           />
         </TabsContent>
       </Tabs>

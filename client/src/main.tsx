@@ -4,15 +4,26 @@ import "./index.css";
 import "./i18n";
 import App from "./layout/App";
 import { RequireAuth, RequireNoAuth } from "./layout/auth/AuthCheck";
-import Login from "./layout/auth/Login";
-import Dashboard from "./layout/dashboard/Dashboard";
-import Debts from "./layout/debts/Debts";
-import Payments from "./layout/payments/Payments";
-import CustomerStatement from "./layout/dashboard/components/CustomerStatement";
-import Dev from "./layout/Dev";
-import NotFound from "./layout/NotFound";
 import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
+import { lazy, Suspense } from "react";
+import { Spinner } from "./components/ui/spinner";
+
+const Login = lazy(() => import("./layout/auth/Login"));
+const Dashboard = lazy(() => import("./layout/dashboard/Dashboard"));
+const Debts = lazy(() => import("./layout/debts/Debts"));
+const Payments = lazy(() => import("./layout/payments/Payments"));
+const CustomerStatement = lazy(
+    () => import("./layout/dashboard/components/CustomerStatement"),
+);
+const Dev = lazy(() => import("./layout/Dev"));
+const NotFound = lazy(() => import("./layout/NotFound"));
+
+const PageLoader = () => (
+    <div className="flex h-full w-full items-center justify-center p-4">
+        <Spinner className="size-8" />
+    </div>
+);
 
 const router = createBrowserRouter([
     {
@@ -24,7 +35,11 @@ const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        Component: Login,
+                        element: (
+                            <Suspense fallback={<PageLoader />}>
+                                <Login />
+                            </Suspense>
+                        ),
                     },
                 ],
             },
@@ -40,22 +55,44 @@ const router = createBrowserRouter([
                                 children: [
                                     {
                                         index: true,
-                                        Component: Dashboard,
+                                        element: (
+                                            <Suspense fallback={<PageLoader />}>
+                                                <Dashboard />
+                                            </Suspense>
+                                        ),
                                     },
                                     {
                                         path: "alacaklar",
                                         children: [
                                             {
                                                 index: true,
-                                                Component: Debts,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <Debts />
+                                                    </Suspense>
+                                                ),
                                             },
                                             {
                                                 path: "odemeler",
-                                                Component: Payments,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <Payments />
+                                                    </Suspense>
+                                                ),
                                             },
                                             {
                                                 path: "borc_dokumu/:customerId",
-                                                Component: CustomerStatement,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <CustomerStatement />
+                                                    </Suspense>
+                                                ),
                                             },
                                         ],
                                     },
@@ -64,25 +101,47 @@ const router = createBrowserRouter([
                                         children: [
                                             {
                                                 index: true,
-                                                Component: Debts,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <Debts />
+                                                    </Suspense>
+                                                ),
                                             },
                                             {
                                                 path: "odemeler",
-                                                Component: Payments,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <Payments />
+                                                    </Suspense>
+                                                ),
                                             },
                                             {
                                                 path: "borc_dokumu/:customerId",
-                                                Component: CustomerStatement,
+                                                element: (
+                                                    <Suspense
+                                                        fallback={<PageLoader />}
+                                                    >
+                                                        <CustomerStatement />
+                                                    </Suspense>
+                                                ),
                                             },
                                         ],
                                     },
                                     {
                                         path: "dev",
-                                        Component:
+                                        element:
                                             import.meta.env.VITE_NODE_ENV ===
-                                            "development"
-                                                ? Dev
-                                                : null,
+                                            "development" ? (
+                                                <Suspense
+                                                    fallback={<PageLoader />}
+                                                >
+                                                    <Dev />
+                                                </Suspense>
+                                            ) : null,
                                     },
                                 ],
                             },
@@ -92,7 +151,11 @@ const router = createBrowserRouter([
             },
             {
                 path: "*",
-                Component: NotFound,
+                element: (
+                    <Suspense fallback={<PageLoader />}>
+                        <NotFound />
+                    </Suspense>
+                ),
             },
         ],
     },

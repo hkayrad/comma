@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState } from "@tanstack/react-table";
+import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState, VisibilityState } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -43,10 +43,12 @@ type Props = {
     onSortingChange?: OnChangeFn<SortingState>;
     columnFilters?: ColumnFiltersState;
     onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+    columnVisibility?: VisibilityState;
+    onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
 };
 
 export default function CustomerTable(props: Props) {
-    const { data, type = "receivable", rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange } = props;
+    const { data, type = "receivable", rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange, columnVisibility, onColumnVisibilityChange } = props;
 
     const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -586,6 +588,8 @@ export default function CustomerTable(props: Props) {
             onSortingChange={onSortingChange}
             columnFilters={columnFilters}
             onColumnFiltersChange={onColumnFiltersChange}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={onColumnVisibilityChange}
         />
     );
 }

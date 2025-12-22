@@ -4,7 +4,8 @@ import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import PaymentTable from "./components/PaymentTable";
 import { useLocation } from "react-router";
-import type { PaginationState, SortingState, ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
+import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
+import { useTableState } from "@/hooks/use-table-state";
 
 export default function Payments() {
   const location = useLocation();
@@ -12,12 +13,17 @@ export default function Payments() {
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const [payments, setPayments] = useState<PaymentDto[]>([]);
   const [rowCount, setRowCount] = useState(0);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const {
+    pagination,
+    setPagination,
+    sorting,
+    setSorting,
+    columnFilters,
+    setColumnFilters,
+    columnVisibility,
+    setColumnVisibility,
+  } = useTableState({ key: `payments-${type}` });
 
   const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
     setColumnFilters(updaterOrValue);
@@ -59,6 +65,8 @@ export default function Payments() {
           onSortingChange={setSorting}
           columnFilters={columnFilters}
           onColumnFiltersChange={onColumnFiltersChange}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={setColumnVisibility}
         />
       </div>
     </div>

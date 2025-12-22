@@ -27,7 +27,7 @@ import {
 import type { DateRange, Locale } from "react-day-picker";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
-import { exportCustomerStatementPDF } from "@/lib/pdf";
+import { exportCustomerStatementPDF } from "@/lib/pdf-new";
 import { Logger } from "@/lib/utils/logger";
 import { useBreadcrumb } from "@/contexts/breadcrumb/useBreadcrumb";
 import { useTranslation } from "react-i18next";
@@ -80,7 +80,9 @@ export default function CustomerStatement() {
                 }
             })
             .catch(() =>
-                toast.error(t("dashboard.customerStatement.error.fetchStatement")),
+                toast.error(
+                    t("dashboard.customerStatement.error.fetchStatement"),
+                ),
             )
             .finally(() => setLoading(false));
     }, [customerId, API, date, setLabel, t]);
@@ -303,7 +305,7 @@ export default function CustomerStatement() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <div className="max-h-[400px] overflow-auto">
+                        <div className="max-h-100 overflow-auto">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted sticky top-0">
                                     <tr className="text-left">
@@ -331,7 +333,9 @@ export default function CustomerStatement() {
                                             )}
                                         </th>
                                         <th className="py-2 px-3 font-medium">
-                                            {t("debt.table.column.total_in_try")}
+                                            {t(
+                                                "debt.table.column.total_in_try",
+                                            )}
                                         </th>
                                     </tr>
                                 </thead>
@@ -404,7 +408,7 @@ export default function CustomerStatement() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <div className="max-h-[400px] overflow-auto">
+                        <div className="max-h-100 overflow-auto">
                             <table className="w-full text-sm">
                                 <thead className="bg-muted sticky top-0">
                                     <tr className="text-left">

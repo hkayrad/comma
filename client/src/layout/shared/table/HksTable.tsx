@@ -40,6 +40,8 @@ type Props = {
   onSortingChange?: OnChangeFn<SortingState>;
   columnFilters?: ColumnFiltersState;
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+  columnVisibility?: VisibilityState;
+  onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
 };
 
 export default function HksTable(props: Props) {
@@ -55,11 +57,13 @@ export default function HksTable(props: Props) {
     onSortingChange,
     columnFilters: controlledColumnFilters,
     onColumnFiltersChange,
+    columnVisibility: controlledColumnVisibility,
+    onColumnVisibilityChange,
   } = props;
 
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+  const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({
     "Mersis No": false,
   });
   const [internalPagination, setInternalPagination] = useState<PaginationState>({
@@ -75,7 +79,7 @@ export default function HksTable(props: Props) {
     rowCount,
     onSortingChange: isServerSide && onSortingChange ? onSortingChange : setInternalSorting,
     onColumnFiltersChange: isServerSide && onColumnFiltersChange ? onColumnFiltersChange : setInternalColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: onColumnVisibilityChange ?? setInternalColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -88,7 +92,7 @@ export default function HksTable(props: Props) {
       pagination: isServerSide ? controlledPagination : internalPagination,
       sorting: isServerSide && controlledSorting ? controlledSorting : internalSorting,
       columnFilters: isServerSide && controlledColumnFilters ? controlledColumnFilters : internalColumnFilters,
-      columnVisibility,
+      columnVisibility: controlledColumnVisibility ?? internalColumnVisibility,
     },
   });
 
