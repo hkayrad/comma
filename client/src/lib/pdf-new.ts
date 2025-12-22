@@ -52,7 +52,7 @@ async function loadLogo(url: string): Promise<LogoData | null> {
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed to fetch logo: ${res.statusText}`);
-        
+
         const blob = await res.blob();
         return await new Promise((resolve) => {
             const img = new Image();
@@ -60,7 +60,7 @@ async function loadLogo(url: string): Promise<LogoData | null> {
                 const MAX_WIDTH = 500;
                 // Resize if image is larger than MAX_WIDTH
                 const scale = Math.min(1, MAX_WIDTH / img.width);
-                
+
                 const finalWidth = img.width * scale;
                 const finalHeight = img.height * scale;
 
@@ -110,7 +110,7 @@ export class CustomerStatementPDF {
      */
     private async getLogo(company: CompanyDto | null): Promise<LogoData | null> {
         const baseUrl = import.meta.env.VITE_API_URL;
-        let url = "/hks-logo.png"; // Default fallback
+        let url = "/hks-logo.webp"; // Default fallback
 
         if (company?.large_logo_path) {
             url = `${baseUrl}/logo-proxy/${company.large_logo_path}`;
@@ -124,7 +124,7 @@ export class CustomerStatementPDF {
     private addHeader(logo: LogoData | null, company: CompanyDto | null, dateRange: { from: Date; to: Date }) {
         const MAX_LOGO_WIDTH = 120;
         const MAX_LOGO_HEIGHT = 60;
-        
+
         let pdfLogoWidth = 0;
         let pdfLogoHeight = 0;
 
@@ -141,7 +141,7 @@ export class CustomerStatementPDF {
             }
         } else {
             // Reserve space even if no logo, or set to 0 to collapse
-            pdfLogoWidth = MAX_LOGO_WIDTH; 
+            pdfLogoWidth = MAX_LOGO_WIDTH;
         }
 
         // Prepare info lines
@@ -175,7 +175,7 @@ export class CustomerStatementPDF {
         // Render Info Text (Right Aligned)
         this.doc.setFontSize(11);
         this.doc.setTextColor(...COLORS.TEXT.SECONDARY);
-        
+
         const infoRightX = this.pageWidth - MARGIN.RIGHT;
         const infoWidth = this.pageWidth - MARGIN.LEFT - pdfLogoWidth - 28 - MARGIN.RIGHT;
         const LINE_HEIGHT = 12;
@@ -195,12 +195,12 @@ export class CustomerStatementPDF {
     private addCustomerTitle(name: string) {
         this.doc.setFontSize(14);
         this.doc.setTextColor(...COLORS.TEXT.DEFAULT);
-        
+
         const fullWidth = this.pageWidth - MARGIN.LEFT - MARGIN.RIGHT;
         const splitName = this.doc.splitTextToSize(name, fullWidth);
-        
+
         this.doc.text(splitName, MARGIN.LEFT, this.cursorY);
-        
+
         const textHeight = splitName.length * 18;
         this.cursorY += textHeight + 6;
 
@@ -239,7 +239,7 @@ export class CustomerStatementPDF {
 
         metrics.forEach((m, i) => {
             const x = MARGIN.LEFT + i * colWidth;
-            
+
             this.doc.setFontSize(11);
             this.doc.setTextColor(...COLORS.TEXT.MUTED);
             this.doc.text(m.label, x, boxY);
@@ -251,7 +251,7 @@ export class CustomerStatementPDF {
 
         // Move past summary
         this.cursorY = boxY + 40;
-        
+
         // Separator
         this.doc.setTextColor(...COLORS.TEXT.DEFAULT); // Reset
         this.doc.setDrawColor(200);
@@ -273,7 +273,7 @@ export class CustomerStatementPDF {
             headStyles: { fillColor: COLORS.TABLE.HEAD, font: FONT, fontStyle: "normal" },
             theme: 'striped',
         });
-        
+
         // Update cursor to end of table
         this.cursorY = (this.doc as any).lastAutoTable.finalY + 30;
     }
@@ -324,10 +324,10 @@ export class CustomerStatementPDF {
         for (let i = 1; i <= pageCount; i++) {
             this.doc.setPage(i);
             const footerY = this.pageHeight - MARGIN.BOTTOM;
-            
+
             this.doc.setDrawColor(COLORS.LINES.LIGHT);
             this.doc.line(MARGIN.LEFT, footerY, this.pageWidth - MARGIN.RIGHT, footerY);
-            
+
             this.doc.setFontSize(8);
             this.doc.setTextColor(...COLORS.TEXT.FOOTER);
             this.doc.text("IO - Müşteri Borç Dökümü", MARGIN.LEFT, footerY + 15);
@@ -337,7 +337,7 @@ export class CustomerStatementPDF {
 
     public async generate(statement: CustomerStatement, company: CompanyDto | null, dateRange: { from: Date; to: Date }) {
         const logo = await this.getLogo(company);
-        
+
         this.addHeader(logo, company, dateRange);
         // Ensure name exists
         this.addCustomerTitle(statement.customer.name || "Müşteri");
@@ -345,7 +345,7 @@ export class CustomerStatementPDF {
         this.addDebtsTable(statement.debts);
         this.addPaymentsTable(statement.payments);
         this.addFooter();
-        
+
         // Sanitize filename
         const safeName = (statement.customer.name || "customer").replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]/g, "").replace(/\s+/g, "_");
         this.doc.save(`${safeName}_dokum.pdf`);

@@ -68,7 +68,7 @@ export async function exportCustomerStatementPDF(
 	} else if (company?.small_logo_path) {
 		logoData = await loadLogo(`${baseUrl}/logo-proxy/${company.small_logo_path}`);
 	} else {
-		logoData = await loadLogo("/hks-logo.png");
+		logoData = await loadLogo("/hks-logo.webp");
 	}
 
 	// Header

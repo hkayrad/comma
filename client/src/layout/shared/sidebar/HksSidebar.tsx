@@ -100,10 +100,10 @@ export default function HksSidebar() {
     () => ({
       small: logos.smallLogo
         ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
-        : "/hks-icon.png",
+        : "/hks-icon.webp",
       large: logos.largeLogo
         ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
-        : "/hks-logo.png",
+        : "/hks-logo.webp",
     }),
     [logos.largeLogo, logos.smallLogo, cacheBuster],
   );
