@@ -124,14 +124,14 @@ export default function FloatingButton() {
                     </TooltipContent>
                 </Tooltip>
                 <DropdownMenuContent
-                    className="w-fit !bg-transparent !p-0 !border-none !space-y-1 !shadow-none overflow-visible"
+                    className="w-fit bg-transparent! p-0! border-none! space-y-1! shadow-none! overflow-visible"
                     side="top"
                     align="end"
                     sideOffset={4}
                 >
                     {(location.pathname === "/" ||
                         location.pathname.startsWith("/alacaklar")) && (
-                        <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
+                        <DropdownMenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
                             <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
                                 {t(
                                     "dashboard.floatingButton.actions.receivable",
@@ -169,7 +169,7 @@ export default function FloatingButton() {
                     )}
                     {(location.pathname === "/" ||
                         location.pathname.startsWith("/borclar")) && (
-                        <DropdownMenuGroup className="bg-popover !p-1 !border !rounded-md shadow-md">
+                        <DropdownMenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
                             <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
                                 {t("dashboard.floatingButton.actions.payable")}
                             </DropdownMenuLabel>

@@ -114,7 +114,7 @@ export const WebSocketProvider = ({
                   id: "maintenance_mode_toast",
                   className: "relative overflow-hidden",
                   classNames: {
-                    icon: "!mr-4",
+                    icon: "mr-4!",
                   },
                 });
                 setTimeout(() => {

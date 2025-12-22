@@ -100,7 +100,7 @@ export default function Header() {
                 </Tooltip>
                 <Separator
                     orientation="vertical"
-                    className="w-px mr-4 ml-3 !h-4"
+                    className="w-px mr-4 ml-3 h-4!"
                 />
 
                 <Breadcrumb>

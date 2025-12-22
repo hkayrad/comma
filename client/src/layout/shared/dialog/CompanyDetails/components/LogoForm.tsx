@@ -153,7 +153,7 @@ export default function LogoForm() {
                         onDrop={(files) => handleDrop(files, "small")}
                         onError={Logger.error}
                         multiple={false}
-                        className={`${smallLogo && "aspect-square"} w-auto !p-6`}
+                        className={`${smallLogo && "aspect-square"} w-auto p-6!`}
                     >
                         <DropzoneEmptyState>
                             <div className="flex flex-col items-center justify-center text-center p-4">
@@ -225,7 +225,7 @@ export default function LogoForm() {
                         onDrop={(files) => handleDrop(files, "large")}
                         onError={Logger.error}
                         multiple={false}
-                        className="w-auto !p-6"
+                        className="w-auto p-6!"
                     >
                         <DropzoneEmptyState>
                             <div className="flex flex-col items-center justify-center text-center p-4">

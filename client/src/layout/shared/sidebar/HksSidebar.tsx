@@ -185,7 +185,7 @@ export default function HksSidebar() {
                 key="icon"
                 src={logoSrc.small}
                 alt="HKS.IO Logo"
-                className="h-full mx-auto !bg-contain"
+                className="h-full mx-auto bg-contain!"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -211,7 +211,7 @@ export default function HksSidebar() {
                 key="logo"
                 src={logoSrc.large}
                 alt="HKS.IO Logo"
-                className="h-full w-auto mx-auto !bg-contain"
+                className="h-full w-auto mx-auto bg-contain!"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -276,7 +276,7 @@ export default function HksSidebar() {
                   </DropdownMenuItem>*/}
                   <DropdownMenuItem
                     onClick={handleCompanyDetails}
-                    className="!justify-start"
+                    className="justify-start!"
                   >
                     <Building2 className="text-inherit bg-inherit select-none" />
                     <span>
@@ -305,9 +305,9 @@ export default function HksSidebar() {
             {t("sidebar.footer.info.label")}
           </TooltipContent>
         </Tooltip>
-        <SidebarSeparator className="!mx-0" />
+        <SidebarSeparator className="mx-0!" />
 
-        <SidebarGroup className="!p-0">
+        <SidebarGroup className="p-0!">
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
               <SidebarMenuItem>
@@ -376,7 +376,7 @@ export default function HksSidebar() {
                     <DropdownMenuItem
                       onClick={handleLogout}
                       variant="destructive"
-                      className="!justify-start"
+                      className="justify-start!"
                     >
                       <LogOut className="text-inherit bg-inherit select-none" />
                       <span>{t("sidebar.footer.account.logout")}</span>

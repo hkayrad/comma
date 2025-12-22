@@ -83,7 +83,7 @@ export default function CustomerSelect(props: Props) {
                                         )}
                                     >
                                         <span className="overflow-hidden text-ellipsis flex items-center gap-2">
-                                            <IdCard className="!text-muted-foreground" />
+                                            <IdCard className="text-muted-foreground!" />
                                             {field.value
                                                 ? customerIdAndNames.find(
                                                       (customer) =>

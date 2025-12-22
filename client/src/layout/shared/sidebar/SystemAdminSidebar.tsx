@@ -51,7 +51,7 @@ export default function SystemAdminSidebarContent() {
   return (
     <SidebarContent className="gap-0">
       <SidebarGroup>
-        <SidebarGroupLabel className="!w-full whitespace-nowrap overflow-hidden text-ellipsis">
+        <SidebarGroupLabel className="w-full! whitespace-nowrap overflow-hidden text-ellipsis">
           <span className="w-full whitespace-nowrap overflow-hidden text-ellipsis select-none">
             {t("sidebar.sysAdmin.actions")}
           </span>
@@ -66,7 +66,7 @@ export default function SystemAdminSidebarContent() {
               <TooltipTrigger asChild>
                 <SidebarMenuButton
                   onClick={handleToggleMaintenance}
-                  className="!justify-start"
+                  className="justify-start!"
                 >
                   <Construction className="text-inherit bg-inherit select-none" />
                   <span>{t("sidebar.sysAdmin.actions.maintenanceMode")}</span>
@@ -83,7 +83,7 @@ export default function SystemAdminSidebarContent() {
               <TooltipTrigger asChild>
                 <SidebarMenuButton
                   onClick={handleGetActiveUsers}
-                  className="!justify-start"
+                  className="justify-start!"
                 >
                   <UsersRound className="text-inherit bg-inherit select-none" />
                   <span>{t("sidebar.sysAdmin.actions.activeUsers")}</span>

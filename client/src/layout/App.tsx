@@ -28,7 +28,7 @@ export default function App() {
       <BreadcrumbProvider>
         <SidebarProvider>
           <HksSidebar />
-          <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative !ml-0">
+          <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
             <MaintenanceBanner />
             <SystemAdminOnly>
               <Admin />
