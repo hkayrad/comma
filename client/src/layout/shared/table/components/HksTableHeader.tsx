@@ -38,19 +38,19 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 
 type Props = {
-  table: Table<any>;
-  searchColumn: string;
-  tags?: {
-    column: string;
-    column_label: string;
-    value: string;
-    label?: string;
-    color: string;
-  }[];
+    table: Table<any>;
+    searchColumn: string;
+    tags?: {
+        column: string;
+        column_label: string;
+        value: string;
+        label?: string;
+        color: string;
+    }[];
 };
 
 export default function HksTableHeader(props: Props) {
-  const { table, searchColumn, tags } = props;
+    const { table, searchColumn, tags } = props;
     const { t } = useTranslation();
     const location = useLocation();
 
@@ -203,103 +203,116 @@ export default function HksTableHeader(props: Props) {
 
     const rowCounts = useMemo(() => [5, 10, 20, 50, 100], []);
 
-      // Group tags by column
-      const groupedTags = useMemo(() => {
+    // Group tags by column
+    const groupedTags = useMemo(() => {
         if (!tags)
-          return new Map<
+            return new Map<
+                string,
+                Array<{
+                    column: string;
+                    column_label: string;
+                    value: string;
+                    label?: string;
+                    color: string;
+                }>
+            >();
+
+        const groups = new Map<
             string,
             Array<{
-              column: string;
-              column_label: string;
-              value: string;
-              label?: string;
-              color: string;
+                column: string;
+                column_label: string;
+                value: string;
+                label?: string;
+                color: string;
             }>
-          >();
-    
-        const groups = new Map<
-          string,
-          Array<{
-            column: string;
-            column_label: string;
-            value: string;
-            label?: string;
-            color: string;
-          }>
         >();
         tags.forEach((tag) => {
-          if (!groups.has(tag.column_label)) {
-            groups.set(tag.column_label, []);
-          }
-          groups.get(tag.column_label)!.push(tag);
+            if (!groups.has(tag.column_label)) {
+                groups.set(tag.column_label, []);
+            }
+            groups.get(tag.column_label)!.push(tag);
         });
         return groups;
-      }, [tags]);
-        return (
+    }, [tags]);
+    return (
         <div className="flex items-center gap-2">
             <ButtonGroup>
                 <Tooltip>
-                    <TooltipTrigger asChild>
-                        <InputGroup className="bg-background min-w-76">
-                            <InputGroupAddon>
-                                <UserRound
-                                    className={
-                                        searchInputRef.current?.value === ""
-                                            ? "text-muted-foreground"
-                                            : "text-primary"
-                                    }
-                                />
-                            </InputGroupAddon>
-                            <InputGroupInput
-                                ref={searchInputRef}
-                                placeholder={t("table.header.search")}
-                                value={searchValue}
-                                onChange={(event) =>
-                                    setSearchValue(event.target.value)
-                                }
-                                onKeyDown={(e) => {
-                                    if (e.key === "Escape") {
-                                        searchInputRef.current?.blur();
-                                    }
-                                }}
-                                className="select-none"
-                            />
-                            <InputGroupAddon
-                                align="inline-end"
-                                className="gap-1"
+                    <TooltipTrigger
+                        render={(props) => (
+                            <InputGroup
+                                {...props}
+                                className="bg-background min-w-76"
                             >
-                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                                    <span className="text-xs">Ctrl</span>
-                                </kbd>
-                                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                                    <span className="text-xs">/</span>
-                                </kbd>
-                            </InputGroupAddon>
-                        </InputGroup>
-                    </TooltipTrigger>
+                                <InputGroupAddon>
+                                    <UserRound
+                                        className={
+                                            searchInputRef.current?.value === ""
+                                                ? "text-muted-foreground"
+                                                : "text-primary"
+                                        }
+                                    />
+                                </InputGroupAddon>
+                                <InputGroupInput
+                                    ref={searchInputRef}
+                                    placeholder={t("table.header.search")}
+                                    value={searchValue}
+                                    onChange={(event) =>
+                                        setSearchValue(event.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Escape") {
+                                            searchInputRef.current?.blur();
+                                        }
+                                    }}
+                                    className="select-none"
+                                />
+                                <InputGroupAddon
+                                    align="inline-end"
+                                    className="gap-1"
+                                >
+                                    <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                        <span className="text-xs">Ctrl</span>
+                                    </kbd>
+                                    <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                        <span className="text-xs">/</span>
+                                    </kbd>
+                                </InputGroupAddon>
+                            </InputGroup>
+                        )}
+                    ></TooltipTrigger>
                     <TooltipContent>
                         {t("table.header.search.hover")}
                     </TooltipContent>
                 </Tooltip>
                 {tags && (
                     <DropdownMenu>
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="select-none relative"
-                                    >
-                                        <Filter />
-                                        <span>{t("table.header.filters")}</span>
-                                        {activeFilterCount > 0 && (
-                                            <Badge variant="default">
-                                                {activeFilterCount}
-                                            </Badge>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <DropdownMenuTrigger
+                                        {...props}
+                                        render={(props) => (
+                                            <Button
+                                                {...props}
+                                                variant="outline"
+                                                className="select-none relative"
+                                            >
+                                                <Filter />
+                                                <span>
+                                                    {t("table.header.filters")}
+                                                </span>
+                                                {activeFilterCount > 0 && (
+                                                    <Badge variant="default">
+                                                        {activeFilterCount}
+                                                    </Badge>
+                                                )}
+                                            </Button>
                                         )}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
+                                    />
+                                )}
+                            />
                             <TooltipContent>
                                 {t("table.header.filters.hover")}
                             </TooltipContent>
@@ -326,12 +339,11 @@ export default function HksTableHeader(props: Props) {
                                                         e.preventDefault()
                                                     }
                                                 >
-                                                                              <Badge
-                                                                                className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
-                                                                              >
-                                                                                {tag.label ?? tag.value}
-                                                                              </Badge>
-                                                    
+                                                    <Badge
+                                                        className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
+                                                    >
+                                                        {tag.label ?? tag.value}
+                                                    </Badge>
                                                 </DropdownMenuCheckboxItem>
                                             );
                                         })}
@@ -345,20 +357,26 @@ export default function HksTableHeader(props: Props) {
                     </DropdownMenu>
                 )}
                 <DropdownMenu>
-                    <Tooltip disableHoverableContent>
-                        <TooltipTrigger asChild>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="select-none"
-                                >
-                                    <Columns3Cog />
-                                    <span>
-                                        {t("table.header.showHideCols")}
-                                    </span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                        </TooltipTrigger>
+                    <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                            render={(props) => (
+                                <DropdownMenuTrigger
+                                    {...props}
+                                    render={(props) => (
+                                        <Button
+                                            {...props}
+                                            variant="outline"
+                                            className="select-none"
+                                        >
+                                            <Columns3Cog />
+                                            <span>
+                                                {t("table.header.showHideCols")}
+                                            </span>
+                                        </Button>
+                                    )}
+                                />
+                            )}
+                        ></TooltipTrigger>
                         <TooltipContent>
                             {t("table.header.showHideCols.hover")}
                         </TooltipContent>
@@ -390,18 +408,26 @@ export default function HksTableHeader(props: Props) {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <DropdownMenu>
-                    <Tooltip disableHoverableContent>
-                        <TooltipTrigger asChild>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="select-none"
-                                >
-                                    <Rows3 />
-                                    <span>{t("table.header.rowCount")}</span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                        </TooltipTrigger>
+                    <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                            render={(props) => (
+                                <DropdownMenuTrigger
+                                    {...props}
+                                    render={(props) => (
+                                        <Button
+                                            {...props}
+                                            variant="outline"
+                                            className="select-none"
+                                        >
+                                            <Rows3 />
+                                            <span>
+                                                {t("table.header.rowCount")}
+                                            </span>
+                                        </Button>
+                                    )}
+                                />
+                            )}
+                        ></TooltipTrigger>
                         <TooltipContent>
                             {t("table.header.rowCount.hover")}
                         </TooltipContent>
@@ -427,32 +453,38 @@ export default function HksTableHeader(props: Props) {
                 </DropdownMenu>
             </ButtonGroup>
             <ButtonGroup>
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="outline"
-                            className="select-none"
-                            onClick={onFilterReset}
-                        >
-                            <FilterX />
-                            {t("table.header.filters.clear")}
-                        </Button>
-                    </TooltipTrigger>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <Button
+                                {...props}
+                                variant="outline"
+                                className="select-none"
+                                onClick={onFilterReset}
+                            >
+                                <FilterX />
+                                {t("table.header.filters.clear")}
+                            </Button>
+                        )}
+                    />
                     <TooltipContent>
                         {t("table.header.filters.clear.hover")}
                     </TooltipContent>
                 </Tooltip>
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="outline"
-                            className="select-none"
-                            onClick={onSortReset}
-                        >
-                            <ArrowUpDown />
-                            {t("table.header.sorting.clear")}
-                        </Button>
-                    </TooltipTrigger>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <Button
+                                {...props}
+                                variant="outline"
+                                className="select-none"
+                                onClick={onSortReset}
+                            >
+                                <ArrowUpDown />
+                                {t("table.header.sorting.clear")}
+                            </Button>
+                        )}
+                    />
                     <TooltipContent>
                         {t("table.header.sorting.clear.hover")}
                     </TooltipContent>
@@ -460,19 +492,22 @@ export default function HksTableHeader(props: Props) {
             </ButtonGroup>
             <div className="flex gap-4 ml-auto ">
                 <HksTablePagination table={table} />
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="select-none"
-                            disabled={isRefreshing}
-                            onClick={onRefresh}
-                        >
-                            <RefreshCw
-                                className={`${isRefreshing ? "animate-spin" : ""} shadow-xs`}
-                            />
-                            {t("table.header.refresh")}
-                        </Button>
-                    </TooltipTrigger>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <Button
+                                {...props}
+                                className="select-none"
+                                disabled={isRefreshing}
+                                onClick={onRefresh}
+                            >
+                                <RefreshCw
+                                    className={`${isRefreshing ? "animate-spin" : ""} shadow-xs`}
+                                />
+                                {t("table.header.refresh")}
+                            </Button>
+                        )}
+                    />
                     <TooltipContent>
                         {t("table.header.refresh.hover")}
                     </TooltipContent>

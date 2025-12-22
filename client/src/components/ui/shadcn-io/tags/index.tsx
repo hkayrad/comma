@@ -116,22 +116,26 @@ export const TagsTrigger = ({
     children,
     ...props
 }: TagsTriggerProps) => (
-    <PopoverTrigger asChild>
-        <Button
-            className={cn("h-auto w-full justify-between p-2", className)}
-            // biome-ignore lint/a11y/useSemanticElements: "Required"
-            role="combobox"
-            variant="outline"
-            {...(props as any)}
-        >
-            <div className="flex flex-wrap items-center gap-1">
-                {children}
-                <span className="px-2 py-px text-muted-foreground">
-                    Select a tag...
-                </span>
-            </div>
-        </Button>
-    </PopoverTrigger>
+    <PopoverTrigger
+        {...props}
+        render={(props) => (
+            <Button
+                {...props}
+                className={cn("h-auto w-full justify-between p-2", className)}
+                // biome-ignore lint/a11y/useSemanticElements: "Required"
+                role="combobox"
+                variant="outline"
+                {...(props as any)}
+            >
+                <div className="flex flex-wrap items-center gap-1">
+                    {children}
+                    <span className="px-2 py-px text-muted-foreground">
+                        Select a tag...
+                    </span>
+                </div>
+            </Button>
+        )}
+    />
 );
 
 export type TagsValueProps = ComponentProps<typeof Badge>;

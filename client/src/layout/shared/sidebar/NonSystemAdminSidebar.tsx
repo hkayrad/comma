@@ -12,16 +12,17 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import {
     Collapsible,
-    CollapsibleContent,
+    CollapsiblePanel,
     CollapsibleTrigger,
-} from "@/components/animate-ui/primitives/radix/collapsible";
+} from "@/components/animate-ui/primitives/base/collapsible";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/animate-ui/components/radix/dropdown-menu";
+    Menu,
+    MenuPanel,
+    MenuItem,
+    MenuGroupLabel,
+    MenuTrigger,
+    MenuGroup,
+} from "@/components/animate-ui/components/base/menu";
 import {
     Tooltip,
     TooltipContent,
@@ -134,45 +135,56 @@ export default function NonSystemAdminSidebarContent() {
 
     const renderCollapsedItem = (item: any, isActive: boolean) => (
         <SidebarMenuItem key={item.title}>
-            <DropdownMenu>
+            <Menu>
                 <Tooltip>
-                    <TooltipTrigger asChild>
-                        <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton isActive={isActive}>
-                                {item.icon && <item.icon />}
-                                <span className="select-none">
-                                    {item.title}
-                                </span>
-                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                            </SidebarMenuButton>
-                        </DropdownMenuTrigger>
-                    </TooltipTrigger>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <MenuTrigger
+                                {...props}
+                                render={(props) => (
+                                    <SidebarMenuButton
+                                        {...props}
+                                        isActive={isActive}
+                                        className="group/menu-trigger"
+                                    >
+                                        {item.icon && <item.icon />}
+                                        <span className="select-none">
+                                            {item.title}
+                                        </span>
+                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/menu-trigger:rotate-90" />
+                                    </SidebarMenuButton>
+                                )}
+                            ></MenuTrigger>
+                        )}
+                    />
                     <TooltipContent side="right" hidden={state !== "collapsed"}>
                         {item.title}
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent side="right" align="start" sideOffset={4}>
-                    <DropdownMenuLabel className="text-muted-foreground select-none">
-                        {item.title}
-                    </DropdownMenuLabel>
-                    {item.items.map((subItem: any) => (
-                        <DropdownMenuItem
-                            key={subItem.title}
-                            onClick={() => {
-                                if (subItem.url !== location.pathname) {
-                                    navigate(subItem.url);
-                                }
-                            }}
-                            className="w-full cursor-pointer flex items-center"
-                        >
-                            {subItem.icon && (
-                                <subItem.icon className="mr-2 h-4 w-4" />
-                            )}
-                            <span>{subItem.title}</span>
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
+                <MenuPanel side="right" align="start" sideOffset={4}>
+                    <MenuGroup>
+                        <MenuGroupLabel className="text-muted-foreground select-none">
+                            {item.title}
+                        </MenuGroupLabel>
+                        {item.items.map((subItem: any) => (
+                            <MenuItem
+                                key={subItem.title}
+                                onClick={() => {
+                                    if (subItem.url !== location.pathname) {
+                                        navigate(subItem.url);
+                                    }
+                                }}
+                                className="w-full cursor-pointer flex items-center"
+                            >
+                                {subItem.icon && (
+                                    <subItem.icon className="mr-2 h-4 w-4" />
+                                )}
+                                <span>{subItem.title}</span>
+                            </MenuItem>
+                        ))}
+                    </MenuGroup>
+                </MenuPanel>
+            </Menu>
         </SidebarMenuItem>
     );
 
@@ -196,92 +208,100 @@ export default function NonSystemAdminSidebarContent() {
                                 return (
                                     <Collapsible
                                         key={item.title}
-                                        asChild
                                         defaultOpen={isActive}
                                         className="group/collapsible"
-                                    >
-                                        <SidebarMenuItem>
-                                            <CollapsibleTrigger asChild>
-                                                <SidebarMenuButton
-                                                    tooltip={item.title}
-                                                    isActive={isActive}
-                                                >
-                                                    {item.icon && <item.icon />}
-                                                    <span className="select-none">
-                                                        {item.title}
-                                                    </span>
-                                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                                </SidebarMenuButton>
-                                            </CollapsibleTrigger>
-                                            <CollapsibleContent>
-                                                <SidebarMenuSub>
-                                                    {item.items.map(
-                                                        (subItem) => {
-                                                            const isSubActive =
-                                                                location.pathname ===
-                                                                subItem.url;
-                                                            return (
-                                                                <SidebarMenuSubItem
-                                                                    key={
-                                                                        subItem.title
-                                                                    }
-                                                                >
-                                                                    <SidebarMenuSubButton
-                                                                        isActive={
-                                                                            isSubActive
-                                                                        }
-                                                                        onClick={() => {
-                                                                            if (
-                                                                                subItem.url !==
-                                                                                location.pathname
-                                                                            ) {
-                                                                                navigate(
-                                                                                    subItem.url,
-                                                                                );
-                                                                            }
-                                                                        }}
-                                                                        className="cursor-pointer select-none"
-                                                                    >
-                                                                        {subItem.icon && (
-                                                                            <subItem.icon />
-                                                                        )}
-                                                                        <span>
-                                                                            {
-                                                                                subItem.title
-                                                                            }
-                                                                        </span>
-                                                                    </SidebarMenuSubButton>
-                                                                </SidebarMenuSubItem>
-                                                            );
-                                                        },
+                                        render={(props) => (
+                                            <SidebarMenuItem {...props}>
+                                                <CollapsibleTrigger
+                                                    render={(props) => (
+                                                        <SidebarMenuButton
+                                                            {...props}
+                                                            tooltip={item.title}
+                                                            className="group/collapsible-trigger"
+                                                        >
+                                                            {item.icon && (
+                                                                <item.icon />
+                                                            )}
+                                                            <span className="select-none">
+                                                                {item.title}
+                                                            </span>
+                                                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
+                                                        </SidebarMenuButton>
                                                     )}
-                                                </SidebarMenuSub>
-                                            </CollapsibleContent>
-                                        </SidebarMenuItem>
-                                    </Collapsible>
+                                                />
+                                                <CollapsiblePanel>
+                                                    <SidebarMenuSub>
+                                                        {item.items.map(
+                                                            (subItem) => {
+                                                                const isSubActive =
+                                                                    location.pathname ===
+                                                                    subItem.url;
+                                                                return (
+                                                                    <SidebarMenuSubItem
+                                                                        key={
+                                                                            subItem.title
+                                                                        }
+                                                                    >
+                                                                        <SidebarMenuSubButton
+                                                                            isActive={
+                                                                                isSubActive
+                                                                            }
+                                                                            onClick={() => {
+                                                                                if (
+                                                                                    subItem.url !==
+                                                                                    location.pathname
+                                                                                ) {
+                                                                                    navigate(
+                                                                                        subItem.url,
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                            className="cursor-pointer select-none"
+                                                                        >
+                                                                            {subItem.icon && (
+                                                                                <subItem.icon />
+                                                                            )}
+                                                                            <span>
+                                                                                {
+                                                                                    subItem.title
+                                                                                }
+                                                                            </span>
+                                                                        </SidebarMenuSubButton>
+                                                                    </SidebarMenuSubItem>
+                                                                );
+                                                            },
+                                                        )}
+                                                    </SidebarMenuSub>
+                                                </CollapsiblePanel>
+                                            </SidebarMenuItem>
+                                        )}
+                                    ></Collapsible>
                                 );
                             }
 
                             return (
                                 <SidebarMenuItem key={item.title}>
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <SidebarMenuButton
-                                                isActive={isActive}
-                                                onClick={() => {
-                                                    if (
-                                                        item.url !==
-                                                        location.pathname
-                                                    ) {
-                                                        navigate(item.url);
-                                                    }
-                                                }}
-                                                className="cursor-pointer"
-                                            >
-                                                {item.icon && <item.icon />}
-                                                <span>{item.title}</span>
-                                            </SidebarMenuButton>
-                                        </TooltipTrigger>
+                                        <TooltipTrigger
+                                            render={(props) => (
+                                                <SidebarMenuButton
+                                                    {...props}
+                                                    isActive={isActive}
+                                                    onClick={() => {
+                                                        if (
+                                                            item.url !==
+                                                            location.pathname
+                                                        ) {
+                                                            navigate(item.url);
+                                                        }
+                                                    }}
+                                                    className="cursor-pointer"
+                                                >
+                                                    {item.icon && <item.icon />}
+                                                    <span>{item.title}</span>
+                                                </SidebarMenuButton>
+                                            )}
+                                        />
                                         <TooltipContent
                                             side="right"
                                             hidden={state !== "collapsed"}

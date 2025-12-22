@@ -2,29 +2,29 @@ import { Navigate, Outlet } from "react-router";
 import { useUser } from "@/contexts/user";
 
 export function RequireAuth(): React.ReactNode {
-  const { user, isLoading } = useUser();
+    const { user, isLoading } = useUser();
 
-  if (isLoading) {
-    return null;
-  }
+    if (isLoading) {
+        return null;
+    }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
 
-  return <Outlet />;
+    return <Outlet />;
 }
 
 export function RequireNoAuth(): React.ReactNode {
-  const { user, isLoading } = useUser();
+    const { user, isLoading } = useUser();
 
-  if (isLoading) {
-    return null;
-  }
+    if (isLoading) {
+        return null;
+    }
 
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
+    if (user) {
+        return <Navigate to="/" replace />;
+    }
 
-  return <Outlet />;
+    return <Outlet />;
 }

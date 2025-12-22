@@ -68,7 +68,9 @@ const router = createBrowserRouter([
                                                 index: true,
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <Debts />
                                                     </Suspense>
@@ -78,7 +80,9 @@ const router = createBrowserRouter([
                                                 path: "odemeler",
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <Payments />
                                                     </Suspense>
@@ -88,7 +92,9 @@ const router = createBrowserRouter([
                                                 path: "borc_dokumu/:customerId",
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <CustomerStatement />
                                                     </Suspense>
@@ -103,7 +109,9 @@ const router = createBrowserRouter([
                                                 index: true,
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <Debts />
                                                     </Suspense>
@@ -113,7 +121,9 @@ const router = createBrowserRouter([
                                                 path: "odemeler",
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <Payments />
                                                     </Suspense>
@@ -123,7 +133,9 @@ const router = createBrowserRouter([
                                                 path: "borc_dokumu/:customerId",
                                                 element: (
                                                     <Suspense
-                                                        fallback={<PageLoader />}
+                                                        fallback={
+                                                            <PageLoader />
+                                                        }
                                                     >
                                                         <CustomerStatement />
                                                     </Suspense>

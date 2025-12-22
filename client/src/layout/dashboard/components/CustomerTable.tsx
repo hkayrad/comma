@@ -21,7 +21,16 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState, VisibilityState } from "@tanstack/react-table";
+import type {
+    Column,
+    ColumnDef,
+    Row,
+    PaginationState,
+    OnChangeFn,
+    SortingState,
+    ColumnFiltersState,
+    VisibilityState,
+} from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -48,7 +57,19 @@ type Props = {
 };
 
 export default function CustomerTable(props: Props) {
-    const { data, type = "receivable", rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange, columnVisibility, onColumnVisibilityChange } = props;
+    const {
+        data,
+        type = "receivable",
+        rowCount,
+        pagination,
+        onPaginationChange,
+        sorting,
+        onSortingChange,
+        columnFilters,
+        onColumnFiltersChange,
+        columnVisibility,
+        onColumnVisibilityChange,
+    } = props;
 
     const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -133,7 +154,7 @@ export default function CustomerTable(props: Props) {
                     />
                 ),
                 cell: ({ row, column }) => (
-                    <Tooltip disableHoverableContent>
+                    <Tooltip disableHoverablePopup>
                         <TooltipTrigger className="text-left flex">
                             <ClickToCopyText
                                 value={row.getValue(column.id) || "-"}
@@ -194,7 +215,7 @@ export default function CustomerTable(props: Props) {
                     />
                 ),
                 cell: ({ row, column }) => (
-                    <Tooltip disableHoverableContent>
+                    <Tooltip disableHoverablePopup>
                         <TooltipTrigger className="text-left flex">
                             <ClickToCopyText
                                 value={row.getValue(column.id) || "-"}
@@ -387,71 +408,89 @@ export default function CustomerTable(props: Props) {
                 header: t("dashboard.table.column.actions"),
                 cell: ({ row }: { row: Row<CustomerDto> }) => (
                     <div className="flex gap-2">
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                        navigate(
-                                            `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
-                                        )
-                                    }
-                                >
-                                    <Paperclip />
-                                </Button>
-                            </TooltipTrigger>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() =>
+                                            navigate(
+                                                `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
+                                            )
+                                        }
+                                    >
+                                        <Paperclip />
+                                    </Button>
+                                )}
+                            ></TooltipTrigger>
                             <TooltipContent>
                                 {t(
                                     "dashboard.table.column.actions.show_statement",
                                 )}
                             </TooltipContent>
                         </Tooltip>
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onDetails(row.original.id!)}
-                                >
-                                    <Info />
-                                </Button>
-                            </TooltipTrigger>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() =>
+                                            onDetails(row.original.id!)
+                                        }
+                                    >
+                                        <Info />
+                                    </Button>
+                                )}
+                            />
                             <TooltipContent>
                                 {t(
                                     "dashboard.table.column.actions.show_details",
                                 )}
                             </TooltipContent>
                         </Tooltip>
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onEdit(row.original.id!)}
-                                >
-                                    <Pencil />
-                                </Button>
-                            </TooltipTrigger>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => onEdit(row.original.id!)}
+                                    >
+                                        <Pencil />
+                                    </Button>
+                                )}
+                            />
                             <TooltipContent>
                                 {t(
                                     "dashboard.table.column.actions.edit_details",
                                 )}
                             </TooltipContent>
                         </Tooltip>
-                        <Tooltip disableHoverableContent>
+                        <Tooltip disableHoverablePopup>
                             <Dialog>
-                                <DialogTrigger asChild>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                                        >
-                                            <Trash2 />
-                                        </Button>
-                                    </TooltipTrigger>
-                                </DialogTrigger>
+                                <DialogTrigger
+                                    render={(props) => (
+                                        <TooltipTrigger
+                                            {...props}
+                                            render={(props) => (
+                                                <Button
+                                                    {...props}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                                                >
+                                                    <Trash2 />
+                                                </Button>
+                                            )}
+                                        />
+                                    )}
+                                />
+
                                 <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
                                     {t("dashboard.table.column.actions.delete")}
                                 </TooltipContent>
@@ -469,11 +508,16 @@ export default function CustomerTable(props: Props) {
                                         </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter>
-                                        <DialogClose asChild>
-                                            <Button variant="outline">
-                                                {t("vars.cancel")}
-                                            </Button>
-                                        </DialogClose>
+                                        <DialogClose
+                                            render={(props) => (
+                                                <Button
+                                                    {...props}
+                                                    variant="outline"
+                                                >
+                                                    {t("vars.cancel")}
+                                                </Button>
+                                            )}
+                                        />
                                         <Button
                                             variant="destructive"
                                             onClick={() =>

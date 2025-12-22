@@ -74,21 +74,24 @@ export default function Header() {
     return (
         <header className="border-b p-3 bg-background sticky top-0 z-10">
             <div className="flex w-full items-center">
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <Button
-                            onClick={toggleSidebar}
-                            size="icon"
-                            variant="ghost"
-                            className="size-7"
-                        >
-                            {state === "collapsed" ? (
-                                <SidebarOpen />
-                            ) : (
-                                <SidebarClose />
-                            )}
-                        </Button>
-                    </TooltipTrigger>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <Button
+                                {...props}
+                                onClick={toggleSidebar}
+                                size="icon"
+                                variant="ghost"
+                                className="size-7"
+                            >
+                                {state === "collapsed" ? (
+                                    <SidebarOpen />
+                                ) : (
+                                    <SidebarClose />
+                                )}
+                            </Button>
+                        )}
+                    ></TooltipTrigger>
                     <TooltipContent side="right">
                         {t("sidebar.toggle", {
                             action:
@@ -98,6 +101,7 @@ export default function Header() {
                         })}
                     </TooltipContent>
                 </Tooltip>
+
                 <Separator
                     orientation="vertical"
                     className="w-px mr-4 ml-3 h-4!"
@@ -120,11 +124,13 @@ export default function Header() {
                                             {item.name}
                                         </BreadcrumbPage>
                                     ) : (
-                                        <BreadcrumbLink asChild>
-                                            <Link to={item.path}>
-                                                {item.name}
-                                            </Link>
-                                        </BreadcrumbLink>
+                                        <BreadcrumbLink
+                                            render={(props) => (
+                                                <Link {...props} to={item.path}>
+                                                    {item.name}
+                                                </Link>
+                                            )}
+                                        />
                                     )}
                                 </BreadcrumbItem>
                                 {!item.isLast && <BreadcrumbSeparator />}

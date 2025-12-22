@@ -1,7 +1,7 @@
 import {
-  CompanyAdminOnly,
-  NonSystemAdminOnly,
-  SystemAdminOnly,
+    CompanyAdminOnly,
+    NonSystemAdminOnly,
+    SystemAdminOnly,
 } from "@/layout/auth/RoleGuard";
 import NonSystemAdminSidebarContent from "./NonSystemAdminSidebar";
 import SystemAdminSidebarContent from "./SystemAdminSidebar";
@@ -15,47 +15,47 @@ import { NavLink, useLocation, useNavigate } from "react-router";
 import { useWebSocket } from "@/contexts/webSocket";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/animate-ui/components/radix/dropdown-menu";
+    Menu,
+    MenuPanel,
+    MenuItem,
+    MenuTrigger,
+} from "@/components/animate-ui/components/base/menu";
 import {
-  RoleBackgrounds,
-  RoleColors,
-  UserRole,
-  type RoleBackgroundType,
-  type RoleColorType,
-  type UserRoleType,
+    RoleBackgrounds,
+    RoleColors,
+    UserRole,
+    type RoleBackgroundType,
+    type RoleColorType,
+    type UserRoleType,
 } from "@/lib/enums";
 import {
-  Building2,
-  EllipsisVertical,
-  Info,
-  LogOut,
-  Moon,
-  Sun,
-  //UsersRound,
-  Wrench,
+    Building2,
+    EllipsisVertical,
+    Info,
+    LogOut,
+    Moon,
+    Sun,
+    //UsersRound,
+    Wrench,
 } from "lucide-react";
 import {
-  Sidebar,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  SidebarSeparator,
-  useSidebar,
+    Sidebar,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
+    SidebarSeparator,
+    useSidebar,
 } from "@/components/animate-ui/components/radix/sidebar";
 import { AnimatePresence, motion } from "motion/react";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CompanyApi } from "@/lib/api/company";
 import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog";
@@ -66,328 +66,384 @@ import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
 
 export default function HksSidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { theme, setTheme } = useTheme();
-  const { state } = useSidebar();
-  const { user, clearUser } = useUser();
-  const { role } = useRole();
-  const { reloadConnection } = useWebSocket();
-  const { openDialog } = useDialog();
-  const { t } = useTranslation();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { theme, setTheme } = useTheme();
+    const { state } = useSidebar();
+    const { user, clearUser } = useUser();
+    const { role } = useRole();
+    const { reloadConnection } = useWebSocket();
+    const { openDialog } = useDialog();
+    const { t } = useTranslation();
 
-  const handleLogout = useCallback(async () => {
-    const promise = AuthApi.Logout();
-    toast.promise(promise, {
-      loading: t("notification.auth.logout.pending"),
-      success: () => {
-        clearUser();
-        navigate("/login");
-        reloadConnection();
-        return t("notification.auth.logout.success");
-      },
-      error: t("notification.auth.logout.error"),
+    const handleLogout = useCallback(async () => {
+        const promise = AuthApi.Logout();
+        toast.promise(promise, {
+            loading: t("notification.auth.logout.pending"),
+            success: () => {
+                clearUser();
+                navigate("/login");
+                reloadConnection();
+                return t("notification.auth.logout.success");
+            },
+            error: t("notification.auth.logout.error"),
+        });
+    }, [navigate, reloadConnection, clearUser, t]);
+
+    const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
+    const [logos, setLogos] = useState<{
+        smallLogo: string;
+        largeLogo: string;
+    }>({
+        smallLogo: "",
+        largeLogo: "",
     });
-  }, [navigate, reloadConnection, clearUser, t]);
+    const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
+    const logoSrc = useMemo(
+        () => ({
+            small: logos.smallLogo
+                ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
+                : "/hks-icon.webp",
+            large: logos.largeLogo
+                ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
+                : "/hks-logo.webp",
+        }),
+        [logos.largeLogo, logos.smallLogo, cacheBuster],
+    );
 
-  const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
-  const [logos, setLogos] = useState<{ smallLogo: string; largeLogo: string }>({
-    smallLogo: "",
-    largeLogo: "",
-  });
-  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
-  const logoSrc = useMemo(
-    () => ({
-      small: logos.smallLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
-        : "/hks-icon.webp",
-      large: logos.largeLogo
-        ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
-        : "/hks-logo.webp",
-    }),
-    [logos.largeLogo, logos.smallLogo, cacheBuster],
-  );
-
-  const fetchLogos = useCallback(async () => {
-    try {
-      const response = await CompanyApi.GetLogos();
-      if (response.success) {
-        setLogos(response.data);
-      }
-    } catch (error) {
-      Logger.error("Şirket logoları alınırken bir hata oluştu:", error);
-    }
-  }, []);
-
-  const handleCompanyDetails = useCallback(async () => {
-    openDialog({
-      title: t("dialog.accountDetails.title"),
-      description: t("dialog.accountDetails.description"),
-      size: "3xl",
-      content: <CompanyDetailsDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog, t]);
-
-  const handleInfo = useCallback(async () => {
-    openDialog({
-      title: t("dialog.info.title"),
-      description: t("dialog.info.description"),
-      size: "xl",
-      content: <InfoDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog, t]);
-
-  useEffect(() => {
-    if (theme === "dark") {
-      setLogoFilter("brightness(0) invert(1)");
-    } else {
-      setLogoFilter("brightness(1) invert(0)");
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    fetchLogos();
-    window.addEventListener("logo:refresh", fetchLogos);
-    return () => {
-      window.removeEventListener("logo:refresh", fetchLogos);
-    };
-  }, [fetchLogos]);
-
-  useEffect(() => {
-    const interval = setInterval(
-      () => {
-        setCacheBuster(Date.now());
-      },
-      4 * 60 * 60 * 1000,
-    ); // 4 hours
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <Sidebar className="no-print" variant="inset" collapsible="icon">
-      <SidebarRail className="w-3" />
-      <SidebarHeader>
-        <NavLink
-          to="/"
-          onClick={(e) => {
-            if (location.pathname === "/") {
-              e.preventDefault();
+    const fetchLogos = useCallback(async () => {
+        try {
+            const response = await CompanyApi.GetLogos();
+            if (response.success) {
+                setLogos(response.data);
             }
-          }}
-          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-9"
-        >
-          <AnimatePresence mode="wait">
-            {state === "collapsed" ? (
-              <motion.img
-                key="icon"
-                src={logoSrc.small}
-                alt="HKS.IO Logo"
-                className="h-full mx-auto bg-contain!"
-                initial={{
-                  opacity: 0,
-                  x: 0,
-                  scale: 1.2,
-                  filter: `blur(4px) ${logoFilter}`,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  scale: 1,
-                  filter: `blur(0px) ${logoFilter}`,
-                }}
-                exit={{
-                  opacity: 0,
-                  x: -30,
-                  scale: 0.8,
-                  filter: `blur(4px) ${logoFilter}`,
-                }}
-                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              />
-            ) : (
-              <motion.img
-                key="logo"
-                src={logoSrc.large}
-                alt="HKS.IO Logo"
-                className="h-full w-auto mx-auto bg-contain!"
-                initial={{
-                  opacity: 0,
-                  x: 0,
-                  scale: 1.2,
-                  filter: `blur(4px) ${logoFilter}`,
-                }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  scale: 1,
-                  filter: `blur(0px) ${logoFilter}`,
-                }}
-                exit={{
-                  opacity: 0,
-                  x: -30,
-                  scale: 0.8,
-                  filter: `blur(4px) ${logoFilter}`,
-                }}
-                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              />
-            )}
-          </AnimatePresence>
-        </NavLink>
-      </SidebarHeader>
+        } catch (error) {
+            Logger.error("Şirket logoları alınırken bir hata oluştu:", error);
+        }
+    }, []);
 
-      {/* SIDEBAR CONTENT */}
-      <NonSystemAdminOnly>
-        <NonSystemAdminSidebarContent />
-      </NonSystemAdminOnly>
-      <SystemAdminOnly>
-        <SystemAdminSidebarContent />
-      </SystemAdminOnly>
-      {/* END SIDEBAR CONTENT */}
+    const handleCompanyDetails = useCallback(async () => {
+        openDialog({
+            title: t("dialog.accountDetails.title"),
+            description: t("dialog.accountDetails.description"),
+            size: "3xl",
+            content: <CompanyDetailsDialog />,
+            showCloseButton: true,
+        });
+    }, [openDialog, t]);
 
-      <SidebarFooter>
-        <CompanyAdminOnly>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <Tooltip disableHoverableContent>
-                  <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton>
-                        <Wrench />
-                        <span className="select-none">
-                          {t("sidebar.footer.companyManagement.label")}
-                        </span>
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent side="right" hidden={state !== "collapsed"}>
-                    {t("sidebar.footer.companyManagement.label")}
-                  </TooltipContent>
-                </Tooltip>
-                <DropdownMenuContent side="right" align="end" sideOffset={4}>
-                  {/*<DropdownMenuItem
+    const handleInfo = useCallback(async () => {
+        openDialog({
+            title: t("dialog.info.title"),
+            description: t("dialog.info.description"),
+            size: "xl",
+            content: <InfoDialog />,
+            showCloseButton: true,
+        });
+    }, [openDialog, t]);
+
+    useEffect(() => {
+        if (theme === "dark") {
+            setLogoFilter("brightness(0) invert(1)");
+        } else {
+            setLogoFilter("brightness(1) invert(0)");
+        }
+    }, [theme]);
+
+    useEffect(() => {
+        fetchLogos();
+        window.addEventListener("logo:refresh", fetchLogos);
+        return () => {
+            window.removeEventListener("logo:refresh", fetchLogos);
+        };
+    }, [fetchLogos]);
+
+    useEffect(() => {
+        const interval = setInterval(
+            () => {
+                setCacheBuster(Date.now());
+            },
+            4 * 60 * 60 * 1000,
+        ); // 4 hours
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <Sidebar className="no-print" variant="inset" collapsible="icon">
+            <SidebarRail className="w-3" />
+            <SidebarHeader>
+                <NavLink
+                    to="/"
+                    onClick={(e) => {
+                        if (location.pathname === "/") {
+                            e.preventDefault();
+                        }
+                    }}
+                    className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-9"
+                >
+                    <AnimatePresence mode="wait">
+                        {state === "collapsed" ? (
+                            <motion.img
+                                key="icon"
+                                src={logoSrc.small}
+                                alt="HKS.IO Logo"
+                                className="h-full mx-auto bg-contain!"
+                                initial={{
+                                    opacity: 0,
+                                    x: 0,
+                                    scale: 1.2,
+                                    filter: `blur(4px) ${logoFilter}`,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    scale: 1,
+                                    filter: `blur(0px) ${logoFilter}`,
+                                }}
+                                exit={{
+                                    opacity: 0,
+                                    x: -30,
+                                    scale: 0.8,
+                                    filter: `blur(4px) ${logoFilter}`,
+                                }}
+                                transition={{
+                                    duration: 0.25,
+                                    ease: [0.4, 0, 0.2, 1],
+                                }}
+                            />
+                        ) : (
+                            <motion.img
+                                key="logo"
+                                src={logoSrc.large}
+                                alt="HKS.IO Logo"
+                                className="h-full w-auto mx-auto bg-contain!"
+                                initial={{
+                                    opacity: 0,
+                                    x: 0,
+                                    scale: 1.2,
+                                    filter: `blur(4px) ${logoFilter}`,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    scale: 1,
+                                    filter: `blur(0px) ${logoFilter}`,
+                                }}
+                                exit={{
+                                    opacity: 0,
+                                    x: -30,
+                                    scale: 0.8,
+                                    filter: `blur(4px) ${logoFilter}`,
+                                }}
+                                transition={{
+                                    duration: 0.25,
+                                    ease: [0.4, 0, 0.2, 1],
+                                }}
+                            />
+                        )}
+                    </AnimatePresence>
+                </NavLink>
+            </SidebarHeader>
+
+            {/* SIDEBAR CONTENT */}
+            <NonSystemAdminOnly>
+                <NonSystemAdminSidebarContent />
+            </NonSystemAdminOnly>
+            <SystemAdminOnly>
+                <SystemAdminSidebarContent />
+            </SystemAdminOnly>
+            {/* END SIDEBAR CONTENT */}
+
+            <SidebarFooter>
+                <CompanyAdminOnly>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <Menu>
+                                <Tooltip disableHoverablePopup>
+                                    <TooltipTrigger
+                                        render={(props) => (
+                                            <MenuTrigger
+                                                {...props}
+                                                render={(props) => (
+                                                    <SidebarMenuButton
+                                                        {...props}
+                                                    >
+                                                        <Wrench />
+                                                        <span className="select-none">
+                                                            {t(
+                                                                "sidebar.footer.companyManagement.label",
+                                                            )}
+                                                        </span>
+                                                    </SidebarMenuButton>
+                                                )}
+                                            />
+                                        )}
+                                    />
+                                    <TooltipContent
+                                        side="right"
+                                        hidden={state !== "collapsed"}
+                                    >
+                                        {t(
+                                            "sidebar.footer.companyManagement.label",
+                                        )}
+                                    </TooltipContent>
+                                </Tooltip>
+                                <MenuPanel
+                                    side="right"
+                                    align="end"
+                                    sideOffset={4}
+                                >
+                                    {/*<DropdownMenuItem
                     onClick={() => {}}
                     className="!justify-start"
                   >
                     <UsersRound className="text-inherit bg-inherit select-none" />
                     <span>Kullanıcıları Düzenle</span>
                   </DropdownMenuItem>*/}
-                  <DropdownMenuItem
-                    onClick={handleCompanyDetails}
-                    className="justify-start!"
-                  >
-                    <Building2 className="text-inherit bg-inherit select-none" />
-                    <span>
-                      {t(
-                        "sidebar.footer.companyManagement.accountDetails.label",
-                      )}
-                    </span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </CompanyAdminOnly>
-        <Tooltip disableHoverableContent>
-          <TooltipTrigger asChild>
-            <SidebarMenu>
-              <SidebarMenuButton onClick={handleInfo}>
-                <Info />
-                <span className="select-none">
-                  {t("sidebar.footer.info.label")}
-                </span>
-              </SidebarMenuButton>
-            </SidebarMenu>
-          </TooltipTrigger>
-          <TooltipContent side="right" hidden={state !== "collapsed"}>
-            {t("sidebar.footer.info.label")}
-          </TooltipContent>
-        </Tooltip>
-        <SidebarSeparator className="mx-0!" />
-
-        <SidebarGroup className="p-0!">
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-2">
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                          size="lg"
-                          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                        >
-                          <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarFallback
-                              className={`
-                                h-8 w-8 rounded-lg select-none
-                                ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
-                                ${RoleColors[(role ?? 0) as RoleColorType]}
-                                `}
-                            >
-                              {user?.username.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="grid flex-1 text-left text-sm leading-tight">
-                            <span className="truncate font-medium select-none">
-                              {user?.username}
-                            </span>
-                            <span className="text-muted-foreground truncate text-xs select-none">
-                              {t(
-                                `user.role.${UserRole[(role ?? 0) as UserRoleType]}`,
-                              )}
-                            </span>
-                          </div>
-                          <EllipsisVertical className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
+                                    <MenuItem
+                                        onClick={handleCompanyDetails}
+                                        className="justify-start!"
+                                    >
+                                        <Building2 className="text-inherit bg-inherit select-none" />
+                                        <span>
+                                            {t(
+                                                "sidebar.footer.companyManagement.accountDetails.label",
+                                            )}
+                                        </span>
+                                    </MenuItem>
+                                </MenuPanel>
+                            </Menu>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </CompanyAdminOnly>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <SidebarMenu {...props}>
+                                <SidebarMenuButton onClick={handleInfo}>
+                                    <Info />
+                                    <span className="select-none">
+                                        {t("sidebar.footer.info.label")}
+                                    </span>
+                                </SidebarMenuButton>
+                            </SidebarMenu>
+                        )}
+                    ></TooltipTrigger>
                     <TooltipContent side="right" hidden={state !== "collapsed"}>
-                      {t("sidebar.footer.account.label")}
+                        {t("sidebar.footer.info.label")}
                     </TooltipContent>
-                  </Tooltip>
-                  <DropdownMenuContent
-                    side="right"
-                    align="end"
-                    sideOffset={4}
-                    className="overflow-hidden"
-                  >
-                    <DropdownMenuItem
-                      onClick={() =>
-                        setTheme(theme === "dark" ? "light" : "dark")
-                      }
-                    >
-                      {theme === "dark" ? (
-                        <Sun className="text-inherit bg-inherit select-none" />
-                      ) : (
-                        <Moon className="text-inherit bg-inherit select-none" />
-                      )}
-                      <span>
-                        {theme === "dark"
-                          ? t("sidebar.footer.account.theme.light")
-                          : t("sidebar.footer.account.theme.dark")}
-                      </span>
-                    </DropdownMenuItem>
+                </Tooltip>
+                <SidebarSeparator className="mx-0!" />
 
-                    <LanguageButton />
+                <SidebarGroup className="p-0!">
+                    <SidebarGroupContent>
+                        <SidebarMenu className="gap-2">
+                            <SidebarMenuItem>
+                                <Menu>
+                                    <Tooltip disableHoverablePopup>
+                                        <TooltipTrigger
+                                            render={(props) => (
+                                                <MenuTrigger
+                                                    {...props}
+                                                    render={(props) => (
+                                                        <SidebarMenuButton
+                                                            {...props}
+                                                            size="lg"
+                                                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                                        >
+                                                            <Avatar className="h-8 w-8 rounded-lg">
+                                                                <AvatarFallback
+                                                                    className={`
+                                                                        h-8 w-8 rounded-lg select-none
+                                                                        ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
+                                                                        ${RoleColors[(role ?? 0) as RoleColorType]}
+                                                                    `}
+                                                                >
+                                                                    {user?.username
+                                                                        .charAt(
+                                                                            0,
+                                                                        )
+                                                                        .toUpperCase()}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="grid flex-1 text-left text-sm leading-tight">
+                                                                <span className="truncate font-medium select-none">
+                                                                    {
+                                                                        user?.username
+                                                                    }
+                                                                </span>
+                                                                <span className="text-muted-foreground truncate text-xs select-none">
+                                                                    {t(
+                                                                        `user.role.${UserRole[(role ?? 0) as UserRoleType]}`,
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                            <EllipsisVertical className="ml-auto size-4" />
+                                                        </SidebarMenuButton>
+                                                    )}
+                                                />
+                                            )}
+                                        />
+                                        <TooltipContent
+                                            side="right"
+                                            hidden={state !== "collapsed"}
+                                        >
+                                            {t("sidebar.footer.account.label")}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <MenuPanel
+                                        side="right"
+                                        align="end"
+                                        sideOffset={4}
+                                        className="overflow-hidden"
+                                    >
+                                        <MenuItem
+                                            onClick={() =>
+                                                setTheme(
+                                                    theme === "dark"
+                                                        ? "light"
+                                                        : "dark",
+                                                )
+                                            }
+                                        >
+                                            {theme === "dark" ? (
+                                                <Sun className="text-inherit bg-inherit select-none" />
+                                            ) : (
+                                                <Moon className="text-inherit bg-inherit select-none" />
+                                            )}
+                                            <span>
+                                                {theme === "dark"
+                                                    ? t(
+                                                          "sidebar.footer.account.theme.light",
+                                                      )
+                                                    : t(
+                                                          "sidebar.footer.account.theme.dark",
+                                                      )}
+                                            </span>
+                                        </MenuItem>
 
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      variant="destructive"
-                      className="justify-start!"
-                    >
-                      <LogOut className="text-inherit bg-inherit select-none" />
-                      <span>{t("sidebar.footer.account.logout")}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarFooter>
-    </Sidebar>
-  );
+                                        <LanguageButton />
+
+                                        <MenuItem
+                                            onClick={handleLogout}
+                                            variant="destructive"
+                                            className="justify-start!"
+                                        >
+                                            <LogOut className="text-inherit bg-inherit select-none" />
+                                            <span>
+                                                {t(
+                                                    "sidebar.footer.account.logout",
+                                                )}
+                                            </span>
+                                        </MenuItem>
+                                    </MenuPanel>
+                                </Menu>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarFooter>
+        </Sidebar>
+    );
 }

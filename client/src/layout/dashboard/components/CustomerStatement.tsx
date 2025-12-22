@@ -191,51 +191,64 @@ export default function CustomerStatement() {
                         {t("dashboard.customerStatement.resetDate")}
                     </Button>
                     <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                id="date"
-                                variant={"outline"}
-                                className={cn(
-                                    "w-fit justify-start text-left font-normal",
-                                    !date && "text-muted-foreground",
-                                )}
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {(() => {
-                                    const isAllTime =
-                                        date?.from?.getTime() === 0 &&
-                                        date?.to?.getFullYear() === 2100 &&
-                                        date?.to?.getMonth() === 0 &&
-                                        date?.to?.getDate() === 1;
+                        <PopoverTrigger
+                            render={(props) => (
+                                <Button
+                                    {...props}
+                                    id="date"
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-fit justify-start text-left font-normal",
+                                        !date && "text-muted-foreground",
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {(() => {
+                                        const isAllTime =
+                                            date?.from?.getTime() === 0 &&
+                                            date?.to?.getFullYear() === 2100 &&
+                                            date?.to?.getMonth() === 0 &&
+                                            date?.to?.getDate() === 1;
 
-                                    if (!date?.from || isAllTime) {
-                                        return <span>{t("vars.all")}</span>;
-                                    }
+                                        if (!date?.from || isAllTime) {
+                                            return <span>{t("vars.all")}</span>;
+                                        }
 
-                                    if (date.to) {
-                                        return (
-                                            <>
-                                                {format(date.from, "dd LLL y", {
-                                                    locale: langMap[
-                                                        i18n.language
-                                                    ] as any,
-                                                })}{" "}
-                                                -{" "}
-                                                {format(date.to, "dd LLL y", {
-                                                    locale: langMap[
-                                                        i18n.language
-                                                    ] as any,
-                                                })}
-                                            </>
-                                        );
-                                    }
+                                        if (date.to) {
+                                            return (
+                                                <>
+                                                    {format(
+                                                        date.from,
+                                                        "dd LLL y",
+                                                        {
+                                                            locale: langMap[
+                                                                i18n.language
+                                                            ] as any,
+                                                        },
+                                                    )}{" "}
+                                                    -{" "}
+                                                    {format(
+                                                        date.to,
+                                                        "dd LLL y",
+                                                        {
+                                                            locale: langMap[
+                                                                i18n.language
+                                                            ] as any,
+                                                        },
+                                                    )}
+                                                </>
+                                            );
+                                        }
 
-                                    return format(date.from, "dd LLL y", {
-                                        locale: langMap[i18n.language] as any,
-                                    });
-                                })()}
-                            </Button>
-                        </PopoverTrigger>
+                                        return format(date.from, "dd LLL y", {
+                                            locale: langMap[
+                                                i18n.language
+                                            ] as any,
+                                        });
+                                    })()}
+                                </Button>
+                            )}
+                        />
                         <PopoverContent className="w-auto p-0" align="end">
                             <Calendar
                                 mode="range"

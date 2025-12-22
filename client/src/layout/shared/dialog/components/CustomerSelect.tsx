@@ -23,7 +23,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import type { CustomerIdName } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown, IdCard, Plus } from "lucide-react";
+import { ChevronsUpDown, IdCard, Plus } from "lucide-react";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -71,34 +71,38 @@ export default function CustomerSelect(props: Props) {
                             open={isCustomerSelectOpen}
                             onOpenChange={setIsCustomerSelectOpen}
                         >
-                            <PopoverTrigger asChild>
-                                <FormControl>
-                                    <Button
-                                        variant="outline"
-                                        role="combobox"
-                                        className={cn(
-                                            "max-w-[calc(100%-2.75rem)] flex grow justify-between overflow-hidden text-ellipsis",
-                                            !field.value &&
-                                                "text-muted-foreground",
-                                        )}
-                                    >
-                                        <span className="overflow-hidden text-ellipsis flex items-center gap-2">
-                                            <IdCard className="text-muted-foreground!" />
-                                            {field.value
-                                                ? customerIdAndNames.find(
-                                                      (customer) =>
-                                                          customer.id ===
-                                                          field.value,
-                                                  )?.name
-                                                : t(
-                                                      "form.customer.select.placeholder",
-                                                  )}
-                                        </span>
-                                        <ChevronsUpDown className="opacity-50" />
-                                    </Button>
-                                </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[400px] p-0">
+                            <PopoverTrigger
+                                render={(props) => (
+                                    <FormControl {...props}>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className={cn(
+                                                "max-w-[calc(100%-2.75rem)] flex grow justify-between overflow-hidden text-ellipsis",
+                                                !field.value &&
+                                                    "text-muted-foreground",
+                                            )}
+                                        >
+                                            <span className="overflow-hidden flex items-center gap-2 min-w-0 flex-1">
+                                                <IdCard className="text-muted-foreground! shrink-0" />
+                                                <span className="truncate">
+                                                    {field.value
+                                                        ? customerIdAndNames.find(
+                                                              (customer) =>
+                                                                  customer.id ===
+                                                                  field.value,
+                                                          )?.name
+                                                        : t(
+                                                              "form.customer.select.placeholder",
+                                                          )}
+                                                </span>
+                                            </span>
+                                            <ChevronsUpDown className="opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                )}
+                            />
+                            <PopoverContent className="w-100 p-0">
                                 <Command>
                                     <CommandInput
                                         placeholder={t(
@@ -118,6 +122,10 @@ export default function CustomerSelect(props: Props) {
                                                     <CommandItem
                                                         value={customer.name}
                                                         key={customer.id}
+                                                        data-checked={
+                                                            customer.id ===
+                                                            field.value
+                                                        }
                                                         onSelect={() => {
                                                             form.setValue(
                                                                 "customer_id",
@@ -128,16 +136,9 @@ export default function CustomerSelect(props: Props) {
                                                             );
                                                         }}
                                                     >
-                                                        {customer.name}
-                                                        <Check
-                                                            className={cn(
-                                                                "ml-auto",
-                                                                customer.id ===
-                                                                    field.value
-                                                                    ? "opacity-100"
-                                                                    : "opacity-0",
-                                                            )}
-                                                        />
+                                                        <span className="truncate flex-1">
+                                                            {customer.name}
+                                                        </span>
                                                     </CommandItem>
                                                 ),
                                             )}
@@ -146,34 +147,37 @@ export default function CustomerSelect(props: Props) {
                                 </Command>
                             </PopoverContent>
                         </Popover>
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    hidden={!addNewCustomer}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        openDialog({
-                                            title: t("dialog.customer.add"),
-                                            description: t(
-                                                "dialog.customer.add.description",
-                                            ),
-                                            size: "3xl",
-                                            content: (
-                                                <CustomerDialog
-                                                    type={type}
-                                                    onSuccess={onRefresh}
-                                                />
-                                            ),
-                                            showCloseButton: true,
-                                        });
-                                    }}
-                                    variant="outline"
-                                    size="icon"
-                                >
-                                    <Plus />
-                                </Button>
-                            </TooltipTrigger>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        hidden={!addNewCustomer}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            openDialog({
+                                                title: t("dialog.customer.add"),
+                                                description: t(
+                                                    "dialog.customer.add.description",
+                                                ),
+                                                size: "3xl",
+                                                content: (
+                                                    <CustomerDialog
+                                                        type={type}
+                                                        onSuccess={onRefresh}
+                                                    />
+                                                ),
+                                                showCloseButton: true,
+                                            });
+                                        }}
+                                        variant="outline"
+                                        size="icon"
+                                    >
+                                        <Plus />
+                                    </Button>
+                                )}
+                            />
                             <TooltipContent>
                                 {t("form.customer.select.add")}
                             </TooltipContent>

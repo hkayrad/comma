@@ -375,20 +375,23 @@ export default function DebtDialog(props: Props) {
                                             }
                                         </InputGroupAddon>
                                         <InputGroupAddon align="inline-end">
-                                            <Tooltip disableHoverableContent>
-                                                <TooltipTrigger asChild>
-                                                    <InputGroupButton
-                                                        size="xs"
-                                                        onClick={(e) =>
-                                                            handleVatButtonClick(
-                                                                e,
-                                                                0.1,
-                                                            )
-                                                        }
-                                                    >
-                                                        %10
-                                                    </InputGroupButton>
-                                                </TooltipTrigger>
+                                            <Tooltip disableHoverablePopup>
+                                                <TooltipTrigger
+                                                    render={(props) => (
+                                                        <InputGroupButton
+                                                            {...props}
+                                                            size="xs"
+                                                            onClick={(e) =>
+                                                                handleVatButtonClick(
+                                                                    e,
+                                                                    0.1,
+                                                                )
+                                                            }
+                                                        >
+                                                            %10
+                                                        </InputGroupButton>
+                                                    )}
+                                                />
                                                 <TooltipContent>
                                                     <p>
                                                         {t(
@@ -397,20 +400,23 @@ export default function DebtDialog(props: Props) {
                                                     </p>
                                                 </TooltipContent>
                                             </Tooltip>
-                                            <Tooltip disableHoverableContent>
-                                                <TooltipTrigger asChild>
-                                                    <InputGroupButton
-                                                        size="xs"
-                                                        onClick={(e) =>
-                                                            handleVatButtonClick(
-                                                                e,
-                                                                0.2,
-                                                            )
-                                                        }
-                                                    >
-                                                        %20
-                                                    </InputGroupButton>
-                                                </TooltipTrigger>
+                                            <Tooltip disableHoverablePopup>
+                                                <TooltipTrigger
+                                                    render={(props) => (
+                                                        <InputGroupButton
+                                                            {...props}
+                                                            size="xs"
+                                                            onClick={(e) =>
+                                                                handleVatButtonClick(
+                                                                    e,
+                                                                    0.2,
+                                                                )
+                                                            }
+                                                        >
+                                                            %20
+                                                        </InputGroupButton>
+                                                    )}
+                                                />
                                                 <TooltipContent>
                                                     <p>
                                                         {t(
@@ -466,21 +472,22 @@ export default function DebtDialog(props: Props) {
                                                 {currencySign["TRY"]}
                                             </InputGroupAddon>
                                             <InputGroupAddon align="inline-end">
-                                                <Tooltip
-                                                    disableHoverableContent
-                                                >
-                                                    <TooltipTrigger asChild>
-                                                        <InputGroupButton
-                                                            size="xs"
-                                                            onClick={
-                                                                handleSetExchangeRateButtonClick
-                                                            }
-                                                        >
-                                                            {t(
-                                                                "form.debt.exchange_rate.set.label",
-                                                            )}
-                                                        </InputGroupButton>
-                                                    </TooltipTrigger>
+                                                <Tooltip disableHoverablePopup>
+                                                    <TooltipTrigger
+                                                        render={(props) => (
+                                                            <InputGroupButton
+                                                                {...props}
+                                                                size="xs"
+                                                                onClick={
+                                                                    handleSetExchangeRateButtonClick
+                                                                }
+                                                            >
+                                                                {t(
+                                                                    "form.debt.exchange_rate.set.label",
+                                                                )}
+                                                            </InputGroupButton>
+                                                        )}
+                                                    />
                                                     <TooltipContent>
                                                         <p>
                                                             {t(

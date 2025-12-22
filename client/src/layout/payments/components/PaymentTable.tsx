@@ -19,7 +19,16 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
-import type { Column, ColumnDef, Row, PaginationState, OnChangeFn, SortingState, ColumnFiltersState, VisibilityState } from "@tanstack/react-table";
+import type {
+    Column,
+    ColumnDef,
+    Row,
+    PaginationState,
+    OnChangeFn,
+    SortingState,
+    ColumnFiltersState,
+    VisibilityState,
+} from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
@@ -47,7 +56,19 @@ type Props = {
 };
 
 export default function PaymentTable(props: Props) {
-    const { data, type, rowCount, pagination, onPaginationChange, sorting, onSortingChange, columnFilters, onColumnFiltersChange, columnVisibility, onColumnVisibilityChange } = props;
+    const {
+        data,
+        type,
+        rowCount,
+        pagination,
+        onPaginationChange,
+        sorting,
+        onSortingChange,
+        columnFilters,
+        onColumnFiltersChange,
+        columnVisibility,
+        onColumnVisibilityChange,
+    } = props;
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -105,7 +126,7 @@ export default function PaymentTable(props: Props) {
                     />
                 ),
                 cell: ({ row, column }) => (
-                    <Tooltip disableHoverableContent>
+                    <Tooltip disableHoverablePopup>
                         <TooltipTrigger className="text-left flex">
                             <ClickToCopyText
                                 value={row.getValue(column.id) || "-"}
@@ -331,7 +352,7 @@ export default function PaymentTable(props: Props) {
                     />
                 ),
                 cell: ({ row, column }) => (
-                    <Tooltip disableHoverableContent>
+                    <Tooltip disableHoverablePopup>
                         <TooltipTrigger className="text-left flex">
                             <ClickToCopyText
                                 value={row.getValue(column.id) || "-"}
@@ -353,7 +374,7 @@ export default function PaymentTable(props: Props) {
                     />
                 ),
                 cell: ({ row, column }) => (
-                    <Tooltip disableHoverableContent>
+                    <Tooltip disableHoverablePopup>
                         <TooltipTrigger className="text-left flex">
                             <ClickToCopyText
                                 value={row.getValue(column.id) || "-"}
@@ -371,33 +392,42 @@ export default function PaymentTable(props: Props) {
                 header: t("payment.table.column.actions"),
                 cell: ({ row }) => (
                     <div className="flex gap-2">
-                        <Tooltip disableHoverableContent>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onEdit(row.original.id!)}
-                                >
-                                    <Pencil />
-                                </Button>
-                            </TooltipTrigger>
+                        <Tooltip disableHoverablePopup>
+                            <TooltipTrigger
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => onEdit(row.original.id!)}
+                                    >
+                                        <Pencil />
+                                    </Button>
+                                )}
+                            />
                             <TooltipContent>
                                 {t("payment.table.column.actions.edit")}
                             </TooltipContent>
                         </Tooltip>
-                        <Tooltip disableHoverableContent>
+                        <Tooltip disableHoverablePopup>
                             <Dialog>
-                                <DialogTrigger asChild>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                                        >
-                                            <Trash2 />
-                                        </Button>
-                                    </TooltipTrigger>
-                                </DialogTrigger>
+                                <DialogTrigger
+                                    render={(props) => (
+                                        <TooltipTrigger
+                                            {...props}
+                                            render={(props) => (
+                                                <Button
+                                                    {...props}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                                                >
+                                                    <Trash2 />
+                                                </Button>
+                                            )}
+                                        />
+                                    )}
+                                />
                                 <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
                                     {t("payment.table.column.actions.delete")}
                                 </TooltipContent>
@@ -415,11 +445,16 @@ export default function PaymentTable(props: Props) {
                                         </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter>
-                                        <DialogClose asChild>
-                                            <Button variant="outline">
-                                                {t("vars.cancel")}
-                                            </Button>
-                                        </DialogClose>
+                                        <DialogClose
+                                            render={(props) => (
+                                                <Button
+                                                    {...props}
+                                                    variant="outline"
+                                                >
+                                                    {t("vars.cancel")}
+                                                </Button>
+                                            )}
+                                        ></DialogClose>
                                         <Button
                                             variant="destructive"
                                             onClick={() =>

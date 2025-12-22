@@ -16,13 +16,13 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/animate-ui/components/radix/dropdown-menu";
+    Menu,
+    MenuPanel,
+    MenuGroup,
+    MenuItem,
+    MenuGroupLabel,
+    MenuTrigger,
+} from "@/components/animate-ui/components/base/menu";
 import { useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 
@@ -105,25 +105,31 @@ export default function FloatingButton() {
 
     return (
         <>
-            <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                size="icon"
-                                className="fixed bottom-4 right-4 z-50"
-                            >
-                                <Plus
-                                    className={`transition-transform duration-300 ease ${isMenuOpen ? `-rotate-45` : `rotate-0`}`}
-                                />
-                            </Button>
-                        </DropdownMenuTrigger>
-                    </TooltipTrigger>
+            <Menu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <MenuTrigger
+                                {...props}
+                                render={(props) => (
+                                    <Button
+                                        {...props}
+                                        size="icon"
+                                        className="fixed bottom-4 right-4 z-50"
+                                    >
+                                        <Plus
+                                            className={`transition-transform duration-300 ease ${isMenuOpen ? `-rotate-45` : `rotate-0`}`}
+                                        />
+                                    </Button>
+                                )}
+                            ></MenuTrigger>
+                        )}
+                    ></TooltipTrigger>
                     <TooltipContent side="left">
                         {t("dashboard.floatingButton.hover")}
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent
+                <MenuPanel
                     className="w-fit bg-transparent! p-0! border-none! space-y-1! shadow-none! overflow-visible"
                     side="top"
                     align="end"
@@ -131,78 +137,72 @@ export default function FloatingButton() {
                 >
                     {(location.pathname === "/" ||
                         location.pathname.startsWith("/alacaklar")) && (
-                        <DropdownMenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
-                            <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
+                        <MenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
+                            <MenuGroupLabel className="relative z-10 text-muted-foreground select-none">
                                 {t(
                                     "dashboard.floatingButton.actions.receivable",
                                 )}
-                            </DropdownMenuLabel>
-                            <DropdownMenuItem
-                                onClick={handleAddReceivableCustomer}
-                            >
+                            </MenuGroupLabel>
+                            <MenuItem onClick={handleAddReceivableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.receivable.addCustomer",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleAddReceivableDebt}>
+                            </MenuItem>
+                            <MenuItem onClick={handleAddReceivableDebt}>
                                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.receivable.addReceivable",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={handleAddReceivablePayment}
-                            >
+                            </MenuItem>
+                            <MenuItem onClick={handleAddReceivablePayment}>
                                 <Banknote className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.receivable.addPayment",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
+                            </MenuItem>
+                        </MenuGroup>
                     )}
                     {(location.pathname === "/" ||
                         location.pathname.startsWith("/borclar")) && (
-                        <DropdownMenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
-                            <DropdownMenuLabel className="relative z-10 text-muted-foreground select-none">
+                        <MenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
+                            <MenuGroupLabel className="relative z-10 text-muted-foreground select-none">
                                 {t("dashboard.floatingButton.actions.payable")}
-                            </DropdownMenuLabel>
-                            <DropdownMenuItem
-                                onClick={handleAddPayableCustomer}
-                            >
+                            </MenuGroupLabel>
+                            <MenuItem onClick={handleAddPayableCustomer}>
                                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.payable.addCustomer",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleAddPayableDebt}>
+                            </MenuItem>
+                            <MenuItem onClick={handleAddPayableDebt}>
                                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.payable.addPayable",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleAddPayablePayment}>
+                            </MenuItem>
+                            <MenuItem onClick={handleAddPayablePayment}>
                                 <Banknote className="mr-2 h-4 w-4" />
                                 <span>
                                     {t(
                                         "dashboard.floatingButton.actions.payable.addPayment",
                                     )}
                                 </span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
+                            </MenuItem>
+                        </MenuGroup>
                     )}
-                </DropdownMenuContent>
-            </DropdownMenu>
+                </MenuPanel>
+            </Menu>
         </>
     );
 }

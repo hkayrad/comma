@@ -126,38 +126,46 @@ export default function Login() {
                         className="w-64 lg:w-96 saturate-0 brightness-0 invert"
                     />
                 </div>
-                <Tooltip disableHoverableContent>
-                    <TooltipTrigger asChild>
-                        <Button
-                            size="icon"
-                            className="absolute bottom-4 right-4"
-                            onClick={() =>
-                                setTheme(theme === "dark" ? "light" : "dark")
-                            }
-                        >
-                            {theme === "dark" ? (
-                                <Sun className="text-inherit select-none" />
-                            ) : (
-                                <Moon className="text-inherit select-none" />
-                            )}
-                        </Button>
-                    </TooltipTrigger>
+                <Tooltip disableHoverablePopup>
+                    <TooltipTrigger
+                        render={(props) => (
+                            <Button
+                                {...props}
+                                size="icon"
+                                className="absolute bottom-4 right-4"
+                                onClick={() =>
+                                    setTheme(
+                                        theme === "dark" ? "light" : "dark",
+                                    )
+                                }
+                            >
+                                {theme === "dark" ? (
+                                    <Sun className="text-inherit select-none" />
+                                ) : (
+                                    <Moon className="text-inherit select-none" />
+                                )}
+                            </Button>
+                        )}
+                    />
                     <TooltipContent side="left">
                         {t("login.changeTheme")}
                     </TooltipContent>
                 </Tooltip>
                 <DropdownMenu>
-                    <Tooltip disableHoverableContent>
-                        <TooltipTrigger asChild>
-                            <DropdownMenuTrigger
-                                className="absolute bottom-16 right-4"
-                                asChild
-                            >
-                                <Button size="icon">
-                                    <Globe />
-                                </Button>
-                            </DropdownMenuTrigger>
-                        </TooltipTrigger>
+                    <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                            render={(props) => (
+                                <DropdownMenuTrigger
+                                    {...props}
+                                    className="absolute bottom-16 right-4"
+                                    asChild
+                                >
+                                    <Button size="icon">
+                                        <Globe />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            )}
+                        />
                         <TooltipContent side="left">
                             {t("login.changeLanguage")}
                         </TooltipContent>

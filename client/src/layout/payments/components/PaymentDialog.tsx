@@ -227,6 +227,7 @@ export default function PaymentDialog(props: Props) {
                     form={form}
                     customerIdAndNames={customerIdAndNames}
                     addNewCustomer
+                    onRefresh={handleFetchCustomerIdAndNames}
                 />
                 <FormField
                     control={form.control}
@@ -263,7 +264,7 @@ export default function PaymentDialog(props: Props) {
                                     <SelectTrigger className="w-full">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="p-1">
                                         <SelectItem value="TRY">
                                             <TurkishLira />
                                             <span>{t("vars.try")}</span>
@@ -363,21 +364,22 @@ export default function PaymentDialog(props: Props) {
                                                 {currencySign["TRY"]}
                                             </InputGroupAddon>
                                             <InputGroupAddon align="inline-end">
-                                                <Tooltip
-                                                    disableHoverableContent
-                                                >
-                                                    <TooltipTrigger asChild>
-                                                        <InputGroupButton
-                                                            size="xs"
-                                                            onClick={
-                                                                handleSetExchangeRateButtonClick
-                                                            }
-                                                        >
-                                                            {t(
-                                                                "form.payment.exchange_rate.set.label",
-                                                            )}
-                                                        </InputGroupButton>
-                                                    </TooltipTrigger>
+                                                <Tooltip disableHoverablePopup>
+                                                    <TooltipTrigger
+                                                        render={(props) => (
+                                                            <InputGroupButton
+                                                                {...props}
+                                                                size="xs"
+                                                                onClick={
+                                                                    handleSetExchangeRateButtonClick
+                                                                }
+                                                            >
+                                                                {t(
+                                                                    "form.payment.exchange_rate.set.label",
+                                                                )}
+                                                            </InputGroupButton>
+                                                        )}
+                                                    ></TooltipTrigger>
                                                     <TooltipContent>
                                                         <p>
                                                             {t(
