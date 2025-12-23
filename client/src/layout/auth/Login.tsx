@@ -254,17 +254,8 @@ export default function Login() {
                                 className="mx-auto"
                                 disabled={loading}
                             >
-                                {loading ? (
-                                    <>
-                                        <Spinner />
-                                        {t("login.form.submit.pending")}
-                                    </>
-                                ) : (
-                                    <>
-                                        <LogIn className="mr-2 h-4 w-4" />
-                                        {t("login.form.submit")}
-                                    </>
-                                )}
+                                {loading ? <Spinner /> : <LogIn />}
+                                {t("login.form.submit")}
                             </Button>
                         </form>
                     </Form>

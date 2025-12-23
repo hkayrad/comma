@@ -130,7 +130,7 @@ export default function Dashboard() {
                     <OverviewCards type="receivable" align="stretch" />
                     <Separator
                         orientation="vertical"
-                        className="h-20! w-full"
+                        className="h-12! w-full"
                     />
                     <OverviewCards type="payable" align="stretch" />
                 </div>
