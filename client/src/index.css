@@ -128,3 +128,9 @@
     animation: none;
     mix-blend-mode: normal;
 }
+
+@media (max-width: 1536px) {
+    html {
+        font-size: 80%;
+    }
+}
