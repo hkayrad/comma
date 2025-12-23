@@ -2,7 +2,6 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
 import "./i18n";
-import App from "./layout/App";
 import { RequireAuth, RequireNoAuth } from "./layout/auth/AuthCheck";
 import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
@@ -11,6 +10,7 @@ import { Spinner } from "./components/ui/spinner";
 import { cn } from "./lib/utils";
 
 const Login = lazy(() => import("./layout/auth/Login"));
+const App = lazy(() => import("./layout/App"));
 const Dashboard = lazy(() => import("./layout/dashboard/Dashboard"));
 const Debts = lazy(() => import("./layout/debts/Debts"));
 const Payments = lazy(() => import("./layout/payments/Payments"));
@@ -42,7 +42,11 @@ const router = createBrowserRouter([
                     {
                         index: true,
                         element: (
-                            <Suspense fallback={<PageLoader className="h-screen! w-screen!" />}>
+                            <Suspense
+                                fallback={
+                                    <PageLoader className="h-screen! w-screen!" />
+                                }
+                            >
                                 <Login />
                             </Suspense>
                         ),
@@ -54,7 +58,15 @@ const router = createBrowserRouter([
                 Component: RequireAuth,
                 children: [
                     {
-                        Component: App,
+                        element: (
+                            <Suspense
+                                fallback={
+                                    <PageLoader className="h-screen! w-screen!" />
+                                }
+                            >
+                                <App />
+                            </Suspense>
+                        ),
                         children: [
                             {
                                 Component: NonSystemAdminOnly,

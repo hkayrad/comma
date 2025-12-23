@@ -103,10 +103,10 @@ export default function HksSidebar() {
         () => ({
             small: logos.smallLogo
                 ? `${import.meta.env.VITE_API_URL}${logos.smallLogo}?t=${cacheBuster}`
-                : "/hks-icon.webp",
+                : "/icon.webp",
             large: logos.largeLogo
                 ? `${import.meta.env.VITE_API_URL}${logos.largeLogo}?t=${cacheBuster}`
-                : "/hks-logo.webp",
+                : "/logo.webp",
         }),
         [logos.largeLogo, logos.smallLogo, cacheBuster],
     );
@@ -187,7 +187,7 @@ export default function HksSidebar() {
                             <motion.img
                                 key="icon"
                                 src={logoSrc.small}
-                                alt="HKS.IO Logo"
+                                alt="Comma Logo"
                                 className="h-full w-auto mx-auto object-contain"
                                 initial={{
                                     opacity: 0,
@@ -216,7 +216,7 @@ export default function HksSidebar() {
                             <motion.img
                                 key="logo"
                                 src={logoSrc.large}
-                                alt="HKS.IO Logo"
+                                alt="Comma Logo"
                                 className="h-full w-auto mx-auto object-contain"
                                 initial={{
                                     opacity: 0,
@@ -334,6 +334,7 @@ export default function HksSidebar() {
                         {t("sidebar.footer.info.label")}
                     </TooltipContent>
                 </Tooltip>
+
                 <SidebarSeparator className="mx-0!" />
 
                 <SidebarGroup className="p-0!">

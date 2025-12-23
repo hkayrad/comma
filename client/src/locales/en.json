@@ -1,648 +1,649 @@
 {
-  "dashboard": {
-    "customer_info": {
-      "contact_info": "Contact Information",
-      "credit_balance": "You have a balance to pay to this customer.",
-      "financial_summary": "Financial Summary",
-      "outstanding_balance": "You have outstanding balance to collect from this customer.",
-      "overcharge": "This customer has been overcharged.",
-      "overpay": "This customer has been overpaid."
-    },
-    "floatingButton": {
-      "actions": {
-        "payable": "Payable Actions",
-        "payable.addCustomer": "Add Customer",
-        "payable.addPayable": "Add Payable",
-        "payable.addPayment": "Add Payment",
-        "receivable": "Receivable Actions",
-        "receivable.addCustomer": "Add Customer",
-        "receivable.addPayment": "Add Payment",
-        "receivable.addReceivable": "Add Receivable"
-      },
-      "hover": "Open action menu"
-    },
-    "customerStatement": {
-      "back": "Back",
-      "debts": "Debts",
-      "error": {
-        "companyInfo": "Could not load company information",
-        "fetchStatement": "An error occurred while fetching the customer statement",
-        "pdfExport": "An error occurred while generating the PDF"
-      },
-      "exportPdf": "Export PDF",
-      "noDebts": "No debts found",
-      "noPayments": "No payments found",
-      "notFound": {
-        "description": "Customer or statement not found.",
-        "title": "Data not found"
-      },
-      "payments": "Payments",
-      "resetDate": "Reset date selection",
-      "success": {
-        "pdfExport": "PDF downloaded"
-      }
-    },
-    "table": {
-      "column": {
-        "actions": "Actions",
-        "actions.delete": "Delete customer",
-        "actions.delete.confirm": "Delete Customer",
-        "actions.delete.description": "This action will delete the customer record. Do you accept?",
-        "actions.delete.title": "Are you sure?",
-        "actions.edit_details": "Edit customer information",
-        "actions.show_details": "Display customer information",
-        "actions.show_statement": "Display customer statement",
-        "debt_status": "Debt Status",
-        "is_company": "Type",
-        "mersis_no": "Mersis No",
-        "name": "Customer",
-        "remaining_debt": "Remaining",
-        "tax_number": "Tax No",
-        "tax_office": "Tax Office",
-        "total_debt": "Total",
-        "total_payments": "Paid"
-      }
-    }
-  },
-  "debt": {
-    "table": {
-      "column": {
-        "actions": "Actions",
-        "actions.delete": "Delete debt",
-        "actions.delete.confirm": "Delete debt",
-        "actions.delete.description": "This action will delete debt record. Do you agree?",
-        "actions.delete.title": "Are you sure?",
-        "actions.edit": "Edit debt details",
-        "amount": "Amount",
-        "currency": "Currency",
-        "customer_name": "Customer",
-        "description": "Description",
-        "exchange_rate": "Exchange Rate",
-        "invoice_no": "Invoice No",
-        "issue_date": "Issue Date",
-        "total": "Total",
-        "total_in_try": "Amount to be Paid",
-        "vat": "VAT"
-      }
-    }
-  },
-  "dialog": {
-    "accountDetails": {
-      "accountInformation": "Account Information",
-      "description": "See and edit your account information.",
-      "logos": "Logos",
-      "logos.form.acceptedFormats": "Accepted formats: png, jpg, jpeg",
-      "logos.form.dragNDrop": "Drag and drop",
-      "logos.form.upload": "Upload",
-      "logos.form.upload.confirm": "Upload Logos",
-      "logos.large": "Large Logo",
-      "logos.small": "Small Logo",
-      "title": "Account Details"
-    },
-    "customer": {
-      "add": "Add Customer",
-      "add.description": "Add a new customer",
-      "couldNotFind": "Could not find the customer",
-      "details": {
-        "description": "{{tax_no_label}}: {{tax_no}} | Tax Office: {{tax_office}}",
-        "title": "Customer Details"
-      },
-      "edit": {
-        "description": "Edit customer information",
-        "title": "Edit Customer"
-      },
-      "update": "Update Customer"
-    },
-    "debt": {
-      "add": "Add Debt",
-      "edit": {
-        "description": "Edit debt information",
-        "title": "Edit Debt"
-      },
-      "update": "Update Debt"
-    },
-    "info": {
-      "description": "See the information about IO system.",
-      "developer": "Developer",
-      "exchangeInfo": "Exchange Information",
-      "title": "About",
-      "version": "Application Version"
-    },
-    "maintenanceMode": {
-      "end": {
-        "button": "End Maintenance",
-        "description": "Are you sure you want to end the maintenance?",
-        "title": "End the Planned Maintenance"
-      },
-      "endTime": "Finish Time",
-      "start": {
-        "button": "Start Maintenance",
-        "description": "Are you sure you want to start the maintenance mode? This action will cause all users to be logged out.",
-        "title": "Start Planned Maintenance"
-      },
-      "startTime": "Start Time"
-    },
-    "payable": {
-      "add": {
-        "description": "Add a new payable",
-        "title": "Add Payable"
-      }
-    },
-    "payableCustomer": {
-      "add": {
-        "description": "Add a payable customer",
-        "title": "Add Customer"
-      }
-    },
-    "payablePayment": {
-      "add": {
-        "description": "Add a new payable payment",
-        "title": "Add Payable Payment"
-      }
-    },
-    "payment": {
-      "add": "Add Payment",
-      "edit": {
-        "description": "Edit payment information",
-        "title": "Edit Payment"
-      },
-      "update": "Update Payment"
-    },
-    "receivable": {
-      "add": {
-        "description": "Add a new receivable",
-        "title": "Add Receivable"
-      }
-    },
-    "receivableCustomer": {
-      "add": {
-        "description": "Add a receivable customer",
-        "title": "Add Customer"
-      }
-    },
-    "receivablePayment": {
-      "add": {
-        "description": "Add a new receivable payment",
-        "title": "Add Receivable Payment"
-      }
-    }
-  },
-  "form": {
-    "company": {
-      "address": "Address",
-      "address.description": "Company's address",
-      "address.validation.invalid": "Invalid address",
-      "address.validation.max": "Address must be at most {{charCount}} characters",
-      "address.validation.min": "Address must be at least {{charCount}} characters",
-      "email": "Email Address",
-      "email.description": "Your email address",
-      "email.validation.invalid": "Invalid email address",
-      "email.validation.max": "Email address must be at most {{charCount}} characters",
-      "email.validation.min": "Email address must be at least {{charCount}} characters",
-      "is_company": "Account Type",
-      "is_company.description": "Your account type",
-      "mersis_no": "MERSIS No",
-      "mersis_no.description": "Company's MERSIS number",
-      "mersis_no.validation.invalid": "Invalid MERSIS number",
-      "mersis_no.validation.max": "MERSIS number must be at most {{charCount}} characters",
-      "mersis_no.validation.min": "MERSIS numbermust be at least {{charCount}} characters",
-      "name": "Company Name",
-      "name.description": "Company or individual name",
-      "name.validation.invalid": "Invalid customer name",
-      "name.validation.max": "Company name must be at most {{charCount}} characters",
-      "name.validation.min": "Company name must be at least {{charCount}} characters",
-      "phone": "Phone Number",
-      "phone.description": "Company's phone number",
-      "phone.validation.invalid": "Invalid phone number",
-      "phone.validation.max": "Phone number must be at most {{charCount}} characters",
-      "phone.validation.min": "Phone number must be at least {{charCount}} characters",
-      "select": "Customer",
-      "select.add": "Add New Customer",
-      "select.couldNotFind": "Could not find customer.",
-      "select.description": "Customer to be processed",
-      "select.placeholder": "Select a customer",
-      "select.search": "Search...",
-      "tax_number": "Tax",
-      "tax_number.description": "Company's {{tax_number_text}} number",
-      "tax_number.validation.invalid": "Invalid tax number",
-      "tax_number.validation.max": "Tax number must be at most {{charCount}} characters",
-      "tax_number.validation.min": "Tax number must be at least {{charCount}} characters",
-      "tax_number_alternative": "TR Identity",
-      "tax_office": "Tax Office",
-      "tax_office.description": "Company's tax office",
-      "tax_office.validation.invalid": "Invalid tax office",
-      "tax_office.validation.max": "Tax office must be at most {{charCount}} characters",
-      "tax_office.validation.min": "Tax office must be at least {{charCount}} characters"
-    },
-    "customer": {
-      "address": "Address",
-      "address.description": "Customer's address",
-      "address.validation.invalid": "Invalid address",
-      "address.validation.max": "Address must be at most {{charCount}} characters",
-      "address.validation.min": "Address must be at least {{charCount}} characters",
-      "email": "Email Address",
-      "email.description": "Customer's email address",
-      "email.validation.invalid": "Invalid email address",
-      "email.validation.max": "Email address must be at most {{charCount}} characters",
-      "email.validation.min": "Email address must be at least {{charCount}} characters",
-      "is_company": "Customer Type",
-      "is_company.description": "Customer's type",
-      "mersis_no": "MERSIS No",
-      "mersis_no.description": "Customer's MERSIS number",
-      "mersis_no.validation.invalid": "Invalid MERSIS number",
-      "mersis_no.validation.max": "MERSIS number must be at most {{charCount}} characters",
-      "mersis_no.validation.min": "MERSIS numbermust be at least {{charCount}} characters",
-      "name": "Customer Name",
-      "name.description": "Company or individual name",
-      "name.validation.invalid": "Invalid customer name",
-      "name.validation.max": "Customer name must be at most {{charCount}} characters",
-      "name.validation.min": "Customer name must be at least {{charCount}} characters",
-      "phone": "Phone Number",
-      "phone.description": "Customer's phone number",
-      "phone.validation.invalid": "Invalid phone number",
-      "phone.validation.max": "Phone number must be at most {{charCount}} characters",
-      "phone.validation.min": "Phone number must be at least {{charCount}} characters",
-      "select": "Customer",
-      "select.add": "Add New Customer",
-      "select.couldNotFind": "Could not find customer.",
-      "select.description": "Customer to be processed",
-      "select.placeholder": "Select a customer",
-      "select.search": "Search...",
-      "tax_number": "Tax",
-      "tax_number.description": "Customer's {{tax_number_text}} number",
-      "tax_number.validation.invalid": "Invalid tax number",
-      "tax_number.validation.max": "Tax number must be at most {{charCount}} characters",
-      "tax_number.validation.min": "Tax number must be at least {{charCount}} characters",
-      "tax_number_alternative": "TR Identity",
-      "tax_office": "Tax Office",
-      "tax_office.description": "Customer's tax office",
-      "tax_office.validation.invalid": "Invalid tax office",
-      "tax_office.validation.max": "Tax office must be at most {{charCount}} characters",
-      "tax_office.validation.min": "Tax office must be at least {{charCount}} characters"
-    },
-    "debt": {
-      "amount": "Amount",
-      "amount.description": "Debt amount",
-      "amount.validation.invalid": "Invalid amount",
-      "amount.validation.min": "Amount must be at least {{min}}",
-      "currency": "Currency",
-      "currency.description": "Debt currency",
-      "currency.validation.invalid": "Invalid currency",
-      "customer_id": {
-        "validation": {
-          "required": "Customer selection is mandatory"
-        }
-      },
-      "description": "Description",
-      "description.description": "Additional information (if any)",
-      "description.validation.invalid": "Invalid description",
-      "description.validation.max": "Description must be at most {{charCount}} characters",
-      "exchange_rate": "Exchange Rate",
-      "exchange_rate.description": "Exchange rate",
-      "exchange_rate.set.label": "CBRT Rate",
-      "exchange_rate.set.tooltip": "Use the CBRT daily exchange rate as the exchange rate.",
-      "exchange_rate.validation.invalid": "Invalid exchange rate",
-      "exchange_rate.validation.min": "Exchange rate must be at least {{min}}",
-      "invoice_no": "Invoice No",
-      "invoice_no.description": "Invoice number (if any)",
-      "invoice_no.validation.invalid": "Invalid invoice no",
-      "invoice_no.validation.max": "Invoice no must be at most {{charCount}} characters",
-      "issue_date": "Issue Date",
-      "issue_date.description": "Debt issue date",
-      "issue_date.validation.invalid": "Invalid date",
-      "vat": "VAT",
-      "vat.description": "VAT on Debt",
-      "vat.set.10%": "Set VAT to 10% of the amount",
-      "vat.set.20%": "Set VAT to 20% of the amount",
-      "vat.validation.invalid": "Invalid VAT",
-      "vat.validation.min": "VAT must be at least {{min}}"
-    },
-    "payment": {
-      "amount": "Amount",
-      "amount.description": "Payment amount",
-      "amount.validation.invalid": "Invalid amount",
-      "amount.validation.min": "Amount must be at least {{min}}",
-      "currency": "Currency",
-      "currency.description": "Debt currency",
-      "currency.validation.invalid": "Invalid currency",
-      "customer_id": {
-        "validation": {
-          "required": "Customer selection is mandatory"
-        }
-      },
-      "description": "Description",
-      "description.description": "Additional information (if any)",
-      "description.validation.invalid": "Invalid description",
-      "description.validation.max": "Description must be at most {{charCount}} characters",
-      "exchange_rate": "Exchange Rate",
-      "exchange_rate.description": "Exchange rate",
-      "exchange_rate.set.label": "CBRT Rate",
-      "exchange_rate.set.tooltip": "Use the CBRT daily exchange rate as the exchange rate.",
-      "exchange_rate.validation.invalid": "Invalid exchange rate",
-      "exchange_rate.validation.min": "Exchange rate must be at least {{min}}",
-      "invoice_no": "Invoice No",
-      "invoice_no.description": "Invoice number (if any)",
-      "invoice_no.validation.invalid": "Invalid invoice no",
-      "invoice_no.validation.max": "Invoice number must be at most {{charCount}} characters",
-      "payment_date": "Payment Date",
-      "payment_date.description": "Debt payment date",
-      "payment_date.validation.invalid": "Invalid date",
-      "payment_method": "Payment Method",
-      "payment_method.description": "Select a payment method",
-      "payment_method.validation.invalid": "Invalid payment method"
-    }
-  },
-  "header": {
-    "breadcrumb": {
-      "finance": {
-        "overview": "Overview",
-        "receivables": "Receivables"
-      }
-    },
-    "breadcrumbs": {
-      "finance": {
-        "customerStatement": "Customer Statement",
-        "payables": "Payables",
-        "payments": "Payments"
-      }
-    },
-    "exchange": {
-      "buy": "Buy",
-      "lastUpdate": "Last Update: {{date}}",
-      "lastUpdate.hover": "Exchange rates decided by {{tcmb}} for {{date}}",
-      "noData": "{{tcmb}} data is not available.",
-      "sell": "Sell"
-    },
-    "maintenanceBanner": "System is in maintenance mode. Please do not do any operation."
-  },
-  "login": {
-    "changeLanguage": "Change Language",
-    "changeTheme": "Change Theme",
-    "form": {
-      "password": "Password",
-      "password.maxCharError": "Password can be a maximum of 50 characters.",
-      "submit": "Login",
-      "submit.pending": "Logging In...",
-      "username": "Username",
-      "username.maxCharError": "Username can be a maximum of 20 characters."
-    },
-    "title": "Login"
-  },
-  "notification": {
-    "accountDetails": {
-      "logos": {
-        "delete": {
-          "error": "There was an error while deleting logos",
-          "pending": "Deleting logos...",
-          "success": "Logos successfully deleted!"
+    "dashboard": {
+        "customer_info": {
+            "contact_info": "Contact Information",
+            "credit_balance": "You have a balance to pay to this customer.",
+            "financial_summary": "Financial Summary",
+            "outstanding_balance": "You have outstanding balance to collect from this customer.",
+            "overcharge": "This customer has been overcharged.",
+            "overpay": "This customer has been overpaid."
         },
-        "upload": {
-          "error": "There was an error while loading logos",
-          "pending": "Loading logos...",
-          "success": "Logos successfully loaded!"
+        "floatingButton": {
+            "actions": {
+                "payable": "Payable Actions",
+                "payable.addCustomer": "Add Customer",
+                "payable.addPayable": "Add Payable",
+                "payable.addPayment": "Add Payment",
+                "receivable": "Receivable Actions",
+                "receivable.addCustomer": "Add Customer",
+                "receivable.addPayment": "Add Payment",
+                "receivable.addReceivable": "Add Receivable"
+            },
+            "hover": "Open action menu"
+        },
+        "customerStatement": {
+            "back": "Back",
+            "debts": "Debts",
+            "error": {
+                "companyInfo": "Could not load company information",
+                "fetchStatement": "An error occurred while fetching the customer statement",
+                "pdfExport": "An error occurred while generating the PDF"
+            },
+            "exportPdf": "Export PDF",
+            "noDebts": "No debts found",
+            "noPayments": "No payments found",
+            "notFound": {
+                "description": "Customer or statement not found.",
+                "title": "Data not found"
+            },
+            "payments": "Payments",
+            "resetDate": "Reset date selection",
+            "success": {
+                "pdfExport": "PDF downloaded"
+            }
+        },
+        "table": {
+            "column": {
+                "actions": "Actions",
+                "actions.delete": "Delete customer",
+                "actions.delete.confirm": "Delete Customer",
+                "actions.delete.description": "This action will delete the customer record. Do you accept?",
+                "actions.delete.title": "Are you sure?",
+                "actions.edit_details": "Edit customer information",
+                "actions.show_details": "Display customer information",
+                "actions.show_statement": "Display customer statement",
+                "debt_status": "Debt Status",
+                "is_company": "Type",
+                "mersis_no": "Mersis No",
+                "name": "Customer",
+                "remaining_debt": "Remaining",
+                "tax_number": "Tax No",
+                "tax_office": "Tax Office",
+                "total_debt": "Total",
+                "total_payments": "Paid"
+            }
         }
-      }
-    },
-    "activeUserCount": "Active User Count: {{count}}",
-    "admin": {
-      "endMaintenance": {
-        "error": "Could not end the maintenance mode.",
-        "pending": "Ending maintenance mode...",
-        "success": "Maintenance mode ended."
-      },
-      "startMaintenance": {
-        "error": "Could not start the maintenance mode.",
-        "pending": "Starting maintenance mode...",
-        "success": "Maintenance mode started."
-      }
-    },
-    "auth": {
-      "login": {
-        "error": "Login failed, please check your credentials",
-        "fillEmptyFields": "Please fill all fields",
-        "pending": "Logging in...",
-        "success": "Logged in successfully!"
-      },
-      "logout": {
-        "error": "There was an error while trying to logout",
-        "pending": "Logging out...",
-        "success": "Logged out successfully!"
-      }
-    },
-    "companyDetails": {
-      "update": {
-        "error": "There was an error while updating company details",
-        "pending": "Updating company details...",
-        "success": "Updated company details successfully!"
-      }
-    },
-    "copy": {
-      "error": "Could not copy to clipboard",
-      "success": "Copied to clipboard"
-    },
-    "customer": {
-      "add": {
-        "error": "There was an error while adding the customer",
-        "pending": "Adding customer...",
-        "success": "Customer added successfully"
-      },
-      "delete": {
-        "error": "There was an error while deleting the customer",
-        "pending": "Deleting customer...",
-        "succes": "Customer deleted successfully"
-      },
-      "update": {
-        "error": "There was an error while updating the customer",
-        "pending": "Updating customer...",
-        "success": "Customer updated successfully"
-      }
     },
     "debt": {
-      "add": {
-        "error": "There was an error while adding debt",
-        "pending": "Adding debt...",
-        "success": "Debt added successfully"
-      },
-      "couldNotFind": "Could not find debt",
-      "delete": {
-        "error": "There was an error while deleting debt",
-        "pending": "Deleting debt...",
-        "success": "Debt deleted successfully!"
-      },
-      "update": {
-        "error": "There was an error while updating debt",
-        "pending": "Updating debt...",
-        "success": "Debt updated successfully"
-      }
-    },
-    "endMaintenance": {
-      "title": "System maintenance has been completed, the page will refresh in {{refreshTime}} seconds."
-    },
-    "notImplemented": "This feature has not been developed yet",
-    "payment": {
-      "add": {
-        "error": "There was an error while adding payment",
-        "pending": "Adding payment...",
-        "success": "Payment added successfully"
-      },
-      "couldNotFind": "Could not find payment",
-      "delete": {
-        "error": "There was an error while deleting payment",
-        "pending": "Deleting payment...",
-        "success": "Payment deleted successfully"
-      },
-      "update": {
-        "error": "There was an error while updating payment",
-        "pending": "Updating payment...",
-        "success": "Payment updated successfully"
-      }
-    },
-    "startMaintenance": {
-      "body": "You will be logged out due to a planned maintenance. Please save the work you're doing.",
-      "estimatedMaintenanceInterval": "Estimated Maintenance Interval: {{start}} - {{end}}",
-      "title": "Planned Maintenance"
-    }
-  },
-  "overviewCards": {
-    "paid": "Paid {{state}}",
-    "remaning": "Remaining {{state}}",
-    "total": "Total {{state}}"
-  },
-  "payment": {
-    "table": {
-      "column": {
-        "actions": "Actions",
-        "actions.delete": "Delete payment",
-        "actions.delete.confirm": "Delete Payment",
-        "actions.delete.description": "This action will delete the payment record. Do you agree?",
-        "actions.delete.title": "Are you sure?",
-        "actions.edit": "Edit payment details",
-        "amount": "Amount",
-        "amount_in_try": "Amount Paid",
-        "currency": "Currency",
-        "customer_name": "Customer",
-        "description": "Description",
-        "exchange_rate": "Exchange Rate",
-        "invoice_no": "Invoice No",
-        "payment_date": "Payment Date",
-        "payment_method": "Payment Method"
-      }
-    }
-  },
-  "sidebar": {
-    "footer": {
-      "account": {
-        "label": "Account",
-        "language": "Language",
-        "logout": "Log Out",
-        "theme": {
-          "dark": "Dark Mode",
-          "light": "Light Mode"
+        "table": {
+            "column": {
+                "actions": "Actions",
+                "actions.delete": "Delete debt",
+                "actions.delete.confirm": "Delete debt",
+                "actions.delete.description": "This action will delete debt record. Do you agree?",
+                "actions.delete.title": "Are you sure?",
+                "actions.edit": "Edit debt details",
+                "amount": "Amount",
+                "currency": "Currency",
+                "customer_name": "Customer",
+                "description": "Description",
+                "exchange_rate": "Exchange Rate",
+                "invoice_no": "Invoice No",
+                "issue_date": "Issue Date",
+                "total": "Total",
+                "total_in_try": "Amount to be Paid",
+                "vat": "VAT"
+            }
         }
-      },
-      "companyManagement": {
+    },
+    "dialog": {
         "accountDetails": {
-          "label": "Account Details"
+            "accountInformation": "Account Information",
+            "description": "See and edit your account information.",
+            "logos": "Logos",
+            "logos.form.acceptedFormats": "Accepted formats: png, jpg, jpeg",
+            "logos.form.dragNDrop": "Drag and drop",
+            "logos.form.upload": "Upload",
+            "logos.form.upload.confirm": "Upload Logos",
+            "logos.large": "Large Logo",
+            "logos.small": "Small Logo",
+            "title": "Account Details"
         },
-        "label": "Management"
-      },
-      "info": {
-        "label": "About"
-      }
+        "customer": {
+            "add": "Add Customer",
+            "add.description": "Add a new customer",
+            "couldNotFind": "Could not find the customer",
+            "details": {
+                "description": "{{tax_no_label}}: {{tax_no}} | Tax Office: {{tax_office}}",
+                "title": "Customer Details"
+            },
+            "edit": {
+                "description": "Edit customer information",
+                "title": "Edit Customer"
+            },
+            "update": "Update Customer"
+        },
+        "debt": {
+            "add": "Add Debt",
+            "edit": {
+                "description": "Edit debt information",
+                "title": "Edit Debt"
+            },
+            "update": "Update Debt"
+        },
+        "info": {
+            "description": "See the information about Comma system.",
+            "developer": "Developer",
+            "exchangeInfo": "Exchange Information",
+            "title": "About",
+            "version": "Application Version"
+        },
+        "maintenanceMode": {
+            "end": {
+                "button": "End Maintenance",
+                "description": "Are you sure you want to end the maintenance?",
+                "title": "End the Planned Maintenance"
+            },
+            "endTime": "Finish Time",
+            "start": {
+                "button": "Start Maintenance",
+                "description": "Are you sure you want to start the maintenance mode? This action will cause all users to be logged out.",
+                "title": "Start Planned Maintenance"
+            },
+            "startTime": "Start Time"
+        },
+        "payable": {
+            "add": {
+                "description": "Add a new payable",
+                "title": "Add Payable"
+            }
+        },
+        "payableCustomer": {
+            "add": {
+                "description": "Add a payable customer",
+                "title": "Add Customer"
+            }
+        },
+        "payablePayment": {
+            "add": {
+                "description": "Add a new payable payment",
+                "title": "Add Payable Payment"
+            }
+        },
+        "payment": {
+            "add": "Add Payment",
+            "edit": {
+                "description": "Edit payment information",
+                "title": "Edit Payment"
+            },
+            "update": "Update Payment"
+        },
+        "receivable": {
+            "add": {
+                "description": "Add a new receivable",
+                "title": "Add Receivable"
+            }
+        },
+        "receivableCustomer": {
+            "add": {
+                "description": "Add a receivable customer",
+                "title": "Add Customer"
+            }
+        },
+        "receivablePayment": {
+            "add": {
+                "description": "Add a new receivable payment",
+                "title": "Add Receivable Payment"
+            }
+        }
     },
-    "nonSysAdmin": {
-      "finance": "Finance",
-      "finance.overview": "Overview",
-      "finance.payableInfo": "Payable Information",
-      "finance.payableInfo.outgoingPayments": "Outgoing Payments",
-      "finance.payableInfo.payables": "Payables",
-      "finance.receivableInfo": "Receivable Information",
-      "finance.receivableInfo.incomingPayments": "Incoming Payments",
-      "finance.receivableInfo.receivables": "Receivables"
+    "form": {
+        "company": {
+            "address": "Address",
+            "address.description": "Company's address",
+            "address.validation.invalid": "Invalid address",
+            "address.validation.max": "Address must be at most {{charCount}} characters",
+            "address.validation.min": "Address must be at least {{charCount}} characters",
+            "email": "Email Address",
+            "email.description": "Your email address",
+            "email.validation.invalid": "Invalid email address",
+            "email.validation.max": "Email address must be at most {{charCount}} characters",
+            "email.validation.min": "Email address must be at least {{charCount}} characters",
+            "is_company": "Account Type",
+            "is_company.description": "Your account type",
+            "mersis_no": "MERSIS No",
+            "mersis_no.description": "Company's MERSIS number",
+            "mersis_no.validation.invalid": "Invalid MERSIS number",
+            "mersis_no.validation.max": "MERSIS number must be at most {{charCount}} characters",
+            "mersis_no.validation.min": "MERSIS numbermust be at least {{charCount}} characters",
+            "name": "Company Name",
+            "name.description": "Company or individual name",
+            "name.validation.invalid": "Invalid customer name",
+            "name.validation.max": "Company name must be at most {{charCount}} characters",
+            "name.validation.min": "Company name must be at least {{charCount}} characters",
+            "phone": "Phone Number",
+            "phone.description": "Company's phone number",
+            "phone.validation.invalid": "Invalid phone number",
+            "phone.validation.max": "Phone number must be at most {{charCount}} characters",
+            "phone.validation.min": "Phone number must be at least {{charCount}} characters",
+            "select": "Customer",
+            "select.add": "Add New Customer",
+            "select.couldNotFind": "Could not find customer.",
+            "select.description": "Customer to be processed",
+            "select.placeholder": "Select a customer",
+            "select.search": "Search...",
+            "tax_number": "Tax",
+            "tax_number.description": "Company's {{tax_number_text}} number",
+            "tax_number.validation.invalid": "Invalid tax number",
+            "tax_number.validation.max": "Tax number must be at most {{charCount}} characters",
+            "tax_number.validation.min": "Tax number must be at least {{charCount}} characters",
+            "tax_number_alternative": "TR Identity",
+            "tax_office": "Tax Office",
+            "tax_office.description": "Company's tax office",
+            "tax_office.validation.invalid": "Invalid tax office",
+            "tax_office.validation.max": "Tax office must be at most {{charCount}} characters",
+            "tax_office.validation.min": "Tax office must be at least {{charCount}} characters"
+        },
+        "customer": {
+            "address": "Address",
+            "address.description": "Customer's address",
+            "address.validation.invalid": "Invalid address",
+            "address.validation.max": "Address must be at most {{charCount}} characters",
+            "address.validation.min": "Address must be at least {{charCount}} characters",
+            "email": "Email Address",
+            "email.description": "Customer's email address",
+            "email.validation.invalid": "Invalid email address",
+            "email.validation.max": "Email address must be at most {{charCount}} characters",
+            "email.validation.min": "Email address must be at least {{charCount}} characters",
+            "is_company": "Customer Type",
+            "is_company.description": "Customer's type",
+            "mersis_no": "MERSIS No",
+            "mersis_no.description": "Customer's MERSIS number",
+            "mersis_no.validation.invalid": "Invalid MERSIS number",
+            "mersis_no.validation.max": "MERSIS number must be at most {{charCount}} characters",
+            "mersis_no.validation.min": "MERSIS numbermust be at least {{charCount}} characters",
+            "name": "Customer Name",
+            "name.description": "Company or individual name",
+            "name.validation.invalid": "Invalid customer name",
+            "name.validation.max": "Customer name must be at most {{charCount}} characters",
+            "name.validation.min": "Customer name must be at least {{charCount}} characters",
+            "phone": "Phone Number",
+            "phone.description": "Customer's phone number",
+            "phone.validation.invalid": "Invalid phone number",
+            "phone.validation.max": "Phone number must be at most {{charCount}} characters",
+            "phone.validation.min": "Phone number must be at least {{charCount}} characters",
+            "select": "Customer",
+            "select.add": "Add New Customer",
+            "select.couldNotFind": "Could not find customer.",
+            "select.description": "Customer to be processed",
+            "select.placeholder": "Select a customer",
+            "select.search": "Search...",
+            "tax_number": "Tax",
+            "tax_number.description": "Customer's {{tax_number_text}} number",
+            "tax_number.validation.invalid": "Invalid tax number",
+            "tax_number.validation.max": "Tax number must be at most {{charCount}} characters",
+            "tax_number.validation.min": "Tax number must be at least {{charCount}} characters",
+            "tax_number_alternative": "TR Identity",
+            "tax_office": "Tax Office",
+            "tax_office.description": "Customer's tax office",
+            "tax_office.validation.invalid": "Invalid tax office",
+            "tax_office.validation.max": "Tax office must be at most {{charCount}} characters",
+            "tax_office.validation.min": "Tax office must be at least {{charCount}} characters"
+        },
+        "debt": {
+            "amount": "Amount",
+            "amount.description": "Debt amount",
+            "amount.validation.invalid": "Invalid amount",
+            "amount.validation.min": "Amount must be at least {{min}}",
+            "currency": "Currency",
+            "currency.description": "Debt currency",
+            "currency.validation.invalid": "Invalid currency",
+            "customer_id": {
+                "validation": {
+                    "required": "Customer selection is mandatory"
+                }
+            },
+            "description": "Description",
+            "description.description": "Additional information (if any)",
+            "description.validation.invalid": "Invalid description",
+            "description.validation.max": "Description must be at most {{charCount}} characters",
+            "exchange_rate": "Exchange Rate",
+            "exchange_rate.description": "Exchange rate",
+            "exchange_rate.set.label": "CBRT Rate",
+            "exchange_rate.set.tooltip": "Use the CBRT daily exchange rate as the exchange rate.",
+            "exchange_rate.validation.invalid": "Invalid exchange rate",
+            "exchange_rate.validation.min": "Exchange rate must be at least {{min}}",
+            "invoice_no": "Invoice No",
+            "invoice_no.description": "Invoice number (if any)",
+            "invoice_no.validation.invalid": "Invalid invoice no",
+            "invoice_no.validation.max": "Invoice no must be at most {{charCount}} characters",
+            "issue_date": "Issue Date",
+            "issue_date.description": "Debt issue date",
+            "issue_date.validation.invalid": "Invalid date",
+            "vat": "VAT",
+            "vat.description": "VAT on Debt",
+            "vat.set.10%": "Set VAT to 10% of the amount",
+            "vat.set.20%": "Set VAT to 20% of the amount",
+            "vat.validation.invalid": "Invalid VAT",
+            "vat.validation.min": "VAT must be at least {{min}}"
+        },
+        "payment": {
+            "amount": "Amount",
+            "amount.description": "Payment amount",
+            "amount.validation.invalid": "Invalid amount",
+            "amount.validation.min": "Amount must be at least {{min}}",
+            "currency": "Currency",
+            "currency.description": "Debt currency",
+            "currency.validation.invalid": "Invalid currency",
+            "customer_id": {
+                "validation": {
+                    "required": "Customer selection is mandatory"
+                }
+            },
+            "description": "Description",
+            "description.description": "Additional information (if any)",
+            "description.validation.invalid": "Invalid description",
+            "description.validation.max": "Description must be at most {{charCount}} characters",
+            "exchange_rate": "Exchange Rate",
+            "exchange_rate.description": "Exchange rate",
+            "exchange_rate.set.label": "CBRT Rate",
+            "exchange_rate.set.tooltip": "Use the CBRT daily exchange rate as the exchange rate.",
+            "exchange_rate.validation.invalid": "Invalid exchange rate",
+            "exchange_rate.validation.min": "Exchange rate must be at least {{min}}",
+            "invoice_no": "Invoice No",
+            "invoice_no.description": "Invoice number (if any)",
+            "invoice_no.validation.invalid": "Invalid invoice no",
+            "invoice_no.validation.max": "Invoice number must be at most {{charCount}} characters",
+            "payment_date": "Payment Date",
+            "payment_date.description": "Debt payment date",
+            "payment_date.validation.invalid": "Invalid date",
+            "payment_method": "Payment Method",
+            "payment_method.description": "Select a payment method",
+            "payment_method.validation.invalid": "Invalid payment method"
+        }
     },
-    "sysAdmin": {
-      "actions": "Admin Actions",
-      "actions.activeUsers": "Active Users",
-      "actions.maintenanceMode": "Maintenance Mode"
-    },
-    "toggle": "{{action}} Sidebar",
-    "toggle.close": "Close",
-    "toggle.open": "Open"
-  },
-  "table": {
     "header": {
-      "filters": "Filters",
-      "filters.clear": "Clear Filters",
-      "filters.clear.hover": "Clear all filters",
-      "filters.hover": "Show filtering options",
-      "pagination": {
-        "next": "Next",
-        "next.hover": "Go to next page",
-        "page": "Page {{currentPage}} / {{totalPages}}",
-        "prev": "Previous",
-        "prev.hover": "Go to previous page"
-      },
-      "refresh": "Refresh",
-      "refresh.hover": "Refresh the table",
-      "rowCount": "Row Count",
-      "rowCount.hover": "Select row count",
-      "rowCount.row": "{{rowCount}} Rows",
-      "search": "Search by Customer Name...",
-      "search.hover": "Search by Customer Name",
-      "showHideCols": "Show/Hide Columns",
-      "showHideCols.hover": "Show or hide desired columns",
-      "sorting": {
-        "clear": "Reset Sorting",
-        "clear.hover": "Reset the sorting"
-      }
-    }
-  },
-  "user": {
-    "role": {
-      "admin": "Admin",
-      "manager": "Manager",
-      "user": "User"
-    }
-  },
-  "vars": {
-    "address": "Address",
-    "all": "All",
-    "bank_transfer": "Bank Transfer",
-    "cancel": "Cancel",
-    "card": "Card",
-    "cash": "Cash",
-    "check": "Check",
-    "creation_date": "Creation Date",
-    "customer": "Customer",
-    "date_range": "Date Range",
-    "debt_status": {
-      "has_debt": "Credit Balance",
-      "has_no_debt": "No Credit",
-      "has_no_receivable": "No Balance Due",
-      "has_receivable": "Outstanding Balance"
+        "breadcrumb": {
+            "finance": {
+                "overview": "Overview",
+                "receivables": "Receivables"
+            }
+        },
+        "breadcrumbs": {
+            "finance": {
+                "customerStatement": "Customer Statement",
+                "payables": "Payables",
+                "payments": "Payments"
+            }
+        },
+        "exchange": {
+            "buy": "Buy",
+            "lastUpdate": "Last Update: {{date}}",
+            "lastUpdate.hover": "Exchange rates decided by {{tcmb}} for {{date}}",
+            "noData": "{{tcmb}} data is not available.",
+            "sell": "Sell"
+        },
+        "maintenanceBanner": "System is in maintenance mode. Please do not do any operation."
     },
-    "delete": "Delete",
-    "details": "Details",
-    "email": "Email",
-    "eur": "Euro (EUR)",
-    "is_company": {
-      "false": "Individual",
-      "true": "Company"
+    "login": {
+        "changeLanguage": "Change Language",
+        "changeTheme": "Change Theme",
+        "form": {
+            "password": "Password",
+            "password.maxCharError": "Password can be a maximum of 50 characters.",
+            "submit": "Login",
+            "submit.pending": "Logging In...",
+            "username": "Username",
+            "username.maxCharError": "Username can be a maximum of 20 characters."
+        },
+        "title": "Login",
+        "description": "Please enter your credentials to access the system."
     },
-    "large": "large",
-    "payable": "Payable",
-    "payables": "Payables",
-    "payment": "Payment",
-    "phone": "Phone",
-    "receivable": "Receivable",
-    "receivables": "Receivables",
-    "save": "Save",
-    "small": "Small",
-    "tax_number": "Tax No",
-    "tckn": "TR Identity No",
-    "tcmb": "Central Bank of the Republic of Türkiye",
-    "try": "Turkish Lira (TRY)",
-    "unspecified": "Unspecified",
-    "usd": "United States Dolar (USD)"
-  }
+    "notification": {
+        "accountDetails": {
+            "logos": {
+                "delete": {
+                    "error": "There was an error while deleting logos",
+                    "pending": "Deleting logos...",
+                    "success": "Logos successfully deleted!"
+                },
+                "upload": {
+                    "error": "There was an error while loading logos",
+                    "pending": "Loading logos...",
+                    "success": "Logos successfully loaded!"
+                }
+            }
+        },
+        "activeUserCount": "Active User Count: {{count}}",
+        "admin": {
+            "endMaintenance": {
+                "error": "Could not end the maintenance mode.",
+                "pending": "Ending maintenance mode...",
+                "success": "Maintenance mode ended."
+            },
+            "startMaintenance": {
+                "error": "Could not start the maintenance mode.",
+                "pending": "Starting maintenance mode...",
+                "success": "Maintenance mode started."
+            }
+        },
+        "auth": {
+            "login": {
+                "error": "Login failed, please check your credentials",
+                "fillEmptyFields": "Please fill all fields",
+                "pending": "Logging in...",
+                "success": "Logged in successfully!"
+            },
+            "logout": {
+                "error": "There was an error while trying to logout",
+                "pending": "Logging out...",
+                "success": "Logged out successfully!"
+            }
+        },
+        "companyDetails": {
+            "update": {
+                "error": "There was an error while updating company details",
+                "pending": "Updating company details...",
+                "success": "Updated company details successfully!"
+            }
+        },
+        "copy": {
+            "error": "Could not copy to clipboard",
+            "success": "Copied to clipboard"
+        },
+        "customer": {
+            "add": {
+                "error": "There was an error while adding the customer",
+                "pending": "Adding customer...",
+                "success": "Customer added successfully"
+            },
+            "delete": {
+                "error": "There was an error while deleting the customer",
+                "pending": "Deleting customer...",
+                "succes": "Customer deleted successfully"
+            },
+            "update": {
+                "error": "There was an error while updating the customer",
+                "pending": "Updating customer...",
+                "success": "Customer updated successfully"
+            }
+        },
+        "debt": {
+            "add": {
+                "error": "There was an error while adding debt",
+                "pending": "Adding debt...",
+                "success": "Debt added successfully"
+            },
+            "couldNotFind": "Could not find debt",
+            "delete": {
+                "error": "There was an error while deleting debt",
+                "pending": "Deleting debt...",
+                "success": "Debt deleted successfully!"
+            },
+            "update": {
+                "error": "There was an error while updating debt",
+                "pending": "Updating debt...",
+                "success": "Debt updated successfully"
+            }
+        },
+        "endMaintenance": {
+            "title": "System maintenance has been completed, the page will refresh in {{refreshTime}} seconds."
+        },
+        "notImplemented": "This feature has not been developed yet",
+        "payment": {
+            "add": {
+                "error": "There was an error while adding payment",
+                "pending": "Adding payment...",
+                "success": "Payment added successfully"
+            },
+            "couldNotFind": "Could not find payment",
+            "delete": {
+                "error": "There was an error while deleting payment",
+                "pending": "Deleting payment...",
+                "success": "Payment deleted successfully"
+            },
+            "update": {
+                "error": "There was an error while updating payment",
+                "pending": "Updating payment...",
+                "success": "Payment updated successfully"
+            }
+        },
+        "startMaintenance": {
+            "body": "You will be logged out due to a planned maintenance. Please save the work you're doing.",
+            "estimatedMaintenanceInterval": "Estimated Maintenance Interval: {{start}} - {{end}}",
+            "title": "Planned Maintenance"
+        }
+    },
+    "overviewCards": {
+        "paid": "Paid {{state}}",
+        "remaning": "Remaining {{state}}",
+        "total": "Total {{state}}"
+    },
+    "payment": {
+        "table": {
+            "column": {
+                "actions": "Actions",
+                "actions.delete": "Delete payment",
+                "actions.delete.confirm": "Delete Payment",
+                "actions.delete.description": "This action will delete the payment record. Do you agree?",
+                "actions.delete.title": "Are you sure?",
+                "actions.edit": "Edit payment details",
+                "amount": "Amount",
+                "amount_in_try": "Amount Paid",
+                "currency": "Currency",
+                "customer_name": "Customer",
+                "description": "Description",
+                "exchange_rate": "Exchange Rate",
+                "invoice_no": "Invoice No",
+                "payment_date": "Payment Date",
+                "payment_method": "Payment Method"
+            }
+        }
+    },
+    "sidebar": {
+        "footer": {
+            "account": {
+                "label": "Account",
+                "language": "Language",
+                "logout": "Log Out",
+                "theme": {
+                    "dark": "Dark Mode",
+                    "light": "Light Mode"
+                }
+            },
+            "companyManagement": {
+                "accountDetails": {
+                    "label": "Account Details"
+                },
+                "label": "Management"
+            },
+            "info": {
+                "label": "About"
+            }
+        },
+        "nonSysAdmin": {
+            "finance": "Finance",
+            "finance.overview": "Overview",
+            "finance.payableInfo": "Payable Information",
+            "finance.payableInfo.outgoingPayments": "Outgoing Payments",
+            "finance.payableInfo.payables": "Payables",
+            "finance.receivableInfo": "Receivable Information",
+            "finance.receivableInfo.incomingPayments": "Incoming Payments",
+            "finance.receivableInfo.receivables": "Receivables"
+        },
+        "sysAdmin": {
+            "actions": "Admin Actions",
+            "actions.activeUsers": "Active Users",
+            "actions.maintenanceMode": "Maintenance Mode"
+        },
+        "toggle": "{{action}} Sidebar",
+        "toggle.close": "Close",
+        "toggle.open": "Open"
+    },
+    "table": {
+        "header": {
+            "filters": "Filters",
+            "filters.clear": "Clear Filters",
+            "filters.clear.hover": "Clear all filters",
+            "filters.hover": "Show filtering options",
+            "pagination": {
+                "next": "Next",
+                "next.hover": "Go to next page",
+                "page": "Page {{currentPage}} / {{totalPages}}",
+                "prev": "Previous",
+                "prev.hover": "Go to previous page"
+            },
+            "refresh": "Refresh",
+            "refresh.hover": "Refresh the table",
+            "rowCount": "Row Count",
+            "rowCount.hover": "Select row count",
+            "rowCount.row": "{{rowCount}} Rows",
+            "search": "Search by Customer Name...",
+            "search.hover": "Search by Customer Name",
+            "showHideCols": "Show/Hide Columns",
+            "showHideCols.hover": "Show or hide desired columns",
+            "sorting": {
+                "clear": "Reset Sorting",
+                "clear.hover": "Reset the sorting"
+            }
+        }
+    },
+    "user": {
+        "role": {
+            "admin": "Admin",
+            "manager": "Manager",
+            "user": "User"
+        }
+    },
+    "vars": {
+        "address": "Address",
+        "all": "All",
+        "bank_transfer": "Bank Transfer",
+        "cancel": "Cancel",
+        "card": "Card",
+        "cash": "Cash",
+        "check": "Check",
+        "creation_date": "Creation Date",
+        "customer": "Customer",
+        "date_range": "Date Range",
+        "debt_status": {
+            "has_debt": "Credit Balance",
+            "has_no_debt": "No Credit",
+            "has_no_receivable": "No Balance Due",
+            "has_receivable": "Outstanding Balance"
+        },
+        "delete": "Delete",
+        "details": "Details",
+        "email": "Email",
+        "eur": "Euro (EUR)",
+        "is_company": {
+            "false": "Individual",
+            "true": "Company"
+        },
+        "large": "large",
+        "payable": "Payable",
+        "payables": "Payables",
+        "payment": "Payment",
+        "phone": "Phone",
+        "receivable": "Receivable",
+        "receivables": "Receivables",
+        "save": "Save",
+        "small": "Small",
+        "tax_number": "Tax No",
+        "tckn": "TR Identity No",
+        "tcmb": "Central Bank of the Republic of Türkiye",
+        "try": "Turkish Lira (TRY)",
+        "unspecified": "Unspecified",
+        "usd": "United States Dolar (USD)"
+    }
 }

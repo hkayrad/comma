@@ -110,7 +110,7 @@ export class CustomerStatementPDF {
      */
     private async getLogo(company: CompanyDto | null): Promise<LogoData | null> {
         const baseUrl = import.meta.env.VITE_API_URL;
-        let url = "/hks-logo.webp"; // Default fallback
+        let url = "/logo.webp"; // Default fallback
 
         if (company?.large_logo_path) {
             url = `${baseUrl}/logo-proxy/${company.large_logo_path}`;
@@ -330,7 +330,7 @@ export class CustomerStatementPDF {
 
             this.doc.setFontSize(8);
             this.doc.setTextColor(...COLORS.TEXT.FOOTER);
-            this.doc.text("IO - Müşteri Borç Dökümü", MARGIN.LEFT, footerY + 15);
+            this.doc.text("Comma - Müşteri Borç Dökümü", MARGIN.LEFT, footerY + 15);
             this.doc.text(`Sayfa ${i} / ${pageCount}`, this.pageWidth - MARGIN.RIGHT, footerY + 15, { align: "right" });
         }
     }

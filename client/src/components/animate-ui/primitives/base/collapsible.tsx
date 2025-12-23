@@ -20,7 +20,7 @@ type CollapsibleProps = React.ComponentProps<typeof CollapsiblePrimitive.Root>;
 function Collapsible(props: CollapsibleProps) {
   const [isOpen, setIsOpen] = useControlledState({
     value: props?.open,
-    defaultValue: props?.defaultOpen,
+    defaultValue: props?.defaultOpen ?? false,
     onChange: props?.onOpenChange,
   });
 
@@ -29,6 +29,7 @@ function Collapsible(props: CollapsibleProps) {
       <CollapsiblePrimitive.Root
         data-slot="collapsible"
         {...props}
+        open={isOpen}
         onOpenChange={setIsOpen}
       />
     </CollapsibleProvider>

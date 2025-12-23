@@ -122,7 +122,7 @@ export default function Login() {
             <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-black selection:text-white">
                 <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
                     <img
-                        src="/hks-logo.webp"
+                        src="/logo.webp"
                         className="w-64 lg:w-96 saturate-0 brightness-0 invert"
                     />
                 </div>
@@ -183,9 +183,12 @@ export default function Login() {
                     </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
-                    <h1 className="text-4xl font-bold text-center mb-8">
+                    <h1 className="text-4xl font-bold text-center">
                         {t("login.title")}
                     </h1>
+                    <p className="mt-2 mb-8 text-muted-foreground text-sm">
+                        {t("login.description")}
+                    </p>
                     <Form {...form}>
                         <form
                             onSubmit={form.handleSubmit(onSubmit)}

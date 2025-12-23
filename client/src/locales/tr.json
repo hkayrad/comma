@@ -122,7 +122,7 @@
       "update": "Borcu Güncelle"
     },
     "info": {
-      "description": "IO uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
+      "description": "Comma uygulaması hakkındaki bilgilere aşağıdan erişebilirsiniz.",
       "developer": "Geliştirici",
       "exchangeInfo": "Döviz Verileri",
       "title": "Hakkında",
@@ -380,7 +380,8 @@
       "username": "Kullanıcı Adı",
       "username.maxCharError": "Kullanıcı adı en fazla 20 karakter olabilir."
     },
-    "title": "Giriş Yap"
+    "title": "Giriş Yap",
+    "description": "Lütfen kullanıcı adı ve şifrenizi girerek sisteme giriş yapın."
   },
   "notification": {
     "accountDetails": {

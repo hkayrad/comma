@@ -68,7 +68,7 @@ export async function exportCustomerStatementPDF(
 	} else if (company?.small_logo_path) {
 		logoData = await loadLogo(`${baseUrl}/logo-proxy/${company.small_logo_path}`);
 	} else {
-		logoData = await loadLogo("/hks-logo.webp");
+		logoData = await loadLogo("/logo.webp");
 	}
 
 	// Header
@@ -302,7 +302,7 @@ export async function exportCustomerStatementPDF(
 		doc.line(MARGIN_LEFT, footerY, pageWidth - MARGIN_RIGHT, footerY);
 		doc.setFontSize(8);
 		doc.setTextColor(90);
-		doc.text("IO - Müşteri Borç Dökümü", MARGIN_LEFT, footerY + 15);
+		doc.text("COmma - Müşteri Borç Dökümü", MARGIN_LEFT, footerY + 15);
 		doc.text(`Sayfa ${i} / ${pageCount}`, pageWidth - MARGIN_RIGHT, footerY + 15, { align: "right" });
 	}
 
