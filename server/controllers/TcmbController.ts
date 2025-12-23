@@ -40,12 +40,7 @@ router.get("/", async (req, res) => {
 		Logger.debug(`TCMB date: ${tcmbFourteenDaysAgoDate}`);
 
 		const response = await fetch(
-			`https://evds2.tcmb.gov.tr/service/evds/series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
-			{
-				headers: {
-					Key: process.env.TCMB_API_KEY || "",
-				},
-			},
+			`https://proxy.hkayrad.me/tcmb?series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
 		);
 
 		if (!response.ok) {
