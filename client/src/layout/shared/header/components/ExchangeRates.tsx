@@ -86,7 +86,7 @@ export default function ExchangeRates() {
                                     className="flex gap-2 select-none"
                                 >
                                     <DollarSign size={20} />
-                                    <p className="text-sm">
+                                    <p className="text-sm self-center">
                                         {t("header.exchange.buy")}:&nbsp;
                                         <span
                                             className="hover:cursor-copy"
@@ -101,7 +101,7 @@ export default function ExchangeRates() {
                                             {exchangeRates.usd.forexBuying}
                                         </span>
                                     </p>
-                                    <p className="text-sm">
+                                    <p className="text-sm self-center">
                                         {t("header.exchange.sell")}:&nbsp;
                                         <span
                                             className="hover:cursor-copy"
@@ -135,7 +135,7 @@ export default function ExchangeRates() {
                                     className="flex gap-2 select-none"
                                 >
                                     <Euro size={20} />
-                                    <p className="text-sm">
+                                    <p className="text-sm self-center">
                                         {t("header.exchange.buy")}:&nbsp;
                                         <span
                                             className="hover:cursor-copy"
@@ -150,7 +150,7 @@ export default function ExchangeRates() {
                                             {exchangeRates.eur.forexBuying}
                                         </span>
                                     </p>
-                                    <p className="text-sm">
+                                    <p className="text-sm self-center">
                                         {t("header.exchange.sell")}:&nbsp;
                                         <span
                                             className="hover:cursor-copy"

@@ -188,7 +188,7 @@ export default function HksSidebar() {
                                 key="icon"
                                 src={logoSrc.small}
                                 alt="HKS.IO Logo"
-                                className="h-full mx-auto bg-contain!"
+                                className="h-full w-auto mx-auto object-contain"
                                 initial={{
                                     opacity: 0,
                                     x: 0,
@@ -217,7 +217,7 @@ export default function HksSidebar() {
                                 key="logo"
                                 src={logoSrc.large}
                                 alt="HKS.IO Logo"
-                                className="h-full w-auto mx-auto bg-contain!"
+                                className="h-full w-auto mx-auto object-contain"
                                 initial={{
                                     opacity: 0,
                                     x: 0,

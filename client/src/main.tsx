@@ -8,6 +8,7 @@ import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
 import { lazy, Suspense } from "react";
 import { Spinner } from "./components/ui/spinner";
+import { cn } from "./lib/utils";
 
 const Login = lazy(() => import("./layout/auth/Login"));
 const Dashboard = lazy(() => import("./layout/dashboard/Dashboard"));
@@ -19,8 +20,13 @@ const CustomerStatement = lazy(
 const Dev = lazy(() => import("./layout/Dev"));
 const NotFound = lazy(() => import("./layout/NotFound"));
 
-const PageLoader = () => (
-    <div className="flex h-full w-full items-center justify-center p-4">
+const PageLoader = ({ className }: { className?: string }) => (
+    <div
+        className={cn(
+            "flex h-full w-full items-center justify-center p-4",
+            className,
+        )}
+    >
         <Spinner className="size-8" />
     </div>
 );
@@ -36,7 +42,7 @@ const router = createBrowserRouter([
                     {
                         index: true,
                         element: (
-                            <Suspense fallback={<PageLoader />}>
+                            <Suspense fallback={<PageLoader className="h-screen! w-screen!" />}>
                                 <Login />
                             </Suspense>
                         ),

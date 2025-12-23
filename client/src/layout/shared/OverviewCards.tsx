@@ -131,7 +131,7 @@ export default function OverviewCards(props: Props) {
         >
             <Card className="grow w-48 shadow-xs">
                 <CardHeader>
-                    <CardDescription className="text-xs 2xl:text-sm select-none">
+                    <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
                         {t("overviewCards.total", {
                             state:
                                 type === "receivable"
@@ -156,7 +156,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="grow w-48 shadow-xs">
                 <CardHeader>
-                    <CardDescription className="text-xs 2xl:text-sm select-none">
+                    <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
                         {t("overviewCards.paid", {
                             state:
                                 type === "receivable"
@@ -183,7 +183,7 @@ export default function OverviewCards(props: Props) {
             </Card>
             <Card className="grow w-48 shadow-xs">
                 <CardHeader>
-                    <CardDescription className="text-xs 2xl:text-sm select-none">
+                    <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
                         {t("overviewCards.remaning", {
                             state:
                                 type === "receivable"
