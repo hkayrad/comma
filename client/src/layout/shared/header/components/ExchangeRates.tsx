@@ -1,4 +1,4 @@
-import { TCMBApi } from "@/lib/api/tcmb";
+ import { TCMBApi } from "@/lib/api/tcmb";
 import { useCallback, useEffect, useState } from "react";
 import type { ExchangeRates } from "@/lib/types";
 import {
@@ -55,7 +55,7 @@ export default function ExchangeRates() {
                             render={(props) => (
                                 <p
                                     {...props}
-                                    className="text-muted-foreground text-[10px] my-auto mr-1 select-none"
+                                    className="text-muted-foreground text-[0.625rem] my-auto mr-1 select-none"
                                 >
                                     {t("header.exchange.lastUpdate", {
                                         date: exchangeRates.date.replaceAll(
@@ -85,7 +85,7 @@ export default function ExchangeRates() {
                                     {...props}
                                     className="flex gap-2 select-none"
                                 >
-                                    <DollarSign size={20} />
+                                    <DollarSign size={"1.25rem"} />
                                     <p className="text-sm self-center">
                                         {t("header.exchange.buy")}:&nbsp;
                                         <span
@@ -134,7 +134,7 @@ export default function ExchangeRates() {
                                     {...props}
                                     className="flex gap-2 select-none"
                                 >
-                                    <Euro size={20} />
+                                    <Euro size={"1.25rem"} />
                                     <p className="text-sm self-center">
                                         {t("header.exchange.buy")}:&nbsp;
                                         <span
