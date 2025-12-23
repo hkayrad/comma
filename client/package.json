@@ -5,7 +5,7 @@
         "url": "https://hkayrad.tr"
     },
     "private": true,
-    "version": "1.18.0",
+    "version": "1.18.1",
     "type": "module",
     "scripts": {
         "dev": "vite",
