@@ -15,6 +15,47 @@ import {
     ChevronDownIcon,
 } from "lucide-react";
 
+/**
+ * Normalizes a date to noon (12:00) to prevent timezone issues.
+ * When dates are serialized to UTC, midnight local time can shift to the previous day.
+ * Setting to noon ensures the date stays the same regardless of timezone offset.
+ */
+function normalizeToNoon<T extends Date | undefined | null>(date: T): T {
+    if (!date) return date;
+    const normalized = new Date(date);
+    normalized.setHours(12, 0, 0, 0);
+    return normalized as T;
+}
+
+/**
+ * Normalizes selected value (single date, date range, or multiple dates) to noon
+ */
+function normalizeSelected(selected: unknown): unknown {
+    if (!selected) return selected;
+
+    if (selected instanceof Date) {
+        return normalizeToNoon(selected);
+    }
+
+    if (Array.isArray(selected)) {
+        return selected.map((d) =>
+            d instanceof Date ? normalizeToNoon(d) : d,
+        );
+    }
+
+    if (typeof selected === "object" && selected !== null) {
+        const range = selected as { from?: Date; to?: Date };
+        if ("from" in range || "to" in range) {
+            return {
+                from: normalizeToNoon(range.from),
+                to: normalizeToNoon(range.to),
+            };
+        }
+    }
+
+    return selected;
+}
+
 function Calendar({
     className,
     classNames,
@@ -28,6 +69,37 @@ function Calendar({
     buttonVariant?: React.ComponentProps<typeof Button>["variant"];
 }) {
     const defaultClassNames = getDefaultClassNames();
+
+    // Extract onSelect and wrap it to normalize dates
+    const originalOnSelect = (props as { onSelect?: Function }).onSelect;
+    const restProps = { ...props };
+    delete (restProps as { onSelect?: Function }).onSelect;
+
+    const handleSelect = React.useMemo(() => {
+        if (!originalOnSelect) return undefined;
+
+        return (
+            selected: unknown,
+            triggerDate: Date,
+            modifiers: unknown,
+            e: unknown,
+        ) => {
+            const normalizedSelected = normalizeSelected(selected);
+            const normalizedTriggerDate = normalizeToNoon(triggerDate);
+            originalOnSelect(
+                normalizedSelected,
+                normalizedTriggerDate,
+                modifiers,
+                e,
+            );
+        };
+    }, [originalOnSelect]);
+
+    // Build final props with wrapped onSelect
+    const finalProps = {
+        ...restProps,
+        ...(handleSelect ? { onSelect: handleSelect } : {}),
+    } as React.ComponentProps<typeof DayPicker>;
 
     return (
         <DayPicker
@@ -189,7 +261,7 @@ function Calendar({
                 },
                 ...components,
             }}
-            {...props}
+            {...finalProps}
         />
     );
 }

@@ -14,7 +14,7 @@ export default function LanguageButton() {
     return (
         <MenuSubmenu>
             <MenuSubmenuTrigger className="gap-2">
-                <Globe size={16} />
+                <Globe size={"1rem"} />
                 <span>{t("sidebar.footer.account.language")}</span>
             </MenuSubmenuTrigger>
             <MenuSubmenuPanel>

@@ -44,6 +44,7 @@ export default function DateSelect(props: Props) {
             <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                     mode="single"
+                    timeZone="Europe/Istanbul"
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>

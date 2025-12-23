@@ -42,3 +42,9 @@ export function formatDate(date?: Date) {
 		day: "numeric",
 	});
 }
+
+export function normalizeDateToUTC(date: Date): Date {
+	const utcDate = new Date(date);
+	utcDate.setMinutes(utcDate.getMinutes() - date.getTimezoneOffset());
+	return utcDate;
+}
