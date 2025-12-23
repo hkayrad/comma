@@ -1,9 +1,9 @@
 ---
 deployment:
   tasks:
-    - export CLIENT_ROOT=/home/USERNAME/comma.orhandogan.com.tr
-    - export API_ROOT=/home/USERNAME/api.orhandogan.com.tr
-    
+    - export CLIENT_ROOT=/home/htrltd/comma.orhandogan.com.tr
+    - export API_ROOT=/home/htrltd/api.orhandogan.com.tr
+
     # 1. Build the project in the repository
     - /bin/bash deploy.sh
 
@@ -14,7 +14,7 @@ deployment:
     # 3. Deploy API (Node.js Server)
     # Copy server files (dist, node_modules, package.json) to the api subdomain root
     - /bin/cp -r server/* $API_ROOT
-    
+
     # 4. Restart API Server (Phusion Passenger)
     - mkdir -p $API_ROOT/tmp
     - touch $API_ROOT/tmp/restart.txt
