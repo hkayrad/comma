@@ -26,6 +26,7 @@ export default function DateSelect(props: Props) {
                     <FormControl {...props}>
                         <Button
                             variant={"outline"}
+                            nativeButton
                             className={cn(
                                 "w-full pl-3 text-left font-normal justify-start",
                                 !field.value && "text-muted-foreground",

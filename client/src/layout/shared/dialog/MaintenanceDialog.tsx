@@ -90,6 +90,7 @@ export default function MaintenanceDialog() {
                             <Button
                                 {...props}
                                 className="bg-green-600"
+                                nativeButton
                                 onClick={handleEndMaintenance}
                             >
                                 {t("dialog.maintenanceMode.end.button")}
@@ -138,7 +139,7 @@ export default function MaintenanceDialog() {
                     <div className="col-span-2 flex justify-end mt-8 gap-2">
                         <DialogClose
                             render={(props) => (
-                                <Button {...props} variant="ghost">
+                                <Button {...props} nativeButton variant="ghost">
                                     {t("vars.cancel")}
                                 </Button>
                             )}
@@ -148,6 +149,7 @@ export default function MaintenanceDialog() {
                                 <Button
                                     {...props}
                                     variant="destructive"
+                                    nativeButton
                                     onClick={handleStartMaintenance}
                                 >
                                     {t("dialog.maintenanceMode.start.button")}

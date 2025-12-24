@@ -131,6 +131,7 @@ export default function Login() {
                         render={(props) => (
                             <Button
                                 {...props}
+                                nativeButton
                                 size="icon"
                                 className="absolute bottom-4 right-4"
                                 onClick={() =>
@@ -234,6 +235,7 @@ export default function Login() {
                                                 <Button
                                                     type="button"
                                                     variant="outline"
+                                                    nativeButton
                                                     size="icon"
                                                     onClick={
                                                         togglePasswordVisibility

@@ -195,6 +195,7 @@ export default function CustomerStatement() {
                             render={(props) => (
                                 <Button
                                     {...props}
+                                    nativeButton
                                     id="date"
                                     variant={"outline"}
                                     className={cn(

@@ -370,6 +370,7 @@ export default function PaymentDialog(props: Props) {
                                                             <InputGroupButton
                                                                 {...props}
                                                                 size="xs"
+                                                                nativeButton
                                                                 onClick={
                                                                     handleSetExchangeRateButtonClick
                                                                 }

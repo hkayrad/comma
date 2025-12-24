@@ -79,6 +79,7 @@ export default function Header() {
                         render={(props) => (
                             <Button
                                 {...props}
+                                nativeButton
                                 onClick={toggleSidebar}
                                 size="icon"
                                 variant="ghost"

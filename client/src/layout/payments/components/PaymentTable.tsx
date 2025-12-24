@@ -397,6 +397,7 @@ export default function PaymentTable(props: Props) {
                                 render={(props) => (
                                     <Button
                                         {...props}
+                                        nativeButton
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => onEdit(row.original.id!)}
@@ -418,6 +419,7 @@ export default function PaymentTable(props: Props) {
                                             render={(props) => (
                                                 <Button
                                                     {...props}
+                                                    nativeButton
                                                     variant="ghost"
                                                     size="icon"
                                                     className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
@@ -449,6 +451,7 @@ export default function PaymentTable(props: Props) {
                                             render={(props) => (
                                                 <Button
                                                     {...props}
+                                                    nativeButton
                                                     variant="outline"
                                                 >
                                                     {t("vars.cancel")}

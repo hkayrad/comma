@@ -381,6 +381,7 @@ export default function DebtDialog(props: Props) {
                                                         <InputGroupButton
                                                             {...props}
                                                             size="xs"
+                                                            nativeButton
                                                             onClick={(e) =>
                                                                 handleVatButtonClick(
                                                                     e,
@@ -406,6 +407,7 @@ export default function DebtDialog(props: Props) {
                                                         <InputGroupButton
                                                             {...props}
                                                             size="xs"
+                                                            nativeButton
                                                             onClick={(e) =>
                                                                 handleVatButtonClick(
                                                                     e,
@@ -478,6 +480,7 @@ export default function DebtDialog(props: Props) {
                                                             <InputGroupButton
                                                                 {...props}
                                                                 size="xs"
+                                                                nativeButton
                                                                 onClick={
                                                                     handleSetExchangeRateButtonClick
                                                                 }

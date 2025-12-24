@@ -18,7 +18,9 @@ export default function Admin() {
     const [companies, setCompanies] = useState<CompanyDto[]>([]);
     const [rowCount, setRowCount] = useState(0);
     const [currentView, setCurrentView] = useState<AdminView>("companies");
-    const [selectedCompany, setSelectedCompany] = useState<CompanyDto | null>(null);
+    const [selectedCompany, setSelectedCompany] = useState<CompanyDto | null>(
+        null,
+    );
 
     const { openDialog } = useDialog();
     const { t } = useTranslation();
@@ -107,12 +109,16 @@ export default function Admin() {
                         {t("sidebar.footer.companyManagement.label")}
                     </h1>
                     <p className="text-muted-foreground">
-                        {t("sidebar.footer.companyManagement.accountDetails.label")}
+                        {t(
+                            "sidebar.footer.companyManagement.accountDetails.label",
+                        )}
                     </p>
                 </div>
                 <Button onClick={handleAddCompany}>
                     <Plus className="h-4 w-4 mr-2" />
-                    {t("dashboard.floatingButton.actions.receivable.addCustomer")}
+                    {t(
+                        "dashboard.floatingButton.actions.receivable.addCustomer",
+                    )}
                 </Button>
             </div>
             <div>

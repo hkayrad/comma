@@ -103,7 +103,10 @@ export default function ResetPasswordDialog(props: Props) {
                 className="flex flex-col gap-6"
             >
                 <div className="text-sm text-muted-foreground">
-                    {t("login.form.username")}: <span className="font-medium text-foreground">{username}</span>
+                    {t("login.form.username")}:{" "}
+                    <span className="font-medium text-foreground">
+                        {username}
+                    </span>
                 </div>
                 <FormField
                     control={form.control}
@@ -162,16 +165,10 @@ export default function ResetPasswordDialog(props: Props) {
                     )}
                 />
                 <div className="flex justify-end gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                    >
+                    <Button type="button" variant="outline" onClick={onCancel}>
                         {t("vars.cancel")}
                     </Button>
-                    <Button type="submit">
-                        {t("vars.save")}
-                    </Button>
+                    <Button type="submit">{t("vars.save")}</Button>
                 </div>
             </form>
         </Form>

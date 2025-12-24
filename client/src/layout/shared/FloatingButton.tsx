@@ -115,6 +115,7 @@ export default function FloatingButton() {
                                 render={(props) => (
                                     <Button
                                         {...props}
+                                        nativeButton
                                         size="icon"
                                         className="fixed bottom-4 right-4 z-50"
                                     >

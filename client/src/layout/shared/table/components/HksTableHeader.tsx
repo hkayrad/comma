@@ -296,6 +296,7 @@ export default function HksTableHeader(props: Props) {
                                         render={(props) => (
                                             <Button
                                                 {...props}
+                                                nativeButton
                                                 variant="outline"
                                                 className="select-none relative"
                                             >
@@ -365,6 +366,7 @@ export default function HksTableHeader(props: Props) {
                                     render={(props) => (
                                         <Button
                                             {...props}
+                                            nativeButton
                                             variant="outline"
                                             className="select-none"
                                         >
@@ -416,6 +418,7 @@ export default function HksTableHeader(props: Props) {
                                     render={(props) => (
                                         <Button
                                             {...props}
+                                            nativeButton
                                             variant="outline"
                                             className="select-none"
                                         >
@@ -458,6 +461,7 @@ export default function HksTableHeader(props: Props) {
                         render={(props) => (
                             <Button
                                 {...props}
+                                nativeButton
                                 variant="outline"
                                 className="select-none"
                                 onClick={onFilterReset}
@@ -476,6 +480,7 @@ export default function HksTableHeader(props: Props) {
                         render={(props) => (
                             <Button
                                 {...props}
+                                nativeButton
                                 variant="outline"
                                 className="select-none"
                                 onClick={onSortReset}
@@ -497,6 +502,7 @@ export default function HksTableHeader(props: Props) {
                         render={(props) => (
                             <Button
                                 {...props}
+                                nativeButton
                                 className="select-none"
                                 disabled={isRefreshing}
                                 onClick={onRefresh}

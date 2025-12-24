@@ -24,6 +24,7 @@ export default function HksTablePagination(props: Props) {
                     render={(props) => (
                         <Button
                             {...props}
+                            nativeButton
                             variant="outline"
                             size="default"
                             className="select-none"
@@ -50,6 +51,7 @@ export default function HksTablePagination(props: Props) {
                     render={(props) => (
                         <Button
                             {...props}
+                            nativeButton
                             variant="outline"
                             size="default"
                             className="select-none"

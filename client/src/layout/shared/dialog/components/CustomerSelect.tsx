@@ -76,6 +76,7 @@ export default function CustomerSelect(props: Props) {
                                     <FormControl {...props}>
                                         <Button
                                             variant="outline"
+                                            nativeButton
                                             role="combobox"
                                             className={cn(
                                                 "max-w-[calc(100%-2.75rem)] flex grow justify-between overflow-hidden text-ellipsis",
