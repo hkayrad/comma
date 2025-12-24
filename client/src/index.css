@@ -134,3 +134,9 @@
         font-size: 75%;
     }
 }
+
+@media (max-width: 768px) {
+    html {
+        font-size: 100%;
+    }
+}

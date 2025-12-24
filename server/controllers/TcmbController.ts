@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
 		Logger.debug(`TCMB date: ${tcmbFourteenDaysAgoDate}`);
 
 		const response = await fetch(
-			`https://proxy.hkayrad.me/tcmb?series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
+			`${process.env.PROXY_URL}/tcmb?series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
 		);
 
 		if (!response.ok) {

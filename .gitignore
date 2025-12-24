@@ -27,6 +27,5 @@ dist-ssr
 node_modules/
 
 server/uploads/logos/
-server/certs/
 
 client/.tolgeerc.json

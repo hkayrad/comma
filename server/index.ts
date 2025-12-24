@@ -140,6 +140,7 @@ server.listen(listenPort, async () => {
 		"JWT Issuer": process.env.JWT_ISSUER,
 		"JWT Audience": process.env.JWT_AUDIENCE,
 		"Refresh Token Expires In": `${process.env.JWT_EXPIRES_IN} (days)`,
+		"Proxy URL": process.env.PROXY_URL,
 		"Node Environment": process.env.NODE_ENV,
 	});
 });
