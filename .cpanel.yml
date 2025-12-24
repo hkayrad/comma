@@ -13,7 +13,9 @@ deployment:
 
     # 3. Deploy API (Node.js Server)
     # Copy server files (dist, node_modules, package.json) to the api subdomain root
-    - /bin/cp -r server/* $API_ROOT
+    - /bin/cp -r server/dist/* $API_ROOT
+    - cd $API_ROOT && npm install --omit=dev
+    - cd $API_ROOT && node sync-db.js
 
     # 4. Restart API Server (Phusion Passenger)
     - mkdir -p $API_ROOT/tmp
