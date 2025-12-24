@@ -19,6 +19,7 @@ import NotificationWebSocket from "./lib/ws/notificationWebSocket";
 import TcmbController from "./controllers/TcmbController";
 import CompanyController from "./controllers/CompanyController";
 import CompanyManagementController from "./controllers/Admin/CompanyManagementController";
+import UserManagementController from "./controllers/Admin/UserManagementController";
 import { Logger } from "./lib/utils/logger";
 import { sequelize } from "./lib/db/sequelize";
 
@@ -114,6 +115,7 @@ app.use("/payables", PayableDebtsController);
 app.use("/payables", PayablePaymentsController);
 
 app.use("/admin/companies", CompanyManagementController);
+app.use("/admin/users", UserManagementController);
 
 const listenPort =
 	process.env.SERVER_PORT ||

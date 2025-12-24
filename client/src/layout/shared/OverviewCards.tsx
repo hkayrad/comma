@@ -9,14 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type { OverviewViewType, Totals } from "@/lib/types";
 import { copyToClipboard } from "@/lib/utils";
-import {
-    BadgeAlert,
-    BadgeCheck,
-    BadgeDollarSignIcon,
-    BadgeEuroIcon,
-    BadgeTurkishLiraIcon,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type Props = {
@@ -41,15 +35,6 @@ export default function OverviewCards(props: Props) {
         total_payments: "₺0",
         remaining_debt: "₺0",
     });
-
-    const currencyBadges = useMemo(
-        () => ({
-            TRY: <BadgeTurkishLiraIcon className="hidden 2xl:block" />,
-            USD: <BadgeDollarSignIcon className="hidden 2xl:block" />,
-            EUR: <BadgeEuroIcon className="hidden 2xl:block" />,
-        }),
-        [],
-    );
 
     const fetchReceivableTotals = useCallback(async () => {
         const response = await ReceivableDebtApi.GetTotals(currency);
@@ -151,7 +136,9 @@ export default function OverviewCards(props: Props) {
                             formattedTotals.total_debts
                         )}
                     </CardTitle>
-                    <CardAction>{currencyBadges[currency]}</CardAction>
+                    <CardAction>
+                        <BadgeTurkishLiraIcon size={"1.5rem"} />
+                    </CardAction>
                 </CardHeader>
             </Card>
             <Card className="grow w-48 shadow-xs">
@@ -177,7 +164,10 @@ export default function OverviewCards(props: Props) {
                         )}
                     </CardTitle>
                     <CardAction>
-                        <BadgeCheck className="text-green-600 hidden 2xl:block" />
+                        <BadgeCheck
+                            size={"1.5rem"}
+                            className="text-green-600"
+                        />
                     </CardAction>
                 </CardHeader>
             </Card>
@@ -204,7 +194,7 @@ export default function OverviewCards(props: Props) {
                         )}
                     </CardTitle>
                     <CardAction>
-                        <BadgeAlert className="text-red-500 hidden 2xl:block" />
+                        <BadgeAlert size={"1.5rem"} className="text-red-500" />
                     </CardAction>
                 </CardHeader>
             </Card>

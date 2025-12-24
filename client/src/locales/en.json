@@ -45,6 +45,10 @@
         "table": {
             "column": {
                 "actions": "Actions",
+                "address": "Address",
+                "email": "Email",
+                "index": "#",
+                "phone": "Phone",
                 "actions.delete": "Delete customer",
                 "actions.delete.confirm": "Delete Customer",
                 "actions.delete.description": "This action will delete the customer record. Do you accept?",

@@ -4,5 +4,4 @@
 
 ## long term
 
-sirket admini kullanici ekleyebilmeli
 stok takip

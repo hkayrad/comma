@@ -20,7 +20,7 @@ export default function Root() {
                     <WebSocketProvider url={import.meta.env.VITE_WEBSOCKET_URL}>
                         <ThemeProvider
                             defaultTheme="light"
-                            storageKey="vite-ui-theme"
+                            storageKey="comma-theme"
                         >
                             <DialogProvider>
                                 <Toaster

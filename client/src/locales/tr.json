@@ -45,6 +45,10 @@
     "table": {
       "column": {
         "actions": "İşlemler",
+        "address": "Adres",
+        "email": "E-posta",
+        "index": "#",
+        "phone": "Telefon",
         "actions.delete": "Müşteriyi sil",
         "actions.delete.confirm": "Müşteriyi Sil",
         "actions.delete.description": "Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?",

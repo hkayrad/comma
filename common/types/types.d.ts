@@ -131,3 +131,24 @@ export type InsertResult = {
 	affectedRows: number;
 	id: string;
 };
+
+export type UserRole = 0 | 1 | 99;
+
+export type UserDto = {
+	id?: UUID;
+	company_id: UUID;
+	username: string;
+	role: UserRole;
+	created_at?: Date;
+	created_by?: UUID;
+	updated_at?: Date;
+	deleted_at?: Date;
+	deleted_by?: UUID;
+};
+
+export type CreateUserDto = {
+	company_id: UUID;
+	username: string;
+	password: string;
+	role: UserRole;
+};

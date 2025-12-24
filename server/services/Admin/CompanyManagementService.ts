@@ -3,6 +3,8 @@ import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import dotenv from "dotenv";
 import { Companies } from "../../models";
+import { sequelize } from "../../lib/db/sequelize";
+import { QueryTypes } from "sequelize";
 
 dotenv.config();
 
@@ -13,7 +15,7 @@ export class CompanyManagementService {
 
 			const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = company;
 
-			if (!name || !email) {
+			if (!name) {
 				Logger.error("[CompanyManagementService] Invalid company data", { company });
 				return ApiResponse.error("Invalid company data");
 			}
@@ -37,21 +39,114 @@ export class CompanyManagementService {
 		}
 	}
 
-	static async GetAll() {
-		Logger.info("[CompanyManagementService] GetAll called");
-
+	static async GetAll(page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
 		try {
-			Logger.debug("[CompanyManagementService] Fetching companies");
-			// Legacy query had `WHERE is_company != 2`. Assuming standard boolean field now.
-			const rows = await Companies.findAll();
+			Logger.info("[CompanyManagementService] GetAll called", { page, limit, sorting, filters });
 
-			if (!rows || rows.length === 0) {
-				Logger.warn("[CompanyManagementService] No companies found");
-				return ApiResponse.success([]);
+			const offset = page * limit;
+
+			const colMap: Record<string, string> = {
+				name: "c.name",
+				is_company: "c.is_company",
+				email: "c.email",
+				phone: "c.phone",
+				tax_number: "c.tax_number",
+				tax_office: "c.tax_office",
+				mersis_no: "c.mersis_no",
+				address: "c.address",
+				created_at: "c.created_at",
+			};
+
+			let whereClause = "WHERE c.deleted_at IS NULL";
+			const replacements: any[] = [];
+
+			if (filters && filters.length > 0) {
+				filters.forEach((filter) => {
+					const { id, value } = filter;
+
+					if (id === "is_company") {
+						const values = Array.isArray(value) ? value : [value];
+						const mapped = values.map((v: string) => parseInt(v, 10)).filter((v) => !isNaN(v));
+						if (mapped.length > 0) {
+							whereClause += ` AND c.is_company IN (?)`;
+							replacements.push(mapped);
+						}
+						return;
+					}
+
+					const dbCol = colMap[id];
+					if (!dbCol) return;
+
+					if (Array.isArray(value) && value.length > 0) {
+						whereClause += ` AND ${dbCol} IN (?)`;
+						replacements.push(value);
+					} else if (typeof value === "string" && value.trim() !== "") {
+						whereClause += ` AND ${dbCol} LIKE ?`;
+						replacements.push(`%${value}%`);
+					}
+				});
 			}
 
-			Logger.info("[CompanyManagementService] Fetched companies successfully");
-			return ApiResponse.success(rows);
+			let orderClause = "ORDER BY c.created_at DESC";
+			if (sorting && sorting.length > 0) {
+				const sortParts = sorting
+					.map((sort) => {
+						const dbCol = colMap[sort.id];
+						if (!dbCol) return null;
+						return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
+					})
+					.filter(Boolean);
+
+				if (sortParts.length > 0) {
+					orderClause = `ORDER BY ${sortParts.join(", ")}`;
+				}
+			}
+
+			const countQuery = `
+				SELECT COUNT(*) as count
+				FROM companies c
+				${whereClause}
+			`;
+
+			const countResult = (await sequelize.query(countQuery, {
+				replacements,
+				type: QueryTypes.SELECT,
+			})) as { count: number }[];
+
+			const totalCount = countResult[0]?.count || 0;
+
+			const query = `
+				SELECT
+					c.id,
+					c.name,
+					c.is_company,
+					c.email,
+					c.phone,
+					c.tax_number,
+					c.tax_office,
+					c.mersis_no,
+					c.address,
+					c.small_logo_path,
+					c.large_logo_path,
+					c.created_at,
+					c.updated_at
+				FROM companies c
+				${whereClause}
+				${orderClause}
+				LIMIT ? OFFSET ?;
+			`;
+
+			const result = (await sequelize.query(query, {
+				replacements: [...replacements, limit, offset],
+				type: QueryTypes.SELECT,
+			})) as CompanyDto[];
+
+			Logger.debug("[CompanyManagementService] Companies fetched successfully", {
+				count: result.length,
+				totalCount,
+			});
+
+			return ApiResponse.success({ rows: result, count: totalCount }, "Companies retrieved successfully");
 		} catch (error: any) {
 			Logger.error("[CompanyManagementService] Error fetching companies", error);
 			return ApiResponse.error("Failed to fetch companies");
@@ -84,7 +179,7 @@ export class CompanyManagementService {
 
 			const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = company;
 
-			if (!name || !email) {
+			if (!name) {
 				Logger.error("[CompanyManagementService] Invalid company data", { company });
 				return ApiResponse.error("Invalid company data");
 			}
@@ -104,7 +199,7 @@ export class CompanyManagementService {
 				},
 				{
 					where: { id },
-				}
+				},
 			);
 
 			if (affectedRows === 0) {
