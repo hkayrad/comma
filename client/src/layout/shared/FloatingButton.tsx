@@ -111,6 +111,7 @@ export default function FloatingButton() {
                         render={(props) => (
                             <MenuTrigger
                                 {...props}
+                                nativeButton
                                 render={(props) => (
                                     <Button
                                         {...props}
