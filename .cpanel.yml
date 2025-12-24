@@ -5,7 +5,7 @@ deployment:
     - export API_ROOT=/home/htrltd/api.orhandogan.com.tr
 
     # 1. Build the project in the repository
-    - /bin/bash deploy.sh
+    - /bin/bash deploy.sh > deploy.log 2>&1
 
     # 2. Deploy Client (Static Files)
     # Copy the contents of client/dist to the client subdomain root
