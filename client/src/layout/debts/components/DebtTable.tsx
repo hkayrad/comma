@@ -200,13 +200,16 @@ export default function DebtTable(props: Props) {
             title={t("debt.table.column.withholding")}
           />
         ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency
-            row={row}
-            column={column}
-            currency={row.getValue("currency")}
-          />
-        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) =>
+          row.getValue("withholding") === 0 ? (
+            "-"
+          ) : (
+            <FormattedCurrency
+              row={row}
+              column={column}
+              currency={row.getValue("currency")}
+            />
+          ),
         sortingFn: formattedNumber,
       },
       {
