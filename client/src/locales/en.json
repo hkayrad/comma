@@ -81,6 +81,7 @@
                 "currency": "Currency",
                 "customer_name": "Customer",
                 "description": "Description",
+                "discount": "Discount",
                 "exchange_rate": "Exchange Rate",
                 "invoice_no": "Invoice No",
                 "issue_date": "Issue Date",

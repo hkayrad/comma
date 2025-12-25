@@ -106,22 +106,23 @@ export default function Dashboard() {
     }, [handleRefresh]);
 
     return (
-        <div className="px-4 py-4 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+        <div className="px-3 py-3 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
             <Tabs
                 value={tabValue}
                 onValueChange={handleTabChange}
                 className="w-full gap-2"
             >
-                <TabsList className="fixed bottom-6 z-20 left-0 right-0 mx-auto select-none">
+                <TabsList className="fixed bottom-4 z-20 left-0 right-0 mx-auto select-none">
                     <TabsTrigger
                         value="receivable"
-                        className="data-active:text-green-600 data-active:bg-green-50"
+
+                        className="data-active:text-green-600 data-active:bg-green-50 h-7.5!"
                     >
                         {t("vars.receivables")}
                     </TabsTrigger>
                     <TabsTrigger
                         value="payable"
-                        className="data-active:text-red-600 data-active:bg-red-50"
+                        className="data-active:text-red-600 data-active:bg-red-50 h-7.5!"
                     >
                         {t("vars.payables")}
                     </TabsTrigger>

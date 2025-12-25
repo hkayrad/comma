@@ -179,7 +179,7 @@ export default function CustomerTable(props: Props) {
                     const isCompany = row.getValue(column.id);
                     return isCompany ? (
                         <Badge
-                            className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy"
+                            className="bg-violet-100 dark:bg-violet-900 text-violet-800 dark:text-violet-100 select-none hover:cursor-copy self-center"
                             onClick={() =>
                                 copyToClipboard(t("vars.is_company.true"), t)
                             }

@@ -185,6 +185,32 @@ export default function DebtTable(props: Props) {
                 sortingFn: formattedNumber,
             },
             {
+                accessorKey: "discount",
+                header: ({ column }: { column: Column<any> }) => (
+                    <SortableColumnHeader
+                        column={column}
+                        title={t("debt.table.column.discount")}
+                    />
+                ),
+                cell: ({
+                    row,
+                    column,
+                }: {
+                    row: Row<any>;
+                    column: Column<any>;
+                }) =>
+                    row.getValue("discount") === 0 ? (
+                        "-"
+                    ) : (
+                        <FormattedCurrency
+                            row={row}
+                            column={column}
+                            currency={row.getValue("currency")}
+                            negative
+                        />
+                    ),
+            },
+            {
                 accessorKey: "total",
                 header: ({ column }: { column: Column<any> }) => (
                     <SortableColumnHeader

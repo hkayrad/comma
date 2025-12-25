@@ -127,7 +127,7 @@ export default function HksTable(props: Props) {
                 />
             </div>
             <div className="rounded-md border overflow-clip">
-                <div className="overflow-auto max-h-[calc(100vh-21rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+                <div className="overflow-auto max-h-[calc(100vh-18rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
                     <table className="w-full caption-bottom text-sm">
                         <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
                             {table.getHeaderGroups().map((headerGroup) => (
@@ -146,7 +146,7 @@ export default function HksTable(props: Props) {
                                                     ${header.id === "actions" && "w-1"}
                                                     ${header.id === "debt_status" && "w-32"}
                                                     ${header.id === "invoice_no" && "w-36"}
-                                                    ${header.id === "is_company" && "w-32"}
+                                                    ${header.id === "is_company" && "w-16"}
                                                 `}
                                             >
                                                 {header.isPlaceholder
@@ -176,11 +176,13 @@ export default function HksTable(props: Props) {
                                             <TableCell
                                                 key={cell.id}
                                                 className={`
-                                                    py-1.5 select-none
+                                                    py-1 px-1 select-none
+                                                    ${cell.column.id === "is_company" && "w-16 text-center"}
                                                     ${cell.column.id === "name" && "w-36 overflow-hidden"}
                                                     ${cell.column.id === "desciption" && "w-36 overflow-hidden"}
                                                     ${cell.column.id === "tax_office" && "w-36 overflow-hidden"}
                                                     ${cell.column.id === "invoice_no" && "w-36 overflow-hidden"}
+                                                    ${cell.column.id === "debt_status" && "w-fit text-center"}
                                                     ${cell.column.id === "actions" && "w-fit"}
                                                 `}
                                             >

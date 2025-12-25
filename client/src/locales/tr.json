@@ -81,6 +81,7 @@
                 "currency": "Para Birimi",
                 "customer_name": "Müşteri",
                 "description": "Açıklama",
+                "discount": "İskonto",
                 "exchange_rate": "Kur",
                 "invoice_no": "Fatura No",
                 "issue_date": "Oluşturma Tarihi",

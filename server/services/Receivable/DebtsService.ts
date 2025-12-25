@@ -65,6 +65,7 @@ export default class ReceivableDebtsService {
 				amount: "d.amount",
 				vat: "d.vat",
 				total: "(d.amount + d.vat)",
+				discount: "d.discount",
 				currency: "d.currency",
 				exchange_rate: "d.exchange_rate",
 				total_in_try: "((d.amount + d.vat) * d.exchange_rate)",
