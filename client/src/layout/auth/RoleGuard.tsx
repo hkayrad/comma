@@ -3,27 +3,27 @@ import type { ReactNode } from "react";
 import { Outlet } from "react-router";
 
 interface RoleGuardProps {
-    children: ReactNode;
-    /**
-     * Required role to render children
-     */
-    requiredRole?: number;
-    /**
-     * Minimum role level required (for hierarchical roles)
-     */
-    minimumRole?: number;
-    /**
-     * Array of roles that have access
-     */
-    allowedRoles?: number[];
-    /**
-     * Render this instead if user doesn't have required role
-     */
-    fallback?: ReactNode;
-    /**
-     * Invert the logic - render children only if user does NOT have the role
-     */
-    invert?: boolean;
+  children: ReactNode;
+  /**
+   * Required role to render children
+   */
+  requiredRole?: number;
+  /**
+   * Minimum role level required (for hierarchical roles)
+   */
+  minimumRole?: number;
+  /**
+   * Array of roles that have access
+   */
+  allowedRoles?: number[];
+  /**
+   * Render this instead if user doesn't have required role
+   */
+  fallback?: ReactNode;
+  /**
+   * Invert the logic - render children only if user does NOT have the role
+   */
+  invert?: boolean;
 }
 
 /**
@@ -54,74 +54,74 @@ interface RoleGuardProps {
  * </RoleGuard>
  */
 export const RoleGuard = ({
-    children,
-    requiredRole,
-    minimumRole,
-    allowedRoles,
-    fallback = null,
-    invert = false,
+  children,
+  requiredRole,
+  minimumRole,
+  allowedRoles,
+  fallback = null,
+  invert = false,
 }: RoleGuardProps) => {
-    const { hasRole, hasMinimumRole, hasAnyRole } = useRole();
+  const { hasRole, hasMinimumRole, hasAnyRole } = useRole();
 
-    let hasAccess = false;
+  let hasAccess = false;
 
-    if (requiredRole !== undefined) {
-        hasAccess = hasRole(requiredRole);
-    } else if (minimumRole !== undefined) {
-        hasAccess = hasMinimumRole(minimumRole);
-    } else if (allowedRoles !== undefined) {
-        hasAccess = hasAnyRole(allowedRoles);
-    } else {
-        // If no role check is specified, default to true
-        hasAccess = true;
-    }
+  if (requiredRole !== undefined) {
+    hasAccess = hasRole(requiredRole);
+  } else if (minimumRole !== undefined) {
+    hasAccess = hasMinimumRole(minimumRole);
+  } else if (allowedRoles !== undefined) {
+    hasAccess = hasAnyRole(allowedRoles);
+  } else {
+    // If no role check is specified, default to true
+    hasAccess = true;
+  }
 
-    // Apply invert logic if specified
-    if (invert) {
-        hasAccess = !hasAccess;
-    }
+  // Apply invert logic if specified
+  if (invert) {
+    hasAccess = !hasAccess;
+  }
 
-    return hasAccess ? <>{children}</> : <>{fallback}</>;
+  return hasAccess ? <>{children}</> : <>{fallback}</>;
 };
 
 export const SystemAdminOnly = ({ children }: { children?: ReactNode }) => {
-    return (
-        <RoleGuard requiredRole={99} fallback={null}>
-            {children ? children : <Outlet />}
-        </RoleGuard>
-    );
+  return (
+    <RoleGuard requiredRole={99} fallback={null}>
+      {children ? children : <Outlet />}
+    </RoleGuard>
+  );
 };
 
 /**
  * Component that only renders for admin users (role === 1)
  */
 export const CompanyAdminOnly = ({
-    children,
-    fallback = null,
+  children,
+  fallback = null,
 }: {
-    children?: ReactNode;
-    fallback?: ReactNode;
+  children?: ReactNode;
+  fallback?: ReactNode;
 }) => {
-    return (
-        <RoleGuard requiredRole={1} fallback={fallback}>
-            {children ? children : <Outlet />}
-        </RoleGuard>
-    );
+  return (
+    <RoleGuard requiredRole={1} fallback={fallback}>
+      {children ? children : <Outlet />}
+    </RoleGuard>
+  );
 };
 
 /**
  * Component that only renders for non-admin users (role !== 1)
  */
 export const NonSystemAdminOnly = ({
-    children,
-    fallback = null,
+  children,
+  fallback = null,
 }: {
-    children?: ReactNode;
-    fallback?: ReactNode;
+  children?: ReactNode;
+  fallback?: ReactNode;
 }) => {
-    return (
-        <RoleGuard minimumRole={99} invert fallback={fallback}>
-            {children ? children : <Outlet />}
-        </RoleGuard>
-    );
+  return (
+    <RoleGuard minimumRole={99} invert fallback={fallback}>
+      {children ? children : <Outlet />}
+    </RoleGuard>
+  );
 };

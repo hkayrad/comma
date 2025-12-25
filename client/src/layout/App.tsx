@@ -6,40 +6,40 @@ import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
 import HksSidebar from "@/layout/shared/sidebar/HksSidebar";
 import Header from "@/layout/shared/header/Header";
 import {
-    SidebarInset,
-    SidebarProvider,
+  SidebarInset,
+  SidebarProvider,
 } from "@/components/animate-ui/components/radix/sidebar";
 import { NonSystemAdminOnly, SystemAdminOnly } from "./auth/RoleGuard";
 import Admin from "./admin/Admin";
 import { BreadcrumbProvider } from "@/contexts/breadcrumb/breadcrumbProvider";
 
 export default function App() {
-    const location = useLocation();
+  const location = useLocation();
 
-    useEffect(() => {
-        sendRefreshEvent();
-    }, [location]);
+  useEffect(() => {
+    sendRefreshEvent();
+  }, [location]);
 
-    return (
-        <div className="selection:bg-foreground selection:text-background">
+  return (
+    <div className="selection:bg-foreground selection:text-background">
+      <NonSystemAdminOnly>
+        <FloatingButton />
+      </NonSystemAdminOnly>
+      <BreadcrumbProvider>
+        <SidebarProvider>
+          <HksSidebar />
+          <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
+            <MaintenanceBanner />
+            <SystemAdminOnly>
+              <Admin />
+            </SystemAdminOnly>
             <NonSystemAdminOnly>
-                <FloatingButton />
+              <Header />
+              <Outlet />
             </NonSystemAdminOnly>
-            <BreadcrumbProvider>
-                <SidebarProvider>
-                    <HksSidebar />
-                    <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
-                        <MaintenanceBanner />
-                        <SystemAdminOnly>
-                            <Admin />
-                        </SystemAdminOnly>
-                        <NonSystemAdminOnly>
-                            <Header />
-                            <Outlet />
-                        </NonSystemAdminOnly>
-                    </SidebarInset>
-                </SidebarProvider>
-            </BreadcrumbProvider>
-        </div>
-    );
+          </SidebarInset>
+        </SidebarProvider>
+      </BreadcrumbProvider>
+    </div>
+  );
 }

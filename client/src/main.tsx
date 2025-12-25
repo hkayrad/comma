@@ -15,182 +15,151 @@ const Dashboard = lazy(() => import("./layout/dashboard/Dashboard"));
 const Debts = lazy(() => import("./layout/debts/Debts"));
 const Payments = lazy(() => import("./layout/payments/Payments"));
 const CustomerStatement = lazy(
-    () => import("./layout/dashboard/components/CustomerStatement"),
+  () => import("./layout/dashboard/components/CustomerStatement"),
 );
 const Dev = lazy(() => import("./layout/Dev"));
 const NotFound = lazy(() => import("./layout/NotFound"));
 
 const PageLoader = ({ className }: { className?: string }) => (
-    <div
-        className={cn(
-            "flex h-full w-full items-center justify-center p-4",
-            className,
-        )}
-    >
-        <Spinner className="size-8" />
-    </div>
+  <div
+    className={cn(
+      "flex h-full w-full items-center justify-center p-4",
+      className,
+    )}
+  >
+    <Spinner className="size-8" />
+  </div>
 );
 
 const router = createBrowserRouter([
-    {
-        Component: Root,
+  {
+    Component: Root,
+    children: [
+      {
+        path: "login",
+        Component: RequireNoAuth,
         children: [
-            {
-                path: "login",
-                Component: RequireNoAuth,
+          {
+            index: true,
+            element: (
+              <Suspense
+                fallback={<PageLoader className="h-screen! w-screen!" />}
+              >
+                <Login />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      {
+        path: "/",
+        Component: RequireAuth,
+        children: [
+          {
+            element: (
+              <Suspense
+                fallback={<PageLoader className="h-screen! w-screen!" />}
+              >
+                <App />
+              </Suspense>
+            ),
+            children: [
+              {
+                Component: NonSystemAdminOnly,
                 children: [
-                    {
+                  {
+                    index: true,
+                    element: (
+                      <Suspense fallback={<PageLoader />}>
+                        <Dashboard />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "alacaklar",
+                    children: [
+                      {
                         index: true,
                         element: (
-                            <Suspense
-                                fallback={
-                                    <PageLoader className="h-screen! w-screen!" />
-                                }
-                            >
-                                <Login />
-                            </Suspense>
+                          <Suspense fallback={<PageLoader />}>
+                            <Debts />
+                          </Suspense>
                         ),
-                    },
-                ],
-            },
-            {
-                path: "/",
-                Component: RequireAuth,
-                children: [
-                    {
+                      },
+                      {
+                        path: "odemeler",
                         element: (
-                            <Suspense
-                                fallback={
-                                    <PageLoader className="h-screen! w-screen!" />
-                                }
-                            >
-                                <App />
-                            </Suspense>
+                          <Suspense fallback={<PageLoader />}>
+                            <Payments />
+                          </Suspense>
                         ),
-                        children: [
-                            {
-                                Component: NonSystemAdminOnly,
-                                children: [
-                                    {
-                                        index: true,
-                                        element: (
-                                            <Suspense fallback={<PageLoader />}>
-                                                <Dashboard />
-                                            </Suspense>
-                                        ),
-                                    },
-                                    {
-                                        path: "alacaklar",
-                                        children: [
-                                            {
-                                                index: true,
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <Debts />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                            {
-                                                path: "odemeler",
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <Payments />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                            {
-                                                path: "borc_dokumu/:customerId",
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <CustomerStatement />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        path: "borclar",
-                                        children: [
-                                            {
-                                                index: true,
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <Debts />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                            {
-                                                path: "odemeler",
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <Payments />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                            {
-                                                path: "borc_dokumu/:customerId",
-                                                element: (
-                                                    <Suspense
-                                                        fallback={
-                                                            <PageLoader />
-                                                        }
-                                                    >
-                                                        <CustomerStatement />
-                                                    </Suspense>
-                                                ),
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        path: "dev",
-                                        element:
-                                            import.meta.env.VITE_NODE_ENV ===
-                                            "development" ? (
-                                                <Suspense
-                                                    fallback={<PageLoader />}
-                                                >
-                                                    <Dev />
-                                                </Suspense>
-                                            ) : null,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
+                      },
+                      {
+                        path: "borc_dokumu/:customerId",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <CustomerStatement />
+                          </Suspense>
+                        ),
+                      },
+                    ],
+                  },
+                  {
+                    path: "borclar",
+                    children: [
+                      {
+                        index: true,
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <Debts />
+                          </Suspense>
+                        ),
+                      },
+                      {
+                        path: "odemeler",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <Payments />
+                          </Suspense>
+                        ),
+                      },
+                      {
+                        path: "borc_dokumu/:customerId",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <CustomerStatement />
+                          </Suspense>
+                        ),
+                      },
+                    ],
+                  },
+                  {
+                    path: "dev",
+                    element:
+                      import.meta.env.VITE_NODE_ENV === "development" ? (
+                        <Suspense fallback={<PageLoader />}>
+                          <Dev />
+                        </Suspense>
+                      ) : null,
+                  },
                 ],
-            },
-            {
-                path: "*",
-                element: (
-                    <Suspense fallback={<PageLoader />}>
-                        <NotFound />
-                    </Suspense>
-                ),
-            },
+              },
+            ],
+          },
         ],
-    },
+      },
+      {
+        path: "*",
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <NotFound />
+          </Suspense>
+        ),
+      },
+    ],
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(
-    <RouterProvider router={router} />,
+  <RouterProvider router={router} />,
 );

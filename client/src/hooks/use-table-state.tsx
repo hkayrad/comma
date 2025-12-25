@@ -42,16 +42,16 @@ export function useTableState({
 
   // Initialize individual states, preferring stored values over defaults
   const [pagination, setPagination] = useState<PaginationState>(
-    loadedState.pagination ?? initialPagination
+    loadedState.pagination ?? initialPagination,
   );
   const [sorting, setSorting] = useState<SortingState>(
-    loadedState.sorting ?? initialSorting
+    loadedState.sorting ?? initialSorting,
   );
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    loadedState.columnFilters ?? initialColumnFilters
+    loadedState.columnFilters ?? initialColumnFilters,
   );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    loadedState.columnVisibility ?? initialColumnVisibility
+    loadedState.columnVisibility ?? initialColumnVisibility,
   );
 
   // Sync state changes to localStorage
