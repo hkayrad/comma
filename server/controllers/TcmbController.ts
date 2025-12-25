@@ -4,7 +4,9 @@ import { Logger } from "../lib/utils/logger";
 import { authMiddleware } from "../lib/middleware";
 
 function formatDate(date: Date): string {
-	return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+	const day = String(date.getDate()).padStart(2, "0");
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	return `${day}-${month}-${date.getFullYear()}`;
 }
 
 const router = express.Router();
@@ -34,18 +36,22 @@ router.get("/", async (req, res) => {
 		const today = new Date(Date.now());
 		const threeDaysAgo = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000);
 
-		const tcmbTodayDate = formatDate(today);
-		Logger.debug(`TCMB date: ${tcmbTodayDate}`);
-		const tcmbFourteenDaysAgoDate = formatDate(threeDaysAgo);
-		Logger.debug(`TCMB date: ${tcmbFourteenDaysAgoDate}`);
+		const tcmbEndDate = formatDate(today);
+		const tcmbStartDate = formatDate(threeDaysAgo);
+
+		Logger.debug(`TCMB date range: ${tcmbStartDate} to ${tcmbEndDate}`);
 
 		const response = await fetch(
-			`${process.env.PROXY_URL}/tcmb?series=${series.join("-")}&startDate=${tcmbFourteenDaysAgoDate}&endDate=${tcmbTodayDate}&type=json&frequency=2`,
+			`${process.env.PROXY_URL}/tcmb?series=${series.join("-")}&startDate=${tcmbStartDate}&endDate=${tcmbEndDate}&type=json&frequency=2`,
+			{
+				headers: {
+					"X-Api-Key": process.env.PROXY_API_KEY || "",
+				},
+			},
 		);
 
 		if (!response.ok) {
 			Logger.error("[TCMB] Failed to fetch from TCMB API", {
-				response: response,
 				status: response.status,
 				statusText: response.statusText,
 			});
@@ -53,15 +59,14 @@ router.get("/", async (req, res) => {
 		}
 
 		const result: TcmbJsonResult = await response.json();
-		Logger.debug(result);
 
-		if (!result) {
-			Logger.error("[TCMB] Failed to parse response from TCMB API");
-			return res.status(500).json({ success: false, message: "Failed to parse response from TCMB API" });
+		if (!result || !result.items || result.items.length === 0) {
+			Logger.error("[TCMB] No data returned from TCMB API");
+			return res.status(500).json({ success: false, message: "No exchange rate data available" });
 		}
 
-		const latest = result.items[result.totalCount - 1];
-		Logger.debug(latest);
+		const latest = result.items[result.items.length - 1];
+		Logger.debug("[TCMB] Processing latest data point", { latest });
 
 		const usd = {
 			buy: latest.TP_DK_USD_A_YTL,
@@ -72,14 +77,14 @@ router.get("/", async (req, res) => {
 			sell: latest.TP_DK_EUR_S_YTL,
 		};
 
-		if (!usd || !eur) {
-			Logger.error("[TCMB] Missing required currency data", { hasUsd: !!usd, hasEur: !!eur });
+		if (!usd.buy || !eur.buy) {
+			Logger.error("[TCMB] Missing required currency data in response", { hasUsd: !!usd.buy, hasEur: !!eur.buy });
 			return res.status(500).json({ success: false, message: "Missing currency data" });
 		}
 
 		const data: ExchangeRates = {
 			date: latest.Tarih,
-			unixtime: latest.UNIXTIME.$numberLong,
+			unixtime: latest.UNIXTIME?.$numberLong || "0",
 			usd: {
 				forexBuying: usd.buy,
 				forexSelling: usd.sell,
