@@ -10,7 +10,18 @@ export default class PayableDebtsService {
 		try {
 			Logger.info("[PayableDebts] Creating debt", { companyId, customerId: debt.customer_id, userId });
 
-			const { customer_id, amount, vat, currency, exchange_rate, issue_date, invoice_no, description } = debt;
+			const {
+				customer_id,
+				amount,
+				discount,
+				vat,
+				withholding,
+				currency,
+				exchange_rate,
+				issue_date,
+				invoice_no,
+				description,
+			} = debt;
 
 			if (
 				!customer_id ||
@@ -29,7 +40,9 @@ export default class PayableDebtsService {
 			const newDebt = await PayableDebts.create({
 				customer_id,
 				amount,
+				discount,
 				vat,
+				withholding,
 				currency,
 				exchange_rate,
 				issue_date,
@@ -59,6 +72,7 @@ export default class PayableDebtsService {
 				vat: "d.vat",
 				total: "(d.amount + d.vat)",
 				discount: "d.discount",
+				withholding: "d.withholding",
 				currency: "d.currency",
 				exchange_rate: "d.exchange_rate",
 				total_in_try: "((d.amount + d.vat) * d.exchange_rate)",
@@ -186,7 +200,18 @@ export default class PayableDebtsService {
 				return ApiResponse.error("Debt ID is required");
 			}
 
-			const { customer_id, amount, vat, currency, exchange_rate, issue_date, invoice_no, description } = debt;
+			const {
+				customer_id,
+				amount,
+				discount,
+				vat,
+				withholding,
+				currency,
+				exchange_rate,
+				issue_date,
+				invoice_no,
+				description,
+			} = debt;
 
 			if (
 				!customer_id ||
@@ -206,7 +231,9 @@ export default class PayableDebtsService {
 				{
 					customer_id,
 					amount,
+					discount,
 					vat,
+					withholding,
 					currency,
 					exchange_rate,
 					issue_date,

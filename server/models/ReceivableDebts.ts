@@ -10,7 +10,9 @@ export class ReceivableDebts extends Model<InferAttributes<ReceivableDebts>, Inf
 	declare customer_id: string;
 	declare invoice_no: CreationOptional<string | null>;
 	declare amount: number;
+	declare discount: number;
 	declare vat: number;
+	declare withholding: number;
 	declare currency: string;
 	declare exchange_rate: number;
 	declare total: CreationOptional<number>;
@@ -58,9 +60,19 @@ ReceivableDebts.init(
 			type: DataTypes.DECIMAL(12, 2),
 			allowNull: false,
 		},
+		discount: {
+			type: DataTypes.DECIMAL(12, 2),
+			allowNull: true,
+			defaultValue: 0.0,
+		},
 		vat: {
 			type: DataTypes.DECIMAL(12, 2),
 			allowNull: false,
+		},
+		withholding: {
+			type: DataTypes.DECIMAL(12, 2),
+			allowNull: true,
+			defaultValue: 0.0,
 		},
 		currency: {
 			type: DataTypes.CHAR(3),

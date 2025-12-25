@@ -84,6 +84,14 @@ export default function DebtDialog(props: Props) {
     currency: z.enum(["TRY", "USD", "EUR"], {
       error: t("form.debt.currency.validation.invalid"),
     }),
+    withholding: z
+      .number({ error: t("form.debt.withholding.validation.invalid") })
+      .min(0, t("form.debt.withholding.validation.min", { min: 0 }))
+      .or(z.literal(0)),
+    discount: z
+      .number({ error: t("form.debt.discount.validation.invalid") })
+      .min(0, t("form.debt.discount.validation.min", { min: 0 }))
+      .or(z.literal(0)),
     exchange_rate: z
       .number({ error: t("form.debt.exchange_rate.validation.invalid") })
       .min(0, t("form.debt.exchange_rate.validation.min", { min: 0 }))
@@ -113,6 +121,8 @@ export default function DebtDialog(props: Props) {
       customer_id: debt?.customer_id || "",
       amount: debt?.amount ? Number(debt.amount) : 0,
       vat: debt?.vat ? Number(debt.vat) : 0,
+      withholding: debt?.withholding ? Number(debt.withholding) : 0,
+      discount: debt?.discount ? Number(debt.discount) : 0,
       currency: debt?.currency || "TRY",
       exchange_rate: debt?.exchange_rate ? Number(debt.exchange_rate) : 1,
       issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
@@ -135,7 +145,32 @@ export default function DebtDialog(props: Props) {
     (e: React.MouseEvent<HTMLButtonElement>, vatPercentage: number) => {
       e.preventDefault();
       const amount = form.getValues("amount");
-      form.setValue("vat", Number((amount * vatPercentage).toFixed(2)));
+      const discount = form.getValues("discount");
+      form.setValue(
+        "vat",
+        Number(((amount - discount) * vatPercentage).toFixed(2)),
+      );
+    },
+    [form],
+  );
+
+  const handleDiscountButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
+      e.preventDefault();
+      const amount = form.getValues("amount");
+      form.setValue(
+        "discount",
+        Number((amount * discountPercentage).toFixed(2)),
+      );
+    },
+    [form],
+  );
+
+  const handleSetWithholdingButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
+      e.preventDefault();
+      const vat = form.getValues("vat");
+      form.setValue("withholding", Number((vat * discountPercentage).toFixed(2)));
     },
     [form],
   );
@@ -321,6 +356,79 @@ export default function DebtDialog(props: Props) {
         />
         <FormField
           control={form.control}
+          name="discount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex gap-1">
+                {t("form.debt.discount")}
+              </FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-1">
+                  <InputGroup>
+                    <InputGroupInput
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const num = value === "" ? "" : parseFloat(value);
+                        field.onChange(Number.isNaN(num) ? undefined : num);
+                      }}
+                    />
+                    <InputGroupAddon>
+                      {currencySign[form.watch("currency")]}
+                    </InputGroupAddon>
+                    <InputGroupAddon align="inline-end">
+                      <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                          render={(props) => (
+                            <InputGroupButton
+                              {...props}
+                              size="xs"
+                              nativeButton
+                              onClick={(e) =>
+                                handleDiscountButtonClick(e, 0.05)
+                              }
+                            >
+                              %5
+                            </InputGroupButton>
+                          )}
+                        />
+                        <TooltipContent>
+                          <p>{t("form.debt.discount.set.5%")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                          render={(props) => (
+                            <InputGroupButton
+                              {...props}
+                              size="xs"
+                              nativeButton
+                              onClick={(e) => handleDiscountButtonClick(e, 0.1)}
+                            >
+                              %10
+                            </InputGroupButton>
+                          )}
+                        />
+                        <TooltipContent>
+                          <p>{t("form.debt.discount.set.10%")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
+              </FormControl>
+              <FormDescription>
+                {t("form.debt.discount.description")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="vat"
           render={({ field }) => (
             <FormItem>
@@ -385,6 +493,62 @@ export default function DebtDialog(props: Props) {
               </FormControl>
               <FormDescription>
                 {t("form.debt.vat.description")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="withholding"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex gap-1">
+                {t("form.debt.withholding")}
+              </FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-1">
+                  <InputGroup>
+                    <InputGroupInput
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const num = value === "" ? "" : parseFloat(value);
+                        field.onChange(Number.isNaN(num) ? undefined : num);
+                      }}
+                    />
+                    <InputGroupAddon>
+                      {currencySign[form.watch("currency")]}
+                    </InputGroupAddon>
+                    <InputGroupAddon align="inline-end">
+                      <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                          render={(props) => (
+                            <InputGroupButton
+                              {...props}
+                              size="xs"
+                              nativeButton
+                              onClick={(e) =>
+                                handleSetWithholdingButtonClick(e, 0.5)
+                              }
+                            >
+                              %50
+                            </InputGroupButton>
+                          )}
+                        />
+                        <TooltipContent>
+                          <p>{t("form.debt.withholding.set.50%")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
+              </FormControl>
+              <FormDescription>
+                {t("form.debt.withholding.description")}
               </FormDescription>
               <FormMessage />
             </FormItem>

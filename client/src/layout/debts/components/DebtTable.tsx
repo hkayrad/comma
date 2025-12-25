@@ -156,23 +156,6 @@ export default function DebtTable(props: Props) {
         sortingFn: formattedNumber,
       },
       {
-        accessorKey: "vat",
-        header: ({ column }: { column: Column<any> }) => (
-          <SortableColumnHeader
-            column={column}
-            title={t("debt.table.column.vat")}
-          />
-        ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
-          <FormattedCurrency
-            row={row}
-            column={column}
-            currency={row.getValue("currency")}
-          />
-        ),
-        sortingFn: formattedNumber,
-      },
-      {
         accessorKey: "discount",
         header: ({ column }: { column: Column<any> }) => (
           <SortableColumnHeader
@@ -191,6 +174,40 @@ export default function DebtTable(props: Props) {
               negative
             />
           ),
+      },
+      {
+        accessorKey: "vat",
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("debt.table.column.vat")}
+          />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("currency")}
+          />
+        ),
+        sortingFn: formattedNumber,
+      },
+      {
+        accessorKey: "withholding",
+        header: ({ column }: { column: Column<any> }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("debt.table.column.withholding")}
+          />
+        ),
+        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+          <FormattedCurrency
+            row={row}
+            column={column}
+            currency={row.getValue("currency")}
+          />
+        ),
+        sortingFn: formattedNumber,
       },
       {
         accessorKey: "total",

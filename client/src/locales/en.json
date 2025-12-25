@@ -87,7 +87,8 @@
         "issue_date": "Issue Date",
         "total": "Total",
         "total_in_try": "Amount to be Paid",
-        "vat": "VAT"
+        "vat": "VAT",
+        "withholding": "Withholding"
       }
     }
   },
@@ -320,7 +321,18 @@
       "vat.set.10%": "Set VAT to 10% of the amount",
       "vat.set.20%": "Set VAT to 20% of the amount",
       "vat.validation.invalid": "Invalid VAT",
-      "vat.validation.min": "VAT must be at least {{min}}"
+      "vat.validation.min": "VAT must be at least {{min}}",
+      "withholding": "Withholding",
+      "withholding.description": "Withholding on Debt",
+      "withholding.set.50%": "Set Withholding to 50% of the amount",
+      "withholding.validation.invalid": "Invalid withholding",
+      "withholding.validation.min": "Withholding must be at least {{min}}",
+      "discount": "Discount",
+      "discount.description": "Discount on Debt",
+      "discount.set.5%": "Set Discount to 5% of the amount",
+      "discount.set.10%": "Set Discount to 10% of the amount",
+      "discount.validation.invalid": "Invalid discount",
+      "discount.validation.min": "Discount must be at least {{min}}"
     },
     "payment": {
       "amount": "Amount",

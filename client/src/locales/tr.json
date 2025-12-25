@@ -87,7 +87,8 @@
         "issue_date": "Oluşturma Tarihi",
         "total": "Toplam",
         "total_in_try": "Ödenecek Miktar",
-        "vat": "KDV"
+        "vat": "KDV",
+        "withholding": "Tevkifat"
       }
     }
   },
@@ -314,7 +315,18 @@
       "vat.set.10%": "Tutarın %10'unu KDV olarak ayarla",
       "vat.set.20%": "Tutarın %20'sini KDV olarak ayarla",
       "vat.validation.invalid": "Geçersiz KDV tutarı",
-      "vat.validation.min": "KDV en az {{min}} olmalıdır"
+      "vat.validation.min": "KDV en az {{min}} olmalıdır",
+      "withholding": "Tevkifat",
+      "withholding.description": "Borç Tevkifatı",
+      "withholding.set.50%": "Tevkifat tutarını borç tutarının %50'si olarak ayarla",
+      "withholding.validation.invalid": "Geçersiz Tevkifat",
+      "withholding.validation.min": "Tevkifat en az {{min}} olmalıdır",
+      "discount": "İskonto",
+      "discount.description": "İskonto Tutarı",
+      "discount.set.5%": "İskonto tutarını borç tutarının %5'i olarak ayarla",
+      "discount.set.10%": "İskonto tutarını borç tutarının %10'u olarak ayarla",
+      "discount.validation.invalid": "Geçersiz indirim",
+      "discount.validation.min": "İskonto en az {{min}} olmalıdır"
     },
     "payment": {
       "amount": "Miktar",

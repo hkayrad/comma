@@ -56,8 +56,10 @@ export type DebtDto = {
 	invoice_no?: string;
 	amount: number;
 	vat: number;
+	withholding: number;
 	currency: AvailableCurrency;
 	exchange_rate: number;
+	discount: number;
 	total?: number;
 	total_in_try?: number;
 	description?: string;
