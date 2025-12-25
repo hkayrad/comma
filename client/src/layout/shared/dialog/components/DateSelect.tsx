@@ -7,10 +7,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { format, type Locale } from "date-fns";
+import { tr, enUS } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { useMemo } from "react";
 import type { ControllerRenderProps } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   field: ControllerRenderProps<any>;
@@ -18,6 +20,16 @@ type Props = {
 
 export default function DateSelect(props: Props) {
   const { field } = props;
+
+  const { i18n } = useTranslation();
+
+  const localeMap: Record<string, Locale> = useMemo(
+    () => ({
+      tr: tr,
+      en: enUS,
+    }),
+    [],
+  );
 
   return (
     <Popover>
@@ -34,7 +46,9 @@ export default function DateSelect(props: Props) {
             >
               <CalendarIcon className="h-4 w-4 opacity-50" />
               {field.value ? (
-                format(field.value, "PPP", { locale: tr })
+                format(field.value, "PPP", {
+                  locale: localeMap[i18n.language],
+                })
               ) : (
                 <span>Bir tarih seçin</span>
               )}
@@ -45,6 +59,7 @@ export default function DateSelect(props: Props) {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
+          lang={i18n.language}
           timeZone="Europe/Istanbul"
           selected={field.value}
           onSelect={field.onChange}
