@@ -18,7 +18,7 @@ export default function ExchangeRates() {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(
     null,
   );
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const fetchExchangeRates = useCallback(async () => {
     try {
@@ -39,6 +39,11 @@ export default function ExchangeRates() {
     setIsLoading(false);
   }, [fetchExchangeRates]);
 
+  const formatDate = (date: string) => {
+    const [day, month, year] = date.split("-");
+    return `${month}.${day}.${year}`;
+  };
+
   useEffect(() => {
     handleRefresh();
   }, [fetchExchangeRates, handleRefresh]);
@@ -55,7 +60,9 @@ export default function ExchangeRates() {
                   className="text-muted-foreground text-[0.625rem] my-auto mr-1 select-none"
                 >
                   {t("header.exchange.lastUpdate", {
-                    date: exchangeRates.date.replaceAll("-", "/"),
+                    date: new Date(
+                      formatDate(exchangeRates.date),
+                    ).toLocaleDateString(i18n.language),
                   })}
                 </p>
               )}
@@ -63,7 +70,9 @@ export default function ExchangeRates() {
             <TooltipContent side="left">
               <span>
                 {t("header.exchange.lastUpdate.hover", {
-                  date: exchangeRates.date.replaceAll("-", "/"),
+                  date: new Date(
+                    formatDate(exchangeRates.date),
+                  ).toLocaleDateString(i18n.language),
                   tcmb: t("vars.tcmb"),
                 })}
               </span>

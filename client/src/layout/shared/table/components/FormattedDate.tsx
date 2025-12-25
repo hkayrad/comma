@@ -9,9 +9,9 @@ type Props = {
 
 export default function FormattedDate(props: Props) {
   const { row, column } = props;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const date = new Date(row.getValue(column.id));
-  const formatted = date.toLocaleDateString("tr-TR");
+  const formatted = date.toLocaleDateString(i18n.language);
 
   return (
     <p
