@@ -29,3 +29,5 @@ node_modules/
 server/uploads/logos/
 
 client/.tolgeerc.json
+
+build/
