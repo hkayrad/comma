@@ -112,10 +112,6 @@ export default function Admin() {
             {t("sidebar.footer.companyManagement.accountDetails.label")}
           </p>
         </div>
-        <Button onClick={handleAddCompany}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t("dashboard.addButton.actions.receivable.addCustomer")}
-        </Button>
       </div>
       <div>
         <CompanyTable
@@ -130,6 +126,12 @@ export default function Admin() {
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={setColumnVisibility}
           onManageUsers={handleManageUsers}
+          addButton={
+            <Button onClick={handleAddCompany}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t("dashboard.addButton.actions.receivable.addCustomer")}
+            </Button>
+          }
         />
       </div>
     </div>

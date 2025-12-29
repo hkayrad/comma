@@ -5,7 +5,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -42,6 +42,7 @@ type Props = {
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
+  addButton?: ReactNode;
 };
 
 export default function HksTable(props: Props) {
@@ -59,6 +60,7 @@ export default function HksTable(props: Props) {
     onColumnFiltersChange,
     columnVisibility: controlledColumnVisibility,
     onColumnVisibilityChange,
+    addButton,
   } = props;
 
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -114,7 +116,12 @@ export default function HksTable(props: Props) {
   return (
     <>
       <div className="sticky -top-4 z-20 pt-2 pb-2 bg-background">
-        <HksTableHeader table={table} searchColumn={searchColumn} tags={tags} />
+        <HksTableHeader
+          table={table}
+          searchColumn={searchColumn}
+          tags={tags}
+          addButton={addButton}
+        />
       </div>
       <div className="rounded-md border overflow-clip">
         <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">

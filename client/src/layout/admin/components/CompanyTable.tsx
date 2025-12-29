@@ -32,7 +32,7 @@ import CompanyDialog from "./CompanyDialog";
 import { useDialog } from "@/contexts/dialog";
 import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
 import ClickToCopyText from "@/layout/shared/ClickToCopyText";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 
@@ -48,6 +48,7 @@ type Props = {
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   onManageUsers?: (company: CompanyDto) => void;
+  addButton?: ReactNode;
 };
 
 export default function CompanyTable(props: Props) {
@@ -63,6 +64,7 @@ export default function CompanyTable(props: Props) {
     columnVisibility,
     onColumnVisibilityChange,
     onManageUsers,
+    addButton,
   } = props;
 
   const { openDialog } = useDialog();
@@ -351,6 +353,7 @@ export default function CompanyTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      addButton={addButton}
     />
   );
 }

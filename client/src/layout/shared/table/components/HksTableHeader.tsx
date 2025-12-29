@@ -30,7 +30,14 @@ import {
   Rows3,
   UserRound,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { toast } from "sonner";
 import HksTablePagination from "./HksTablePagination";
 import { Badge } from "@/components/ui/badge";
@@ -48,10 +55,11 @@ type Props = {
     label?: string;
     color: string;
   }[];
+  addButton?: ReactNode;
 };
 
 export default function HksTableHeader(props: Props) {
-  const { table, searchColumn, tags } = props;
+  const { table, searchColumn, tags, addButton } = props;
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -484,7 +492,7 @@ export default function HksTableHeader(props: Props) {
           />
           <TooltipContent>{t("table.header.refresh.hover")}</TooltipContent>
         </Tooltip>
-        <AddButton />
+        {addButton || <AddButton />}
       </div>
     </div>
   );
