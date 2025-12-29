@@ -9,7 +9,7 @@ This project provides a robust platform for businesses and individuals to manage
 ## Features
 
 - **Dashboard:** A comprehensive overview of key financial metrics, including total receivables, total payables, and outstanding balances.
-- **Debt Management:** Create, edit, and delete debt records with detailed information such as due dates, amounts, and associated customers.
+- **Debt Management:** Create, edit, and delete debt records with detailed information such as due dates, amounts, and associated customers. Supports discount and withholding calculations.
 - **Payment Processing:** Record payments against outstanding debts, with support for partial payments and payment history tracking.
 - **Customer Management:** Maintain a centralized database of customer information, including contact details and transaction history.
 - **User Authentication:** Secure user authentication with role-based access control, ensuring that users can only access the information and features relevant to their roles.
@@ -30,7 +30,7 @@ To get the project up and running on your local machine, please follow these ste
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/hks-io.git
+    git clone https://github.com/Hakan-Kimya/comma.git
     cd hks-io
     ```
 2.  **Install client dependencies:**
@@ -65,6 +65,8 @@ To get the project up and running on your local machine, please follow these ste
         NODE_ENV=<development | production>
         CLIENT_URL=<client_url>
         TCMB_API_KEY=<your_tcmb_evds2_api_key>
+        PROXY_URL=<your_proxy_url>
+        PROXY_API_KEY=<your_proxy_api_key>
         ```
 
 ### Running the Application

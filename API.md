@@ -252,7 +252,16 @@ Base URL: `/receivables`
 - **Endpoint:** `/debts`
 - **Description:** Creates a new debt record for a receivable customer.
 - **Request Body:**
-    - `DebtDto` object.
+    - `customer_id` (UUID): The ID of the customer.
+    - `amount` (number): The debt amount.
+    - `currency` (string): The currency code (TRY, USD, EUR).
+    - `exchange_rate` (number): The exchange rate at the time of issue.
+    - `vat` (number): The VAT amount.
+    - `withholding` (number): The withholding tax amount.
+    - `discount` (number): The discount amount.
+    - `issue_date` (string): The date of issue (ISO 8601).
+    - `invoice_no` (string, optional): The invoice number.
+    - `description` (string, optional): A description of the debt.
 - **Response:**
     - `success` (boolean): True if successful.
 
@@ -284,7 +293,16 @@ Base URL: `/receivables`
 - **Parameters:**
     - `id` (string): The debt ID.
 - **Request Body:**
-    - `DebtDto` object.
+    - `customer_id` (UUID): The ID of the customer.
+    - `amount` (number): The debt amount.
+    - `currency` (string): The currency code (TRY, USD, EUR).
+    - `exchange_rate` (number): The exchange rate.
+    - `vat` (number): The VAT amount.
+    - `withholding` (number): The withholding tax amount.
+    - `discount` (number): The discount amount.
+    - `issue_date` (string): The date of issue.
+    - `invoice_no` (string, optional): The invoice number.
+    - `description` (string, optional): A description.
 - **Response:**
     - `success` (boolean): True if successful.
 
@@ -419,7 +437,16 @@ Base URL: `/payables`
 - **Endpoint:** `/debts`
 - **Description:** Creates a new debt record (bill) for a payable customer.
 - **Request Body:**
-    - `DebtDto` object.
+    - `customer_id` (UUID): The ID of the customer.
+    - `amount` (number): The debt amount.
+    - `currency` (string): The currency code (TRY, USD, EUR).
+    - `exchange_rate` (number): The exchange rate.
+    - `vat` (number): The VAT amount.
+    - `withholding` (number): The withholding tax amount.
+    - `discount` (number): The discount amount.
+    - `issue_date` (string): The date of issue.
+    - `invoice_no` (string, optional): The invoice number.
+    - `description` (string, optional): A description.
 - **Response:**
     - `success` (boolean): True if successful.
 
@@ -451,7 +478,16 @@ Base URL: `/payables`
 - **Parameters:**
     - `id` (string): The debt ID.
 - **Request Body:**
-    - `DebtDto` object.
+    - `customer_id` (UUID): The ID of the customer.
+    - `amount` (number): The debt amount.
+    - `currency` (string): The currency code (TRY, USD, EUR).
+    - `exchange_rate` (number): The exchange rate.
+    - `vat` (number): The VAT amount.
+    - `withholding` (number): The withholding tax amount.
+    - `discount` (number): The discount amount.
+    - `issue_date` (string): The date of issue.
+    - `invoice_no` (string, optional): The invoice number.
+    - `description` (string, optional): A description.
 - **Response:**
     - `success` (boolean): True if successful.
 
