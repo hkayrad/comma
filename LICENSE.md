@@ -1,4 +1,4 @@
-# hks-io License
+# Comma License
 
 Copyright (c) 2025 Hakan Kayra Doğan. All rights reserved.
 
@@ -6,7 +6,7 @@ This software is the confidential and proprietary information of Hakan Kayra Do�
 
 ## 1. Definitions
 
-- **"Software"** refers to the hks-io application, including all of its source code, object code, and accompanying documentation.
+- **"Software"** refers to the Comma application, including all of its source code, object code, and accompanying documentation.
 - **"Licensor"** refers to Hakan Kayra Doğan.
 - **"Licensee"** refers to the individual or entity that has been granted a license to use the Software.
 

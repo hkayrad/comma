@@ -1,6 +1,6 @@
 # Coding Conventions
 
-This document outlines the coding standards and architectural patterns for the hks-io project.
+This document outlines the coding standards and architectural patterns for the Comma project.
 
 ## Client-Side Conventions (React + TypeScript)
 

@@ -1,10 +1,10 @@
-# hks-io
+# Comma
 
-hks-io is a full-stack web application designed to streamline the management of receivables and payables. It offers a comprehensive suite of tools for tracking finances, managing customer data, and ensuring secure access to financial information.
+Comma is a full-stack web application designed to streamline the management of receivables and payables. It offers a comprehensive suite of tools for tracking finances, managing customer data, and ensuring secure access to financial information.
 
 ## About the Project
 
-This project provides a robust platform for businesses and individuals to manage their financial transactions. With a user-friendly interface and a powerful backend, hks-io simplifies the process of tracking debts, recording payments, and maintaining a clear overview of financial health. The application is designed to be both scalable and secure, making it suitable for a wide range of use cases.
+This project provides a robust platform for businesses and individuals to manage their financial transactions. With a user-friendly interface and a powerful backend, Comma simplifies the process of tracking debts, recording payments, and maintaining a clear overview of financial health. The application is designed to be both scalable and secure, making it suitable for a wide range of use cases.
 
 ## Features
 
@@ -31,7 +31,7 @@ To get the project up and running on your local machine, please follow these ste
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/Hakan-Kimya/comma.git
-    cd hks-io
+    cd comma
     ```
 2.  **Install client dependencies:**
     ```bash

@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-**hks-io** is a full-stack web application for managing financial transactions (receivables and payables). It features a modern React-based frontend and a robust Node.js/Express backend backed by a MariaDB database.
+**Comma** is a full-stack web application for managing financial transactions (receivables and payables). It features a modern React-based frontend and a robust Node.js/Express backend backed by a MariaDB database.
 
 *   **Frontend:** React, TypeScript, Vite, Tailwind CSS, Shadcn/ui.
 *   **Backend:** Node.js, Express, TypeScript, Sequelize ORM.
