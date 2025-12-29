@@ -26,19 +26,19 @@ import {
 import { useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 
-export default function FloatingButton() {
+export default function AddButton() {
   const { openDialog } = useDialog();
   const location = useLocation();
   const { t } = useTranslation();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleFloatingMenu = useCallback(() => {
+  const toggleAddMenu = useCallback(() => {
     setIsMenuOpen(!isMenuOpen);
   }, [isMenuOpen]);
 
   const handleAddReceivableCustomer = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.receivableCustomer.add.title"),
       description: t("dialog.receivableCustomer.add.description"),
@@ -46,10 +46,10 @@ export default function FloatingButton() {
       content: <CustomerDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   const handleAddReceivableDebt = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.receivable.add.title"),
       description: t("dialog.receivable.add.description"),
@@ -57,10 +57,10 @@ export default function FloatingButton() {
       content: <DebtDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   const handleAddReceivablePayment = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.receivablePayment.add.title"),
       description: t("dialog.receivablePayment.add.description"),
@@ -68,10 +68,10 @@ export default function FloatingButton() {
       content: <PaymentDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   const handleAddPayableCustomer = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.payableCustomer.add.title"),
       description: t("dialog.payableCustomer.add.description"),
@@ -79,10 +79,10 @@ export default function FloatingButton() {
       content: <CustomerDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   const handleAddPayableDebt = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.payable.add.title"),
       description: t("dialog.payable.add.description"),
@@ -90,10 +90,10 @@ export default function FloatingButton() {
       content: <DebtDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   const handleAddPayablePayment = useCallback(() => {
-    toggleFloatingMenu();
+    toggleAddMenu();
     openDialog({
       title: t("dialog.payablePayment.add.title"),
       description: t("dialog.payablePayment.add.description"),
@@ -101,7 +101,7 @@ export default function FloatingButton() {
       content: <PaymentDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleFloatingMenu, t]);
+  }, [openDialog, toggleAddMenu, t]);
 
   return (
     <>
@@ -116,24 +116,25 @@ export default function FloatingButton() {
                   <Button
                     {...props}
                     nativeButton
-                    size="icon"
-                    className="fixed bottom-4 right-4 z-50"
+                    size="default"
+                    // className="fixed bottom-4 right-4 z-50"
                   >
                     <Plus
                       className={`transition-transform duration-300 ease ${isMenuOpen ? `-rotate-45` : `rotate-0`}`}
                     />
+                    {t("dashboard.addButton.label")}
                   </Button>
                 )}
               ></MenuTrigger>
             )}
           ></TooltipTrigger>
-          <TooltipContent side="left">
-            {t("dashboard.floatingButton.hover")}
+          <TooltipContent side="top">
+            {t("dashboard.addButton.hover")}
           </TooltipContent>
         </Tooltip>
         <MenuPanel
           className="w-fit bg-transparent! p-0! border-none! space-y-1! shadow-none! overflow-visible"
-          side="top"
+          side="bottom"
           align="end"
           sideOffset={4}
         >
@@ -141,26 +142,24 @@ export default function FloatingButton() {
             location.pathname.startsWith("/alacaklar")) && (
             <MenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
               <MenuGroupLabel className="relative z-10 text-muted-foreground select-none">
-                {t("dashboard.floatingButton.actions.receivable")}
+                {t("dashboard.addButton.actions.receivable")}
               </MenuGroupLabel>
               <MenuItem onClick={handleAddReceivableCustomer}>
                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                 <span>
-                  {t("dashboard.floatingButton.actions.receivable.addCustomer")}
+                  {t("dashboard.addButton.actions.receivable.addCustomer")}
                 </span>
               </MenuItem>
               <MenuItem onClick={handleAddReceivableDebt}>
                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
                 <span>
-                  {t(
-                    "dashboard.floatingButton.actions.receivable.addReceivable",
-                  )}
+                  {t("dashboard.addButton.actions.receivable.addReceivable")}
                 </span>
               </MenuItem>
               <MenuItem onClick={handleAddReceivablePayment}>
                 <Banknote className="mr-2 h-4 w-4" />
                 <span>
-                  {t("dashboard.floatingButton.actions.receivable.addPayment")}
+                  {t("dashboard.addButton.actions.receivable.addPayment")}
                 </span>
               </MenuItem>
             </MenuGroup>
@@ -169,24 +168,24 @@ export default function FloatingButton() {
             location.pathname.startsWith("/borclar")) && (
             <MenuGroup className="bg-popover p-1! border! rounded-md! shadow-md">
               <MenuGroupLabel className="relative z-10 text-muted-foreground select-none">
-                {t("dashboard.floatingButton.actions.payable")}
+                {t("dashboard.addButton.actions.payable")}
               </MenuGroupLabel>
               <MenuItem onClick={handleAddPayableCustomer}>
                 <UserPlus2Icon className="mr-2 h-4 w-4" />
                 <span>
-                  {t("dashboard.floatingButton.actions.payable.addCustomer")}
+                  {t("dashboard.addButton.actions.payable.addCustomer")}
                 </span>
               </MenuItem>
               <MenuItem onClick={handleAddPayableDebt}>
                 <ReceiptTurkishLira className="mr-2 h-4 w-4" />
                 <span>
-                  {t("dashboard.floatingButton.actions.payable.addPayable")}
+                  {t("dashboard.addButton.actions.payable.addPayable")}
                 </span>
               </MenuItem>
               <MenuItem onClick={handleAddPayablePayment}>
                 <Banknote className="mr-2 h-4 w-4" />
                 <span>
-                  {t("dashboard.floatingButton.actions.payable.addPayment")}
+                  {t("dashboard.addButton.actions.payable.addPayment")}
                 </span>
               </MenuItem>
             </MenuGroup>

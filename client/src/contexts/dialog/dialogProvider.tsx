@@ -60,17 +60,17 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
 
       const dialogToClose = prev[lastOpenIndex];
 
-      // Trigger onClose callback if exists
-      if (dialogToClose.onClose) {
-        dialogToClose.onClose();
-      }
-
       // Create new array with the target dialog set to isOpen: false
       const newDialogs = [...prev];
       newDialogs[lastOpenIndex] = { ...dialogToClose, isOpen: false };
 
       // Schedule removal of this dialog after animation
       setTimeout(() => {
+        // Trigger onClose callback if exists
+        if (dialogToClose.onClose) {
+          dialogToClose.onClose();
+        }
+
         setDialogs((currentDialogs) =>
           currentDialogs.filter((d) => d.id !== dialogToClose.id),
         );

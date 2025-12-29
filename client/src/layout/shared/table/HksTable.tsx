@@ -113,11 +113,11 @@ export default function HksTable(props: Props) {
 
   return (
     <>
-      <div className="sticky -top-4 z-20 pt-2 pb-4 bg-background">
+      <div className="sticky -top-4 z-20 pt-2 pb-2 bg-background">
         <HksTableHeader table={table} searchColumn={searchColumn} tags={tags} />
       </div>
       <div className="rounded-md border overflow-clip">
-        <div className="overflow-auto max-h-[calc(100vh-18rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+        <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
           <table className="w-full caption-bottom text-sm">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (

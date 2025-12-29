@@ -8,7 +8,8 @@
       "overcharge": "This customer has been overcharged.",
       "overpay": "This customer has been overpaid."
     },
-    "floatingButton": {
+    "addButton": {
+      "label": "Add",
       "actions": {
         "payable": "Payable Actions",
         "payable.addCustomer": "Add Customer",

@@ -75,7 +75,7 @@ export default function UserManagement({ company, onBack }: Props) {
 
   const handleAddUser = useCallback(() => {
     openDialog({
-      title: t("dashboard.floatingButton.actions.receivable.addCustomer"),
+      title: t("dashboard.addButton.actions.receivable.addCustomer"),
       description: t("dialog.customer.add.description"),
       size: "md",
       content: <UserDialog companyId={company.id!} />,
@@ -97,7 +97,7 @@ export default function UserManagement({ company, onBack }: Props) {
         </div>
         <Button onClick={handleAddUser}>
           <Plus className="h-4 w-4 mr-2" />
-          {t("dashboard.floatingButton.actions.receivable.addCustomer")}
+          {t("dashboard.addButton.actions.receivable.addCustomer")}
         </Button>
       </div>
       <div>

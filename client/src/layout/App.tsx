@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router";
 import { useEffect } from "react";
 import { sendRefreshEvent } from "@/lib/utils";
-import FloatingButton from "@/layout/shared/FloatingButton";
+// import addButton from "@/layout/shared/addButton";
 import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
 import HksSidebar from "@/layout/shared/sidebar/HksSidebar";
 import Header from "@/layout/shared/header/Header";
@@ -22,9 +22,8 @@ export default function App() {
 
   return (
     <div className="selection:bg-foreground selection:text-background">
-      <NonSystemAdminOnly>
-        <FloatingButton />
-      </NonSystemAdminOnly>
+      {/*<NonSystemAdminOnly>
+      </NonSystemAdminOnly>*/}
       <BreadcrumbProvider>
         <SidebarProvider>
           <HksSidebar />

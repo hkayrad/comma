@@ -114,7 +114,7 @@ export default function Admin() {
         </div>
         <Button onClick={handleAddCompany}>
           <Plus className="h-4 w-4 mr-2" />
-          {t("dashboard.floatingButton.actions.receivable.addCustomer")}
+          {t("dashboard.addButton.actions.receivable.addCustomer")}
         </Button>
       </div>
       <div>

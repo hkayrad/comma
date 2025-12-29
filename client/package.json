@@ -5,7 +5,7 @@
         "url": "https://hkayrad.tr"
     },
     "private": true,
-    "version": "2.2.3",
+    "version": "2.3.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -54,6 +54,7 @@
         "lucide-react": "^0.561.0",
         "motion": "^12.23.26",
         "next-themes": "^0.4.6",
+        "pdfjs-dist": "^5.4.449",
         "radix-ui": "^1.4.3",
         "react": "^19.2.3",
         "react-day-picker": "^9.13.0",

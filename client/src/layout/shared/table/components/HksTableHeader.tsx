@@ -36,6 +36,7 @@ import HksTablePagination from "./HksTablePagination";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
+import AddButton from "./AddButton";
 
 type Props = {
   table: Table<any>;
@@ -461,7 +462,7 @@ export default function HksTableHeader(props: Props) {
           </TooltipContent>
         </Tooltip>
       </ButtonGroup>
-      <div className="flex gap-4 ml-auto ">
+      <div className="flex gap-2 ml-auto ">
         <HksTablePagination table={table} />
         <Tooltip disableHoverablePopup>
           <TooltipTrigger
@@ -471,6 +472,7 @@ export default function HksTableHeader(props: Props) {
                 nativeButton
                 className="select-none"
                 disabled={isRefreshing}
+                variant="outline"
                 onClick={onRefresh}
               >
                 <RefreshCw
@@ -482,6 +484,7 @@ export default function HksTableHeader(props: Props) {
           />
           <TooltipContent>{t("table.header.refresh.hover")}</TooltipContent>
         </Tooltip>
+        <AddButton />
       </div>
     </div>
   );
