@@ -24,8 +24,8 @@ cd "$SERVER_DIR" || handle_error "Failed to change to server directory."
 $SERVER_BUILD_CMD || handle_error "Server build failed."
 $SERVER_POSTBUILD_CMD || handle_error "Server postbuild failed."
 sed -i '/"type": "module",/d' dist/package.json || handle_error "Failed to remove type: module from package.json"
-mkdir -p ../build/server || handle_error "Failed to create build directory"
-cp -r dist/* ../build/server || handle_error "Failed to copy server files to build directory"
+mkdir -p ../build/api.orhandogan.com.tr || handle_error "Failed to create build directory"
+cp -r dist/* ../build/api.orhandogan.com.tr || handle_error "Failed to copy server files to build directory"
 rm -rf ./dist
 cd - > /dev/null # Go back to the original directory
 
@@ -33,8 +33,8 @@ cd - > /dev/null # Go back to the original directory
 echo "Building client project..."
 cd "$CLIENT_DIR" || handle_error "Failed to change to client directory."
 $CLIENT_BUILD_CMD || handle_error "Client build failed."
-mkdir -p ../build/client || handle_error "Failed to create build directory"
-cp -r dist/* ../build/client || handle_error "Failed to copy client files to build directory"
+mkdir -p ../build/comma.orhandogan.com.tr || handle_error "Failed to create build directory"
+cp -r dist/* ../build/comma.orhandogan.com.tr || handle_error "Failed to copy client files to build directory"
 rm -rf ./dist
 cd - > /dev/null # Go back to the original directory
 
