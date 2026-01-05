@@ -5,7 +5,7 @@
         "url": "https://hkayrad.tr"
     },
     "private": true,
-    "version": "2.3.1",
+    "version": "2.3.2",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -45,6 +45,7 @@
         "country-flag-icons": "^1.6.4",
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
+        "html2canvas": "^1.4.1",
         "i18next": "^25.7.3",
         "i18next-browser-languagedetector": "^8.2.0",
         "input-otp": "^1.4.2",

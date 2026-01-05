@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "title": "Customers",
     "customer_info": {
       "contact_info": "Contact Information",
       "credit_balance": "You have a balance to pay to this customer.",
@@ -70,6 +71,7 @@
     }
   },
   "debt": {
+    "title": "Debts",
     "table": {
       "column": {
         "actions": "Actions",
@@ -528,6 +530,7 @@
     "total": "Total {{state}}"
   },
   "payment": {
+    "title": "Payments",
     "table": {
       "column": {
         "actions": "Actions",
@@ -590,6 +593,14 @@
   },
   "table": {
     "header": {
+      "export": "Export",
+      "export.hover": "Export table",
+      "export.csv": "Export as CSV",
+      "export.csv.success": "Table exported as CSV",
+      "export.pdf": "Export as PDF",
+      "export.pdf.success": "Table exported as PDF",
+      "export.pdf.error": "Error creating PDF",
+      "export.pdf.title": "Table Export",
       "filters": "Filters",
       "filters.clear": "Clear Filters",
       "filters.clear.hover": "Clear all filters",
@@ -631,6 +642,7 @@
     "card": "Card",
     "cash": "Cash",
     "check": "Check",
+    "created_at": "Created",
     "creation_date": "Creation Date",
     "customer": "Customer",
     "date_range": "Date Range",
@@ -651,6 +663,7 @@
     "large": "large",
     "payable": "Payable",
     "payables": "Payables",
+    "page": "Page",
     "payment": "Payment",
     "phone": "Phone",
     "receivable": "Receivable",
@@ -658,6 +671,7 @@
     "save": "Save",
     "small": "Small",
     "tax_number": "Tax No",
+    "tax_office": "Tax Office",
     "tckn": "TR Identity No",
     "tcmb": "Central Bank of the Republic of Türkiye",
     "try": "Turkish Lira (TRY)",

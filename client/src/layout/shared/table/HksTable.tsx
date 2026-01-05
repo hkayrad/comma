@@ -123,7 +123,7 @@ export default function HksTable(props: Props) {
           addButton={addButton}
         />
       </div>
-      <div className="rounded-md border overflow-clip">
+      <div className="rounded-md border overflow-clip" data-table-export>
         <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
           <table className="w-full caption-bottom text-sm">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">

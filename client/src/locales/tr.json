@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "title": "Müşteriler",
     "customer_info": {
       "contact_info": "İletişim Bilgileri",
       "credit_balance": "Bu müşteriye ödemeniz gereken bakiye bulunmaktadır.",
@@ -70,6 +71,7 @@
     }
   },
   "debt": {
+    "title": "Borçlar",
     "table": {
       "column": {
         "actions": "İşlemler",
@@ -522,6 +524,7 @@
     "total": "Toplam {{state}}"
   },
   "payment": {
+    "title": "Ödemeler",
     "table": {
       "column": {
         "actions": "İşlemler",
@@ -584,6 +587,14 @@
   },
   "table": {
     "header": {
+      "export": "Dışa Aktar",
+      "export.hover": "Tabloyu dışa aktar",
+      "export.csv": "CSV olarak dışa aktar",
+      "export.csv.success": "Tablo CSV olarak dışa aktarıldı",
+      "export.pdf": "PDF olarak dışa aktar",
+      "export.pdf.success": "Tablo PDF olarak dışa aktarıldı",
+      "export.pdf.error": "PDF oluşturulurken hata oluştu",
+      "export.pdf.title": "Tablo Dışa Aktarımı",
       "filters": "Filtreler",
       "filters.clear": "Filtreleri Temizle",
       "filters.clear.hover": "Tüm filtreleri kaldır",
@@ -625,6 +636,7 @@
     "card": "Kart",
     "cash": "Nakit",
     "check": "Çek",
+    "created_at": "Oluşturma",
     "creation_date": "Oluşturma Tarihi",
     "customer": "Müşteri",
     "date_range": "Tarih Aralığı",
@@ -645,6 +657,7 @@
     "large": "Büyük",
     "payable": "Borç",
     "payables": "Borçlar",
+    "page": "Sayfa",
     "payment": "Ödeme",
     "phone": "Telefon",
     "receivable": "Alacak",
@@ -652,6 +665,7 @@
     "save": "Kaydet",
     "small": "Küçük",
     "tax_number": "Vergi No",
+    "tax_office": "Vergi Dairesi",
     "tckn": "TC Kimlik No",
     "tcmb": "Türkiye Cumhuriyeti Merkez Bankası",
     "try": "Türk Lirası (TRY)",

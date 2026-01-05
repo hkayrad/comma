@@ -5,6 +5,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -24,6 +25,9 @@ import type { Table } from "@tanstack/react-table";
 import {
   ArrowUpDown,
   Columns3Cog,
+  Download,
+  FileSpreadsheet,
+  FileText,
   Filter,
   FilterX,
   RefreshCw,
@@ -44,6 +48,10 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import AddButton from "./AddButton";
+import { CompanyApi } from "@/lib/api/company";
+import type { CompanyDto } from "@/lib/types";
+import { exportTablePDF } from "@/lib/pdf-table-export";
+import { Logger } from "@/lib/utils/logger";
 
 type Props = {
   table: Table<any>;
@@ -130,6 +138,92 @@ export default function HksTableHeader(props: Props) {
     table.resetSorting();
     toast.success("Sıralama sıfırlandı!");
   }, [table]);
+
+  const onExportCSV = useCallback(() => {
+    const visibleColumns = table
+      .getAllColumns()
+      .filter((col) => col.getIsVisible() && col.id !== "actions" && col.id !== "#" && col.id !== "debt_status" && col.id !== "is_company");
+
+    const headers = visibleColumns.map((col) => col.id);
+
+    const rows = table.getRowModel().rows.map((row) => {
+      return visibleColumns.map((col) => {
+        const value = row.getValue(col.id);
+        if (value === null || value === undefined || value === "") return "-";
+        const strValue = String(value).trim();
+        if (strValue === "") return "-";
+        if (strValue.includes(",") || strValue.includes('"') || strValue.includes("\n")) {
+          return `"${strValue.replace(/"/g, '""')}"`;
+        }
+        return strValue;
+      });
+    });
+
+    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success(t("table.header.export.csv.success"));
+  }, [table, t]);
+
+  const onExportPDF = useCallback(async () => {
+    const visibleColumns = table
+      .getAllColumns()
+      .filter((col) => col.getIsVisible() && col.id !== "actions" && col.id !== "#" && col.id !== "debt_status" && col.id !== "is_company");
+
+    const headers = visibleColumns.map((col) =>
+      t(`${translationPrefix}.table.column.${col.id}`, { defaultValue: col.id })
+    );
+
+    const rows = table.getRowModel().rows.map((row) => {
+      return visibleColumns.map((col) => {
+        const value = row.getValue(col.id);
+        if (value === null || value === undefined || value === "") return "-";
+        const strValue = String(value).trim();
+        return strValue === "" ? "-" : strValue;
+      });
+    });
+
+    try {
+      // Fetch company data for the PDF header
+      let company: CompanyDto | null = null;
+      try {
+        const response = await CompanyApi.GetCompanyById();
+        if (response.success) {
+          company = response.data;
+        }
+      } catch (error) {
+        Logger.warn("Could not fetch company data for PDF export:", error);
+      }
+
+      // Generate title based on current page
+      const titleMap: Record<string, string> = {
+        dashboard: t("dashboard.title"),
+        debt: t("debt.title"),
+        payment: t("payment.title"),
+      };
+      const title = titleMap[translationPrefix] || t("table.header.export.pdf.title");
+
+      await exportTablePDF(
+        { headers, rows, title },
+        company,
+        `${new Date().toISOString().split("T")[0]}`,
+        "landscape"
+      );
+
+      toast.success(t("table.header.export.pdf.success"));
+    } catch {
+      toast.error(t("table.header.export.pdf.error"));
+    }
+  }, [table, t, translationPrefix]);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -472,6 +566,39 @@ export default function HksTableHeader(props: Props) {
       </ButtonGroup>
       <div className="flex gap-2 ml-auto ">
         <HksTablePagination table={table} />
+        <DropdownMenu>
+          <Tooltip disableHoverablePopup>
+            <TooltipTrigger
+              render={(props) => (
+                <DropdownMenuTrigger
+                  {...props}
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="outline"
+                      className="select-none"
+                    >
+                      <Download />
+                      <span>{t("table.header.export")}</span>
+                    </Button>
+                  )}
+                />
+              )}
+            />
+            <TooltipContent>{t("table.header.export.hover")}</TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent align="end" className="w-fit">
+            <DropdownMenuItem onClick={onExportCSV}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              {t("table.header.export.csv")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onExportPDF}>
+              <FileText className="mr-2 h-4 w-4" />
+              {t("table.header.export.pdf")}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Tooltip disableHoverablePopup>
           <TooltipTrigger
             render={(props) => (
