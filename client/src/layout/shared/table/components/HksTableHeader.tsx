@@ -142,7 +142,14 @@ export default function HksTableHeader(props: Props) {
   const onExportCSV = useCallback(() => {
     const visibleColumns = table
       .getAllColumns()
-      .filter((col) => col.getIsVisible() && col.id !== "actions" && col.id !== "#" && col.id !== "debt_status" && col.id !== "is_company");
+      .filter(
+        (col) =>
+          col.getIsVisible() &&
+          col.id !== "actions" &&
+          col.id !== "#" &&
+          col.id !== "debt_status" &&
+          col.id !== "is_company",
+      );
 
     const headers = visibleColumns.map((col) => col.id);
 
@@ -152,16 +159,25 @@ export default function HksTableHeader(props: Props) {
         if (value === null || value === undefined || value === "") return "-";
         const strValue = String(value).trim();
         if (strValue === "") return "-";
-        if (strValue.includes(",") || strValue.includes('"') || strValue.includes("\n")) {
+        if (
+          strValue.includes(",") ||
+          strValue.includes('"') ||
+          strValue.includes("\n")
+        ) {
           return `"${strValue.replace(/"/g, '""')}"`;
         }
         return strValue;
       });
     });
 
-    const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
 
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -177,10 +193,19 @@ export default function HksTableHeader(props: Props) {
   const onExportPDF = useCallback(async () => {
     const visibleColumns = table
       .getAllColumns()
-      .filter((col) => col.getIsVisible() && col.id !== "actions" && col.id !== "#" && col.id !== "debt_status" && col.id !== "is_company");
+      .filter(
+        (col) =>
+          col.getIsVisible() &&
+          col.id !== "actions" &&
+          col.id !== "#" &&
+          col.id !== "debt_status" &&
+          col.id !== "is_company",
+      );
 
     const headers = visibleColumns.map((col) =>
-      t(`${translationPrefix}.table.column.${col.id}`, { defaultValue: col.id })
+      t(`${translationPrefix}.table.column.${col.id}`, {
+        defaultValue: col.id,
+      }),
     );
 
     const rows = table.getRowModel().rows.map((row) => {
@@ -210,13 +235,14 @@ export default function HksTableHeader(props: Props) {
         debt: t("debt.title"),
         payment: t("payment.title"),
       };
-      const title = titleMap[translationPrefix] || t("table.header.export.pdf.title");
+      const title =
+        titleMap[translationPrefix] || t("table.header.export.pdf.title");
 
       await exportTablePDF(
         { headers, rows, title },
         company,
         `${new Date().toISOString().split("T")[0]}`,
-        "landscape"
+        "landscape",
       );
 
       toast.success(t("table.header.export.pdf.success"));
@@ -590,11 +616,11 @@ export default function HksTableHeader(props: Props) {
           </Tooltip>
           <DropdownMenuContent align="end" className="w-fit">
             <DropdownMenuItem onClick={onExportCSV}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              <FileSpreadsheet />
               {t("table.header.export.csv")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onExportPDF}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText />
               {t("table.header.export.pdf")}
             </DropdownMenuItem>
           </DropdownMenuContent>
