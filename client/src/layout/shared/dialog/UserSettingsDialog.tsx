@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CancelButton from "../CancelButton";
+import TwoFactorSetup from "./TwoFactorSetup";
 
 export default function UserSettingsDialog() {
   const { t } = useTranslation();
@@ -166,6 +167,9 @@ export default function UserSettingsDialog() {
         </TabsTrigger>
         <TabsTrigger value="password">
           {t("settings.tabs.password")}
+        </TabsTrigger>
+        <TabsTrigger value="2fa">
+          {t("twoFactor.settings.title")}
         </TabsTrigger>
       </TabsList>
 
@@ -394,6 +398,10 @@ export default function UserSettingsDialog() {
             </div>
           </form>
         </Form>
+      </TabsContent>
+
+      <TabsContent value="2fa" className="mt-4">
+        <TwoFactorSetup onComplete={closeDialog} />
       </TabsContent>
     </Tabs>
   );

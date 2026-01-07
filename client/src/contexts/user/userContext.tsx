@@ -6,11 +6,17 @@ export interface User {
   companyId: string;
 }
 
+export interface LoginResult {
+  user: User | null;
+  requires2FA: boolean;
+  tempToken: string | null;
+}
+
 interface UserContextType {
   user: User | null;
   getUser: () => User | null;
   setUser: (user: User | null) => void;
-  login: (username: string, password: string) => Promise<User | null>;
+  login: (username: string, password: string) => Promise<LoginResult>;
   clearUser: () => void;
   isLoading: boolean;
 }

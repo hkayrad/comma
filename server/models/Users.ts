@@ -13,6 +13,12 @@ export class Users extends Model<InferAttributes<Users>, InferCreationAttributes
 	declare updated_at: Date;
 	declare deleted_at: Date;
 	declare deleted_by: string;
+	// 2FA fields
+	declare totp_secret: string | null;
+	declare totp_enabled: boolean;
+	declare totp_recovery_codes: string | null;
+	declare totp_failed_attempts: number;
+	declare totp_lockout_until: Date | null;
 }
 
 Users.init(
@@ -43,6 +49,32 @@ Users.init(
 		},
 		role: {
 			type: DataTypes.INTEGER({ length: 1 }),
+		},
+		// 2FA fields
+		totp_secret: {
+			type: DataTypes.STRING(255),
+			allowNull: true,
+			defaultValue: null,
+		},
+		totp_enabled: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
+		},
+		totp_recovery_codes: {
+			type: DataTypes.TEXT,
+			allowNull: true,
+			defaultValue: null,
+		},
+		totp_failed_attempts: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0,
+		},
+		totp_lockout_until: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
 		},
 		created_at: {
 			type: DataTypes.DATE,

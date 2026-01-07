@@ -32,11 +32,31 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     Logger.info("Login response", response);
 
     if (response.status === 200) {
-      const user = response.data;
+      const data = response.data;
+
+      // Check if 2FA is required
+      if (data.requires2FA) {
+        return {
+          user: null,
+          requires2FA: true,
+          tempToken: data.tempToken,
+        };
+      }
+
+      // Normal login - set user
+      const user = data;
       setUser(user);
-      return user;
+      return {
+        user,
+        requires2FA: false,
+        tempToken: null,
+      };
     }
-    return null;
+    return {
+      user: null,
+      requires2FA: false,
+      tempToken: null,
+    };
   }, []);
 
   const refreshUser = useCallback(async () => {

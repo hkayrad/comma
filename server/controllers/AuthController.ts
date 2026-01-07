@@ -20,14 +20,24 @@ router.post("/login", authRateLimiter, async (req, res) => {
 
 	const response = await AuthService.Login(username, password);
 
-	const { success, accessToken, refreshToken, message, user } = response;
+	const { success, requires2FA, accessToken, refreshToken, tempToken, message, user } = response;
 
-	Logger.info("[AuthController] Login result", { username, success: success });
+	Logger.info("[AuthController] Login result", { username, success, requires2FA });
 
 	if (!success) {
 		return res.status(401).json(ApiResponse.error(message));
 	}
 
+	// If 2FA is required, return temp token for client to use for 2FA verification
+	if (requires2FA) {
+		return res.json({
+			requires2FA: true,
+			tempToken: tempToken,
+			username: user?.username,
+		});
+	}
+
+	// Normal login - set cookies
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",

@@ -16,8 +16,9 @@
 ## Directory Structure
 
 *   `client/`: Frontend application source code.
-    *   `src/components/`: Reusable UI components.
+    *   `src/components/`: Reusable UI components that comes from shadcn or similar libraries.
     *   `src/layout/`: Page layouts and views.
+    *   `src/layout/shared/`: User generated shared UI components.
     *   `src/lib/`: Utilities and API clients.
 *   `server/`: Backend application source code.
     *   `controllers/`: Request handlers.

@@ -48,14 +48,18 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import TwoFactorVerify from "./TwoFactorVerify";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [tempToken, setTempToken] = useState<string | null>(null);
+  const [pendingUsername, setPendingUsername] = useState<string>("");
   const navigate = useNavigate();
   const { reloadConnection } = useWebSocket();
   const { theme, setTheme } = useTheme();
-  const { login } = useUser();
+  const { login, setUser } = useUser();
   const { t, i18n } = useTranslation();
 
   const formSchema = z.object({
@@ -91,29 +95,51 @@ export default function Login() {
       setLoading(true);
       const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
 
-      const loginPromise = new Promise((resolve, reject) => {
-        setTimeout(() => {
-          login(username, password).then(resolve).catch(reject);
-        }, timeout);
-      });
+      try {
+        await new Promise((resolve) => setTimeout(resolve, timeout));
+        const result = await login(username, password);
 
-      toast.promise(loginPromise, {
-        loading: t("notification.auth.login.pending"),
-        success: () => {
+        if (result.requires2FA && result.tempToken) {
+          // 2FA required - show 2FA verification UI
+          setRequires2FA(true);
+          setTempToken(result.tempToken);
+          setPendingUsername(username);
           setLoading(false);
+          return;
+        }
+
+        if (result.user) {
+          toast.success(t("notification.auth.login.success"));
           reloadConnection();
           navigate("/");
-          return t("notification.auth.login.success");
-        },
-        error: (error) => {
-          Logger.error(error);
-          setLoading(false);
-          return t("notification.auth.login.error");
-        },
-      });
+        } else {
+          toast.error(t("notification.auth.login.error"));
+        }
+      } catch (error) {
+        Logger.error(error);
+        toast.error(t("notification.auth.login.error"));
+      } finally {
+        setLoading(false);
+      }
     },
     [navigate, reloadConnection, login, t],
   );
+
+  const handle2FASuccess = useCallback(
+    (userData: { username: string; role: number }) => {
+      setUser({ username: userData.username, role: userData.role, companyId: "" });
+      toast.success(t("notification.auth.login.success"));
+      reloadConnection();
+      navigate("/");
+    },
+    [navigate, reloadConnection, setUser, t],
+  );
+
+  const handle2FACancel = useCallback(() => {
+    setRequires2FA(false);
+    setTempToken(null);
+    setPendingUsername("");
+  }, []);
 
   //WARN DEBUG LOGIN
   const sysAdminLogin = useCallback(async () => {
@@ -192,97 +218,108 @@ export default function Login() {
           </MenuPanel>
         </Menu>
         <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
-          <h1 className="text-4xl font-bold text-center">{t("login.title")}</h1>
-          <p className="mt-2 mb-8 text-muted-foreground text-sm">
-            {t("login.description")}
-          </p>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 w-80 flex flex-col"
-            >
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("login.form.username")}</FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupInput placeholder="hkayrad" {...field} />
-                        <InputGroupAddon align="inline-start">
-                          <User className="text-muted-foreground" />
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("login.form.password")}</FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <KeyRound className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          placeholder="********"
-                          type={isPasswordVisible ? "text" : "password"}
-                          {...field}
-                        />
-                        <InputGroupButton
-                          size="icon-xs"
-                          className="mr-1 text-muted-foreground hover:text-foreground transition-colors"
-                          onClick={togglePasswordVisibility}
-                        >
-                          {isPasswordVisible ? <EyeOff /> : <Eye />}
-                        </InputGroupButton>
-                      </InputGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                variant="default"
-                className="mx-auto"
-                disabled={loading}
-              >
-                {loading ? <Spinner /> : <LogIn />}
-                {t("login.form.submit")}
-              </Button>
-            </form>
-          </Form>
-          {import.meta.env.VITE_NODE_ENV === "development" && (
-            <div className="flex w-full justify-center gap-4 mt-8">
-              <Button
-                className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
-                size="sm"
-                onClick={sysAdminLogin}
-              >
-                Admin Hesabı Doldur
-              </Button>
-              <Button
-                className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
-                size="sm"
-                onClick={adminLogin}
-              >
-                Yönetici Hesabı Doldur
-              </Button>
-              <Button
-                className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
-                size="sm"
-                onClick={userLogin}
-              >
-                Kullanıcı Hesabı Doldur
-              </Button>
-            </div>
+          {requires2FA && tempToken ? (
+            <TwoFactorVerify
+              tempToken={tempToken}
+              username={pendingUsername}
+              onSuccess={handle2FASuccess}
+              onCancel={handle2FACancel}
+            />
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold text-center">{t("login.title")}</h1>
+              <p className="mt-2 mb-8 text-muted-foreground text-sm">
+                {t("login.description")}
+              </p>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4 w-80 flex flex-col"
+                >
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("login.form.username")}</FormLabel>
+                        <FormControl>
+                          <InputGroup>
+                            <InputGroupInput placeholder="hkayrad" {...field} />
+                            <InputGroupAddon align="inline-start">
+                              <User className="text-muted-foreground" />
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("login.form.password")}</FormLabel>
+                        <FormControl>
+                          <InputGroup>
+                            <InputGroupAddon align="inline-start">
+                              <KeyRound className="text-muted-foreground" />
+                            </InputGroupAddon>
+                            <InputGroupInput
+                              placeholder="********"
+                              type={isPasswordVisible ? "text" : "password"}
+                              {...field}
+                            />
+                            <InputGroupButton
+                              size="icon-xs"
+                              className="mr-1 text-muted-foreground hover:text-foreground transition-colors"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {isPasswordVisible ? <EyeOff /> : <Eye />}
+                            </InputGroupButton>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    variant="default"
+                    className="mx-auto"
+                    disabled={loading}
+                  >
+                    {loading ? <Spinner /> : <LogIn />}
+                    {t("login.form.submit")}
+                  </Button>
+                </form>
+              </Form>
+              {import.meta.env.VITE_NODE_ENV === "development" && (
+                <div className="flex w-full justify-center gap-4 mt-8">
+                  <Button
+                    className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
+                    size="sm"
+                    onClick={sysAdminLogin}
+                  >
+                    Admin Hesabı Doldur
+                  </Button>
+                  <Button
+                    className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
+                    size="sm"
+                    onClick={adminLogin}
+                  >
+                    Yönetici Hesabı Doldur
+                  </Button>
+                  <Button
+                    className="bg-red-200 text-red-800 hover:bg-red-300 hover:text-red-900"
+                    size="sm"
+                    onClick={userLogin}
+                  >
+                    Kullanıcı Hesabı Doldur
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

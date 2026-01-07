@@ -737,5 +737,59 @@
     "try": "Turkish Lira (TRY)",
     "unspecified": "Unspecified",
     "usd": "United States Dolar (USD)"
+  },
+  "twoFactor": {
+    "verify": {
+      "title": "Two-Factor Authentication",
+      "description": "Enter the 6-digit code from your authenticator app for {{username}}",
+      "codeLength": "Code must be 6 digits",
+      "invalidCode": "Invalid verification code",
+      "error": "Verification failed. Please try again.",
+      "submit": "Verify",
+      "useRecoveryCode": "Use Recovery Code",
+      "cancel": "Back to Login"
+    },
+    "recovery": {
+      "title": "Recovery Code",
+      "description": "Enter one of your recovery codes to login",
+      "codeRequired": "Recovery code is required",
+      "invalidCode": "Invalid recovery code",
+      "error": "Recovery verification failed",
+      "submit": "Submit",
+      "backToCode": "Use Authenticator Code"
+    },
+    "setup": {
+      "title": "Enable Two-Factor Authentication",
+      "description": "Scan this QR code with your authenticator app",
+      "scanQR": "Scan QR Code",
+      "manualEntry": "Or enter this code manually:",
+      "enterCode": "Enter the 6-digit code from your app",
+      "submit": "Enable 2FA",
+      "cancel": "Cancel",
+      "success": "Two-Factor Authentication enabled successfully!",
+      "error": "Failed to start 2FA setup. Please try again.",
+      "recoveryCodes": {
+        "title": "Recovery Codes",
+        "description": "Save these codes in a safe place. You can use them to login if you lose access to your authenticator app.",
+        "warning": "Each code can only be used once. Make sure to save them now - they won't be shown again.",
+        "copy": "Copy All",
+        "copied": "Codes copied!",
+        "download": "Download",
+        "done": "Done"
+      }
+    },
+    "disable": {
+      "title": "Disable Two-Factor Authentication",
+      "description": "Enter your password and a 2FA code to disable",
+      "submit": "Disable 2FA",
+      "success": "Two-Factor Authentication disabled"
+    },
+    "settings": {
+      "title": "Two-Factor Authentication",
+      "enabled": "2FA is enabled",
+      "disabled": "2FA is not enabled",
+      "enable": "Enable 2FA",
+      "disable": "Disable 2FA"
+    }
   }
 }

@@ -23,8 +23,10 @@ export class AuthService {
 				Logger.error("[AuthService] User not found", { username });
 				return {
 					success: false,
+					requires2FA: false,
 					accessToken: null,
 					refreshToken: null,
+					tempToken: null,
 					message: "Invalid username or password",
 					user: null,
 				};
@@ -37,13 +39,42 @@ export class AuthService {
 				Logger.error("[AuthService] Invalid password", { username });
 				return {
 					success: false,
+					requires2FA: false,
 					accessToken: null,
 					refreshToken: null,
+					tempToken: null,
 					message: "Invalid username or password",
 					user: null,
 				};
 			}
 
+			// Check if 2FA is enabled
+			if (user.totp_enabled) {
+				Logger.info("[AuthService] 2FA required for user", { username, userId: user.id });
+
+				// Generate a temporary token for 2FA verification
+				const tempToken = jwt.sign(
+					{ id: user.id, purpose: "2fa_verification" },
+					process.env.JWT_SECRET as jwt.Secret,
+					{ expiresIn: "5m" }
+				);
+
+				return {
+					success: true,
+					requires2FA: true,
+					accessToken: null,
+					refreshToken: null,
+					tempToken: tempToken,
+					message: "2FA verification required",
+					user: {
+						id: user.id,
+						username: user.username,
+						role: user.role,
+					},
+				};
+			}
+
+			// No 2FA - proceed with normal login
 			Logger.debug("[AuthService] Generating tokens", { userId: user.id, companyId: user.company_id });
 
 			const accessTokenPayload = {
@@ -90,8 +121,10 @@ export class AuthService {
 
 			return {
 				success: true,
+				requires2FA: false,
 				accessToken: accessToken,
 				refreshToken: refreshToken,
+				tempToken: null,
 				message: "Login successful",
 				user: {
 					id: user.id,
@@ -103,9 +136,91 @@ export class AuthService {
 			Logger.error("[AuthService] Error during login", { username, error: error.message });
 			return {
 				success: false,
+				requires2FA: false,
 				accessToken: null,
 				refreshToken: null,
+				tempToken: null,
 				message: "An error occurred during login",
+				user: null,
+			};
+		}
+	}
+
+	/**
+	 * Complete login after 2FA verification - issues full tokens
+	 */
+	static async Complete2FALogin(userId: string) {
+		try {
+			Logger.info("[AuthService] Completing 2FA login", { userId });
+
+			const user = await Users.findByPk(userId);
+
+			if (!user) {
+				return {
+					success: false,
+					accessToken: null,
+					refreshToken: null,
+					message: "User not found",
+					user: null,
+				};
+			}
+
+			const accessTokenPayload = {
+				id: user.id,
+				companyId: user.company_id,
+				username: user.username,
+				role: user.role,
+			};
+
+			const accessToken = jwt.sign(accessTokenPayload, process.env.JWT_SECRET as jwt.Secret, {
+				issuer: process.env.JWT_ISSUER,
+				audience: process.env.JWT_AUDIENCE,
+				expiresIn: this.accessTokenExpiresIn as any,
+			});
+
+			// Generate opaque refresh token
+			const refreshToken = crypto.randomBytes(40).toString("hex");
+			const refreshTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+			const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+			// Cleanup expired tokens
+			try {
+				await RefreshTokens.destroy({
+					where: {
+						user_id: user.id,
+						expires_at: { [Op.lt]: new Date() },
+					},
+				});
+			} catch (cleanupError: any) {
+				Logger.warn("[AuthService] Failed to cleanup expired tokens", { error: cleanupError.message });
+			}
+
+			await RefreshTokens.create({
+				user_id: user.id,
+				token_hash: refreshTokenHash,
+				expires_at: expiresAt,
+			});
+
+			Logger.info("[AuthService] 2FA login completed", { userId, username: user.username });
+
+			return {
+				success: true,
+				accessToken: accessToken,
+				refreshToken: refreshToken,
+				message: "Login successful",
+				user: {
+					id: user.id,
+					username: user.username,
+					role: user.role,
+				},
+			};
+		} catch (error: any) {
+			Logger.error("[AuthService] Error completing 2FA login", { userId, error: error.message });
+			return {
+				success: false,
+				accessToken: null,
+				refreshToken: null,
+				message: "Failed to complete login",
 				user: null,
 			};
 		}

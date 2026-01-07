@@ -731,5 +731,59 @@
     "try": "Türk Lirası (TRY)",
     "unspecified": "Belirtilmemiş",
     "usd": "Amerikan Doları (USD)"
+  },
+  "twoFactor": {
+    "verify": {
+      "title": "İki Faktörlü Doğrulama",
+      "description": "{{username}} için doğrulama uygulamanızdaki 6 haneli kodu girin",
+      "codeLength": "Kod 6 haneli olmalıdır",
+      "invalidCode": "Geçersiz doğrulama kodu",
+      "error": "Doğrulama başarısız. Lütfen tekrar deneyin.",
+      "submit": "Doğrula",
+      "useRecoveryCode": "Kurtarma Kodu Kullan",
+      "cancel": "Girişe Dön"
+    },
+    "recovery": {
+      "title": "Kurtarma Kodu",
+      "description": "Giriş yapmak için kurtarma kodlarınızdan birini girin",
+      "codeRequired": "Kurtarma kodu gereklidir",
+      "invalidCode": "Geçersiz kurtarma kodu",
+      "error": "Kurtarma doğrulaması başarısız",
+      "submit": "Gönder",
+      "backToCode": "Doğrulama Kodu Kullan"
+    },
+    "setup": {
+      "title": "İki Faktörlü Doğrulamayı Etkinleştir",
+      "description": "Bu QR kodunu doğrulama uygulamanızla tarayın",
+      "scanQR": "QR Kodu Tara",
+      "manualEntry": "Veya bu kodu manuel olarak girin:",
+      "enterCode": "Uygulamanızdaki 6 haneli kodu girin",
+      "submit": "2FA'yı Etkinleştir",
+      "cancel": "İptal",
+      "success": "İki Faktörlü Doğrulama başarıyla etkinleştirildi!",
+      "error": "2FA kurulumu başlatılamadı. Lütfen tekrar deneyin.",
+      "recoveryCodes": {
+        "title": "Kurtarma Kodları",
+        "description": "Bu kodları güvenli bir yerde saklayın. Doğrulama uygulamanıza erişiminizi kaybederseniz giriş yapmak için kullanabilirsiniz.",
+        "warning": "Her kod yalnızca bir kez kullanılabilir. Şimdi kaydettiğinizden emin olun - tekrar gösterilmeyecekler.",
+        "copy": "Hepsini Kopyala",
+        "copied": "Kodlar kopyalandı!",
+        "download": "İndir",
+        "done": "Tamam"
+      }
+    },
+    "disable": {
+      "title": "İki Faktörlü Doğrulamayı Devre Dışı Bırak",
+      "description": "Devre dışı bırakmak için şifrenizi ve 2FA kodunu girin",
+      "submit": "2FA'yı Devre Dışı Bırak",
+      "success": "İki Faktörlü Doğrulama devre dışı bırakıldı"
+    },
+    "settings": {
+      "title": "İki Faktörlü Doğrulama",
+      "enabled": "2FA etkin",
+      "disabled": "2FA etkin değil",
+      "enable": "2FA'yı Etkinleştir",
+      "disable": "2FA'yı Devre Dışı Bırak"
+    }
   }
 }
