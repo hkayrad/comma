@@ -20,6 +20,7 @@ import TcmbController from "./controllers/TcmbController";
 import CompanyController from "./controllers/CompanyController";
 import CompanyManagementController from "./controllers/Admin/CompanyManagementController";
 import UserManagementController from "./controllers/Admin/UserManagementController";
+import UserSettingsController from "./controllers/UserSettingsController";
 import { Logger } from "./lib/utils/logger";
 import { sequelize } from "./lib/db/sequelize";
 
@@ -116,6 +117,8 @@ app.use("/payables", PayablePaymentsController);
 
 app.use("/admin/companies", CompanyManagementController);
 app.use("/admin/users", UserManagementController);
+
+app.use("/settings", UserSettingsController);
 
 const listenPort =
 	process.env.SERVER_PORT ||

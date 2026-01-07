@@ -18,6 +18,9 @@ handle_error() {
     exit 1
 }
 
+# Clear build directory
+rm -rf ./build
+
 # Build server
 echo "Building server project..."
 cd "$SERVER_DIR" || handle_error "Failed to change to server directory."

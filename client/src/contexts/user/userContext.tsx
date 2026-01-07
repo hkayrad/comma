@@ -9,6 +9,7 @@ export interface User {
 interface UserContextType {
   user: User | null;
   getUser: () => User | null;
+  setUser: (user: User | null) => void;
   login: (username: string, password: string) => Promise<User | null>;
   clearUser: () => void;
   isLoading: boolean;

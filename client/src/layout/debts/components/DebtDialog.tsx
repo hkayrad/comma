@@ -298,7 +298,7 @@ export default function DebtDialog(props: Props) {
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="p-2">
                     <SelectItem value="TRY">
                       <TurkishLira />
                       <span>{t("vars.try")}</span>

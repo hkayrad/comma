@@ -62,7 +62,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   return (
     <UserContext.Provider
-      value={{ user, getUser, login, clearUser, isLoading }}
+      value={{ user, getUser, setUser, login, clearUser, isLoading }}
     >
       {children}
     </UserContext.Provider>

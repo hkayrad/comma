@@ -194,6 +194,10 @@
         "description": "Add a new receivable payment",
         "title": "Add Receivable Payment"
       }
+    },
+    "settings": {
+      "title": "Account Settings",
+      "description": "Change your username or password"
     }
   },
   "form": {
@@ -522,6 +526,18 @@
       "body": "You will be logged out due to a planned maintenance. Please save the work you're doing.",
       "estimatedMaintenanceInterval": "Estimated Maintenance Interval: {{start}} - {{end}}",
       "title": "Planned Maintenance"
+    },
+    "settings": {
+      "username": {
+        "pending": "Updating username...",
+        "success": "Username updated successfully!",
+        "error": "Failed to update username"
+      },
+      "password": {
+        "pending": "Updating password...",
+        "success": "Password updated successfully!",
+        "error": "Failed to update password"
+      }
     }
   },
   "overviewCards": {
@@ -557,6 +573,7 @@
         "label": "Account",
         "language": "Language",
         "logout": "Log Out",
+        "settings": "Settings",
         "theme": {
           "dark": "Dark Mode",
           "light": "Light Mode"
@@ -564,7 +581,7 @@
       },
       "companyManagement": {
         "accountDetails": {
-          "label": "Account Details"
+          "label": "Company Details"
         },
         "label": "Management"
       },
@@ -632,6 +649,49 @@
       "admin": "Admin",
       "manager": "Manager",
       "user": "User"
+    }
+  },
+  "settings": {
+    "tabs": {
+      "username": "Change Username",
+      "password": "Change Password"
+    },
+    "form": {
+      "username": {
+        "label": "New Username",
+        "placeholder": "Enter new username",
+        "description": "Your new username (3-50 characters)",
+        "validation": {
+          "min": "Username must be at least 3 characters",
+          "max": "Username must be at most 50 characters"
+        }
+      },
+      "currentPassword": {
+        "label": "Current Password",
+        "placeholder": "Enter current password",
+        "description": "Your current password for verification",
+        "validation": {
+          "required": "Current password is required"
+        }
+      },
+      "newPassword": {
+        "label": "New Password",
+        "placeholder": "Enter new password",
+        "description": "Your new password (6-100 characters)",
+        "validation": {
+          "min": "Password must be at least 6 characters",
+          "max": "Password must be at most 100 characters"
+        }
+      },
+      "confirmPassword": {
+        "label": "Confirm Password",
+        "placeholder": "Confirm new password",
+        "description": "Re-enter your new password",
+        "validation": {
+          "required": "Password confirmation is required",
+          "mismatch": "Passwords do not match"
+        }
+      }
     }
   },
   "vars": {

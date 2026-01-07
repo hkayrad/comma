@@ -34,6 +34,7 @@ import {
   Info,
   LogOut,
   Moon,
+  Settings,
   Sun,
   //UsersRound,
   Wrench,
@@ -64,6 +65,7 @@ import { Logger } from "@/lib/utils/logger";
 import InfoDialog from "./components/InfoDialog";
 import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
+import UserSettingsDialog from "../dialog/UserSettingsDialog";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -138,6 +140,16 @@ export default function HksSidebar() {
       description: t("dialog.info.description"),
       size: "xl",
       content: <InfoDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog, t]);
+
+  const handleSettings = useCallback(() => {
+    openDialog({
+      title: t("dialog.settings.title"),
+      description: t("dialog.settings.description"),
+      size: "lg",
+      content: <UserSettingsDialog />,
       showCloseButton: true,
     });
   }, [openDialog, t]);
@@ -395,6 +407,11 @@ export default function HksSidebar() {
                     </MenuItem>
 
                     <LanguageButton />
+
+                    <MenuItem onClick={handleSettings}>
+                      <Settings className="text-inherit bg-inherit select-none" />
+                      <span>{t("sidebar.footer.account.settings")}</span>
+                    </MenuItem>
 
                     <MenuItem
                       onClick={handleLogout}

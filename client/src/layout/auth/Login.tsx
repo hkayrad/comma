@@ -5,8 +5,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Eye, EyeOff, Globe, LogIn, Moon, Sun } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import {
+  Eye,
+  EyeOff,
+  Globe,
+  KeyRound,
+  LogIn,
+  Moon,
+  Sun,
+  User,
+} from "lucide-react";
 import { useCallback, useState } from "react";
 import { Form } from "@/components/ui/form";
 import { z } from "zod";
@@ -34,6 +42,12 @@ import {
 import { supportedLanguages } from "@/lib/supportedLanguages";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -119,7 +133,7 @@ export default function Login() {
   return (
     <>
       <MaintenanceBanner />
-      <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-black selection:text-white">
+      <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-foreground selection:text-background">
         <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
           <img
             src="/logo.webp"
@@ -194,7 +208,12 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>{t("login.form.username")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="hkayrad" {...field} />
+                      <InputGroup>
+                        <InputGroupInput placeholder="hkayrad" {...field} />
+                        <InputGroupAddon align="inline-start">
+                          <User className="text-muted-foreground" />
+                        </InputGroupAddon>
+                      </InputGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -207,22 +226,23 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>{t("login.form.password")}</FormLabel>
                     <FormControl>
-                      <div className="flex gap-2">
-                        <Input
+                      <InputGroup>
+                        <InputGroupAddon align="inline-start">
+                          <KeyRound className="text-muted-foreground" />
+                        </InputGroupAddon>
+                        <InputGroupInput
                           placeholder="********"
                           type={isPasswordVisible ? "text" : "password"}
                           {...field}
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          nativeButton
-                          size="icon"
+                        <InputGroupButton
+                          size="icon-xs"
+                          className="mr-1 text-muted-foreground hover:text-foreground transition-colors"
                           onClick={togglePasswordVisibility}
                         >
                           {isPasswordVisible ? <EyeOff /> : <Eye />}
-                        </Button>
-                      </div>
+                        </InputGroupButton>
+                      </InputGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

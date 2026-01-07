@@ -101,7 +101,6 @@ export default function CustomerSelect(props: Props) {
                 <Command>
                   <CommandInput
                     placeholder={t("form.customer.select.search").toString()}
-                    className="h-9"
                   />
                   <CommandList>
                     <CommandEmpty>

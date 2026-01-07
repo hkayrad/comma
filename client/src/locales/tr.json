@@ -194,6 +194,10 @@
         "description": "Yeni alacak ödemesi ekleyin",
         "title": "Alacak Ödemesi Ekle"
       }
+    },
+    "settings": {
+      "title": "Hesap Ayarları",
+      "description": "Kullanıcı adınızı veya şifrenizi değiştirin"
     }
   },
   "form": {
@@ -516,6 +520,18 @@
       "body": "Planlı bakım çalışması nedeniyle otomatik olarak çıkış yapacaksınız. Lütfen yapılan işlemleri kaydedin.",
       "estimatedMaintenanceInterval": "Tahmini Bakım Aralığı: {{start}} - {{end}}",
       "title": "Planlı Bakım"
+    },
+    "settings": {
+      "username": {
+        "pending": "Kullanıcı adı güncelleniyor...",
+        "success": "Kullanıcı adı başarıyla güncellendi!",
+        "error": "Kullanıcı adı güncellenemedi"
+      },
+      "password": {
+        "pending": "Şifre güncelleniyor...",
+        "success": "Şifre başarıyla güncellendi!",
+        "error": "Şifre güncellenemedi"
+      }
     }
   },
   "overviewCards": {
@@ -551,6 +567,7 @@
         "label": "Hesap",
         "language": "Dil",
         "logout": "Çıkış Yap",
+        "settings": "Ayarlar",
         "theme": {
           "dark": "Koyu Tema",
           "light": "Açık Tema"
@@ -558,7 +575,7 @@
       },
       "companyManagement": {
         "accountDetails": {
-          "label": "Hesap Detayları"
+          "label": "Şirket Detayları"
         },
         "label": "Yönetim"
       },
@@ -626,6 +643,49 @@
       "admin": "Admin",
       "manager": "Yönetici",
       "user": "Kullanıcı"
+    }
+  },
+  "settings": {
+    "tabs": {
+      "username": "Kullanıcı Adı Değiştir",
+      "password": "Şifre Değiştir"
+    },
+    "form": {
+      "username": {
+        "label": "Yeni Kullanıcı Adı",
+        "placeholder": "Yeni kullanıcı adını girin",
+        "description": "Yeni kullanıcı adınız (3-50 karakter)",
+        "validation": {
+          "min": "Kullanıcı adı en az 3 karakter olmalıdır",
+          "max": "Kullanıcı adı en fazla 50 karakter olmalıdır"
+        }
+      },
+      "currentPassword": {
+        "label": "Mevcut Şifre",
+        "placeholder": "Mevcut şifrenizi girin",
+        "description": "Doğrulama için mevcut şifreniz",
+        "validation": {
+          "required": "Mevcut şifre gereklidir"
+        }
+      },
+      "newPassword": {
+        "label": "Yeni Şifre",
+        "placeholder": "Yeni şifrenizi girin",
+        "description": "Yeni şifreniz (6-100 karakter)",
+        "validation": {
+          "min": "Şifre en az 6 karakter olmalıdır",
+          "max": "Şifre en fazla 100 karakter olmalıdır"
+        }
+      },
+      "confirmPassword": {
+        "label": "Şifre Onayı",
+        "placeholder": "Yeni şifrenizi tekrar girin",
+        "description": "Yeni şifrenizi tekrar girin",
+        "validation": {
+          "required": "Şifre onayı gereklidir",
+          "mismatch": "Şifreler eşleşmiyor"
+        }
+      }
     }
   },
   "vars": {

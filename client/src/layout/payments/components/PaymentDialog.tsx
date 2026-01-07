@@ -259,7 +259,7 @@ export default function PaymentDialog(props: Props) {
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="p-1">
+                  <SelectContent className="p-2">
                     <SelectItem value="TRY">
                       <TurkishLira />
                       <span>{t("vars.try")}</span>
