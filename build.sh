@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pushd ~/Repos/comma
+
 # This script builds the client and server projects.
 
 # --- Configuration ---
@@ -42,3 +44,5 @@ rm -rf ./dist
 cd - > /dev/null # Go back to the original directory
 
 echo "Both client and server projects built successfully."
+
+popd

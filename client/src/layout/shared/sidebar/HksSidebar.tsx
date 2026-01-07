@@ -19,6 +19,8 @@ import {
   MenuPanel,
   MenuItem,
   MenuTrigger,
+  MenuGroup,
+  MenuSeparator,
 } from "@/components/animate-ui/components/base/menu";
 import {
   RoleBackgrounds,
@@ -348,10 +350,10 @@ export default function HksSidebar() {
                               <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarFallback
                                   className={`
-                                                                        h-8 w-8 rounded-lg select-none
-                                                                        ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
-                                                                        ${RoleColors[(role ?? 0) as RoleColorType]}
-                                                                    `}
+                                    h-8 w-8 rounded-lg select-none
+                                    ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
+                                    ${RoleColors[(role ?? 0) as RoleColorType]}
+                                  `}
                                 >
                                   {user?.username.charAt(0).toUpperCase()}
                                 </AvatarFallback>
@@ -382,24 +384,28 @@ export default function HksSidebar() {
                     sideOffset={4}
                     className="overflow-hidden"
                   >
-                    <MenuItem
-                      onClick={() =>
-                        setTheme(theme === "dark" ? "light" : "dark")
-                      }
-                    >
-                      {theme === "dark" ? (
-                        <Sun className="text-inherit bg-inherit select-none" />
-                      ) : (
-                        <Moon className="text-inherit bg-inherit select-none" />
-                      )}
-                      <span>
-                        {theme === "dark"
-                          ? t("sidebar.footer.account.theme.light")
-                          : t("sidebar.footer.account.theme.dark")}
-                      </span>
-                    </MenuItem>
+                    <MenuGroup>
+                      <MenuItem
+                        onClick={() =>
+                          setTheme(theme === "dark" ? "light" : "dark")
+                        }
+                      >
+                        {theme === "dark" ? (
+                          <Sun className="text-inherit bg-inherit select-none" />
+                        ) : (
+                          <Moon className="text-inherit bg-inherit select-none" />
+                        )}
+                        <span>
+                          {theme === "dark"
+                            ? t("sidebar.footer.account.theme.light")
+                            : t("sidebar.footer.account.theme.dark")}
+                        </span>
+                      </MenuItem>
 
-                    <LanguageButton />
+                      <LanguageButton />
+                    </MenuGroup>
+
+                    <MenuSeparator />
 
                     <MenuItem onClick={handleSettings}>
                       <Settings className="text-inherit bg-inherit select-none" />

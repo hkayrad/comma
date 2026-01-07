@@ -278,7 +278,7 @@ function MenuSubmenuTrigger({
         data-inset={inset}
         className={cn(
           "focus:text-accent-foreground data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-inset:pl-8",
-          "aria-expanded:**:data-[slot=chevron]:rotate-90 **:[data-slot=chevron]:transition-transform **:[data-slot=chevron]:duration-300 **:[data-slot=chevron]:ease-in-out",
+          "aria-expanded:**:data-[slot=chevron]:rotate-90 **:data-[slot=chevron]:transition-transform **:data-[slot=chevron]:duration-300 **:data-[slot=chevron]:ease-in-out",
           className,
         )}
         {...props}
