@@ -13,8 +13,18 @@ const ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY;
 const APP_NAME = process.env.APP_NAME || "Comma";
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+const MIN_DELAY_MS = 500; // Minimum delay for timing attack prevention
+const MAX_DELAY_MS = 1500; // Maximum delay for timing attack prevention
 
 export class TwoFactorService {
+    /**
+     * Introduce a random delay to prevent timing attacks
+     */
+    private static async randomDelay(): Promise<void> {
+        const delay = Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
+        return new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
     /**
      * Generate a new TOTP secret
      */
@@ -286,6 +296,9 @@ export class TwoFactorService {
         userId: string,
         token: string
     ): Promise<{ success: boolean; locked?: boolean; attemptsRemaining?: number; remainingTime?: number; message: string }> {
+        // Add randomized delay to prevent timing attacks
+        await this.randomDelay();
+
         // Check rate limit first
         const rateLimitStatus = await this.checkRateLimit(userId);
         if (rateLimitStatus.locked) {
@@ -334,6 +347,9 @@ export class TwoFactorService {
         userId: string,
         code: string
     ): Promise<{ success: boolean; remainingCodes?: number; message: string }> {
+        // Add randomized delay to prevent timing attacks
+        await this.randomDelay();
+
         // Check rate limit
         const rateLimitStatus = await this.checkRateLimit(userId);
         if (rateLimitStatus.locked) {
