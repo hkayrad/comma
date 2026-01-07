@@ -25,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CancelButton from "../CancelButton";
 
 export default function UserSettingsDialog() {
   const { t } = useTranslation();
@@ -247,9 +248,7 @@ export default function UserSettingsDialog() {
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                {t("vars.cancel")}
-              </Button>
+              <CancelButton onClick={onCancel} />
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>
@@ -390,9 +389,7 @@ export default function UserSettingsDialog() {
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onCancel}>
-                {t("vars.cancel")}
-              </Button>
+              <CancelButton onClick={onCancel} />
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>

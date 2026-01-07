@@ -6,6 +6,7 @@ import {
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
 import { useDialog } from "@/contexts/dialog";
+import CancelButton from "@/layout/shared/CancelButton";
 import { CompanyApi } from "@/lib/api/company";
 import { sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
@@ -107,6 +108,14 @@ export default function LogoForm() {
       });
     },
     [t],
+  );
+
+  const onCancel = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      closeDialog();
+    },
+    [closeDialog],
   );
 
   useEffect(() => {
@@ -237,7 +246,8 @@ export default function LogoForm() {
           </Dropzone>
         </div>
       </div>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 col-span-2">
+        <CancelButton onClick={onCancel} />
         <Button onClick={handleUpload}>
           {t("dialog.accountDetails.logos.form.upload.confirm")}
         </Button>

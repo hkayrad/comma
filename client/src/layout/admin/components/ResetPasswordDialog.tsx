@@ -14,6 +14,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
+import CancelButton from "@/layout/shared/CancelButton";
 import { AdminUserApi } from "@/lib/api/admin";
 import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -159,9 +160,7 @@ export default function ResetPasswordDialog(props: Props) {
           )}
         />
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">{t("vars.save")}</Button>
         </div>
       </form>

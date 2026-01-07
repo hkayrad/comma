@@ -40,6 +40,7 @@ import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   data: PaymentDto[];
@@ -410,11 +411,7 @@ export default function PaymentTable(props: Props) {
                   </DialogHeader>
                   <DialogFooter>
                     <DialogClose
-                      render={(props) => (
-                        <Button {...props} nativeButton variant="outline">
-                          {t("vars.cancel")}
-                        </Button>
-                      )}
+                      render={(props) => <CancelButton {...props} />}
                     ></DialogClose>
                     <Button
                       variant="destructive"

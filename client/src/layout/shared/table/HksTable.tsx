@@ -171,6 +171,7 @@ export default function HksTable(props: Props) {
                         key={cell.id}
                         className={`
                           py-1 px-1 select-none
+                          ${cell.column.id === "#" && "px-2"}
                           ${cell.column.id === "is_company" && "w-16 text-center"}
                           ${cell.column.id === "name" && "w-36 overflow-hidden"}
                           ${cell.column.id === "desciption" && "w-36 overflow-hidden"}

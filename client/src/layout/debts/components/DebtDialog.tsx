@@ -47,6 +47,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   debt?: DebtDto;
@@ -664,9 +665,7 @@ export default function DebtDialog(props: Props) {
           )}
         />
         <div className="flex justify-end gap-2 col-span-2">
-          <Button variant="ghost" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">
             {debt ? t("dialog.debt.update") : t("dialog.debt.add")}
           </Button>

@@ -52,6 +52,7 @@ import { CompanyApi } from "@/lib/api/company";
 import type { CompanyDto } from "@/lib/types";
 import { exportTablePDF } from "@/lib/pdf-table-export";
 import { Logger } from "@/lib/utils/logger";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 type Props = {
   table: Table<any>;
@@ -393,12 +394,16 @@ export default function HksTableHeader(props: Props) {
                   className="select-none"
                 />
                 <InputGroupAddon align="inline-end" className="gap-1">
-                  <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                  <KbdGroup>
+                    <Kbd>Ctrl</Kbd>
+                    <Kbd>/</Kbd>
+                  </KbdGroup>
+                  {/*<kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                     <span className="text-xs">Ctrl</span>
                   </kbd>
                   <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                     <span className="text-xs">/</span>
-                  </kbd>
+                  </kbd>*/}
                 </InputGroupAddon>
               </InputGroup>
             )}

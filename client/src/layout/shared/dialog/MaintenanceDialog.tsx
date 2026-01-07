@@ -14,6 +14,7 @@ import { Clock } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import CancelButton from "../CancelButton";
 
 export default function MaintenanceDialog() {
   const { configs } = useConfig();
@@ -137,13 +138,7 @@ export default function MaintenanceDialog() {
             </InputGroup>
           </div>
           <div className="col-span-2 flex justify-end mt-8 gap-2">
-            <DialogClose
-              render={(props) => (
-                <Button {...props} nativeButton variant="ghost">
-                  {t("vars.cancel")}
-                </Button>
-              )}
-            />
+            <DialogClose render={(props) => <CancelButton {...props} />} />
             <DialogClose
               render={(props) => (
                 <Button

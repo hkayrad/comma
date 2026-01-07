@@ -18,6 +18,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
+import CancelButton from "@/layout/shared/CancelButton";
 import { CompanyApi } from "@/lib/api/company";
 import type { CompanyDto } from "@/lib/types";
 import { Logger } from "@/lib/utils/logger";
@@ -408,9 +409,7 @@ export default function InformationForm() {
           )}
         />
         <div className="flex justify-end gap-2 col-span-2">
-          <Button variant="ghost" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">{t("vars.save")}</Button>
         </div>
       </form>

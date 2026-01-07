@@ -35,6 +35,7 @@ import ClickToCopyText from "@/layout/shared/ClickToCopyText";
 import { useCallback, useMemo, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   data: CompanyDto[];
@@ -289,9 +290,7 @@ export default function CompanyTable(props: Props) {
                   <DialogFooter>
                     <DialogClose
                       render={(props) => (
-                        <Button {...props} nativeButton variant="outline">
-                          {t("vars.cancel")}
-                        </Button>
+                        <CancelButton {...props} />
                       )}
                     />
                     <Button

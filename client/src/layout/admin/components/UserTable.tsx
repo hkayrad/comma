@@ -36,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import UserDialog from "./UserDialog";
 import ResetPasswordDialog from "./ResetPasswordDialog";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   data: UserDto[];
@@ -259,11 +260,7 @@ export default function UserTable(props: Props) {
                   </DialogHeader>
                   <DialogFooter>
                     <DialogClose
-                      render={(props) => (
-                        <Button {...props} nativeButton variant="outline">
-                          {t("vars.cancel")}
-                        </Button>
-                      )}
+                      render={(props) => <CancelButton {...props} />}
                     />
                     <Button
                       variant="destructive"

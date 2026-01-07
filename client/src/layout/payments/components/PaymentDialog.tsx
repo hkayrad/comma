@@ -51,6 +51,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   payment?: PaymentDto;
@@ -471,9 +472,7 @@ export default function PaymentDialog(props: Props) {
           )}
         />
         <div className="flex justify-end gap-2 col-span-2">
-          <Button variant="ghost" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">
             {payment ? t("dialog.payment.update") : t("dialog.payment.add")}
           </Button>

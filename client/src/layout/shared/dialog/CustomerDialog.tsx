@@ -36,6 +36,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   customer?: CustomerDto;
@@ -475,9 +476,7 @@ export default function CustomerDialog(props: Props) {
           )}
         />
         <div className="flex justify-end gap-2 col-span-2">
-          <Button variant="ghost" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">
             {customer ? t("dialog.customer.update") : t("dialog.customer.add")}
           </Button>

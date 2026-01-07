@@ -28,6 +28,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   companyId: string;
@@ -222,9 +223,7 @@ export default function UserDialog(props: Props) {
           )}
         />
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            {t("vars.cancel")}
-          </Button>
+          <CancelButton onClick={onCancel} />
           <Button type="submit">{t("vars.save")}</Button>
         </div>
       </form>

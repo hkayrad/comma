@@ -40,6 +40,7 @@ import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   data: DebtDto[];
@@ -415,9 +416,7 @@ export default function DebtTable(props: Props) {
                   <DialogFooter>
                     <DialogClose
                       render={(props) => (
-                        <Button {...props} nativeButton variant="outline">
-                          {t("vars.cancel")}
-                        </Button>
+                        <CancelButton {...props} />
                       )}
                     ></DialogClose>
                     <Button
