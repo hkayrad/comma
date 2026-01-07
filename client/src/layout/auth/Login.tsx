@@ -34,11 +34,11 @@ import {
 import { useUser } from "@/contexts/user";
 import { Logger } from "@/lib/utils/logger";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/animate-ui/components/radix/dropdown-menu";
+  Menu,
+  MenuPanel,
+  MenuItem,
+  MenuTrigger,
+} from "@/components/animate-ui/components/base/menu";
 import { supportedLanguages } from "@/lib/supportedLanguages";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "@/components/ui/spinner";
@@ -160,37 +160,37 @@ export default function Login() {
           />
           <TooltipContent side="left">{t("login.changeTheme")}</TooltipContent>
         </Tooltip>
-        <DropdownMenu>
+        <Menu>
           <Tooltip disableHoverablePopup>
             <TooltipTrigger
               render={(props) => (
-                <DropdownMenuTrigger
+                <MenuTrigger
                   {...props}
                   className="absolute bottom-16 right-4"
-                  asChild
-                >
-                  <Button size="icon">
-                    <Globe />
-                  </Button>
-                </DropdownMenuTrigger>
+                  render={(props) => (
+                    <Button {...props} size="icon">
+                      <Globe />
+                    </Button>
+                  )}
+                />
               )}
             />
             <TooltipContent side="left">
               {t("login.changeLanguage")}
             </TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end">
+          <MenuPanel align="end">
             {supportedLanguages.map((lang) => (
-              <DropdownMenuItem
+              <MenuItem
                 key={lang.code}
                 onClick={() => i18n.changeLanguage(lang.code)}
               >
                 {lang.flag}
                 {lang.label}
-              </DropdownMenuItem>
+              </MenuItem>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </MenuPanel>
+        </Menu>
         <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
           <h1 className="text-4xl font-bold text-center">{t("login.title")}</h1>
           <p className="mt-2 mb-8 text-muted-foreground text-sm">

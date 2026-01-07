@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Menu,
+  MenuCheckboxItem,
+  MenuPanel,
+  MenuGroup,
+  MenuItem,
+  MenuGroupLabel,
+  MenuSeparator,
+  MenuTrigger,
+} from "@/components/animate-ui/components/base/menu";
 import {
   InputGroup,
   InputGroupAddon,
@@ -406,11 +406,11 @@ export default function HksTableHeader(props: Props) {
           <TooltipContent>{t("table.header.search.hover")}</TooltipContent>
         </Tooltip>
         {tags && (
-          <DropdownMenu>
+          <Menu>
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
-                  <DropdownMenuTrigger
+                  <MenuTrigger
                     {...props}
                     render={(props) => (
                       <Button
@@ -431,44 +431,45 @@ export default function HksTableHeader(props: Props) {
               />
               <TooltipContent>{t("table.header.filters.hover")}</TooltipContent>
             </Tooltip>
-            <DropdownMenuContent align="end" className="max-w-xs">
+            <MenuPanel align="end" className="max-w-xs">
               {Array.from(groupedTags.entries()).map(
                 ([columnName, columnTags], groupIndex) => (
-                  <DropdownMenuGroup key={columnName}>
-                    <DropdownMenuLabel className="text-muted-foreground">
+                  <MenuGroup key={columnName}>
+                    <MenuGroupLabel className="relative text-muted-foreground z-10">
                       {columnName}
-                    </DropdownMenuLabel>
+                    </MenuGroupLabel>
                     {columnTags.map((tag) => {
                       const filterKey = `${tag.column}:${tag.value}`;
                       return (
-                        <DropdownMenuCheckboxItem
+                        <MenuCheckboxItem
                           key={filterKey}
                           checked={selectedFilters.has(filterKey)}
                           onCheckedChange={() => handleFilterToggle(tag)}
                           onSelect={(e) => e.preventDefault()}
+
                         >
                           <Badge
                             className={`bg-${tag.color}-100 dark:bg-${tag.color}-900 text-${tag.color}-800 dark:text-${tag.color}-100 select-none`}
                           >
                             {tag.label ?? tag.value}
                           </Badge>
-                        </DropdownMenuCheckboxItem>
+                        </MenuCheckboxItem>
                       );
                     })}
                     {groupIndex < groupedTags.size - 1 && (
-                      <DropdownMenuSeparator />
+                      <MenuSeparator />
                     )}
-                  </DropdownMenuGroup>
+                  </MenuGroup>
                 ),
               )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </MenuPanel>
+          </Menu>
         )}
-        <DropdownMenu>
+        <Menu>
           <Tooltip disableHoverablePopup>
             <TooltipTrigger
               render={(props) => (
-                <DropdownMenuTrigger
+                <MenuTrigger
                   {...props}
                   render={(props) => (
                     <Button
@@ -488,13 +489,13 @@ export default function HksTableHeader(props: Props) {
               {t("table.header.showHideCols.hover")}
             </TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end">
+          <MenuPanel align="end">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
                 return (
-                  <DropdownMenuCheckboxItem
+                  <MenuCheckboxItem
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
@@ -508,16 +509,16 @@ export default function HksTableHeader(props: Props) {
                       : t(`${translationPrefix}.table.column.${column.id}`, {
                           defaultValue: column.id,
                         })}
-                  </DropdownMenuCheckboxItem>
+                  </MenuCheckboxItem>
                 );
               })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu>
+          </MenuPanel>
+        </Menu>
+        <Menu>
           <Tooltip disableHoverablePopup>
             <TooltipTrigger
               render={(props) => (
-                <DropdownMenuTrigger
+                <MenuTrigger
                   {...props}
                   render={(props) => (
                     <Button
@@ -535,9 +536,9 @@ export default function HksTableHeader(props: Props) {
             ></TooltipTrigger>
             <TooltipContent>{t("table.header.rowCount.hover")}</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end">
+          <MenuPanel align="end">
             {rowCounts.map((rowCount) => (
-              <DropdownMenuCheckboxItem
+              <MenuCheckboxItem
                 key={`row-count-${rowCount}`}
                 checked={table.getState().pagination.pageSize === rowCount}
                 onCheckedChange={() => table.setPageSize(rowCount)}
@@ -545,10 +546,10 @@ export default function HksTableHeader(props: Props) {
                 {t("table.header.rowCount.row", {
                   rowCount: rowCount,
                 })}
-              </DropdownMenuCheckboxItem>
+              </MenuCheckboxItem>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </MenuPanel>
+        </Menu>
       </ButtonGroup>
       <ButtonGroup>
         <Tooltip disableHoverablePopup>
@@ -592,11 +593,11 @@ export default function HksTableHeader(props: Props) {
       </ButtonGroup>
       <div className="flex gap-2 ml-auto ">
         <HksTablePagination table={table} />
-        <DropdownMenu>
+        <Menu>
           <Tooltip disableHoverablePopup>
             <TooltipTrigger
               render={(props) => (
-                <DropdownMenuTrigger
+                <MenuTrigger
                   {...props}
                   render={(props) => (
                     <Button
@@ -614,17 +615,17 @@ export default function HksTableHeader(props: Props) {
             />
             <TooltipContent>{t("table.header.export.hover")}</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent align="end" className="w-fit">
-            <DropdownMenuItem onClick={onExportCSV}>
-              <FileSpreadsheet />
+          <MenuPanel align="end" className="w-fit">
+            <MenuItem onClick={onExportCSV}>
+              <FileSpreadsheet className="text-foreground" />
               {t("table.header.export.csv")}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onExportPDF}>
-              <FileText />
+            </MenuItem>
+            <MenuItem onClick={onExportPDF}>
+              <FileText className="text-foreground" />
               {t("table.header.export.pdf")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </MenuItem>
+          </MenuPanel>
+        </Menu>
         <Tooltip disableHoverablePopup>
           <TooltipTrigger
             render={(props) => (

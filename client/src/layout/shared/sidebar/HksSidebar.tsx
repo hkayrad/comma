@@ -293,13 +293,6 @@ export default function HksSidebar() {
                   </TooltipContent>
                 </Tooltip>
                 <MenuPanel side="right" align="end" sideOffset={4}>
-                  {/*<DropdownMenuItem
-                    onClick={() => {}}
-                    className="!justify-start"
-                  >
-                    <UsersRound className="text-inherit bg-inherit select-none" />
-                    <span>Kullanıcıları Düzenle</span>
-                  </DropdownMenuItem>*/}
                   <MenuItem
                     onClick={handleCompanyDetails}
                     className="justify-start!"
