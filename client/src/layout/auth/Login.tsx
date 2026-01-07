@@ -93,10 +93,8 @@ export default function Login() {
       }
 
       setLoading(true);
-      const timeout = Math.random() * 1000 + 500; // between 500ms and 1500ms
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, timeout));
         const result = await login(username, password);
 
         if (result.requires2FA && result.tempToken) {

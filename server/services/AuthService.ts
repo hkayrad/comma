@@ -12,9 +12,22 @@ dotenv.config();
 export class AuthService {
 	private static readonly accessTokenExpiresIn = `15m`;
 	private static readonly refreshTokenExpiresIn = `${process.env.JWT_EXPIRES_IN || 7}d`;
+	private static readonly MIN_DELAY_MS = 500; // Minimum delay for timing attack prevention
+	private static readonly MAX_DELAY_MS = 1500; // Maximum delay for timing attack prevention
+
+	/**
+	 * Introduce a random delay to prevent timing attacks
+	 */
+	private static async randomDelay(): Promise<void> {
+		const delay = Math.floor(Math.random() * (this.MAX_DELAY_MS - this.MIN_DELAY_MS + 1)) + this.MIN_DELAY_MS;
+		return new Promise((resolve) => setTimeout(resolve, delay));
+	}
 
 	static async Login(username: string, password: string) {
 		try {
+			// Add randomized delay to prevent timing attacks and brute-force
+			await this.randomDelay();
+
 			Logger.info("[AuthService] Login attempt", { username });
 
 			const user = await Users.findOne({ where: { username } });
