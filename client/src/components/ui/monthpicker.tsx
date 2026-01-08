@@ -3,32 +3,12 @@ import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buttonVariants } from "./button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type Month = {
     number: number;
     name: string;
 };
-
-const MONTHS: Month[][] = [
-    [
-        { number: 0, name: "Jan" },
-        { number: 1, name: "Feb" },
-        { number: 2, name: "Mar" },
-        { number: 3, name: "Apr" },
-    ],
-    [
-        { number: 4, name: "May" },
-        { number: 5, name: "Jun" },
-        { number: 6, name: "Jul" },
-        { number: 7, name: "Aug" },
-    ],
-    [
-        { number: 8, name: "Sep" },
-        { number: 9, name: "Oct" },
-        { number: 10, name: "Nov" },
-        { number: 11, name: "Dec" },
-    ],
-];
 
 type MonthCalProps = {
     selectedMonth?: Date;
@@ -67,7 +47,7 @@ function MonthPicker({
     ...props
 }: React.HTMLAttributes<HTMLDivElement> & MonthCalProps) {
     return (
-        <div className={cn("min-w-[200px] w-[280px] p-3", className)} {...props}>
+        <div className={cn("min-w-50 w-70 p-3", className)} {...props}>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0">
                 <div className="space-y-4 w-full">
                     <MonthCal
@@ -88,9 +68,23 @@ function MonthPicker({
 }
 
 function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, maxDate, disabledDates, onYearBackward, onYearForward }: MonthCalProps) {
+    const { i18n } = useTranslation();
     const [year, setYear] = React.useState<number>(selectedMonth?.getFullYear() ?? new Date().getFullYear());
     const [month, setMonth] = React.useState<number>(selectedMonth?.getMonth() ?? new Date().getMonth());
     const [menuYear, setMenuYear] = React.useState<number>(year);
+
+    const months = React.useMemo(() => {
+        const rows: Month[][] = [[], [], []];
+        const formatter = new Intl.DateTimeFormat(i18n.language, { month: "short" });
+
+        for (let i = 0; i < 12; i++) {
+            const date = new Date(2000, i, 15);
+            const name = formatter.format(date);
+            const rowIdx = Math.floor(i / 4);
+            rows[rowIdx].push({ number: i, name });
+        }
+        return rows;
+    }, [i18n.language]);
 
     if (minDate && maxDate && minDate > maxDate) minDate = maxDate;
 
@@ -125,7 +119,7 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
             </div>
             <table className="w-full border-collapse space-y-1">
                 <tbody>
-                    {MONTHS.map((monthRow, a) => {
+                    {months.map((monthRow, a) => {
                         return (
                             <tr key={"row-" + a} className="flex w-full mt-2">
                                 {monthRow.map((m) => {
