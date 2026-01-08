@@ -78,7 +78,7 @@
       "from": "From",
       "latest": "Latest",
       "reset": "Reset Filtering",
-      "duration": "Duration (Months)",
+      "duration": "Duration",
       "duration.tooltip": "Select the duration for the chart data",
       "startDate": "Start Date",
       "startDate.tooltip": "Select the start date for the chart data"

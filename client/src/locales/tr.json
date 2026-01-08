@@ -78,7 +78,7 @@
       "from": "Başlangıç",
       "latest": "Son",
       "reset": "Filtrelemeyi Sıfırla",
-      "duration": "Süre (Ay)",
+      "duration": "Süre",
       "duration.tooltip": "Grafik verisi için süre seçimi",
       "startDate": "Başlangıç Tarihi",
       "startDate.tooltip": "Grafik verisi için başlangıç tarihi"
