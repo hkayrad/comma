@@ -122,9 +122,11 @@ export default function DashboardCharts() {
 
   if (loading) {
     return (
-      <Card className="mt-2">
-        <CardHeader>
-          <CardTitle>{t("dashboard.charts.title")}</CardTitle>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 h-11">
+          <CardTitle className="select-none">
+            {t("dashboard.charts.title")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-50 w-full" />
@@ -153,7 +155,9 @@ export default function DashboardCharts() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>{t("dashboard.charts.title")}</CardTitle>
+        <CardTitle className="select-none">
+          {t("dashboard.charts.title")}
+        </CardTitle>
         <div className="flex space-x-2 gap-2 items-center">
           {(startDate || months !== 12) && (
             <Button
@@ -289,7 +293,7 @@ export default function DashboardCharts() {
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
-                className="text-muted-foreground"
+                className="text-muted-foreground select-none"
               />
               <YAxis
                 tickFormatter={(value) =>
@@ -301,7 +305,7 @@ export default function DashboardCharts() {
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
-                className="text-muted-foreground"
+                className="text-muted-foreground select-none"
               />
               <RechartsTooltip
                 content={<ChartTooltip />}
@@ -313,6 +317,7 @@ export default function DashboardCharts() {
                     ? t("dashboard.charts.receivable")
                     : t("dashboard.charts.payable")
                 }
+                wrapperStyle={{ userSelect: "none" }}
               />
               <Bar
                 dataKey="receivable"
