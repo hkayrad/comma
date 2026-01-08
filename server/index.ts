@@ -22,6 +22,7 @@ import CompanyManagementController from "./controllers/Admin/CompanyManagementCo
 import UserManagementController from "./controllers/Admin/UserManagementController";
 import UserSettingsController from "./controllers/UserSettingsController";
 import TwoFactorController from "./controllers/TwoFactorController";
+import StatsController from "./controllers/StatsController";
 import { Logger } from "./lib/utils/logger";
 import { sequelize } from "./lib/db/sequelize";
 
@@ -121,6 +122,7 @@ app.use("/admin/users", UserManagementController);
 
 app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);
+app.use("/stats", StatsController);
 
 const listenPort =
 	process.env.SERVER_PORT ||

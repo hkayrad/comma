@@ -68,6 +68,20 @@
         "total_debt": "Toplam",
         "total_payments": "Ödenmiş"
       }
+    },
+    "charts": {
+      "title": "Aylık İstatistik Grafiği",
+      "receivable": "Alacaklar",
+      "payable": "Borçlar",
+      "noData": "Veri bulunamadı",
+      "months": "{{count}} ay",
+      "from": "Başlangıç",
+      "latest": "Son",
+      "reset": "Filtrelemeyi Sıfırla",
+      "duration": "Süre (Ay)",
+      "duration.tooltip": "Grafik verisi için süre seçimi",
+      "startDate": "Başlangıç Tarihi",
+      "startDate.tooltip": "Grafik verisi için başlangıç tarihi"
     }
   },
   "debt": {
@@ -592,6 +606,12 @@
       "finance.receivableInfo": "Alacak Bilgileri",
       "finance.receivableInfo.incomingPayments": "Gelen Ödemeler",
       "finance.receivableInfo.receivables": "Alacaklar"
+    },
+    "pageSettings": {
+      "label": "Sayfa Ayarları",
+      "description": "Bu sayfada nelerin görüneceğini kontrol edin",
+      "overviewCards": "Özet Kartları",
+      "statisticsChart": "İstatistik Grafiği"
     },
     "sysAdmin": {
       "actions": "Admin Eylemleri",

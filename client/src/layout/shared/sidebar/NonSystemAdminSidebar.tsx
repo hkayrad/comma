@@ -119,9 +119,9 @@ export default function NonSystemAdminSidebarContent() {
         },
         import.meta.env.DEV
           ? {
-              title: "Geliştirme",
-              items: devItems,
-            }
+            title: "Geliştirme",
+            items: devItems,
+          }
           : null,
       ].filter((item) => item !== null),
     [financialItems, devItems, t],

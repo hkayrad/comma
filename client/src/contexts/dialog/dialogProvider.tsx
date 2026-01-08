@@ -64,7 +64,7 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
       const newDialogs = [...prev];
       newDialogs[lastOpenIndex] = { ...dialogToClose, isOpen: false };
 
-      // Schedule removal of this dialog after animation
+      // Schedule removal of this dialog after animation completes
       setTimeout(() => {
         // Trigger onClose callback if exists
         if (dialogToClose.onClose) {
@@ -74,7 +74,7 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
         setDialogs((currentDialogs) =>
           currentDialogs.filter((d) => d.id !== dialogToClose.id),
         );
-      }, 0);
+      }, 200);
 
       return newDialogs;
     });
@@ -144,8 +144,10 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
       {children}
       {dialogs.map((dialog, index) => {
         const offset = dialogs.length - 1 - index;
-        const scale = 1 - offset * 0.05;
-        const translateY = offset * -16; // Raise slighty (16px per level)
+        // Only apply stacking transforms when there are multiple dialogs
+        const shouldStack = dialogs.length > 1 && offset > 0;
+        const scale = shouldStack ? 1 - offset * 0.05 : 1;
+        const translateY = shouldStack ? offset * -16 : 0;
 
         return (
           <Dialog
@@ -159,8 +161,9 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
               className={`${getSizeClass(dialog.size)} selection:text-background selection:bg-foreground`}
               style={{
                 ...getWidthStyle(dialog.size),
-                transform: `scale(${scale}) translateY(${translateY * 2}px)`,
-                transition: "all 0.1s ease-in-out",
+                ...(shouldStack && {
+                  transform: `scale(${scale}) translateY(${translateY * 2}px)`,
+                }),
               }}
             >
               {(dialog.title || dialog.description) && (

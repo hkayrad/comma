@@ -4,11 +4,13 @@ import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api/customer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import OverviewCards from "@/layout/shared/OverviewCards";
+import DashboardCharts from "./components/DashboardCharts";
 import CustomerTable from "./components/CustomerTable";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
 import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { useTableState } from "@/hooks/use-table-state";
+import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
 
 export default function Dashboard() {
   const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
@@ -57,6 +59,7 @@ export default function Dashboard() {
   };
 
   const { t } = useTranslation();
+  const { showOverviewCards, showStatisticsChart } = useDashboardSettings();
 
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as OverviewViewType);
@@ -106,11 +109,11 @@ export default function Dashboard() {
   }, [handleRefresh]);
 
   return (
-    <div className="px-3 py-3 h-[calc(100vh-3.5rem)] overflow-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+    <div className="px-3 py-3 h-[calc(100vh-3.5rem)] overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       <Tabs
         value={tabValue}
         onValueChange={handleTabChange}
-        className="w-full gap-2"
+        className="w-full gap-4"
       >
         <TabsList className="fixed top-4 z-20 left-0 right-0 mx-auto select-none">
           <TabsTrigger
@@ -126,11 +129,14 @@ export default function Dashboard() {
             {t("vars.payables")}
           </TabsTrigger>
         </TabsList>
-        <div className="flex items-center gap-4">
-          <OverviewCards type="receivable" align="stretch" />
-          <Separator orientation="vertical" className="h-12! w-full" />
-          <OverviewCards type="payable" align="stretch" />
-        </div>
+        {showOverviewCards && (
+          <div className="flex items-center gap-4">
+            <OverviewCards type="receivable" align="stretch" />
+            <Separator orientation="vertical" className="h-12! w-full" />
+            <OverviewCards type="payable" align="stretch" />
+          </div>
+        )}
+        {showStatisticsChart && <DashboardCharts />}
         <TabsContent value="receivable">
           <CustomerTable
             type="receivable"

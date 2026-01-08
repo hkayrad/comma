@@ -68,6 +68,7 @@ import InfoDialog from "./components/InfoDialog";
 import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
 import UserSettingsDialog from "../dialog/UserSettingsDialog";
+import PageSettingsDialog from "../dialog/PageSettingsDialog";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -152,6 +153,16 @@ export default function HksSidebar() {
       description: t("dialog.settings.description"),
       size: "lg",
       content: <UserSettingsDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog, t]);
+
+  const handlePageSettings = useCallback(() => {
+    openDialog({
+      title: t("sidebar.pageSettings.label"),
+      description: t("sidebar.pageSettings.description"),
+      size: "sm",
+      content: <PageSettingsDialog />,
       showCloseButton: true,
     });
   }, [openDialog, t]);
@@ -270,6 +281,28 @@ export default function HksSidebar() {
       {/* END SIDEBAR CONTENT */}
 
       <SidebarFooter>
+        {/* Page Settings - only on dashboard */}
+        {location.pathname === "/" && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <SidebarMenuButton {...props} onClick={handlePageSettings}>
+                      <Settings />
+                      <span className="select-none">
+                        {t("sidebar.pageSettings.label")}
+                      </span>
+                    </SidebarMenuButton>
+                  )}
+                />
+                <TooltipContent side="right" hidden={state !== "collapsed"}>
+                  {t("sidebar.pageSettings.label")}
+                </TooltipContent>
+              </Tooltip>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         <CompanyAdminOnly>
           <SidebarMenu>
             <SidebarMenuItem>

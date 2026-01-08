@@ -68,6 +68,20 @@
         "total_debt": "Total",
         "total_payments": "Paid"
       }
+    },
+    "charts": {
+      "title": "Monthly Statistics Chart",
+      "receivable": "Receivables",
+      "payable": "Payables",
+      "noData": "No data available",
+      "months": "{{count}} months",
+      "from": "From",
+      "latest": "Latest",
+      "reset": "Reset Filtering",
+      "duration": "Duration (Months)",
+      "duration.tooltip": "Select the duration for the chart data",
+      "startDate": "Start Date",
+      "startDate.tooltip": "Select the start date for the chart data"
     }
   },
   "debt": {
@@ -598,6 +612,12 @@
       "finance.receivableInfo": "Receivable Information",
       "finance.receivableInfo.incomingPayments": "Incoming Payments",
       "finance.receivableInfo.receivables": "Receivables"
+    },
+    "pageSettings": {
+      "label": "Page Settings",
+      "description": "Control what's visible on this page",
+      "overviewCards": "Overview Cards",
+      "statisticsChart": "Statistics Chart"
     },
     "sysAdmin": {
       "actions": "Admin Actions",

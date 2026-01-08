@@ -115,7 +115,7 @@ export default function HksTable(props: Props) {
 
   return (
     <>
-      <div className="sticky -top-4 z-20 pt-2 pb-2 bg-background">
+      <div className="sticky -top-4 z-20 pb-2 bg-background">
         <HksTableHeader
           table={table}
           searchColumn={searchColumn}
@@ -149,9 +149,9 @@ export default function HksTable(props: Props) {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                       </TableHead>
                     );
                   })}
