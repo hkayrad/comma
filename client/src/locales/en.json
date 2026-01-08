@@ -197,7 +197,7 @@
     },
     "settings": {
       "title": "Account Settings",
-      "description": "Change your username or password"
+      "description": "Change your account information"
     }
   },
   "form": {

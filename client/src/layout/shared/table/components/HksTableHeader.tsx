@@ -371,7 +371,7 @@ export default function HksTableHeader(props: Props) {
         <Tooltip>
           <TooltipTrigger
             render={(props) => (
-              <InputGroup {...props} className="bg-background min-w-76">
+              <InputGroup {...props} className="bg-background min-w-48">
                 <InputGroupAddon>
                   <UserRound
                     className={
@@ -398,12 +398,6 @@ export default function HksTableHeader(props: Props) {
                     <Kbd>Ctrl</Kbd>
                     <Kbd>/</Kbd>
                   </KbdGroup>
-                  {/*<kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                    <span className="text-xs">Ctrl</span>
-                  </kbd>
-                  <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                    <span className="text-xs">/</span>
-                  </kbd>*/}
                 </InputGroupAddon>
               </InputGroup>
             )}

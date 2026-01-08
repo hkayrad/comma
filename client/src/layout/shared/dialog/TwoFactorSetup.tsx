@@ -26,6 +26,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useDialog } from "@/contexts/dialog";
+import CancelButton from "../CancelButton";
 
 type SetupStep =
   | "check"
@@ -41,6 +43,7 @@ interface TwoFactorSetupProps {
 
 export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
   const { t } = useTranslation();
+  const { closeDialog } = useDialog();
   const [step, setStep] = useState<SetupStep>("check");
   const [loading, setLoading] = useState(true);
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -183,6 +186,15 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
     onComplete?.();
   }, [onComplete]);
 
+  const onCancel = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault();
+      closeDialog();
+      setStep("check");
+    },
+    [closeDialog],
+  );
+
   if (loading && step === "check") {
     return (
       <div className="flex items-center justify-center py-8">
@@ -204,6 +216,7 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
           </div>
         </div>
         <div className="w-fit flex gap-2 ml-auto">
+          <CancelButton onClick={onCancel} />
           <Button
             variant="destructive"
             size="default"
@@ -278,18 +291,14 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
           )}
 
           <div className="flex gap-2 w-fit ml-auto">
-            <Button
-              variant="outline"
+            <CancelButton
               onClick={() => {
                 setStep("enabled");
                 setError(null);
                 setDisablePassword("");
                 setDisableCode("");
               }}
-              className="flex-1"
-            >
-              {t("vars.cancel")}
-            </Button>
+            />
             <Button
               variant="destructive"
               onClick={handleDisable}
@@ -316,20 +325,23 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
             </p>
           </div>
         </div>
-        <Button
-          onClick={handleInitiateSetup}
-          disabled={loading}
-          className="w-fit ml-auto"
-        >
-          {loading ? (
-            <Spinner />
-          ) : (
-            <>
-              <ShieldCheck className="w-4 h-4 mr-1" />
-              {t("twoFactor.settings.enable")}
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2 ml-auto">
+          <CancelButton onClick={onCancel} />
+          <Button
+            onClick={handleInitiateSetup}
+            disabled={loading}
+            className="w-fit"
+          >
+            {loading ? (
+              <Spinner />
+            ) : (
+              <>
+                <ShieldCheck className="w-4 h-4 mr-1" />
+                {t("twoFactor.settings.enable")}
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -399,13 +411,16 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <Button
-            onClick={handleVerifySetup}
-            disabled={loading || verifyCode.length !== 6}
-            className="w-fit ml-auto"
-          >
-            {loading ? <Spinner /> : t("twoFactor.setup.submit")}
-          </Button>
+          <div className="flex items-center ml-auto gap-2 mt-2">
+            <CancelButton onClick={onCancel} />
+            <Button
+              onClick={handleVerifySetup}
+              disabled={loading || verifyCode.length !== 6}
+              className="w-fit ml-auto"
+            >
+              {loading ? <Spinner /> : t("twoFactor.setup.submit")}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -458,10 +473,11 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
             {t("twoFactor.setup.recoveryCodes.download")}
           </Button>
         </div>
-
-        <Button onClick={handleFinish} className="w-fit ml-auto">
-          {t("twoFactor.setup.recoveryCodes.done")}
-        </Button>
+        <div className="flex items-center ml-auto gap-2 mt-2">
+          <Button onClick={handleFinish} className="w-fit ml-auto">
+            {t("twoFactor.setup.recoveryCodes.done")}
+          </Button>
+        </div>
       </div>
     );
   }
