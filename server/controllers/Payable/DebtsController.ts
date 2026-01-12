@@ -97,4 +97,21 @@ router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) 
 	}
 });
 
+router.get("/debts/upcoming-due-dates", async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
+	const companyId = req.user.companyId;
+	const daysThreshold = parseInt(req.query.days as string) || 7;
+
+	Logger.debug("[PayableDebtsController] Get upcoming due dates request", { companyId, daysThreshold });
+
+	try {
+		const response = await PayableDebtsService.GetUpcomingDueDates(companyId, daysThreshold);
+
+		Logger.debug("[PayableDebtsController] Get upcoming due dates result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[PayableDebtsController] Error fetching upcoming due dates", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching upcoming due dates" });
+	}
+});
+
 export default router;

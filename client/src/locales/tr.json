@@ -82,6 +82,15 @@
       "duration.tooltip": "Grafik verisi için süre seçimi",
       "startDate": "Başlangıç Tarihi",
       "startDate.tooltip": "Grafik verisi için başlangıç tarihi"
+    },
+    "upcomingDueDates": {
+      "title": "Yaklaşan Ödemeler",
+      "noData": "Yaklaşan ödeme yok",
+      "daysRemaining": "{{count}} gün kaldı",
+      "today": "Bugün",
+      "overdue": "Gecikmiş",
+      "receivable": "Alacak",
+      "payable": "Borç"
     }
   },
   "debt": {
@@ -331,6 +340,8 @@
       "issue_date": "Kesim Tarihi",
       "issue_date.description": "Borç kesim tarihi",
       "issue_date.validation.invalid": "Geçersiz tarih",
+      "due_date": "Son Ödeme Tarihi",
+      "due_date.description": "Son ödeme tarihi (opsiyonel)",
       "vat": "KDV",
       "vat.description": "Borç KDV'si",
       "vat.set.10%": "Tutarın %10'unu KDV olarak ayarla",

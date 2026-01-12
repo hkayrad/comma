@@ -82,6 +82,15 @@
       "duration.tooltip": "Select the duration for the chart data",
       "startDate": "Start Date",
       "startDate.tooltip": "Select the start date for the chart data"
+    },
+    "upcomingDueDates": {
+      "title": "Upcoming Payments",
+      "noData": "No upcoming payments",
+      "daysRemaining": "{{count}} days left",
+      "today": "Today",
+      "overdue": "Overdue",
+      "receivable": "Receivable",
+      "payable": "Payable"
     }
   },
   "debt": {
@@ -337,6 +346,8 @@
       "issue_date": "Issue Date",
       "issue_date.description": "Debt issue date",
       "issue_date.validation.invalid": "Invalid date",
+      "due_date": "Due Date",
+      "due_date.description": "Payment due date (optional)",
       "vat": "VAT",
       "vat.description": "VAT on Debt",
       "vat.set.10%": "Set VAT to 10% of the amount",

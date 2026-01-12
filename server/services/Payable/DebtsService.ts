@@ -19,6 +19,7 @@ export default class PayableDebtsService {
 				currency,
 				exchange_rate,
 				issue_date,
+				due_date,
 				invoice_no,
 				description,
 			} = debt;
@@ -46,6 +47,7 @@ export default class PayableDebtsService {
 				currency,
 				exchange_rate,
 				issue_date,
+				due_date: due_date || null,
 				invoice_no: invoice_no || null,
 				description: description || null,
 				company_id: companyId,
@@ -77,6 +79,7 @@ export default class PayableDebtsService {
 				exchange_rate: "d.exchange_rate",
 				total_in_try: "((d.amount + d.vat) * d.exchange_rate)",
 				issue_date: "d.issue_date",
+				due_date: "d.due_date",
 				invoice_no: "d.invoice_no",
 				description: "d.description",
 			};
@@ -209,6 +212,7 @@ export default class PayableDebtsService {
 				currency,
 				exchange_rate,
 				issue_date,
+				due_date,
 				invoice_no,
 				description,
 			} = debt;
@@ -237,6 +241,7 @@ export default class PayableDebtsService {
 					currency,
 					exchange_rate,
 					issue_date,
+					due_date: due_date || null,
 					invoice_no: invoice_no || null,
 					description: description || null,
 				},
@@ -286,6 +291,45 @@ export default class PayableDebtsService {
 		} catch (error: any) {
 			Logger.error("[PayableDebts] Error deleting debt", { debtId: id, companyId, error: error.message });
 			return ApiResponse.error("Failed to delete debt");
+		}
+	}
+
+	static async GetUpcomingDueDates(companyId: string, daysThreshold: number = 7) {
+		try {
+			Logger.debug("[PayableDebts] Fetching upcoming due dates", { companyId, daysThreshold });
+
+			const query = `
+				SELECT
+					d.id,
+					d.amount,
+					d.vat,
+					(d.amount + d.vat) as total,
+					d.currency,
+					d.due_date,
+					DATEDIFF(d.due_date, CURDATE()) as days_remaining,
+					c.name as customer_name
+				FROM payable_debts d
+				JOIN payable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+				WHERE d.company_id = ?
+					AND d.deleted_at IS NULL
+					AND c.deleted_at IS NULL
+					AND d.due_date IS NOT NULL
+					AND d.due_date >= CURDATE()
+					AND d.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+				ORDER BY d.due_date ASC
+				LIMIT 10;
+			`;
+
+			const result = await sequelize.query(query, {
+				replacements: [companyId, daysThreshold],
+				type: QueryTypes.SELECT,
+			});
+
+			Logger.debug("[PayableDebts] Upcoming due dates fetched", { companyId, count: result.length });
+			return ApiResponse.success(result, "Upcoming due dates retrieved successfully");
+		} catch (error: any) {
+			Logger.error("[PayableDebts] Error fetching upcoming due dates", { companyId, error: error.message });
+			return ApiResponse.error("Failed to retrieve upcoming due dates");
 		}
 	}
 }

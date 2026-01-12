@@ -103,6 +103,7 @@ export default function DebtDialog(props: Props) {
     issue_date: z.date({
       error: t("form.debt.issue_date.validation.invalid"),
     }),
+    due_date: z.date().optional().nullable(),
     invoice_no: z
       .string({
         error: t("form.debt.invoice_no.validation.invalid"),
@@ -130,6 +131,7 @@ export default function DebtDialog(props: Props) {
       currency: debt?.currency || "TRY",
       exchange_rate: debt?.exchange_rate ? Number(debt.exchange_rate) : 1,
       issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
+      due_date: debt?.due_date ? new Date(debt.due_date) : null,
       invoice_no: debt?.invoice_no || "",
       description: debt?.description || "",
     },
@@ -214,8 +216,13 @@ export default function DebtDialog(props: Props) {
     (data: z.infer<typeof DebtFormSchema>) => {
       let promise;
 
-      if (debt) promise = DEBT_API.Update(debt.id!, data);
-      else promise = DEBT_API.Create(data);
+      const submitData = {
+        ...data,
+        due_date: data.due_date || null,
+      };
+
+      if (debt) promise = DEBT_API.Update(debt.id!, submitData);
+      else promise = DEBT_API.Create(submitData);
 
       toast.promise(promise, {
         loading: debt
@@ -296,6 +303,26 @@ export default function DebtDialog(props: Props) {
               <DateSelect field={field} />
               <FormDescription>
                 {t("form.debt.issue_date.description")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="due_date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                {t("form.debt.due_date")}
+              </FormLabel>
+              <DateSelect
+                field={field}
+                allowClear
+                allowFuture
+              />
+              <FormDescription>
+                {t("form.debt.due_date.description")}
               </FormDescription>
               <FormMessage />
             </FormItem>

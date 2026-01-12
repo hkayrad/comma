@@ -64,11 +64,23 @@ export type DebtDto = {
 	total_in_try?: number;
 	description?: string;
 	issue_date: Date;
+	due_date?: Date | null;
 	created_at?: Date;
 	created_by?: UUID;
 	updated_at?: Date;
 	deleted_at?: Date;
 	deleted_by?: UUID;
+};
+
+export type UpcomingDueDate = {
+	id: UUID;
+	customer_name: string;
+	amount: number;
+	vat: number;
+	total: number;
+	currency: AvailableCurrency;
+	due_date: Date;
+	days_remaining: number;
 };
 
 export type PaymentDto = {

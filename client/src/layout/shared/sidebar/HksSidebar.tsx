@@ -40,6 +40,7 @@ import {
   Sun,
   //UsersRound,
   Wrench,
+  Bell,
 } from "lucide-react";
 import {
   Sidebar,
@@ -69,6 +70,13 @@ import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
 import UserSettingsDialog from "../dialog/UserSettingsDialog";
 import PageSettingsDialog from "../dialog/PageSettingsDialog";
+import UpcomingDueDates from "@/layout/dashboard/components/UpcomingDueDates";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -80,6 +88,25 @@ export default function HksSidebar() {
   const { reloadConnection } = useWebSocket();
   const { openDialog } = useDialog();
   const { t } = useTranslation();
+  const [upcomingPaymentsCount, setUpcomingPaymentsCount] = useState(0);
+
+  const fetchUpcomingPaymentsCount = useCallback(async () => {
+    try {
+      const [receivables, payables] = await Promise.all([
+        ReceivableDebtApi.GetUpcomingDueDates(7),
+        PayableDebtApi.GetUpcomingDueDates(7),
+      ]);
+      setUpcomingPaymentsCount(receivables.length + payables.length);
+    } catch {
+      setUpcomingPaymentsCount(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUpcomingPaymentsCount();
+    window.addEventListener("global:refresh", fetchUpcomingPaymentsCount);
+    return () => window.removeEventListener("global:refresh", fetchUpcomingPaymentsCount);
+  }, [fetchUpcomingPaymentsCount]);
 
   const handleLogout = useCallback(async () => {
     const promise = AuthApi.Logout();
@@ -361,6 +388,38 @@ export default function HksSidebar() {
             {t("sidebar.footer.info.label")}
           </TooltipContent>
         </Tooltip>
+
+        {/* Notifications button for upcoming due dates */}
+        <Popover>
+          <Tooltip disableHoverablePopup>
+            <TooltipTrigger
+              render={(props) => (
+                <PopoverTrigger
+                  {...props}
+                  render={(popoverProps) => (
+                    <SidebarMenuButton {...popoverProps}>
+                      <div className="relative">
+                        <Bell size={16} />
+                        {upcomingPaymentsCount > 0 && (
+                          <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-sidebar" />
+                        )}
+                      </div>
+                      <span className="select-none">
+                        {t("dashboard.upcomingDueDates.title")}
+                      </span>
+                    </SidebarMenuButton>
+                  )}
+                />
+              )}
+            />
+            <TooltipContent side="right" hidden={state !== "collapsed"}>
+              {t("dashboard.upcomingDueDates.title")}
+            </TooltipContent>
+          </Tooltip>
+          <PopoverContent side="right" align="end" className="w-80 p-0">
+            <UpcomingDueDates />
+          </PopoverContent>
+        </Popover>
 
         <SidebarSeparator className="mx-0!" />
 

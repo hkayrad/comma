@@ -19,6 +19,7 @@ export class ReceivableDebts extends Model<InferAttributes<ReceivableDebts>, Inf
 	declare total_in_try: CreationOptional<number>;
 	declare description: CreationOptional<string | null>;
 	declare issue_date: Date;
+	declare due_date: CreationOptional<Date | null>;
 	declare created_at: CreationOptional<Date>;
 	declare created_by: string;
 	declare updated_at: CreationOptional<Date>;
@@ -106,6 +107,11 @@ ReceivableDebts.init(
 		issue_date: {
 			type: DataTypes.DATE,
 			allowNull: false,
+		},
+		due_date: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
 		},
 		created_at: {
 			type: DataTypes.DATE,

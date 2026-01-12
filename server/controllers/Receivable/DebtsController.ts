@@ -15,7 +15,7 @@ router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
 	Logger.info("[ReceivableDebtsController] Create debt request", { companyId, customerId: debt.customer_id });
 
 	try {
-		const response = await ReceivableDebtsService.Create(debt,userId, companyId);
+		const response = await ReceivableDebtsService.Create(debt, userId, companyId);
 
 		Logger.info("[ReceivableDebtsController] Create debt result", { companyId, success: response.success });
 		return res.json(response);
@@ -95,13 +95,30 @@ router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) 
 	Logger.info("[ReceivableDebtsController] Delete debt request", { debtId: id, companyId });
 
 	try {
-		const response = await ReceivableDebtsService.Delete(id,userId, companyId);
+		const response = await ReceivableDebtsService.Delete(id, userId, companyId);
 
 		Logger.info("[ReceivableDebtsController] Delete debt result", { debtId: id, companyId, success: response.success });
 		return res.json(response);
 	} catch (error: any) {
 		Logger.error("[ReceivableDebtsController] Error deleting debt", { debtId: id, companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error deleting debt" });
+	}
+});
+
+router.get("/debts/upcoming-due-dates", async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
+	const companyId = req.user.companyId;
+	const daysThreshold = parseInt(req.query.days as string) || 7;
+
+	Logger.debug("[ReceivableDebtsController] Get upcoming due dates request", { companyId, daysThreshold });
+
+	try {
+		const response = await ReceivableDebtsService.GetUpcomingDueDates(companyId, daysThreshold);
+
+		Logger.debug("[ReceivableDebtsController] Get upcoming due dates result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (error: any) {
+		Logger.error("[ReceivableDebtsController] Error fetching upcoming due dates", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching upcoming due dates" });
 	}
 });
 
