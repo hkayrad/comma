@@ -57,10 +57,20 @@ type Props = {
   payment?: PaymentDto;
   customerId?: string;
   type?: OverviewViewType;
+  amount?: number;
+  currency?: "TRY" | "USD" | "EUR";
+  exchangeRate?: number;
 };
 
 export default function PaymentDialog(props: Props) {
-  const { payment, customerId, type = "receivable" } = props;
+  const {
+    payment,
+    customerId,
+    type = "receivable",
+    amount,
+    currency,
+    exchangeRate,
+  } = props;
   const { closeDialog } = useDialog();
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
@@ -116,9 +126,17 @@ export default function PaymentDialog(props: Props) {
     resolver: zodResolver(PaymentFormSchema),
     defaultValues: {
       customer_id: payment?.customer_id || customerId || "",
-      amount: payment?.amount ? Number(payment.amount) : 0,
-      currency: payment?.currency || "TRY",
-      exchange_rate: payment?.exchange_rate ? Number(payment.exchange_rate) : 1,
+      amount: payment?.amount
+        ? Number(payment.amount)
+        : amount
+          ? Number(amount)
+          : 0,
+      currency: payment?.currency || currency || "TRY",
+      exchange_rate: payment?.exchange_rate
+        ? Number(payment.exchange_rate)
+        : exchangeRate
+          ? Number(exchangeRate)
+          : 1,
       payment_date: payment?.payment_date
         ? new Date(payment.payment_date)
         : new Date(),

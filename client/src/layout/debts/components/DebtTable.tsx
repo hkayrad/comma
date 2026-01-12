@@ -1,6 +1,6 @@
 import type { DebtDto } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Wallet } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +31,7 @@ import type {
 } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
+import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
 import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/components/FormattedDate";
@@ -108,6 +109,30 @@ export default function DebtTable(props: Props) {
       });
     },
     [data, type, openDialog, t],
+  );
+
+  const onAddPayment = useCallback(
+    (debt: DebtDto) => {
+      openDialog({
+        title: t("dialog.payment.add"),
+        description:
+          type === "receivable"
+            ? t("dialog.receivablePayment.add.description")
+            : t("dialog.payablePayment.add.description"),
+        size: "3xl",
+        content: (
+          <PaymentDialog
+            customerId={debt.customer_id}
+            type={type}
+            amount={Number(debt.total_in_try)}
+            currency="TRY"
+            exchangeRate={1}
+          />
+        ),
+        showCloseButton: true,
+      });
+    },
+    [openDialog, type, t],
   );
 
   const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(
@@ -363,6 +388,28 @@ export default function DebtTable(props: Props) {
         header: t("debt.table.column.actions"),
         cell: ({ row }) => (
           <div className="flex gap-2">
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onAddPayment(row.original)}
+                  >
+                    <Wallet />
+                  </Button>
+                )}
+              />
+              <TooltipContent>
+                {t(
+                  type === "receivable"
+                    ? "dashboard.addButton.actions.receivable.addPayment"
+                    : "dashboard.addButton.actions.payable.addPayment",
+                )}
+              </TooltipContent>
+            </Tooltip>
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
