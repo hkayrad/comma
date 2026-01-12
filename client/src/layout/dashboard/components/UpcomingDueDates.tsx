@@ -87,7 +87,7 @@ export default function UpcomingDueDates() {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <CalendarClock size={16} />
+                        <CalendarClock className="h-4 w-4" />
                         {t("dashboard.upcomingDueDates.title")}
                     </CardTitle>
                 </CardHeader>
@@ -107,7 +107,7 @@ export default function UpcomingDueDates() {
         <Card>
             <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <CalendarClock size={16} />
+                    <CalendarClock className="h-4 w-4" />
                     {t("dashboard.upcomingDueDates.title")}
                     <Badge variant="secondary" className="ml-auto">
                         {dueDates.length}

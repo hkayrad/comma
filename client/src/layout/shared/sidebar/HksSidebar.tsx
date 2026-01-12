@@ -399,7 +399,7 @@ export default function HksSidebar() {
                   render={(popoverProps) => (
                     <SidebarMenuButton {...popoverProps}>
                       <div className="relative">
-                        <Bell size={16} />
+                        <Bell className="h-4 w-4" />
                         {upcomingPaymentsCount > 0 && (
                           <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-sidebar" />
                         )}
