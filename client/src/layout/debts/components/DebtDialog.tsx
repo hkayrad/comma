@@ -12,7 +12,7 @@ import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type { CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types";
-import { sendRefreshEvent } from "@/lib/utils";
+import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -61,6 +61,8 @@ export default function DebtDialog(props: Props) {
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
     CustomerIdName[]
   >([]);
+
+  const [total, setTotal] = useState(0);
 
   const DEBT_API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
   const CUSTOMER_API =
@@ -171,7 +173,10 @@ export default function DebtDialog(props: Props) {
     (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
       e.preventDefault();
       const vat = form.getValues("vat");
-      form.setValue("withholding", Number((vat * discountPercentage).toFixed(2)));
+      form.setValue(
+        "withholding",
+        Number((vat * discountPercentage).toFixed(2)),
+      );
     },
     [form],
   );
@@ -250,6 +255,20 @@ export default function DebtDialog(props: Props) {
       form.setValue("exchange_rate", 1);
     }
   }, [form, selectedCurrency]);
+
+  const watchedAmount = form.watch("amount");
+  const watchedVat = form.watch("vat");
+  const watchedDiscount = form.watch("discount");
+  const watchedWithholding = form.watch("withholding");
+
+  useEffect(() => {
+    const valAmount = watchedAmount || 0;
+    const valVat = watchedVat || 0;
+    const valDiscount = watchedDiscount || 0;
+    const valWithholding = watchedWithholding || 0;
+    const newTotal = valAmount - valDiscount + valVat - valWithholding;
+    setTotal(Number(newTotal.toFixed(2)));
+  }, [watchedAmount, watchedVat, watchedDiscount, watchedWithholding]);
 
   return (
     <Form {...form}>
@@ -664,11 +683,18 @@ export default function DebtDialog(props: Props) {
             </FormItem>
           )}
         />
-        <div className="flex justify-end gap-2 col-span-2">
-          <CancelButton onClick={onCancel} />
-          <Button type="submit">
-            {debt ? t("dialog.debt.update") : t("dialog.debt.add")}
-          </Button>
+        <div className="col-span-2 flex flex-row justify-between">
+          <div className="flex justify-end items-center text-lg font-semibold">
+            {t("form.debt.total", {
+              total: formatCurrency(total, selectedCurrency),
+            })}
+          </div>
+          <div className="flex justify-end gap-2">
+            <CancelButton onClick={onCancel} />
+            <Button type="submit">
+              {debt ? t("dialog.debt.update") : t("dialog.debt.add")}
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

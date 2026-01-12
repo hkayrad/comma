@@ -353,7 +353,8 @@
       "discount.set.5%": "Set Discount to 5% of the amount",
       "discount.set.10%": "Set Discount to 10% of the amount",
       "discount.validation.invalid": "Invalid discount",
-      "discount.validation.min": "Discount must be at least {{min}}"
+      "discount.validation.min": "Discount must be at least {{min}}",
+      "total": "Total: {{total}}"
     },
     "payment": {
       "amount": "Amount",

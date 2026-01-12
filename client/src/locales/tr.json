@@ -347,7 +347,8 @@
       "discount.set.5%": "İskonto tutarını borç tutarının %5'i olarak ayarla",
       "discount.set.10%": "İskonto tutarını borç tutarının %10'u olarak ayarla",
       "discount.validation.invalid": "Geçersiz indirim",
-      "discount.validation.min": "İskonto en az {{min}} olmalıdır"
+      "discount.validation.min": "İskonto en az {{min}} olmalıdır",
+      "total": "Toplam: {{total}}"
     },
     "payment": {
       "amount": "Miktar",

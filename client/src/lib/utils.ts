@@ -27,7 +27,7 @@ export function sendRefreshEvent(type: "global:refresh" | "logo:refresh" = "glob
 }
 
 export function formatCurrency(amount?: number, currency: string = "TRY") {
-	if (!amount) return "0,00 ₺";
+	if (!amount) amount = 0;
 	return new Intl.NumberFormat("tr-TR", {
 		style: "currency",
 		currency: currency,
