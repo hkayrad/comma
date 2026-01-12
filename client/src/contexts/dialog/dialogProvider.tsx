@@ -74,7 +74,7 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
         setDialogs((currentDialogs) =>
           currentDialogs.filter((d) => d.id !== dialogToClose.id),
         );
-      }, 200);
+      }, 0);
 
       return newDialogs;
     });
