@@ -6,6 +6,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { format, type Locale } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
@@ -41,58 +46,67 @@ export default function DateSelect(props: Props) {
   };
 
   return (
-    <Popover>
-      <PopoverTrigger
-        render={(props) => (
-          <FormControl {...props}>
-            <div className="flex items-center gap-1">
+    <div className="flex w-full overflow-hidden gap-2">
+      <Popover>
+        <PopoverTrigger
+          render={(props) => (
+            <FormControl {...props}>
               <Button
-                variant={"outline"}
+                variant="outline"
                 nativeButton
                 className={cn(
-                  "w-full pl-3 text-left font-normal justify-start",
+                  "flex grow justify-between overflow-hidden text-ellipsis",
+                  allowClear && field.value ? "max-w-[calc(100%-2.75rem)]" : "w-full",
                   !field.value && "text-muted-foreground",
                 )}
               >
-                <CalendarIcon className="h-4 w-4 opacity-50" />
-                {field.value ? (
-                  format(field.value, "PPP", {
-                    locale: localeMap[i18n.language],
-                  })
-                ) : (
-                  <span>{placeholder || t("vars.date_range")}</span>
-                )}
+                <span className="overflow-hidden flex items-center gap-2 min-w-0 flex-1">
+                  <CalendarIcon className="text-muted-foreground! shrink-0 h-4 w-4 opacity-50" />
+                  <span className="truncate">
+                    {field.value
+                      ? format(field.value, "PPP", {
+                        locale: localeMap[i18n.language],
+                      })
+                      : (placeholder || t("vars.date_range"))}
+                  </span>
+                </span>
               </Button>
-              {allowClear && field.value && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  nativeButton
-                  className="h-8 w-8 shrink-0"
-                  onClick={handleClear}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </FormControl>
-        )}
-      ></PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          lang={i18n.language}
-          timeZone="Europe/Istanbul"
-          selected={field.value}
-          onSelect={field.onChange}
-          disabled={(date) =>
-            allowFuture
-              ? date < new Date("1900-01-01")
-              : date > new Date() || date < new Date("1900-01-01")
-          }
-          captionLayout="dropdown"
+            </FormControl>
+          )}
         />
-      </PopoverContent>
-    </Popover>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            lang={i18n.language}
+            timeZone="Europe/Istanbul"
+            selected={field.value}
+            onSelect={field.onChange}
+            disabled={(date) =>
+              allowFuture
+                ? date < new Date("1900-01-01")
+                : date > new Date() || date < new Date("1900-01-01")
+            }
+            captionLayout="dropdown"
+          />
+        </PopoverContent>
+      </Popover>
+      {allowClear && field.value && (
+        <Tooltip disableHoverablePopup>
+          <TooltipTrigger
+            render={(props) => (
+              <Button
+                {...props}
+                onClick={handleClear}
+                variant="outline"
+                size="icon"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          />
+          <TooltipContent>{t("component.dateSelect.clear")}</TooltipContent>
+        </Tooltip>
+      )}
+    </div>
   );
 }

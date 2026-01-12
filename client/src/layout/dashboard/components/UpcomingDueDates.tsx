@@ -83,7 +83,21 @@ export default function UpcomingDueDates() {
     }
 
     if (dueDates.length === 0) {
-        return null;
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <CalendarClock size={16} />
+                        {t("dashboard.upcomingDueDates.title")}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                        {t("dashboard.upcomingDueDates.noData")}
+                    </p>
+                </CardContent>
+            </Card>
+        );
     }
 
     const displayedDueDates = showAll ? dueDates : dueDates.slice(0, 5);

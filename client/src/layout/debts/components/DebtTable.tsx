@@ -340,6 +340,52 @@ export default function DebtTable(props: Props) {
         cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
       },
       {
+        accessorKey: "due_date",
+        header: ({ column }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("debt.table.column.due_date")}
+          />
+        ),
+        cell: ({ row, column }) => {
+          const dueDate = row.getValue(column.id) as string | null;
+          if (!dueDate) return <span className="text-muted-foreground">-</span>;
+
+          const dueDateObj = new Date(dueDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          dueDateObj.setHours(0, 0, 0, 0);
+
+          const daysRemaining = Math.ceil(
+            (dueDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+          );
+
+          let badgeClass = "";
+          if (daysRemaining < 0) {
+            badgeClass = "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+          } else if (daysRemaining <= 3) {
+            badgeClass = "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+          } else if (daysRemaining <= 7) {
+            badgeClass = "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+          }
+
+          return (
+            <div className="flex items-center gap-2">
+              <FormattedDate row={row} column={column} />
+              {badgeClass && (
+                <Badge variant="outline" className={badgeClass}>
+                  {daysRemaining === 0
+                    ? t("dashboard.upcomingDueDates.today")
+                    : daysRemaining < 0
+                      ? t("dashboard.upcomingDueDates.overdue")
+                      : t("dashboard.upcomingDueDates.daysRemaining", { count: daysRemaining })}
+                </Badge>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         accessorKey: "invoice_no",
         header: ({ column }) => (
           <SortableColumnHeader

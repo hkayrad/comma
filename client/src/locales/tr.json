@@ -111,11 +111,17 @@
         "exchange_rate": "Kur",
         "invoice_no": "Fatura No",
         "issue_date": "Oluşturma Tarihi",
+        "due_date": "Son Ödeme Tarihi",
         "total": "Toplam",
         "total_in_try": "Ödenecek Miktar",
         "vat": "KDV",
         "withholding": "Tevkifat"
       }
+    }
+  },
+  "component": {
+    "dateSelect": {
+      "clear": "Tarihi temizle"
     }
   },
   "dialog": {

@@ -111,11 +111,17 @@
         "exchange_rate": "Exchange Rate",
         "invoice_no": "Invoice No",
         "issue_date": "Issue Date",
+        "due_date": "Due Date",
         "total": "Total",
         "total_in_try": "Amount to be Paid",
         "vat": "VAT",
         "withholding": "Withholding"
       }
+    }
+  },
+  "component": {
+    "dateSelect": {
+      "clear": "Clear date"
     }
   },
   "dialog": {
