@@ -51,11 +51,12 @@ import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   debt?: DebtDto;
+  customerId?: string;
   type?: OverviewViewType;
 };
 
 export default function DebtDialog(props: Props) {
-  const { debt, type = "receivable" } = props;
+  const { debt, customerId, type = "receivable" } = props;
   const { closeDialog } = useDialog();
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
@@ -121,7 +122,7 @@ export default function DebtDialog(props: Props) {
   const form = useForm<z.infer<typeof DebtFormSchema>>({
     resolver: zodResolver(DebtFormSchema),
     defaultValues: {
-      customer_id: debt?.customer_id || "",
+      customer_id: debt?.customer_id || customerId || "",
       amount: debt?.amount ? Number(debt.amount) : 0,
       vat: debt?.vat ? Number(debt.vat) : 0,
       withholding: debt?.withholding ? Number(debt.withholding) : 0,

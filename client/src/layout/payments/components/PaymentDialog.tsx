@@ -55,11 +55,12 @@ import CancelButton from "@/layout/shared/CancelButton";
 
 type Props = {
   payment?: PaymentDto;
+  customerId?: string;
   type?: OverviewViewType;
 };
 
 export default function PaymentDialog(props: Props) {
-  const { payment, type = "receivable" } = props;
+  const { payment, customerId, type = "receivable" } = props;
   const { closeDialog } = useDialog();
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
@@ -114,7 +115,7 @@ export default function PaymentDialog(props: Props) {
   const form = useForm<z.infer<typeof PaymentFormSchema>>({
     resolver: zodResolver(PaymentFormSchema),
     defaultValues: {
-      customer_id: payment?.customer_id || "",
+      customer_id: payment?.customer_id || customerId || "",
       amount: payment?.amount ? Number(payment.amount) : 0,
       currency: payment?.currency || "TRY",
       exchange_rate: payment?.exchange_rate ? Number(payment.exchange_rate) : 1,

@@ -1,6 +1,6 @@
 import type { CustomerDto, OverviewViewType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Info, Paperclip, Pencil, Trash2 } from "lucide-react";
+import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -34,6 +34,8 @@ import type {
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
+import DebtDialog from "@/layout/debts/components/DebtDialog";
+import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import CustomerDetails from "./CustomerDetails";
 import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
 import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
@@ -137,6 +139,38 @@ export default function CustomerTable(props: Props) {
       });
     },
     [data, type, openDialog, t],
+  );
+
+  const onAddDebt = useCallback(
+    (customerId: string) => {
+      openDialog({
+        title: t("dialog.debt.add"),
+        description:
+          type === "receivable"
+            ? t("dialog.receivable.add.description")
+            : t("dialog.payable.add.description"),
+        size: "3xl",
+        content: <DebtDialog customerId={customerId} type={type} />,
+        showCloseButton: true,
+      });
+    },
+    [openDialog, type, t],
+  );
+
+  const onAddPayment = useCallback(
+    (customerId: string) => {
+      openDialog({
+        title: t("dialog.payment.add"),
+        description:
+          type === "receivable"
+            ? t("dialog.receivablePayment.add.description")
+            : t("dialog.payablePayment.add.description"),
+        size: "3xl",
+        content: <PaymentDialog customerId={customerId} type={type} />,
+        showCloseButton: true,
+      });
+    },
+    [openDialog, type, t],
   );
 
   const CustomerTableColumns: ColumnDef<CustomerDto>[] = useMemo(
@@ -377,6 +411,50 @@ export default function CustomerTable(props: Props) {
         header: t("dashboard.table.column.actions"),
         cell: ({ row }: { row: Row<CustomerDto> }) => (
           <div className="flex gap-2">
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onAddDebt(row.original.id!)}
+                  >
+                    <CirclePlus />
+                  </Button>
+                )}
+              />
+              <TooltipContent>
+                {t(
+                  type === "receivable"
+                    ? "dashboard.addButton.actions.receivable.addReceivable"
+                    : "dashboard.addButton.actions.payable.addPayable",
+                )}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onAddPayment(row.original.id!)}
+                  >
+                    <Wallet />
+                  </Button>
+                )}
+              />
+              <TooltipContent>
+                {t(
+                  type === "receivable"
+                    ? "dashboard.addButton.actions.receivable.addPayment"
+                    : "dashboard.addButton.actions.payable.addPayment",
+                )}
+              </TooltipContent>
+            </Tooltip>
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
