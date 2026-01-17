@@ -1,128 +1,241 @@
 # Comma
 
-Comma is a full-stack web application designed to streamline the management of receivables and payables. It offers a comprehensive suite of tools for tracking finances, managing customer data, and ensuring secure access to financial information.
+Comma is a full-stack financial management application designed to streamline the tracking of receivables and payables for businesses. Built with modern web technologies, it provides a comprehensive suite of tools for managing financial transactions, customer relationships, and business operations with enterprise-grade security and performance.
 
-## About the Project
+## Overview
 
-This project provides a robust platform for businesses and individuals to manage their financial transactions. With a user-friendly interface and a powerful backend, Comma simplifies the process of tracking debts, recording payments, and maintaining a clear overview of financial health. The application is designed to be both scalable and secure, making it suitable for a wide range of use cases.
+Comma offers a robust platform for businesses to manage their financial health through an intuitive interface and powerful backend architecture. The application supports multi-currency transactions, real-time notifications, and provides detailed financial reporting capabilities.
 
-## Features
+### Key Features
 
-- **Dashboard:** A comprehensive overview of key financial metrics, including total receivables, total payables, and outstanding balances.
-- **Debt Management:** Create, edit, and delete debt records with detailed information such as due dates, amounts, and associated customers. Supports discount and withholding calculations.
-- **Payment Processing:** Record payments against outstanding debts, with support for partial payments and payment history tracking.
-- **Customer Management:** Maintain a centralized database of customer information, including contact details and transaction history.
-- **User Authentication:** Secure user authentication with role-based access control, ensuring that users can only access the information and features relevant to their roles.
-- **Real-time Notifications:** Receive real-time notifications for important events, such as new payments or overdue debts, via WebSocket integration.
-- **Responsive Design:** A responsive user interface that works seamlessly on both desktop and mobile devices.
+- **Financial Dashboard**: Real-time overview of receivables, payables, and cash flow metrics
+- **Debt Management**: Complete lifecycle management of debts with support for discounts, withholding taxes, and multi-currency
+- **Payment Processing**: Flexible payment recording with partial payments and comprehensive payment history
+- **Customer Management**: Centralized customer database with transaction history and financial statements
+- **Security**: JWT-based authentication with two-factor support and role-based access control
+- **Real-time Updates**: WebSocket-powered notifications for payment events and system alerts
+- **Responsive Design**: Optimized experience across desktop and mobile devices
+- **Multi-language Support**: Internationalization with English and Turkish language support
+- **Advanced Reporting**: Customer statements, financial summaries, and export capabilities
 
-## Getting Started
-
-To get the project up and running on your local machine, please follow these steps:
+## Quick Start
 
 ### Prerequisites
 
-- Node.js (v14 or later)
-- npm (v6 or later)
-- MariaDB
+- **Node.js**: v18 or later
+- **npm**: v9 or later  
+- **MariaDB**: v10.6 or later
+- **Git**: For version control
 
 ### Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/Hakan-Kimya/comma.git
-    cd comma
-    ```
-2.  **Install client dependencies:**
-    ```bash
-    cd client
-    npm install
-    ```
-3.  **Install server dependencies:**
-    ```bash
-    cd ../server
-    npm install
-    ```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Hakan-Kimya/comma.git
+   cd comma
+   ```
 
-### Configuration
+2. **Install dependencies**
+   ```bash
+   # Install client dependencies
+   cd client && npm install
+   
+   # Install server dependencies  
+   cd ../server && npm install
+   ```
 
-1.  **Set up the database:**
-    - Create a MariaDB database for the application.
-    - You will need to create a `.env` file in the `server` directory and add the database connection details.
-2.  **Configure environment variables:**
-    - In the `server` directory, create a `.env` file and add the following variables:
-        ```
-        SERVER_PORT=<your_server_port>
-        DB_USER=<your_database_user>
-        DB_HOST=<your_database_host>
-        DB_DATABASE=<your_database_name>
-        DB_PASSWORD=<your_database_password>
-        DB_PORT=<your_database_port>
-        JWT_SECRET=<your_jwt_secret>
-        JWT_EXPIRES_IN=<jwt_expiry_in_days>
-        JWT_ISSUER=<jwt_issuer>
-        JWT_AUDIENCE=<jwt_audience>
-        NODE_ENV=<development | production>
-        CLIENT_URL=<client_url>
-        TCMB_API_KEY=<your_tcmb_evds2_api_key>
-        PROXY_URL=<your_proxy_url>
-        PROXY_API_KEY=<your_proxy_api_key>
-        ```
+3. **Database Setup**
+   ```bash
+   # Create MariaDB database
+   mysql -u root -p
+   CREATE DATABASE comma;
+   
+   # Run migrations (if applicable)
+   # See migration.sql for database schema
+   ```
+
+4. **Environment Configuration**
+   
+   Create `.env` file in `server/` directory:
+   ```env
+   # Server Configuration
+   SERVER_PORT=3001
+   NODE_ENV=development
+   
+   # Database
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   DB_DATABASE=comma
+   
+   # JWT Configuration
+   JWT_SECRET=your_jwt_secret_key
+   JWT_EXPIRES_IN=7d
+   JWT_ISSUER=comma
+   JWT_AUDIENCE=comma-users
+   
+   # External Services
+   TCMB_API_KEY=your_tcmb_api_key
+   PROXY_URL=your_proxy_url
+   PROXY_API_KEY=your_proxy_api_key
+   
+   # Client
+   CLIENT_URL=http://localhost:5173
+   ```
 
 ### Running the Application
 
-1.  **Start the backend server:**
-    ```bash
-    cd server
-    npm run dev
-    ```
-2.  **Start the frontend client:**
-    ```bash
-    cd ../client
-    npm run dev
-    ```
+**Option 1: Using the startup script**
+```bash
+chmod +x start.sh
+./start.sh
+```
 
-## Technologies Used
+**Option 2: Manual startup**
+```bash
+# Terminal 1 - Start backend
+cd server
+npm run dev
 
-### Frontend
+# Terminal 2 - Start frontend  
+cd client
+npm run dev
+```
 
-- **React:** A JavaScript library for building user interfaces.
-- **TypeScript:** A typed superset of JavaScript that compiles to plain JavaScript.
-- **Vite:** A fast build tool and development server for modern web projects.
-- **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
-- **Shadcn/ui:** A collection of reusable UI components for React.
-- **React Router:** A declarative routing library for React.
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3001
 
-### Backend
+## Architecture
 
-- **Node.js:** A JavaScript runtime built on Chrome's V8 JavaScript engine.
-- **Express.js:** A fast, unopinionated, minimalist web framework for Node.js.
-- **TypeScript:** A typed superset of JavaScript that compiles to plain JavaScript.
-- **PostgreSQL:** A powerful, open-source object-relational database system.
-- **JWT (JSON Web Tokens):** A compact, URL-safe means of representing claims to be transferred between two parties.
-- **WebSocket:** A communication protocol that provides full-duplex communication channels over a single TCP connection.
+### Technology Stack
 
-## Project Structure
+#### Frontend
+- **React 19.2.3** - Modern UI library with hooks
+- **TypeScript 5.9.3** - Type-safe development
+- **Vite 7.3.0** - Fast build tool and dev server
+- **Tailwind CSS 4.1.18** - Utility-first styling
+- **Shadcn/ui** - High-quality component library
+- **Tanstack Table** - Powerful data grid solution
+- **React Router 7.11.0** - Client-side routing
+- **React Hook Form 7.68.0** - Form management
+- **i18next** - Internationalization support
 
-The project is organized into a monorepo structure with two main packages: `client` and `server`.
+#### Backend
+- **Node.js** - JavaScript runtime
+- **Express 5.2.1** - Web framework
+- **TypeScript 5.9.3** - Type-safe backend development
+- **Sequelize 6.37.7** - ORM for database operations
+- **MariaDB 3.4.5** - Database engine
+- **JWT 9.0.3** - Authentication tokens
+- **WebSocket 8.18.3** - Real-time communication
+- **bcrypt 6.0.0** - Password hashing
+- **OTPAuth 9.4.1** - Two-factor authentication
 
-- **`client/`**: The frontend application built with React.
-    - **`src/`**: Contains the main source code for the client.
-        - **`components/`**: Reusable UI components, including both custom components and components from the Shadcn/ui library.
-        - **`contexts/`**: React Context providers for managing global state, such as user authentication and application configuration.
-        - **`hooks/`**: Custom React hooks for encapsulating and reusing component logic.
-        - **`layout/`**: The main application layout, including pages for different routes.
-        - **`lib/`**: Utility functions, API service clients, and type definitions.
-- **`server/`**: The backend application built with Node.js and Express.
-    - **`src/`**: Contains the main source code for the server.
-        - **`controllers/`**: Express route handlers that process incoming requests and send responses.
-        - **`services/`**: The business logic of the application, which is called by the controllers.
-        - **`lib/`**: Utility functions, middleware, and the database connection pool.
+### Project Structure
+
+```
+comma/
+├── client/                 # React frontend application
+│   ├── src/
+│   │   ├── layout/        # Page components and layouts
+│   │   ├── components/    # Reusable UI components
+│   │   ├── contexts/      # React Context providers
+│   │   ├── lib/          # Utilities and API clients
+│   │   └── locales/      # Internationalization files
+│   ├── package.json
+│   └── vite.config.ts
+├── server/                # Node.js backend application
+│   ├── controllers/      # Route handlers
+│   ├── services/         # Business logic layer
+│   ├── models/           # Database models
+│   ├── lib/              # Utilities and middleware
+│   └── index.ts          # Application entry point
+├── build/                # Production build output
+├── start.sh             # Development startup script
+├── migration.sql        # Database schema migrations
+├── API.md              # API documentation
+├── CODING_CONVENTIONS.md # Development guidelines
+└── README.md           # This file
+```
+
+## Performance
+
+The application is optimized for performance with:
+- **Code Splitting**: Reduced initial bundle size
+- **Lazy Loading**: Components loaded on demand
+- **Production Optimization**: Minified and compressed assets
+- **Database Indexing**: Optimized query performance
+
+Recent performance metrics (LCP ~550ms) demonstrate excellent loading times and user experience.
+
+## Development
+
+### Coding Standards
+
+This project follows strict coding conventions outlined in [CODING_CONVENTIONS.md](CODING_CONVENTIONS.md):
+
+- **Frontend**: Functional React components with TypeScript, Tailwind CSS utility classes
+- **Backend**: Layered architecture with controllers, services, and models
+- **Database**: Sequelize ORM with raw SQL for complex queries
+- **API**: RESTful endpoints with consistent response structure
+
+### Available Scripts
+
+#### Client
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
+
+#### Server
+```bash
+npm run dev      # Start development server with hot reload
+npm run build    # Compile TypeScript
+npm run serve    # Start production server
+```
 
 ## API Documentation
 
-For detailed information about the API endpoints, please refer to the [API Documentation](API.md).
+Comprehensive API documentation is available in [API.md](API.md), covering:
+
+- Authentication endpoints
+- Receivables and payables management
+- Customer operations
+- Payment processing
+- Admin functions
+- Configuration management
+
+## Security Features
+
+- **JWT Authentication**: Secure token-based authentication
+- **Two-Factor Authentication**: Optional 2FA using TOTP
+- **Role-Based Access Control**: Granular permissions system
+- **Rate Limiting**: API endpoint protection
+- **Input Validation**: Request sanitization and validation
+- **Secure Headers**: CORS and security middleware
+
+## Internationalization
+
+The application supports multiple languages:
+- **English** (default)
+- **Türkçe** (Turkish)
+
+Language files are located in `client/src/locales/` and can be easily extended for additional languages.
 
 ## License
 
-This project is a closed-source project. All rights are reserved. See the `LICENSE.md` file for more details.
+This project is closed-source. All rights are reserved. See [LICENSE.md](LICENSE.md) for more details.
+
+## Contributing
+
+For development guidelines and coding standards, please refer to [CODING_CONVENTIONS.md](CODING_CONVENTIONS.md).
+
+---
+
+**Version**: 2.7.2  
+**Author**: Hakan Kayra Doğan  
+**Last Updated**: 2025-12-22
