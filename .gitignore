@@ -24,10 +24,14 @@ dist-ssr
 *.sw?
 
 .env
+.env.development
+.env.production
 node_modules/
 
 server/uploads/logos/
 
 client/.tolgeerc.json
 
-build/
+build/**
+build.bat
+build.ps1
