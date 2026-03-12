@@ -90,7 +90,8 @@
       "today": "Today",
       "overdue": "Overdue",
       "receivable": "Receivable",
-      "payable": "Payable"
+      "payable": "Payable",
+      "paid": "Paid"
     }
   },
   "debt": {

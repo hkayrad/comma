@@ -136,19 +136,19 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
   }, [setupToken, verifyCode, t]);
 
   const handleDisable = useCallback(async () => {
-    if (!disablePassword || disableCode.length !== 6) return;
+    if (!disablePassword) return; // || disableCode.length !== 6
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await TwoFactorApi.disable(disablePassword, disableCode);
+      const response = await TwoFactorApi.disable(disablePassword);
 
       if (response.success) {
         toast.success(t("twoFactor.disable.success"));
         setStep("setup");
         setDisablePassword("");
-        setDisableCode("");
+        // setDisableCode("");
         onComplete?.();
       } else {
         setError(response.message || t("twoFactor.verify.invalidCode"));
@@ -264,7 +264,7 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
             </InputGroupButton>
           </InputGroup>
 
-          <div className="flex flex-col items-center gap-2">
+          {/*<div className="flex flex-col items-center gap-2">
             <InputOTP
               maxLength={6}
               value={disableCode}
@@ -284,7 +284,7 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
                 <InputOTPSlot index={5} />
               </InputOTPGroup>
             </InputOTP>
-          </div>
+          </div>*/}
 
           {error && (
             <p className="text-sm text-destructive text-center">{error}</p>
@@ -302,7 +302,8 @@ export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
             <Button
               variant="destructive"
               onClick={handleDisable}
-              disabled={loading || !disablePassword || disableCode.length !== 6}
+              disabled={loading || !disablePassword}
+              //  || disableCode.length !== 6
               className="flex-1"
             >
               {loading ? <Spinner /> : t("twoFactor.disable.submit")}

@@ -17,438 +17,491 @@ const MIN_DELAY_MS = 500; // Minimum delay for timing attack prevention
 const MAX_DELAY_MS = 1500; // Maximum delay for timing attack prevention
 
 export class TwoFactorService {
-    /**
-     * Introduce a random delay to prevent timing attacks
-     */
-    private static async randomDelay(): Promise<void> {
-        const delay = Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) + MIN_DELAY_MS;
-        return new Promise((resolve) => setTimeout(resolve, delay));
+  /**
+   * Introduce a random delay to prevent timing attacks
+   */
+  private static async randomDelay(): Promise<void> {
+    const delay =
+      Math.floor(Math.random() * (MAX_DELAY_MS - MIN_DELAY_MS + 1)) +
+      MIN_DELAY_MS;
+    return new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  /**
+   * Generate a new TOTP secret
+   */
+  static generateSecret(): string {
+    const secret = new OTPAuth.Secret({ size: 20 });
+    return secret.base32;
+  }
+
+  /**
+   * Generate a TOTP URI for QR code scanning
+   */
+  static generateTOTPUri(username: string, secret: string): string {
+    const totp = new OTPAuth.TOTP({
+      issuer: APP_NAME,
+      label: username,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(secret),
+    });
+    return totp.toString();
+  }
+
+  /**
+   * Generate a QR code data URL from a TOTP URI
+   */
+  static async generateQRCode(uri: string): Promise<string> {
+    try {
+      return await QRCode.toDataURL(uri, {
+        errorCorrectionLevel: "M",
+        type: "image/png",
+        margin: 2,
+        width: 256,
+      });
+    } catch (error: any) {
+      Logger.error("[TwoFactorService] Failed to generate QR code", {
+        error: error.message,
+      });
+      throw new Error("Failed to generate QR code");
+    }
+  }
+
+  /**
+   * Encrypt a TOTP secret using AES-256-GCM
+   */
+  static encryptSecret(secret: string): string {
+    if (!ENCRYPTION_KEY) {
+      throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }
 
-    /**
-     * Generate a new TOTP secret
-     */
-    static generateSecret(): string {
-        const secret = new OTPAuth.Secret({ size: 20 });
-        return secret.base32;
+    const key = Buffer.from(ENCRYPTION_KEY, "hex");
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+
+    let encrypted = cipher.update(secret, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
+    const authTag = cipher.getAuthTag();
+
+    // Format: iv:authTag:encryptedData
+    return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
+  }
+
+  /**
+   * Decrypt a TOTP secret
+   */
+  static decryptSecret(encryptedSecret: string): string {
+    if (!ENCRYPTION_KEY) {
+      throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }
 
-    /**
-     * Generate a TOTP URI for QR code scanning
-     */
-    static generateTOTPUri(username: string, secret: string): string {
-        const totp = new OTPAuth.TOTP({
-            issuer: APP_NAME,
-            label: username,
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
-            secret: OTPAuth.Secret.fromBase32(secret),
-        });
-        return totp.toString();
+    const parts = encryptedSecret.split(":");
+    if (parts.length !== 3) {
+      throw new Error("Invalid encrypted secret format");
     }
 
-    /**
-     * Generate a QR code data URL from a TOTP URI
-     */
-    static async generateQRCode(uri: string): Promise<string> {
-        try {
-            return await QRCode.toDataURL(uri, {
-                errorCorrectionLevel: "M",
-                type: "image/png",
-                margin: 2,
-                width: 256,
-            });
-        } catch (error: any) {
-            Logger.error("[TwoFactorService] Failed to generate QR code", { error: error.message });
-            throw new Error("Failed to generate QR code");
-        }
+    const [ivHex, authTagHex, encrypted] = parts;
+    const key = Buffer.from(ENCRYPTION_KEY, "hex");
+    const iv = Buffer.from(ivHex, "hex");
+    const authTag = Buffer.from(authTagHex, "hex");
+
+    const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+    decipher.setAuthTag(authTag);
+
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+
+    return decrypted;
+  }
+
+  /**
+   * Verify a TOTP token
+   */
+  static verifyToken(secret: string, token: string): boolean {
+    const totp = new OTPAuth.TOTP({
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(secret),
+    });
+
+    // Allow ±1 time step window for clock drift
+    const delta = totp.validate({ token, window: 1 });
+    return delta !== null;
+  }
+
+  /**
+   * Generate recovery codes
+   */
+  static generateRecoveryCodes(count: number = 10): string[] {
+    const codes: string[] = [];
+    for (let i = 0; i < count; i++) {
+      // Generate 10-character alphanumeric codes
+      const code = crypto.randomBytes(5).toString("hex").toUpperCase();
+      // Format as XXXXX-XXXXX for readability
+      codes.push(`${code.slice(0, 5)}-${code.slice(5)}`);
+    }
+    return codes;
+  }
+
+  /**
+   * Hash recovery codes for storage
+   */
+  static async hashRecoveryCodes(codes: string[]): Promise<string[]> {
+    const hashedCodes = await Promise.all(
+      codes.map((code) => bcrypt.hash(code.replace("-", ""), 10)),
+    );
+    return hashedCodes;
+  }
+
+  /**
+   * Verify and consume a recovery code
+   * Returns the index of the matched code, or -1 if not found
+   */
+  static async verifyRecoveryCode(
+    hashedCodes: string[],
+    code: string,
+  ): Promise<number> {
+    const normalizedCode = code.replace("-", "").toUpperCase();
+
+    for (let i = 0; i < hashedCodes.length; i++) {
+      if (
+        hashedCodes[i] &&
+        (await bcrypt.compare(normalizedCode, hashedCodes[i]))
+      ) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Check if user is locked out due to failed attempts
+   */
+  static async checkRateLimit(
+    userId: string,
+  ): Promise<{ locked: boolean; remainingTime?: number }> {
+    const user = await Users.findByPk(userId, {
+      attributes: ["totp_failed_attempts", "totp_lockout_until"],
+    });
+
+    if (!user) {
+      return { locked: false };
     }
 
-    /**
-     * Encrypt a TOTP secret using AES-256-GCM
-     */
-    static encryptSecret(secret: string): string {
-        if (!ENCRYPTION_KEY) {
-            throw new Error("TOTP_ENCRYPTION_KEY is not configured");
-        }
-
-        const key = Buffer.from(ENCRYPTION_KEY, "hex");
-        const iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
-
-        let encrypted = cipher.update(secret, "utf8", "hex");
-        encrypted += cipher.final("hex");
-
-        const authTag = cipher.getAuthTag();
-
-        // Format: iv:authTag:encryptedData
-        return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
+    if (user.totp_lockout_until && new Date() < user.totp_lockout_until) {
+      const remainingTime = Math.ceil(
+        (user.totp_lockout_until.getTime() - Date.now()) / 1000,
+      );
+      return { locked: true, remainingTime };
     }
 
-    /**
-     * Decrypt a TOTP secret
-     */
-    static decryptSecret(encryptedSecret: string): string {
-        if (!ENCRYPTION_KEY) {
-            throw new Error("TOTP_ENCRYPTION_KEY is not configured");
-        }
+    return { locked: false };
+  }
 
-        const parts = encryptedSecret.split(":");
-        if (parts.length !== 3) {
-            throw new Error("Invalid encrypted secret format");
-        }
+  /**
+   * Increment failed attempts and potentially lock the account
+   */
+  static async incrementFailedAttempts(
+    userId: string,
+  ): Promise<{ locked: boolean; attemptsRemaining: number }> {
+    const user = await Users.findByPk(userId);
 
-        const [ivHex, authTagHex, encrypted] = parts;
-        const key = Buffer.from(ENCRYPTION_KEY, "hex");
-        const iv = Buffer.from(ivHex, "hex");
-        const authTag = Buffer.from(authTagHex, "hex");
-
-        const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
-        decipher.setAuthTag(authTag);
-
-        let decrypted = decipher.update(encrypted, "hex", "utf8");
-        decrypted += decipher.final("utf8");
-
-        return decrypted;
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    /**
-     * Verify a TOTP token
-     */
-    static verifyToken(secret: string, token: string): boolean {
-        const totp = new OTPAuth.TOTP({
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
-            secret: OTPAuth.Secret.fromBase32(secret),
-        });
+    const newAttempts = (user.totp_failed_attempts || 0) + 1;
 
-        // Allow ±1 time step window for clock drift
-        const delta = totp.validate({ token, window: 1 });
-        return delta !== null;
+    if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+      const lockoutUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
+      await Users.update(
+        {
+          totp_failed_attempts: newAttempts,
+          totp_lockout_until: lockoutUntil,
+        },
+        { where: { id: userId } },
+      );
+      Logger.warn(
+        "[TwoFactorService] User locked out due to failed 2FA attempts",
+        { userId },
+      );
+      return { locked: true, attemptsRemaining: 0 };
     }
 
-    /**
-     * Generate recovery codes
-     */
-    static generateRecoveryCodes(count: number = 10): string[] {
-        const codes: string[] = [];
-        for (let i = 0; i < count; i++) {
-            // Generate 10-character alphanumeric codes
-            const code = crypto.randomBytes(5).toString("hex").toUpperCase();
-            // Format as XXXXX-XXXXX for readability
-            codes.push(`${code.slice(0, 5)}-${code.slice(5)}`);
-        }
-        return codes;
+    await Users.update(
+      { totp_failed_attempts: newAttempts },
+      { where: { id: userId } },
+    );
+
+    return {
+      locked: false,
+      attemptsRemaining: MAX_FAILED_ATTEMPTS - newAttempts,
+    };
+  }
+
+  /**
+   * Reset failed attempts after successful verification
+   */
+  static async resetFailedAttempts(userId: string): Promise<void> {
+    await Users.update(
+      {
+        totp_failed_attempts: 0,
+        totp_lockout_until: null,
+      },
+      { where: { id: userId } },
+    );
+  }
+
+  /**
+   * Setup 2FA for a user - returns QR code and temporary secret
+   */
+  static async initiateSetup(
+    userId: string,
+  ): Promise<{ qrCode: string; secret: string }> {
+    const user = await Users.findByPk(userId);
+
+    if (!user) {
+      throw new Error("User not found");
     }
 
-    /**
-     * Hash recovery codes for storage
-     */
-    static async hashRecoveryCodes(codes: string[]): Promise<string[]> {
-        const hashedCodes = await Promise.all(codes.map((code) => bcrypt.hash(code.replace("-", ""), 10)));
-        return hashedCodes;
+    const secret = this.generateSecret();
+    const uri = this.generateTOTPUri(user.username, secret);
+    const qrCode = await this.generateQRCode(uri);
+
+    Logger.info("[TwoFactorService] 2FA setup initiated", { userId });
+
+    return { qrCode, secret };
+  }
+
+  /**
+   * Complete 2FA setup after user verifies the code
+   */
+  static async completeSetup(
+    userId: string,
+    secret: string,
+    token: string,
+  ): Promise<{ success: boolean; recoveryCodes?: string[]; message: string }> {
+    // Verify the token first
+    if (!this.verifyToken(secret, token)) {
+      Logger.warn("[TwoFactorService] Invalid token during 2FA setup", {
+        userId,
+      });
+      return { success: false, message: "Invalid verification code" };
     }
 
-    /**
-     * Verify and consume a recovery code
-     * Returns the index of the matched code, or -1 if not found
-     */
-    static async verifyRecoveryCode(hashedCodes: string[], code: string): Promise<number> {
-        const normalizedCode = code.replace("-", "").toUpperCase();
+    // Encrypt and save the secret
+    const encryptedSecret = this.encryptSecret(secret);
 
-        for (let i = 0; i < hashedCodes.length; i++) {
-            if (hashedCodes[i] && (await bcrypt.compare(normalizedCode, hashedCodes[i]))) {
-                return i;
-            }
-        }
-        return -1;
+    // Generate and hash recovery codes
+    const recoveryCodes = this.generateRecoveryCodes(10);
+    const hashedCodes = await this.hashRecoveryCodes(recoveryCodes);
+
+    await Users.update(
+      {
+        totp_secret: encryptedSecret,
+        totp_enabled: true,
+        totp_recovery_codes: JSON.stringify(hashedCodes),
+        totp_failed_attempts: 0,
+        totp_lockout_until: null,
+      },
+      { where: { id: userId } },
+    );
+
+    Logger.info("[TwoFactorService] 2FA setup completed", { userId });
+
+    return {
+      success: true,
+      recoveryCodes,
+      message: "2FA enabled successfully",
+    };
+  }
+
+  /**
+   * Verify 2FA during login
+   */
+  static async verifyLogin(
+    userId: string,
+    token: string,
+  ): Promise<{
+    success: boolean;
+    locked?: boolean;
+    attemptsRemaining?: number;
+    remainingTime?: number;
+    message: string;
+  }> {
+    // Add randomized delay to prevent timing attacks
+    await this.randomDelay();
+
+    // Check rate limit first
+    const rateLimitStatus = await this.checkRateLimit(userId);
+    if (rateLimitStatus.locked) {
+      return {
+        success: false,
+        locked: true,
+        remainingTime: rateLimitStatus.remainingTime,
+        message: `Account locked. Try again in ${Math.ceil((rateLimitStatus.remainingTime || 0) / 60)} minutes`,
+      };
     }
 
-    /**
-     * Check if user is locked out due to failed attempts
-     */
-    static async checkRateLimit(userId: string): Promise<{ locked: boolean; remainingTime?: number }> {
-        const user = await Users.findByPk(userId, {
-            attributes: ["totp_failed_attempts", "totp_lockout_until"],
-        });
+    const user = await Users.findByPk(userId, {
+      attributes: ["totp_secret", "totp_enabled"],
+    });
 
-        if (!user) {
-            return { locked: false };
-        }
-
-        if (user.totp_lockout_until && new Date() < user.totp_lockout_until) {
-            const remainingTime = Math.ceil((user.totp_lockout_until.getTime() - Date.now()) / 1000);
-            return { locked: true, remainingTime };
-        }
-
-        return { locked: false };
+    if (!user || !user.totp_enabled || !user.totp_secret) {
+      return { success: false, message: "2FA not enabled for this user" };
     }
 
-    /**
-     * Increment failed attempts and potentially lock the account
-     */
-    static async incrementFailedAttempts(userId: string): Promise<{ locked: boolean; attemptsRemaining: number }> {
-        const user = await Users.findByPk(userId);
+    const decryptedSecret = this.decryptSecret(user.totp_secret);
 
-        if (!user) {
-            throw new Error("User not found");
-        }
-
-        const newAttempts = (user.totp_failed_attempts || 0) + 1;
-
-        if (newAttempts >= MAX_FAILED_ATTEMPTS) {
-            const lockoutUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
-            await Users.update(
-                {
-                    totp_failed_attempts: newAttempts,
-                    totp_lockout_until: lockoutUntil,
-                },
-                { where: { id: userId } }
-            );
-            Logger.warn("[TwoFactorService] User locked out due to failed 2FA attempts", { userId });
-            return { locked: true, attemptsRemaining: 0 };
-        }
-
-        await Users.update({ totp_failed_attempts: newAttempts }, { where: { id: userId } });
-
-        return { locked: false, attemptsRemaining: MAX_FAILED_ATTEMPTS - newAttempts };
+    if (this.verifyToken(decryptedSecret, token)) {
+      await this.resetFailedAttempts(userId);
+      Logger.info("[TwoFactorService] 2FA verification successful", { userId });
+      return { success: true, message: "Verification successful" };
     }
 
-    /**
-     * Reset failed attempts after successful verification
-     */
-    static async resetFailedAttempts(userId: string): Promise<void> {
-        await Users.update(
-            {
-                totp_failed_attempts: 0,
-                totp_lockout_until: null,
-            },
-            { where: { id: userId } }
-        );
+    // Verification failed
+    const failResult = await this.incrementFailedAttempts(userId);
+    Logger.warn("[TwoFactorService] 2FA verification failed", {
+      userId,
+      attemptsRemaining: failResult.attemptsRemaining,
+    });
+
+    return {
+      success: false,
+      locked: failResult.locked,
+      attemptsRemaining: failResult.attemptsRemaining,
+      message: failResult.locked
+        ? "Too many failed attempts. Account locked for 15 minutes"
+        : `Invalid code. ${failResult.attemptsRemaining} attempts remaining`,
+    };
+  }
+
+  /**
+   * Use a recovery code to bypass 2FA
+   */
+  static async useRecoveryCode(
+    userId: string,
+    code: string,
+  ): Promise<{ success: boolean; remainingCodes?: number; message: string }> {
+    // Add randomized delay to prevent timing attacks
+    await this.randomDelay();
+
+    // Check rate limit
+    const rateLimitStatus = await this.checkRateLimit(userId);
+    if (rateLimitStatus.locked) {
+      return {
+        success: false,
+        message: `Account locked. Try again in ${Math.ceil((rateLimitStatus.remainingTime || 0) / 60)} minutes`,
+      };
     }
 
-    /**
-     * Setup 2FA for a user - returns QR code and temporary secret
-     */
-    static async initiateSetup(userId: string): Promise<{ qrCode: string; secret: string }> {
-        const user = await Users.findByPk(userId);
+    const user = await Users.findByPk(userId, {
+      attributes: ["totp_recovery_codes"],
+    });
 
-        if (!user) {
-            throw new Error("User not found");
-        }
-
-        const secret = this.generateSecret();
-        const uri = this.generateTOTPUri(user.username, secret);
-        const qrCode = await this.generateQRCode(uri);
-
-        Logger.info("[TwoFactorService] 2FA setup initiated", { userId });
-
-        return { qrCode, secret };
+    if (!user || !user.totp_recovery_codes) {
+      return { success: false, message: "No recovery codes found" };
     }
 
-    /**
-     * Complete 2FA setup after user verifies the code
-     */
-    static async completeSetup(
-        userId: string,
-        secret: string,
-        token: string
-    ): Promise<{ success: boolean; recoveryCodes?: string[]; message: string }> {
-        // Verify the token first
-        if (!this.verifyToken(secret, token)) {
-            Logger.warn("[TwoFactorService] Invalid token during 2FA setup", { userId });
-            return { success: false, message: "Invalid verification code" };
-        }
+    const hashedCodes: string[] = JSON.parse(user.totp_recovery_codes);
+    const matchIndex = await this.verifyRecoveryCode(hashedCodes, code);
 
-        // Encrypt and save the secret
-        const encryptedSecret = this.encryptSecret(secret);
-
-        // Generate and hash recovery codes
-        const recoveryCodes = this.generateRecoveryCodes(10);
-        const hashedCodes = await this.hashRecoveryCodes(recoveryCodes);
-
-        await Users.update(
-            {
-                totp_secret: encryptedSecret,
-                totp_enabled: true,
-                totp_recovery_codes: JSON.stringify(hashedCodes),
-                totp_failed_attempts: 0,
-                totp_lockout_until: null,
-            },
-            { where: { id: userId } }
-        );
-
-        Logger.info("[TwoFactorService] 2FA setup completed", { userId });
-
-        return {
-            success: true,
-            recoveryCodes,
-            message: "2FA enabled successfully",
-        };
+    if (matchIndex === -1) {
+      const failResult = await this.incrementFailedAttempts(userId);
+      return {
+        success: false,
+        message: failResult.locked
+          ? "Too many failed attempts. Account locked for 15 minutes"
+          : `Invalid recovery code. ${failResult.attemptsRemaining} attempts remaining`,
+      };
     }
 
-    /**
-     * Verify 2FA during login
-     */
-    static async verifyLogin(
-        userId: string,
-        token: string
-    ): Promise<{ success: boolean; locked?: boolean; attemptsRemaining?: number; remainingTime?: number; message: string }> {
-        // Add randomized delay to prevent timing attacks
-        await this.randomDelay();
+    // Remove the used code
+    hashedCodes[matchIndex] = "";
+    const remainingCodes = hashedCodes.filter((c) => c !== "").length;
 
-        // Check rate limit first
-        const rateLimitStatus = await this.checkRateLimit(userId);
-        if (rateLimitStatus.locked) {
-            return {
-                success: false,
-                locked: true,
-                remainingTime: rateLimitStatus.remainingTime,
-                message: `Account locked. Try again in ${Math.ceil((rateLimitStatus.remainingTime || 0) / 60)} minutes`,
-            };
-        }
+    await Users.update(
+      {
+        totp_recovery_codes: JSON.stringify(hashedCodes),
+        totp_failed_attempts: 0,
+        totp_lockout_until: null,
+      },
+      { where: { id: userId } },
+    );
 
-        const user = await Users.findByPk(userId, {
-            attributes: ["totp_secret", "totp_enabled"],
-        });
+    Logger.info("[TwoFactorService] Recovery code used", {
+      userId,
+      remainingCodes,
+    });
 
-        if (!user || !user.totp_enabled || !user.totp_secret) {
-            return { success: false, message: "2FA not enabled for this user" };
-        }
+    return {
+      success: true,
+      remainingCodes,
+      message: `Recovery code accepted. ${remainingCodes} codes remaining`,
+    };
+  }
 
-        const decryptedSecret = this.decryptSecret(user.totp_secret);
+  /**
+   * Disable 2FA for a user
+   */
+  static async disable(
+    userId: string,
+    password: string,
+  ): Promise<{ success: boolean; message: string }> {
+    //, token: string
+    const user = await Users.findByPk(userId);
 
-        if (this.verifyToken(decryptedSecret, token)) {
-            await this.resetFailedAttempts(userId);
-            Logger.info("[TwoFactorService] 2FA verification successful", { userId });
-            return { success: true, message: "Verification successful" };
-        }
-
-        // Verification failed
-        const failResult = await this.incrementFailedAttempts(userId);
-        Logger.warn("[TwoFactorService] 2FA verification failed", { userId, attemptsRemaining: failResult.attemptsRemaining });
-
-        return {
-            success: false,
-            locked: failResult.locked,
-            attemptsRemaining: failResult.attemptsRemaining,
-            message: failResult.locked
-                ? "Too many failed attempts. Account locked for 15 minutes"
-                : `Invalid code. ${failResult.attemptsRemaining} attempts remaining`,
-        };
+    if (!user) {
+      return { success: false, message: "User not found" };
     }
 
-    /**
-     * Use a recovery code to bypass 2FA
-     */
-    static async useRecoveryCode(
-        userId: string,
-        code: string
-    ): Promise<{ success: boolean; remainingCodes?: number; message: string }> {
-        // Add randomized delay to prevent timing attacks
-        await this.randomDelay();
+    if (!user.totp_secret)
+      return {
+        success: false,
+        message: "Your 2FA secret is invalid, contact system administrator.",
+      };
 
-        // Check rate limit
-        const rateLimitStatus = await this.checkRateLimit(userId);
-        if (rateLimitStatus.locked) {
-            return {
-                success: false,
-                message: `Account locked. Try again in ${Math.ceil((rateLimitStatus.remainingTime || 0) / 60)} minutes`,
-            };
-        }
-
-        const user = await Users.findByPk(userId, {
-            attributes: ["totp_recovery_codes"],
-        });
-
-        if (!user || !user.totp_recovery_codes) {
-            return { success: false, message: "No recovery codes found" };
-        }
-
-        const hashedCodes: string[] = JSON.parse(user.totp_recovery_codes);
-        const matchIndex = await this.verifyRecoveryCode(hashedCodes, code);
-
-        if (matchIndex === -1) {
-            const failResult = await this.incrementFailedAttempts(userId);
-            return {
-                success: false,
-                message: failResult.locked
-                    ? "Too many failed attempts. Account locked for 15 minutes"
-                    : `Invalid recovery code. ${failResult.attemptsRemaining} attempts remaining`,
-            };
-        }
-
-        // Remove the used code
-        hashedCodes[matchIndex] = "";
-        const remainingCodes = hashedCodes.filter((c) => c !== "").length;
-
-        await Users.update(
-            {
-                totp_recovery_codes: JSON.stringify(hashedCodes),
-                totp_failed_attempts: 0,
-                totp_lockout_until: null,
-            },
-            { where: { id: userId } }
-        );
-
-        Logger.info("[TwoFactorService] Recovery code used", { userId, remainingCodes });
-
-        return {
-            success: true,
-            remainingCodes,
-            message: `Recovery code accepted. ${remainingCodes} codes remaining`,
-        };
+    // Verify password
+    const passwordMatch = await bcrypt.compare(password, user.pass_hash);
+    if (!passwordMatch) {
+      return { success: false, message: "Invalid password" };
     }
 
-    /**
-     * Disable 2FA for a user
-     */
-    static async disable(userId: string, password: string, token: string): Promise<{ success: boolean; message: string }> {
-        const user = await Users.findByPk(userId);
+    // // Verify 2FA code
+    // if (user.totp_secret) {
+    //     const decryptedSecret = this.decryptSecret(user.totp_secret);
+    //     if (!this.verifyToken(decryptedSecret, token)) {
+    //         return { success: false, message: "Invalid 2FA code" };
+    //     }
+    // }
 
-        if (!user) {
-            return { success: false, message: "User not found" };
-        }
+    await Users.update(
+      {
+        totp_secret: null,
+        totp_enabled: false,
+        totp_recovery_codes: null,
+        totp_failed_attempts: 0,
+        totp_lockout_until: null,
+      },
+      { where: { id: userId } },
+    );
 
-        // Verify password
-        const passwordMatch = await bcrypt.compare(password, user.pass_hash);
-        if (!passwordMatch) {
-            return { success: false, message: "Invalid password" };
-        }
+    Logger.info("[TwoFactorService] 2FA disabled", { userId });
 
-        // Verify 2FA code
-        if (user.totp_secret) {
-            const decryptedSecret = this.decryptSecret(user.totp_secret);
-            if (!this.verifyToken(decryptedSecret, token)) {
-                return { success: false, message: "Invalid 2FA code" };
-            }
-        }
+    return { success: true, message: "2FA disabled successfully" };
+  }
 
-        await Users.update(
-            {
-                totp_secret: null,
-                totp_enabled: false,
-                totp_recovery_codes: null,
-                totp_failed_attempts: 0,
-                totp_lockout_until: null,
-            },
-            { where: { id: userId } }
-        );
-
-        Logger.info("[TwoFactorService] 2FA disabled", { userId });
-
-        return { success: true, message: "2FA disabled successfully" };
-    }
-
-    /**
-     * Check if 2FA is enabled for a user
-     */
-    static async isEnabled(userId: string): Promise<boolean> {
-        const user = await Users.findByPk(userId, {
-            attributes: ["totp_enabled"],
-        });
-        return user?.totp_enabled ?? false;
-    }
+  /**
+   * Check if 2FA is enabled for a user
+   */
+  static async isEnabled(userId: string): Promise<boolean> {
+    const user = await Users.findByPk(userId, {
+      attributes: ["totp_enabled"],
+    });
+    return user?.totp_enabled ?? false;
+  }
 }

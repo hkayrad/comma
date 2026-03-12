@@ -70,6 +70,7 @@ export type DebtDto = {
 	updated_at?: Date;
 	deleted_at?: Date;
 	deleted_by?: UUID;
+	is_paid?: boolean;
 };
 
 export type UpcomingDueDate = {

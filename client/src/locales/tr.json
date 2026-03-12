@@ -90,7 +90,8 @@
       "today": "Bugün",
       "overdue": "Gecikmiş",
       "receivable": "Alacak",
-      "payable": "Borç"
+      "payable": "Borç",
+      "paid": "Ödenmiş"
     }
   },
   "debt": {

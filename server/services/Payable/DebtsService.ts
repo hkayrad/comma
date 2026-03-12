@@ -136,7 +136,12 @@ export default class PayableDebtsService {
 				SELECT
 			    d.*,
 			    c.name AS customer_name,
-			    c.tax_number AS customer_tax_number
+			    c.tax_number AS customer_tax_number,
+          (
+            SELECT COALESCE(SUM(p.amount_in_try), 0) >= (d.total_in_try)
+            FROM payable_payments p
+            WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL
+          ) AS is_paid
 				FROM payable_debts d
 				JOIN payable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
 				${whereClause}

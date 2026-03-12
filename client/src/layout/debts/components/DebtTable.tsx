@@ -352,6 +352,19 @@ export default function DebtTable(props: Props) {
           const dueDate = row.getValue(column.id) as string | null;
           if (!dueDate) return <span className="text-muted-foreground">-</span>;
 
+          const isPaid = row.original.is_paid;
+
+          if (isPaid) {
+            return (
+              <div className="flex items-center gap-2">
+                <FormattedDate row={row} column={column} />
+                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  {t("dashboard.upcomingDueDates.paid", "Paid")}
+                </Badge>
+              </div>
+            );
+          }
+
           const dueDateObj = new Date(dueDate);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
