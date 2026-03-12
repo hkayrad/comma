@@ -59,6 +59,7 @@ type Props = {
   type?: OverviewViewType;
   amount?: number;
   currency?: "TRY" | "USD" | "EUR";
+  invoiceNo?: string;
   exchangeRate?: number;
 };
 
@@ -69,6 +70,7 @@ export default function PaymentDialog(props: Props) {
     type = "receivable",
     amount,
     currency,
+    invoiceNo,
     exchangeRate,
   } = props;
   const { closeDialog } = useDialog();
@@ -141,7 +143,7 @@ export default function PaymentDialog(props: Props) {
         ? new Date(payment.payment_date)
         : new Date(),
       payment_method: payment?.payment_method || "bank_transfer",
-      invoice_no: payment?.invoice_no || "",
+      invoice_no: payment?.invoice_no || invoiceNo || "",
       description: payment?.description || "",
     },
   });
