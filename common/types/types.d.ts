@@ -76,8 +76,6 @@ export type DebtDto = {
 export type UpcomingDueDate = {
 	id: UUID;
 	customer_name: string;
-	amount: number;
-	vat: number;
 	total: number;
 	currency: AvailableCurrency;
 	due_date: Date;

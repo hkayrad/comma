@@ -306,9 +306,7 @@ export default class PayableDebtsService {
 			const query = `
 				SELECT
 					d.id,
-					d.amount,
-					d.vat,
-					(d.amount + d.vat) as total,
+					d.total,
 					d.currency,
 					d.due_date,
 					DATEDIFF(d.due_date, CURDATE()) as days_remaining,
@@ -321,6 +319,11 @@ export default class PayableDebtsService {
 					AND d.due_date IS NOT NULL
 					AND d.due_date >= CURDATE()
 					AND d.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+					AND (
+						SELECT COALESCE(SUM(p.amount_in_try), 0)
+						FROM payable_payments p
+						WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL
+					) < d.total_in_try
 				ORDER BY d.due_date ASC
 				LIMIT 10;
 			`;
