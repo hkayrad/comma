@@ -1,9 +1,12 @@
-import { DebtDto, InsertResult, Totals, UUID } from "@common/types";
+import { DebtDto, InsertResult, Totals, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import { ReceivableDebts } from "../../models";
 import { sequelize } from "../../lib/db/sequelize";
 import { QueryTypes } from "sequelize";
+import { DebtRepository } from "../../repositories/DebtRepository";
+
+const repo = new DebtRepository("receivable");
 
 export default class ReceivableDebtsService {
 	static async Create(debt: DebtDto, userId: UUID, companyId: UUID) {
@@ -63,107 +66,24 @@ export default class ReceivableDebtsService {
 
 			Logger.info("[ReceivableDebts] Debt created successfully", { debtId: newDebt.id, companyId });
 			return ApiResponse.success(newDebt.id, "Debt created successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error creating debt", { companyId, error: error.message });
 			return ApiResponse.error("Failed to create debt");
 		}
 	}
 
-	static async GetAll(companyId: string, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
+	static async GetAll(companyId: string, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
 		try {
 			Logger.debug("[ReceivableDebts] Fetching all debts", { companyId, page, limit, sorting, filters });
 
 			const offset = page * limit;
+            const repoResult = await repo.findAllWithSummary(companyId, limit, offset, sorting, filters);
 
-			const colMap: Record<string, string> = {
-				customer_name: "c.name",
-				amount: "d.amount",
-				vat: "d.vat",
-				total: "(d.amount + d.vat)",
-				discount: "d.discount",
-				withholding: "d.withholding",
-				currency: "d.currency",
-				exchange_rate: "d.exchange_rate",
-				total_in_try: "((d.amount + d.vat) * d.exchange_rate)",
-				issue_date: "d.issue_date",
-				due_date: "d.due_date",
-				invoice_no: "d.invoice_no",
-				description: "d.description",
-			};
-
-			let whereClause = "WHERE d.company_id = ? AND d.deleted_at IS NULL AND c.deleted_at IS NULL";
-			const replacements: any[] = [companyId];
-
-			if (filters && filters.length > 0) {
-				filters.forEach((filter) => {
-					const { id, value } = filter;
-					const dbCol = colMap[id];
-					if (!dbCol) return;
-
-					if (Array.isArray(value) && value.length > 0) {
-						whereClause += ` AND ${dbCol} IN (?)`;
-						replacements.push(value);
-					} else if (typeof value === "string" && value.trim() !== "") {
-						whereClause += ` AND ${dbCol} LIKE ?`;
-						replacements.push(`%${value}%`);
-					}
-				});
-			}
-
-			let orderClause = "ORDER BY d.issue_date DESC";
-			if (sorting && sorting.length > 0) {
-				const sortParts = sorting
-					.map((sort) => {
-						const dbCol = colMap[sort.id];
-						if (!dbCol) return null;
-						return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
-					})
-					.filter(Boolean);
-
-				if (sortParts.length > 0) {
-					orderClause = `ORDER BY ${sortParts.join(", ")}`;
-				}
-			}
-
-			const countQuery = `
-				SELECT COUNT(*) as count
-				FROM receivable_debts d
-				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
-				${whereClause}
-			`;
-
-			const countResult = (await sequelize.query(countQuery, {
-				replacements,
-				type: QueryTypes.SELECT,
-			})) as { count: number }[];
-
-			const totalCount = countResult[0]?.count || 0;
-
-			const query = `
-				SELECT
-			    d.*,
-			    c.name AS customer_name,
-			    c.tax_number AS customer_tax_number,
-          (
-            SELECT COALESCE(SUM(p.amount_in_try), 0) >= (d.total_in_try)
-            FROM receivable_payments p
-            WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL
-          ) AS is_paid
-				FROM receivable_debts d
-				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
-				${whereClause}
-				${orderClause}
-				LIMIT ? OFFSET ?;
-            `;
-
-			const result = (await sequelize.query(query, {
-				replacements: [...replacements, limit, offset],
-				type: QueryTypes.SELECT,
-			})) as DebtDto[];
-
-			Logger.debug("[ReceivableDebts] Debts fetched successfully", { companyId, count: result.length, totalCount });
-			return ApiResponse.success({ rows: result, count: totalCount }, "Debts retrieved successfully");
-		} catch (error: any) {
+			Logger.debug("[ReceivableDebts] Debts fetched successfully", { companyId, count: repoResult.rows.length, totalCount: repoResult.count });
+			return ApiResponse.success({ rows: repoResult.rows, count: repoResult.count }, "Debts retrieved successfully");
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error fetching debts", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve debts");
 		}
@@ -173,34 +93,17 @@ export default class ReceivableDebtsService {
 		try {
 			Logger.debug("[ReceivableDebts] Fetching totals", { companyId, currency });
 
-			const query = `
-				SELECT
-			    COALESCE(d.total_in_try, 0) AS total_debts,
-			    COALESCE(p.total_in_try, 0) AS total_payments,
-			    COALESCE(d.total_in_try, 0) - COALESCE(p.total_in_try, 0) AS remaining_debt
-				FROM (SELECT ? AS company_id) AS input
-				-- Join Receivable Debt View
-				LEFT JOIN vw_receivable_total_debt_by_company d
-			    ON d.company_id = input.company_id
-				-- Join Receivable Payment View
-				LEFT JOIN vw_receivable_total_payments_by_company p
-			    ON p.company_id = input.company_id;
-      `;
+            const totals = await repo.getTotals(companyId, currency);
+			Logger.debug("[ReceivableDebts] Totals fetched successfully", { companyId, currency, totals });
 
-			const result = (await sequelize.query(query, {
-				replacements: [companyId],
-				type: QueryTypes.SELECT,
-			})) as Totals[];
-
-			Logger.debug("[ReceivableDebts] Totals fetched successfully", { companyId, currency, totals: result[0] });
-
-			if (!result || result.length === 0) {
+			if (!totals) {
 				Logger.error("[ReceivableDebts] No debt data found", { companyId, currency });
 				return ApiResponse.error("No debt data found");
 			}
 
-			return ApiResponse.success(result[0], "Total debt retrieved successfully");
-		} catch (error: any) {
+			return ApiResponse.success(totals, "Total debt retrieved successfully");
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error fetching totals", { companyId, currency, error: error.message });
 			return ApiResponse.error("Failed to retrieve total debt");
 		}
@@ -272,7 +175,8 @@ export default class ReceivableDebtsService {
 
 			Logger.info("[ReceivableDebts] Debt updated successfully", { debtId: id, companyId });
 			return ApiResponse.success(null, "Debt updated successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error updating debt", { debtId: id, companyId, error: error.message });
 			return ApiResponse.error("Failed to update debt");
 		}
@@ -300,7 +204,8 @@ export default class ReceivableDebtsService {
 
 			Logger.info("[ReceivableDebts] Debt deleted successfully", { debtId: id, companyId });
 			return ApiResponse.success(null, "Debt deleted successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error deleting debt", { debtId: id, companyId, error: error.message });
 			return ApiResponse.error("Failed to delete debt");
 		}
@@ -310,39 +215,12 @@ export default class ReceivableDebtsService {
 		try {
 			Logger.debug("[ReceivableDebts] Fetching upcoming due dates", { companyId, daysThreshold });
 
-			const query = `
-				SELECT
-					d.id,
-					d.total,
-					d.currency,
-					d.due_date,
-					DATEDIFF(d.due_date, CURDATE()) as days_remaining,
-					c.name as customer_name
-				FROM receivable_debts d
-				JOIN receivable_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
-				WHERE d.company_id = ?
-					AND d.deleted_at IS NULL
-					AND c.deleted_at IS NULL
-					AND d.due_date IS NOT NULL
-					AND d.due_date >= CURDATE()
-					AND d.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
-					AND (
-						SELECT COALESCE(SUM(p.amount_in_try), 0)
-						FROM receivable_payments p
-						WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL
-					) < d.total_in_try
-				ORDER BY d.due_date ASC
-				LIMIT 10;
-			`;
-
-			const result = await sequelize.query(query, {
-				replacements: [companyId, daysThreshold],
-				type: QueryTypes.SELECT,
-			});
+            const result = await repo.getUpcomingDueDates(companyId, daysThreshold);
 
 			Logger.debug("[ReceivableDebts] Upcoming due dates fetched", { companyId, count: result.length });
 			return ApiResponse.success(result, "Upcoming due dates retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableDebts] Error fetching upcoming due dates", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve upcoming due dates");
 		}

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
-    "postbuild": "cp package.json package-lock.json dist/ && cd dist",
+    "postbuild": "node -e \"const fs=require('fs'); fs.copyFileSync('package.json', 'dist/package.json'); fs.copyFileSync('package-lock.json', 'dist/package-lock.json');\"",
     "serve": "node dist/index.js"
   },
   "dependencies": {

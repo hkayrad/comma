@@ -19,7 +19,8 @@ router.post("/customers", async (req: Request<{}, {}, CustomerDto>, res: Respons
 
 		Logger.info("[ReceivableCustomersController] Create customer result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivableCustomersController] Error creating customer", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error creating customer" });
 	}
@@ -39,7 +40,8 @@ router.get("/customers", async (req: Request, res: Response) => {
 
 		Logger.debug("[ReceivableCustomersController] Get all customers result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivableCustomersController] Error fetching customers", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching customers" });
 	}
@@ -68,7 +70,8 @@ router.get(
 				success: response.success,
 			});
 			return res.json(response);
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivableCustomersController] Error fetching customer statement", {
 				customerId: id,
 				companyId,
@@ -92,7 +95,8 @@ router.get("/customers/id-name", async (req: Request, res: Response) => {
 			success: response.success,
 		});
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivableCustomersController] Error fetching customer IDs and names", {
 			companyId,
 			error: error.message,
@@ -117,7 +121,8 @@ router.put("/customers/:id", async (req: Request<{ id: string }, {}, CustomerDto
 			success: response.success,
 		});
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivableCustomersController] Error updating customer", {
 			customerId: id,
 			companyId,
@@ -142,7 +147,8 @@ router.delete("/customers/:id", async (req: Request<{ id: string }>, res: Respon
 			success: response.success,
 		});
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivableCustomersController] Error deleting customer", {
 			customerId: id,
 			companyId,

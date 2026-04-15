@@ -19,7 +19,8 @@ router.get("/monthly", async (req: Request, res: Response) => {
 
         Logger.debug("[StatsController] Get monthly stats result", { companyId, success: response.success });
         return res.json(response);
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
         Logger.error("[StatsController] Error fetching monthly stats", { companyId, error: error.message });
         return res.status(500).json({ success: false, message: "Error fetching monthly stats" });
     }

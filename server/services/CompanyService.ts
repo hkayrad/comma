@@ -47,7 +47,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error fetching company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch company details");
 		}
@@ -90,7 +91,8 @@ export class CompanyService {
 				// Given legacy behavior, if no error thrown, it's mostly success.
 				return ApiResponse.success(null, "Company details updated successfully");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error updating company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to update company details");
 		}
@@ -143,7 +145,8 @@ export class CompanyService {
 				},
 				"Logo uploaded successfully",
 			);
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error uploading logo", { logoSize, companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to upload logo");
 		}
@@ -171,7 +174,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error fetching logos", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch logos");
 		}
@@ -214,7 +218,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { logoSize, companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error deleting logo", { logoSize, companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to delete logo");
 		}

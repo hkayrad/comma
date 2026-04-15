@@ -1,4 +1,4 @@
-import { InsertResult, PaymentDto, UUID } from "@common/types";
+import { InsertResult, PaymentDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import { ReceivablePayments } from "../../models";
@@ -40,13 +40,14 @@ export default class ReceivablePaymentsService {
 
 			Logger.info("[ReceivablePayments] Payment created successfully", { paymentId: newPayment.id, companyId });
 			return ApiResponse.success(newPayment, "Payment created successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivablePayments] Error creating payment", { companyId, error: error.message });
 			return ApiResponse.error("Error creating payment");
 		}
 	}
 
-	static async GetAll(companyId: UUID, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
+	static async GetAll(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
 		try {
 			Logger.debug("[ReceivablePayments] Fetching all payments", { companyId, page, limit, sorting, filters });
 
@@ -135,7 +136,8 @@ export default class ReceivablePaymentsService {
 				totalCount,
 			});
 			return ApiResponse.success({ rows: result, count: totalCount }, "Payments retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivablePayments] Error fetching payments", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve payments");
 		}
@@ -191,7 +193,8 @@ export default class ReceivablePaymentsService {
 
 			Logger.info("[ReceivablePayments] Payment updated successfully", { paymentId, companyId });
 			return ApiResponse.success(null, "Payment updated successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivablePayments] Error updating payment", { paymentId, companyId, error: error.message });
 			return ApiResponse.error("Failed to update payment");
 		}
@@ -219,7 +222,8 @@ export default class ReceivablePaymentsService {
 
 			Logger.info("[ReceivablePayments] Payment deleted successfully", { paymentId, companyId });
 			return ApiResponse.success(null, "Payment deleted successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivablePayments] Error deleting payment", { paymentId, companyId, error: error.message });
 			return ApiResponse.error("Failed to delete payment");
 		}

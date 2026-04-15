@@ -51,7 +51,7 @@ export default function TwoFactorVerify({
                 setError(response.message || t("twoFactor.verify.invalidCode"));
                 setCode("");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             Logger.error("[TwoFactorVerify] Verification failed", err);
             setError(t("twoFactor.verify.error"));
             setCode("");
@@ -77,7 +77,7 @@ export default function TwoFactorVerify({
             } else {
                 setError(response.message || t("twoFactor.recovery.invalidCode"));
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             Logger.error("[TwoFactorVerify] Recovery verification failed", err);
             setError(t("twoFactor.recovery.error"));
         } finally {

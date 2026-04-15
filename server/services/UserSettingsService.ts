@@ -39,7 +39,8 @@ export class UserSettingsService {
 
             Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });
             return ApiResponse.success({ username: newUsername }, "Username updated successfully");
-        } catch (error: any) {
+        } catch (err: unknown) {
+        	const error = err instanceof Error ? err : new Error(String(err));
             Logger.error("[UserSettingsService] Error updating username", { userId, error: error.message });
             return ApiResponse.error("Failed to update username");
         }
@@ -74,7 +75,8 @@ export class UserSettingsService {
 
             Logger.info("[UserSettingsService] Password updated successfully", { userId });
             return ApiResponse.success(null, "Password updated successfully");
-        } catch (error: any) {
+        } catch (err: unknown) {
+        	const error = err instanceof Error ? err : new Error(String(err));
             Logger.error("[UserSettingsService] Error updating password", { userId, error: error.message });
             return ApiResponse.error("Failed to update password");
         }

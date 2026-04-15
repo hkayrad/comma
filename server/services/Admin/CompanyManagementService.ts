@@ -1,4 +1,4 @@
-import { CompanyDto, UUID } from "@common/types";
+import { CompanyDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import dotenv from "dotenv";
@@ -33,13 +33,14 @@ export class CompanyManagementService {
 
 			Logger.info("[CompanyManagementService] Company created successfully");
 			return ApiResponse.success(newCompany.id, "Company created successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error creating company", error);
 			return ApiResponse.error("Failed to create company");
 		}
 	}
 
-	static async GetAll(page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
+	static async GetAll(page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
 		try {
 			Logger.info("[CompanyManagementService] GetAll called", { page, limit, sorting, filters });
 
@@ -66,7 +67,7 @@ export class CompanyManagementService {
 
 					if (id === "is_company") {
 						const values = Array.isArray(value) ? value : [value];
-						const mapped = values.map((v: string) => parseInt(v, 10)).filter((v) => !isNaN(v));
+						const mapped = values.map((v) => parseInt(String(v), 10)).filter((v) => !isNaN(v));
 						if (mapped.length > 0) {
 							whereClause += ` AND c.is_company IN (?)`;
 							replacements.push(mapped);
@@ -147,7 +148,8 @@ export class CompanyManagementService {
 			});
 
 			return ApiResponse.success({ rows: result, count: totalCount }, "Companies retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error fetching companies", error);
 			return ApiResponse.error("Failed to fetch companies");
 		}
@@ -167,7 +169,8 @@ export class CompanyManagementService {
 
 			Logger.info("[CompanyManagementService] Fetched company successfully");
 			return ApiResponse.success(company);
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error fetching company", error);
 			return ApiResponse.error("Failed to fetch company");
 		}
@@ -215,7 +218,8 @@ export class CompanyManagementService {
 			const updatedCompany = await Companies.findByPk(id);
 			Logger.info("[CompanyManagementService] Updated company successfully");
 			return ApiResponse.success(updatedCompany);
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error updating company", error);
 			return ApiResponse.error("Failed to update company");
 		}
@@ -238,7 +242,8 @@ export class CompanyManagementService {
 
 			Logger.info("[CompanyManagementService] Deleted company successfully");
 			return ApiResponse.success({ id }); // Returning id as proxy for deleted object
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error deleting company", error);
 			return ApiResponse.error("Failed to delete company");
 		}

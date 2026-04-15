@@ -100,7 +100,8 @@ class StatsService {
 
             Logger.debug("[StatsService] Monthly stats fetched", { companyId, dataPoints: data.length });
             return ApiResponse.success(data, "Monthly stats retrieved successfully");
-        } catch (error: any) {
+        } catch (err: unknown) {
+        	const error = err instanceof Error ? err : new Error(String(err));
             Logger.error("[StatsService] Error fetching monthly stats", { companyId, error: error.message });
             return ApiResponse.error("Error fetching monthly stats");
         }

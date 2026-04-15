@@ -165,3 +165,13 @@ export type CreateUserDto = {
 	password: string;
 	role: UserRole;
 };
+
+export type SortItem = {
+	id: string;
+	desc: boolean;
+};
+
+export type FilterItem = {
+	id: string;
+	value: string | string[] | boolean;
+};

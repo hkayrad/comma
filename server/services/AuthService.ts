@@ -145,7 +145,8 @@ export class AuthService {
 					role: user.role,
 				},
 			};
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[AuthService] Error during login", { username, error: error.message });
 			return {
 				success: false,
@@ -227,7 +228,8 @@ export class AuthService {
 					role: user.role,
 				},
 			};
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[AuthService] Error completing 2FA login", { userId, error: error.message });
 			return {
 				success: false,
@@ -353,7 +355,8 @@ export class AuthService {
 					},
 				};
 			});
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[AuthService] Token refresh failed", { error: error.message });
 			return {
 				success: false,
@@ -377,7 +380,8 @@ export class AuthService {
 				deletedCount: result,
 			});
 			return true;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[AuthService] Logout failed", { error: error.message });
 			return false;
 		}

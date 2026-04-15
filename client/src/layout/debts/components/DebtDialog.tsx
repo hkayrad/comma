@@ -48,6 +48,9 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
+import { getDebtFormSchema } from "@/lib/schemas/debtSchema";
+import type { DebtFormValues } from "@/lib/schemas/debtSchema";
+import { useDebtCalculations } from "../hooks/useDebtCalculations";
 
 type Props = {
   debt?: DebtDto;
@@ -63,64 +66,12 @@ export default function DebtDialog(props: Props) {
     CustomerIdName[]
   >([]);
 
-  const [total, setTotal] = useState(0);
-
   const DEBT_API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
-  const CUSTOMER_API =
-    type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
+  const CUSTOMER_API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const DebtFormSchema = z.object({
-    customer_id: z
-      .string({
-        error: t("form.debt.customer_id.validation.required"),
-      })
-      .min(1, t("form.debt.customer_id.validation.required")),
-    amount: z.number({ error: t("form.debt.amount.validation.invalid") }).min(
-      0.01,
-      t("form.debt.amount.validation.min", {
-        min: 0.01,
-      }),
-    ),
-    vat: z
-      .number({ error: t("form.debt.vat.validation.invalid") })
-      .min(0, t("form.debt.vat.validation.min", { min: 0 }))
-      .or(z.literal(0)),
-    currency: z.enum(["TRY", "USD", "EUR"], {
-      error: t("form.debt.currency.validation.invalid"),
-    }),
-    withholding: z
-      .number({ error: t("form.debt.withholding.validation.invalid") })
-      .min(0, t("form.debt.withholding.validation.min", { min: 0 }))
-      .or(z.literal(0)),
-    discount: z
-      .number({ error: t("form.debt.discount.validation.invalid") })
-      .min(0, t("form.debt.discount.validation.min", { min: 0 }))
-      .or(z.literal(0)),
-    exchange_rate: z
-      .number({ error: t("form.debt.exchange_rate.validation.invalid") })
-      .min(0, t("form.debt.exchange_rate.validation.min", { min: 0 }))
-      .or(z.literal(0)),
-    issue_date: z.date({
-      error: t("form.debt.issue_date.validation.invalid"),
-    }),
-    due_date: z.date().optional().nullable(),
-    invoice_no: z
-      .string({
-        error: t("form.debt.invoice_no.validation.invalid"),
-      })
-      .max(100, t("form.debt.invoice_no.validation.max", { charCount: 100 }))
-      .optional()
-      .or(z.literal("")),
-    description: z
-      .string({
-        error: t("form.debt.description.validation.invalid"),
-      })
-      .max(500, t("form.debt.description.validation.max", { charCount: 500 }))
-      .optional()
-      .or(z.literal("")),
-  });
+  const DebtFormSchema = useMemo(() => getDebtFormSchema(t), [t]);
 
-  const form = useForm<z.infer<typeof DebtFormSchema>>({
+  const form = useForm<DebtFormValues>({
     resolver: zodResolver(DebtFormSchema),
     defaultValues: {
       customer_id: debt?.customer_id || customerId || "",
@@ -147,61 +98,13 @@ export default function DebtDialog(props: Props) {
     }
   }, [CUSTOMER_API]);
 
-  const handleVatButtonClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, vatPercentage: number) => {
-      e.preventDefault();
-      const amount = form.getValues("amount");
-      const discount = form.getValues("discount");
-      form.setValue(
-        "vat",
-        Number(((amount - discount) * vatPercentage).toFixed(2)),
-      );
-    },
-    [form],
-  );
-
-  const handleDiscountButtonClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
-      e.preventDefault();
-      const amount = form.getValues("amount");
-      form.setValue(
-        "discount",
-        Number((amount * discountPercentage).toFixed(2)),
-      );
-    },
-    [form],
-  );
-
-  const handleSetWithholdingButtonClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
-      e.preventDefault();
-      const vat = form.getValues("vat");
-      form.setValue(
-        "withholding",
-        Number((vat * discountPercentage).toFixed(2)),
-      );
-    },
-    [form],
-  );
-
-  const handleSetExchangeRateButtonClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      const exchangeRatesString = sessionStorage.getItem("exchangeRates");
-      const exchangeRates =
-        exchangeRatesString && JSON.parse(exchangeRatesString);
-
-      const selectedCurrency = form.watch("currency").toLowerCase();
-
-      if (exchangeRates && exchangeRates[selectedCurrency]) {
-        form.setValue(
-          "exchange_rate",
-          parseFloat(exchangeRates[selectedCurrency].forexBuying),
-        );
-      }
-    },
-    [form],
-  );
+  const { 
+    total, 
+    handleVatButtonClick, 
+    handleDiscountButtonClick, 
+    handleSetWithholdingButtonClick, 
+    handleSetExchangeRateButtonClick 
+  } = useDebtCalculations(form);
 
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -258,25 +161,6 @@ export default function DebtDialog(props: Props) {
   }, [handleFetchCustomerIdAndNames]);
 
   const selectedCurrency = form.watch("currency");
-  useEffect(() => {
-    if (selectedCurrency === "TRY") {
-      form.setValue("exchange_rate", 1);
-    }
-  }, [form, selectedCurrency]);
-
-  const watchedAmount = form.watch("amount");
-  const watchedVat = form.watch("vat");
-  const watchedDiscount = form.watch("discount");
-  const watchedWithholding = form.watch("withholding");
-
-  useEffect(() => {
-    const valAmount = watchedAmount || 0;
-    const valVat = watchedVat || 0;
-    const valDiscount = watchedDiscount || 0;
-    const valWithholding = watchedWithholding || 0;
-    const newTotal = valAmount - valDiscount + valVat - valWithholding;
-    setTotal(Number(newTotal.toFixed(2)));
-  }, [watchedAmount, watchedVat, watchedDiscount, watchedWithholding]);
 
   return (
     <Form {...form}>

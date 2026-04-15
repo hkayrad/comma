@@ -1,4 +1,4 @@
-import { CreateUserDto, UserDto, UUID } from "@common/types";
+import { CreateUserDto, UserDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import { Users } from "../../models";
@@ -40,13 +40,14 @@ export class UserManagementService {
 
 			Logger.info("[UserManagementService] User created successfully", { userId: newUser.id });
 			return ApiResponse.success(newUser.id, "User created successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error creating user", error);
 			return ApiResponse.error("Failed to create user");
 		}
 	}
 
-	static async GetAllByCompany(companyId: UUID, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
+	static async GetAllByCompany(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
 		try {
 			Logger.info("[UserManagementService] GetAllByCompany called", { companyId, page, limit, sorting, filters });
 
@@ -67,7 +68,7 @@ export class UserManagementService {
 
 					if (id === "role") {
 						const roleValues = Array.isArray(value) ? value : [value];
-						const mapped = roleValues.map((v: string) => parseInt(v, 10));
+						const mapped = roleValues.map((v) => parseInt(String(v), 10));
 						if (mapped.length > 0) {
 							whereClause += ` AND u.role IN (?)`;
 							replacements.push(mapped);
@@ -143,7 +144,8 @@ export class UserManagementService {
 			});
 
 			return ApiResponse.success({ rows: result, count: totalCount }, "Users retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error fetching users", error);
 			return ApiResponse.error("Failed to fetch users");
 		}
@@ -178,7 +180,8 @@ export class UserManagementService {
 
 			Logger.info("[UserManagementService] Fetched user successfully", { id });
 			return ApiResponse.success(result[0], "User retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error fetching user", error);
 			return ApiResponse.error("Failed to fetch user");
 		}
@@ -229,7 +232,8 @@ export class UserManagementService {
 
 			Logger.info("[UserManagementService] Updated user successfully", { id });
 			return ApiResponse.success({ id }, "User updated successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error updating user", error);
 			return ApiResponse.error("Failed to update user");
 		}
@@ -254,7 +258,8 @@ export class UserManagementService {
 
 			Logger.info("[UserManagementService] Deleted user successfully", { id });
 			return ApiResponse.success({ id }, "User deleted successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error deleting user", error);
 			return ApiResponse.error("Failed to delete user");
 		}
@@ -281,7 +286,8 @@ export class UserManagementService {
 
 			Logger.info("[UserManagementService] Password reset successfully", { id });
 			return ApiResponse.success({ id }, "Password reset successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error resetting password", error);
 			return ApiResponse.error("Failed to reset password");
 		}

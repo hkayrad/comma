@@ -74,7 +74,7 @@ export const WebSocketProvider = ({
       setIsConnected(false);
     };
 
-    ws.current.onmessage = (event: any) => {
+    ws.current.onmessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
         const { type, title, body, notificationType, startTime, endTime } =

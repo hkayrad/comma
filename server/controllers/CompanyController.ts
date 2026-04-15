@@ -25,7 +25,8 @@ router.put("/", async (req: Request, res: Response) => {
 
 		Logger.info("[CompanyController] Company details update result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error updating company details", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error updating company details" });
 	}
@@ -40,7 +41,8 @@ router.get("/id", async (req: Request, res: Response) => {
 
 		Logger.debug("[CompanyController] Company fetched", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error fetching company", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching company" });
 	}
@@ -61,7 +63,8 @@ router.post("/logo/small", async (req: Request, res: Response) => {
 
 		Logger.info("[CompanyController] Small logo upload result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error uploading small logo", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error uploading logo" });
 	}
@@ -82,7 +85,8 @@ router.post("/logo/large", async (req: Request, res: Response) => {
 
 		Logger.info("[CompanyController] Large logo upload result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error uploading large logo", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error uploading logo" });
 	}
@@ -98,7 +102,8 @@ router.delete("/logo/small", async (req: Request, res: Response) => {
 
 		Logger.info("[CompanyController] Small logo deletion result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error deleting small logo", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error deleting logo" });
 	}
@@ -114,7 +119,8 @@ router.delete("/logo/large", async (req: Request, res: Response) => {
 
 		Logger.info("[CompanyController] Large logo deletion result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error deleting large logo", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error deleting logo" });
 	}
@@ -130,7 +136,8 @@ router.get("/logos", async (req: Request, res: Response) => {
 
 		Logger.debug("[CompanyController] Logos fetched", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyController] Error fetching logos", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching logos" });
 	}

@@ -20,7 +20,8 @@ export class ConfigService {
 
 			Logger.debug("[ConfigService] Configs fetched successfully", { count: Object.keys(configs).length });
 			return configs;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error fetching configs", error);
 			return {};
 		}
@@ -39,7 +40,8 @@ export class ConfigService {
 
 			Logger.debug("[ConfigService] Config fetched successfully", { configKey });
 			return config.configValue;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error fetching config", error);
 			return null;
 		}
@@ -57,7 +59,8 @@ export class ConfigService {
 
 			Logger.info("[ConfigService] Config set successfully", { configKey });
 			return true;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error setting config", { configKey, error });
 			return false;
 		}

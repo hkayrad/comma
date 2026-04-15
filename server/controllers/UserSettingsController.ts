@@ -32,7 +32,8 @@ router.put("/username", async (req: Request, res: Response) => {
 
         Logger.info("[UserSettingsController] Username updated successfully", { userId });
         res.json(result);
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
         Logger.error("[UserSettingsController] Error updating username", error);
         res.status(500).json(ApiResponse.error("Failed to update username"));
     }
@@ -62,7 +63,8 @@ router.put("/password", async (req: Request, res: Response) => {
 
         Logger.info("[UserSettingsController] Password updated successfully", { userId });
         res.json(result);
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
         Logger.error("[UserSettingsController] Error updating password", error);
         res.status(500).json(ApiResponse.error("Failed to update password"));
     }

@@ -1,9 +1,12 @@
-import { CustomerDto, DebtDto, PaymentDto, UUID } from "@common/types";
+import { CustomerRepository } from "../../repositories/CustomerRepository";
+import { CustomerDto, DebtDto, PaymentDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import { PayableCustomers } from "../../models";
 import { sequelize } from "../../lib/db/sequelize";
 import { QueryTypes, Op } from "sequelize";
+
+const repo = new CustomerRepository("payable");
 
 export default class PayableCustomersService {
 	static async Create(customer: CustomerDto, userId: UUID, companyId: UUID) {
@@ -32,136 +35,24 @@ export default class PayableCustomersService {
 
 			Logger.info("[PayableCustomers] Customer created successfully", { customerId: newCustomer.id, companyId });
 			return ApiResponse.success(newCustomer.id, "Customer created successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error creating customer", { companyId, error: error.message });
 			return ApiResponse.error("Error creating customer");
 		}
 	}
 
-	static async GetAll(companyId: UUID, page: number, limit: number, sorting: any[] = [], filters: any[] = []) {
+	static async GetAll(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
 		try {
 			Logger.debug("[PayableCustomers] Fetching all customers", { companyId, page, limit, sorting, filters });
-
 			const offset = page * limit;
+            const repoResult = await repo.findAllWithSummary(companyId, limit, offset, sorting, filters);
 
-            const colMap: Record<string, string> = {
-                "name": "c.name",
-                "is_company": "c.is_company",
-                "tax_office": "c.tax_office",
-                "tax_number": "c.tax_number",
-                "mersis_no": "c.mersis_no",
-                "total_debt": "d.total_debt",
-                "total_payments": "p.total_payments",
-                "remaining_debt": "(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0))"
-            };
+			Logger.debug("[PayableCustomers] Customers fetched successfully", { companyId, count: repoResult.rows.length, totalCount: repoResult.count });
 
-            let whereClause = "WHERE c.company_id = ? AND c.deleted_at IS NULL";
-            const replacements: any[] = [companyId];
-
-            if (filters && filters.length > 0) {
-                filters.forEach((filter) => {
-                    const { id, value } = filter;
-                    
-                    if (id === "is_company") {
-                         const boolValues = Array.isArray(value) ? value : [value];
-                         // 'true' -> 1, 'false' -> 0
-                         const mapped = boolValues.map((v: string) => v === "true" ? 1 : 0);
-                         if (mapped.length > 0) {
-                             whereClause += ` AND c.is_company IN (?)`;
-                             replacements.push(mapped);
-                         }
-                         return;
-                    }
-
-                    if (id === "debt_status") {
-                        const statuses = Array.isArray(value) ? value : [value];
-                        const conditions: string[] = [];
-                        statuses.forEach((status: string) => {
-                            if (status === "HAS_DEBT") conditions.push(`(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) > 0.005`); 
-                            if (status === "HAS_RECEIVABLE") conditions.push(`(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) < -0.005`);
-                            if (status === "HAS_NO_DEBT" || status === "HAS_NO_RECEIVABLE") conditions.push(`ABS(COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0)) <= 0.005`);
-                        });
-                        
-                        if (conditions.length > 0) {
-                            whereClause += ` AND (${conditions.join(" OR ")})`;
-                        }
-                        return;
-                    }
-
-                    const dbCol = colMap[id];
-                    if (!dbCol) return;
-
-                    if (Array.isArray(value) && value.length > 0) {
-                        whereClause += ` AND ${dbCol} IN (?)`;
-                        replacements.push(value);
-                    } else if (typeof value === "string" && value.trim() !== "") {
-                        whereClause += ` AND ${dbCol} LIKE ?`;
-                        replacements.push(`%${value}%`);
-                    }
-                });
-            }
-
-            let orderClause = "ORDER BY c.created_at DESC";
-            if (sorting && sorting.length > 0) {
-                const sortParts = sorting.map((sort) => {
-                    const dbCol = colMap[sort.id];
-                    if (!dbCol) return null;
-                    return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
-                }).filter(Boolean);
-                
-                if (sortParts.length > 0) {
-                    orderClause = `ORDER BY ${sortParts.join(", ")}`;
-                }
-            }
-
-            // JOINs needed for filtering/sorting
-            const joins = `
-				-- Join with the Debt View
-				LEFT JOIN vw_payable_debt_summary d
-			    ON c.id = d.customer_id
-			    AND c.company_id = d.company_id
-				-- Join with the Payment View
-				LEFT JOIN vw_payable_payment_summary p
-			    ON c.id = p.customer_id
-			    AND c.company_id = p.company_id
-            `;
-
-			const countQuery = `
-				SELECT COUNT(*) as count
-				FROM payable_customers c
-                ${joins}
-				${whereClause}
-			`;
-
-			const countResult = (await sequelize.query(countQuery, {
-				replacements,
-				type: QueryTypes.SELECT,
-			})) as { count: number }[];
-
-			const totalCount = countResult[0]?.count || 0;
-
-			const query = `
-				SELECT
-			    c.*,
-			    COALESCE(d.total_debt, 0) AS total_debt,
-			    COALESCE(p.total_payments, 0) AS total_payments,
-			    COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0) AS remaining_debt
-				FROM payable_customers c
-                ${joins}
-				${whereClause}
-				${orderClause}
-				LIMIT ? OFFSET ?;
-      `;
-
-			const result = (await sequelize.query(query, {
-				replacements: [...replacements, limit, offset],
-				type: QueryTypes.SELECT,
-			})) as CustomerDto[];
-
-			Logger.debug("[PayableCustomers] Customers fetched successfully", { companyId, count: result.length, totalCount });
-
-			return ApiResponse.success({ rows: result, count: totalCount }, "Customers retrieved successfully");
-		} catch (error: any) {
+			return ApiResponse.success({ rows: repoResult.rows, count: repoResult.count }, "Customers retrieved successfully");
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error fetching customers", { companyId, error: error.message });
 			return ApiResponse.error("Failed to retrieve customers");
 		}
@@ -181,129 +72,23 @@ export default class PayableCustomersService {
 				return ApiResponse.error("Customer ID is required");
 			}
 
-			const customerQuery = `
-				SELECT
-			    c.*,
-			    COALESCE(ds.total_debt, 0) AS total_debt,
-			    COALESCE(ps.total_payments, 0) AS total_payments,
-			    COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
-				FROM payable_customers c
-				-- Join Debt View (Matches on Customer ID and Company ID)
-				LEFT JOIN vw_payable_debt_summary ds
-			    ON c.id = ds.customer_id
-			    AND c.company_id = ds.company_id
-				-- Join Payment View (Matches on Customer ID and Company ID)
-				LEFT JOIN vw_payable_payment_summary ps
-			    ON c.id = ps.customer_id
-			    AND c.company_id = ps.company_id
-				WHERE c.id = ?
-				  AND c.company_id = ?
-				  AND c.deleted_at IS NULL;
-			`;
+            const response = await repo.getStatement(customerId, companyId, startDate, endDate);
 
-			const customerResult = (await sequelize.query(customerQuery, {
-				replacements: [customerId, companyId],
-				type: QueryTypes.SELECT,
-			})) as CustomerDto[];
-
-			if (customerResult.length === 0) {
+			if (!response) {
 				Logger.error("[PayableCustomers] Customer not found", { customerId, companyId });
 				return ApiResponse.error("Customer not found");
 			}
 
-			// Debts Query
-			let debtsQuery = `
-				SELECT
-          d.id,
-          d.invoice_no,
-          d.amount,
-          d.vat,
-          d.currency,
-          d.exchange_rate,
-          d.total,
-          d.total_in_try,
-          d.description,
-          d.issue_date,
-          d.created_at
-		    FROM payable_debts d
-		    INNER JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id
-		    WHERE d.customer_id = ?
-          AND d.company_id = ?
-          AND d.deleted_at IS NULL
-          AND c.deleted_at IS NULL
-      `;
-
-			const debtParams: any[] = [customerId, companyId];
-
-			if (startDate) {
-				debtsQuery += ` AND d.issue_date >= ?`;
-				debtParams.push(startDate);
-			}
-
-			if (endDate) {
-				debtsQuery += ` AND d.issue_date <= ?`;
-				debtParams.push(endDate);
-			}
-
-			debtsQuery += ` ORDER BY d.issue_date DESC, d.created_at DESC`;
-
-			// Payments Query
-			let paymentsQuery = `
-				SELECT
-          p.id,
-          p.invoice_no,
-          p.amount,
-          p.currency,
-          p.exchange_rate,
-          p.amount_in_try,
-          p.payment_method,
-          p.description,
-          p.payment_date,
-          p.created_at
-	      FROM payable_payments p
-	      INNER JOIN payable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
-	      WHERE p.customer_id = ?
-          AND p.company_id = ?
-          AND p.deleted_at IS NULL
-          AND c.deleted_at IS NULL
-      `;
-
-			const paymentParams: any[] = [customerId, companyId];
-
-			if (startDate) {
-				paymentsQuery += ` AND p.payment_date >= ?`;
-				paymentParams.push(startDate);
-			}
-
-			if (endDate) {
-				paymentsQuery += ` AND p.payment_date <= ?`;
-				paymentParams.push(endDate);
-			}
-
-			paymentsQuery += ` ORDER BY p.payment_date DESC, p.created_at DESC`;
-
-			const [debtsResult, paymentsResult] = await Promise.all([
-				sequelize.query(debtsQuery, { replacements: debtParams, type: QueryTypes.SELECT }) as Promise<DebtDto[]>,
-				sequelize.query(paymentsQuery, { replacements: paymentParams, type: QueryTypes.SELECT }) as Promise<
-					PaymentDto[]
-				>,
-			]);
-
 			Logger.debug("[PayableCustomers] Customer statement fetched successfully", {
 				customerId,
 				companyId,
-				debtsCount: debtsResult.length,
-				paymentsCount: paymentsResult.length,
+				debtsCount: response.debts.length,
+				paymentsCount: response.payments.length,
 			});
 
-			const response = {
-				customer: customerResult[0],
-				debts: debtsResult,
-				payments: paymentsResult,
-			};
-
 			return ApiResponse.success(response, "Customer statement retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error fetching customer statement", {
 				customerId,
 				companyId,
@@ -333,7 +118,8 @@ export default class PayableCustomersService {
 			}
 
 			return ApiResponse.success(result, "Customers retrieved successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error fetching customer IDs and names", { companyId, error: error.message });
 			return ApiResponse.error("Error retrieving customers");
 		}
@@ -386,7 +172,8 @@ export default class PayableCustomersService {
 
 			Logger.info("[PayableCustomers] Customer updated successfully", { customerId: id, companyId });
 			return ApiResponse.success(null, "Customer updated successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error updating customer", { customerId: id, companyId, error: error.message });
 			return ApiResponse.error("Error updating customer");
 		}
@@ -430,7 +217,8 @@ export default class PayableCustomersService {
 
 			Logger.info("[PayableCustomers] Customer deleted successfully", { customerId: id, companyId });
 			return ApiResponse.success(null, "Customer deleted successfully");
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[PayableCustomers] Error deleting customer", { customerId: id, companyId, error: error.message });
 			return ApiResponse.error("Error deleting customer");
 		}

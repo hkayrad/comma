@@ -61,7 +61,8 @@ export class TwoFactorService {
         margin: 2,
         width: 256,
       });
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
       Logger.error("[TwoFactorService] Failed to generate QR code", {
         error: error.message,
       });

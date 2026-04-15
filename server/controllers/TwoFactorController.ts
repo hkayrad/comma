@@ -56,7 +56,8 @@ router.get("/status", authMiddleware, async (req, res) => {
 
     const enabled = await TwoFactorService.isEnabled(userId);
     return res.json({ enabled });
-  } catch (error: any) {
+  } catch (err: unknown) {
+  	const error = err instanceof Error ? err : new Error(String(err));
     Logger.error("[TwoFactorController] Error checking 2FA status", {
       error: error.message,
     });
@@ -99,7 +100,8 @@ router.post("/setup", authMiddleware, async (req, res) => {
       secret,
       setupToken,
     });
-  } catch (error: any) {
+  } catch (err: unknown) {
+  	const error = err instanceof Error ? err : new Error(String(err));
     Logger.error("[TwoFactorController] Error initiating 2FA setup", {
       error: error.message,
     });
@@ -161,7 +163,8 @@ router.post("/verify-setup", authMiddleware, async (req, res) => {
       recoveryCodes: result.recoveryCodes,
       message: result.message,
     });
-  } catch (error: any) {
+  } catch (err: unknown) {
+  	const error = err instanceof Error ? err : new Error(String(err));
     Logger.error("[TwoFactorController] Error completing 2FA setup", {
       error: error.message,
     });
@@ -237,7 +240,8 @@ router.post(
         username: loginResult.user?.username,
         role: loginResult.user?.role,
       });
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
       Logger.error("[TwoFactorController] Error verifying 2FA", {
         error: error.message,
       });
@@ -309,7 +313,8 @@ router.post(
         username: loginResult.user?.username,
         role: loginResult.user?.role,
       });
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
       Logger.error("[TwoFactorController] Error using recovery code", {
         error: error.message,
       });
@@ -351,7 +356,8 @@ router.post("/disable", authMiddleware, async (req, res) => {
       success: true,
       message: result.message,
     });
-  } catch (error: any) {
+  } catch (err: unknown) {
+  	const error = err instanceof Error ? err : new Error(String(err));
     Logger.error("[TwoFactorController] Error disabling 2FA", {
       error: error.message,
     });

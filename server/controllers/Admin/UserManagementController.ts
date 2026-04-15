@@ -17,7 +17,8 @@ router.post("/", async (req: Request, res: Response) => {
 
 		Logger.info("[UserManagementController] Create user result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error creating user", error);
 		res.status(500).json(ApiResponse.error("Failed to create user"));
 	}
@@ -38,7 +39,8 @@ router.get("/company/:companyId", async (req: Request, res: Response) => {
 
 		Logger.debug("[UserManagementController] Get users result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error getting users", error);
 		res.status(500).json(ApiResponse.error("Failed to fetch users"));
 	}
@@ -51,7 +53,8 @@ router.get("/:id", async (req: Request, res: Response) => {
 	try {
 		const response = await UserManagementService.GetById(req.params.id);
 		res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error getting user by id", error);
 		res.status(500).json(ApiResponse.error("Failed to fetch user"));
 	}
@@ -66,7 +69,8 @@ router.put("/:id", async (req: Request, res: Response) => {
 
 		Logger.info("[UserManagementController] Update user result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error updating user", error);
 		res.status(500).json(ApiResponse.error("Failed to update user"));
 	}
@@ -81,7 +85,8 @@ router.delete("/:id", async (req: Request, res: Response) => {
 
 		Logger.info("[UserManagementController] Delete user result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error deleting user", error);
 		res.status(500).json(ApiResponse.error("Failed to delete user"));
 	}
@@ -102,7 +107,8 @@ router.post("/:id/reset-password", async (req: Request, res: Response) => {
 
 		Logger.info("[UserManagementController] Reset password result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[UserManagementController] Error resetting password", error);
 		res.status(500).json(ApiResponse.error("Failed to reset password"));
 	}

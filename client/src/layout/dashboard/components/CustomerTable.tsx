@@ -285,39 +285,39 @@ export default function CustomerTable(props: Props) {
       },
       {
         accessorKey: `total_debt`,
-        header: ({ column }: { column: Column<any> }) => (
+        header: ({ column }: { column: Column<CustomerDto> }) => (
           <SortableColumnHeader
             column={column}
             title={t("dashboard.table.column.total_debt")}
           />
         ),
-        cell: ({ row, column }: { row: any; column: any }) => (
+        cell: ({ row, column }: { row: Row<CustomerDto>; column: Column<CustomerDto> }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
         ),
         sortingFn: formattedNumber,
       },
       {
         accessorKey: `total_payments`,
-        header: ({ column }: { column: Column<any> }) => (
+        header: ({ column }: { column: Column<CustomerDto> }) => (
           <SortableColumnHeader
             column={column}
             title={t("dashboard.table.column.total_payments")}
           />
         ),
-        cell: ({ row, column }: { row: any; column: any }) => (
+        cell: ({ row, column }: { row: Row<CustomerDto>; column: Column<CustomerDto> }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
         ),
         sortingFn: formattedNumber,
       },
       {
         accessorKey: `remaining_debt`,
-        header: ({ column }: { column: Column<any> }) => (
+        header: ({ column }: { column: Column<CustomerDto> }) => (
           <SortableColumnHeader
             column={column}
             title={t("dashboard.table.column.remaining_debt")}
           />
         ),
-        cell: ({ row, column }: { row: Row<any>; column: Column<any> }) => (
+        cell: ({ row, column }: { row: Row<CustomerDto>; column: Column<CustomerDto> }) => (
           <FormattedCurrency row={row} column={column} currency={"TRY"} />
         ),
         sortingFn: formattedNumber,
@@ -325,7 +325,7 @@ export default function CustomerTable(props: Props) {
       {
         id: "debt_status",
         header: t("dashboard.table.column.debt_status"),
-        cell: ({ row }: { row: Row<any> }) => {
+        cell: ({ row }: { row: Row<CustomerDto> }) => {
           const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
           if (remaining_debt > 0)
             return (

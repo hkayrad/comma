@@ -97,7 +97,8 @@ router.get("/", async (req, res) => {
 
 		Logger.debug("[TCMB] Exchange rates fetched successfully", { date: data.date });
 		res.send(data);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[TCMB] Error fetching TCMB data", { error: error.message });
 		res.status(500).json({ success: false, message: "Error fetching TCMB data" });
 	}
