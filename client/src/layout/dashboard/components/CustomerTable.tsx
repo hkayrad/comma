@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import type {
@@ -662,6 +663,53 @@ export default function CustomerTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onAddDebt(c.id!)}>
+            <CirclePlus className="mr-2 h-4 w-4" />
+            {t(
+              type === "receivable"
+                ? "dashboard.addButton.actions.receivable.addReceivable"
+                : "dashboard.addButton.actions.payable.addPayable",
+            )}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onAddPayment(c.id!)}>
+            <Wallet className="mr-2 h-4 w-4" />
+            {t(
+              type === "receivable"
+                ? "dashboard.addButton.actions.receivable.addPayment"
+                : "dashboard.addButton.actions.payable.addPayment",
+            )}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            onClick={() =>
+              navigate(
+                `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${c.id}`,
+              )
+            }
+          >
+            <Paperclip className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.show_statement")}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onDetails(c.id!)}>
+            <Info className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.show_details")}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onEdit(c.id!)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.edit_details")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }

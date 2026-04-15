@@ -188,7 +188,7 @@ export default function HksSidebar() {
     openDialog({
       title: t("sidebar.pageSettings.label"),
       description: t("sidebar.pageSettings.description"),
-      size: "sm",
+      size: "md",
       content: <PageSettingsDialog />,
       showCloseButton: true,
     });
@@ -308,28 +308,26 @@ export default function HksSidebar() {
       {/* END SIDEBAR CONTENT */}
 
       <SidebarFooter>
-        {/* Page Settings - only on dashboard */}
-        {location.pathname === "/" && (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Tooltip disableHoverablePopup>
-                <TooltipTrigger
-                  render={(props) => (
-                    <SidebarMenuButton {...props} onClick={handlePageSettings}>
-                      <Settings />
-                      <span className="select-none">
-                        {t("sidebar.pageSettings.label")}
-                      </span>
-                    </SidebarMenuButton>
-                  )}
-                />
-                <TooltipContent side="right" hidden={state !== "collapsed"}>
-                  {t("sidebar.pageSettings.label")}
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
+        {/* Page Settings */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <SidebarMenuButton {...props} onClick={handlePageSettings}>
+                    <Settings />
+                    <span className="select-none">
+                      {t("sidebar.pageSettings.label")}
+                    </span>
+                  </SidebarMenuButton>
+                )}
+              />
+              <TooltipContent side="right" hidden={state !== "collapsed"}>
+                {t("sidebar.pageSettings.label")}
+              </TooltipContent>
+            </Tooltip>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <CompanyAdminOnly>
           <SidebarMenu>
             <SidebarMenuItem>

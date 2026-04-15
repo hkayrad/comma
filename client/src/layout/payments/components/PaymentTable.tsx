@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import type {
@@ -493,6 +494,22 @@ export default function PaymentTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onEdit(c.id!)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("payment.table.column.actions.edit")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("payment.table.column.actions.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }
