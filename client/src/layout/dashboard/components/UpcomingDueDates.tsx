@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
+import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
 import type { UpcomingDueDate } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 
-type DueDateWithType = UpcomingDueDate & { type: "receivable" | "payable" };
+type DueDateItemType = "receivable" | "payable" | "receivableCheck" | "payableCheck";
+type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
 
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
@@ -19,9 +21,11 @@ export default function UpcomingDueDates() {
     const fetchUpcomingDueDates = useCallback(async () => {
         setLoading(true);
         try {
-            const [receivables, payables] = await Promise.all([
+            const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
                 ReceivableDebtApi.GetUpcomingDueDates(7),
                 PayableDebtApi.GetUpcomingDueDates(7),
+                ReceivablePaymentApi.GetUpcomingChecks(7),
+                PayablePaymentApi.GetUpcomingChecks(7),
             ]);
 
             const receivablesWithType: DueDateWithType[] = receivables.map((item) => ({
@@ -34,7 +38,17 @@ export default function UpcomingDueDates() {
                 type: "payable" as const,
             }));
 
-            const combined = [...receivablesWithType, ...payablesWithType].sort(
+            const receivableChecksWithType: DueDateWithType[] = receivableChecks.map((item) => ({
+                ...item,
+                type: "receivableCheck" as const,
+            }));
+
+            const payableChecksWithType: DueDateWithType[] = payableChecks.map((item) => ({
+                ...item,
+                type: "payableCheck" as const,
+            }));
+
+            const combined = [...receivablesWithType, ...payablesWithType, ...receivableChecksWithType, ...payableChecksWithType].sort(
                 (a, b) => a.days_remaining - b.days_remaining
             );
 
@@ -132,7 +146,7 @@ export default function UpcomingDueDates() {
                                         <span className="mx-1">•</span>
                                         <span
                                             className={
-                                                item.type === "receivable"
+                                                item.type === "receivable" || item.type === "receivableCheck"
                                                     ? "text-green-600 dark:text-green-400"
                                                     : "text-red-600 dark:text-red-400"
                                             }

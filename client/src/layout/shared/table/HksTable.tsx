@@ -154,6 +154,7 @@ export default function HksTable(props: Props) {
                           ${header.id === "currency" && "w-16"}
                           ${header.id === "payment_method" && "w-16"}
                           ${header.id === "payment_date" && "w-16"}
+                          ${header.id === "due_date" && "w-16"}
                         `}
                       >
                         {header.isPlaceholder
@@ -172,7 +173,7 @@ export default function HksTable(props: Props) {
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => {
                   const isSelected = row.getIsSelected();
-                  
+
                   const rowContent = row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -189,6 +190,7 @@ export default function HksTable(props: Props) {
                         ${cell.column.id === "currency" && "w-fit text-center"}
                         ${cell.column.id === "payment_method" && "w-fit text-center"}
                         ${cell.column.id === "payment_date" && "w-fit text-center"}
+                        ${cell.column.id === "due_date" && "w-fit text-center"}
                       `}
                     >
                       {flexRender(
@@ -200,10 +202,10 @@ export default function HksTable(props: Props) {
 
                   if (useContextMenuForActions && contextMenuItems) {
                     const rowClasses = "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted font-light h-[45px]";
-                    
+
                     return (
                       <ContextMenu key={row.id}>
-                        <ContextMenuTrigger 
+                        <ContextMenuTrigger
                           render={<tr className={rowClasses} data-state={isSelected && "selected"} />}
                         >
                           {rowContent}

@@ -10,7 +10,7 @@ export default class ReceivablePaymentsService {
 		try {
 			Logger.info("[ReceivablePayments] Creating payment", { companyId, customerId: payment.customer_id, userId });
 
-			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method, due_date } =
 				payment;
 
 			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
@@ -34,6 +34,7 @@ export default class ReceivablePaymentsService {
 				description: description || null,
 				payment_date,
 				payment_method,
+				due_date: due_date || null,
 				company_id: companyId,
 				created_by: userId,
 			});
@@ -77,7 +78,7 @@ export default class ReceivablePaymentsService {
 				return ApiResponse.error("Missing payment ID");
 			}
 
-			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method } =
+			const { customer_id, amount, currency, exchange_rate, invoice_no, payment_date, description, payment_method, due_date } =
 				payment;
 
 			if (!customer_id || !amount || !currency || !exchange_rate || !payment_date || !payment_method) {
@@ -101,6 +102,7 @@ export default class ReceivablePaymentsService {
 				description: description || null,
 				payment_date,
 				payment_method,
+				due_date: due_date || null,
 			});
 
 			if (affectedRows === 0) {
@@ -142,6 +144,21 @@ export default class ReceivablePaymentsService {
 			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ReceivablePayments] Error deleting payment", { paymentId, companyId, error: error.message });
 			return ApiResponse.error("Failed to delete payment");
+		}
+	}
+
+	static async GetUpcomingChecks(companyId: string, daysThreshold: number = 7) {
+		try {
+			Logger.debug("[ReceivablePayments] Fetching upcoming checks", { companyId, daysThreshold });
+
+			const result = await repo.getUpcomingChecks(companyId, daysThreshold);
+
+			Logger.debug("[ReceivablePayments] Upcoming checks fetched", { companyId, count: result.length });
+			return ApiResponse.success(result, "Upcoming checks retrieved successfully");
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
+			Logger.error("[ReceivablePayments] Error fetching upcoming checks", { companyId, error: error.message });
+			return ApiResponse.error("Failed to retrieve upcoming checks");
 		}
 	}
 }

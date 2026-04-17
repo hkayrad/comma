@@ -77,6 +77,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
+import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -92,11 +93,13 @@ export default function HksSidebar() {
 
   const fetchUpcomingPaymentsCount = useCallback(async () => {
     try {
-      const [receivables, payables] = await Promise.all([
+      const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
         ReceivableDebtApi.GetUpcomingDueDates(7),
         PayableDebtApi.GetUpcomingDueDates(7),
+        ReceivablePaymentApi.GetUpcomingChecks(7),
+        PayablePaymentApi.GetUpcomingChecks(7),
       ]);
-      setUpcomingPaymentsCount(receivables.length + payables.length);
+      setUpcomingPaymentsCount(receivables.length + payables.length + receivableChecks.length + payableChecks.length);
     } catch {
       setUpcomingPaymentsCount(0);
     }

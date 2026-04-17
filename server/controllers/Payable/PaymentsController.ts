@@ -100,4 +100,22 @@ router.delete("/payments/:id", async (req: Request<{ id: string }>, res: Respons
 	}
 });
 
+router.get("/payments/upcoming-checks", async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
+	const companyId = req.user.companyId;
+	const daysThreshold = parseInt(req.query.days as string) || 7;
+
+	Logger.debug("[PayablePaymentsController] Get upcoming checks request", { companyId, daysThreshold });
+
+	try {
+		const response = await PayablePaymentsService.GetUpcomingChecks(companyId, daysThreshold);
+
+		Logger.debug("[PayablePaymentsController] Get upcoming checks result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
+		Logger.error("[PayablePaymentsController] Error fetching upcoming checks", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching upcoming checks" });
+	}
+});
+
 export default router;

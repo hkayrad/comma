@@ -312,6 +312,21 @@ export default function PaymentTable(props: Props) {
         cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
       },
       {
+        accessorKey: "due_date",
+        header: ({ column }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("payment.table.column.due_date")}
+          />
+        ),
+        cell: ({ row, column }) =>
+          row.getValue(column.id) ? (
+            <FormattedDate row={row} column={column} />
+          ) : (
+            <span className="text-muted-foreground">-</span>
+          ),
+      },
+      {
         accessorKey: "invoice_no",
         header: ({ column }) => (
           <SortableColumnHeader
@@ -357,6 +372,7 @@ export default function PaymentTable(props: Props) {
       },
       {
         id: "actions",
+        enableHiding: false,
         header: t("payment.table.column.actions"),
         cell: ({ row }) => (
           <div className="flex gap-2">

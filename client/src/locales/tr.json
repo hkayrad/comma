@@ -91,6 +91,8 @@
       "overdue": "Gecikmiş",
       "receivable": "Alacak",
       "payable": "Borç",
+      "receivableCheck": "Alınan Çek",
+      "payableCheck": "Verilen Çek",
       "paid": "Ödenmiş"
     }
   },
@@ -400,7 +402,9 @@
       "payment_date.validation.invalid": "Geçersiz tarih",
       "payment_method": "Ödeme Yöntemi",
       "payment_method.description": "Ödeme yöntemini seçin",
-      "payment_method.validation.invalid": "Geçersiz ödeme yöntemi"
+      "payment_method.validation.invalid": "Geçersiz ödeme yöntemi",
+      "due_date": "Vade Tarihi",
+      "due_date.description": "Ödemenin vade tarihi (opsiyonel)"
     }
   },
   "header": {
@@ -590,6 +594,7 @@
         "exchange_rate": "Kur",
         "invoice_no": "Fatura No",
         "payment_date": "Ödeme Tarihi",
+        "due_date": "Vade Tarihi",
         "payment_method": "Ödeme Yöntemi"
       }
     }

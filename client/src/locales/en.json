@@ -91,6 +91,8 @@
       "overdue": "Overdue",
       "receivable": "Receivable",
       "payable": "Payable",
+      "receivableCheck": "Received Check",
+      "payableCheck": "Issued Check",
       "paid": "Paid"
     }
   },
@@ -406,7 +408,9 @@
       "payment_date.validation.invalid": "Invalid date",
       "payment_method": "Payment Method",
       "payment_method.description": "Select a payment method",
-      "payment_method.validation.invalid": "Invalid payment method"
+      "payment_method.validation.invalid": "Invalid payment method",
+      "due_date": "Due Date",
+      "due_date.description": "Payment due date (optional)"
     }
   },
   "header": {
@@ -596,6 +600,7 @@
         "exchange_rate": "Exchange Rate",
         "invoice_no": "Invoice No",
         "payment_date": "Payment Date",
+        "due_date": "Due Date",
         "payment_method": "Payment Method"
       }
     }

@@ -93,6 +93,7 @@ export type PaymentDto = {
 	description?: string;
 	invoice_no?: string;
 	payment_date: Date;
+	due_date?: Date | null;
 	created_at?: Date;
 	updated_at?: Date;
 };
