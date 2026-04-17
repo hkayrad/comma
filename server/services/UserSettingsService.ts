@@ -1,6 +1,6 @@
 import { Logger } from "../lib/utils/logger";
 import { ApiResponse } from "../lib/utils/apiResponse";
-import { Users } from "../models";
+import { UserRepository } from "../repositories/UserRepository";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -14,7 +14,7 @@ export class UserSettingsService {
             Logger.info("[UserSettingsService] Updating username", { userId });
 
             // Find the user
-            const user = await Users.findByPk(userId);
+            const user = await UserRepository.findById(userId);
             if (!user) {
                 Logger.error("[UserSettingsService] User not found", { userId });
                 return ApiResponse.error("User not found");
@@ -28,14 +28,14 @@ export class UserSettingsService {
             }
 
             // Check if username is already taken
-            const existingUser = await Users.findOne({ where: { username: newUsername } });
+            const existingUser = await UserRepository.findByUsername(newUsername);
             if (existingUser && existingUser.id !== userId) {
                 Logger.warn("[UserSettingsService] Username already taken", { newUsername });
                 return ApiResponse.error("Username is already taken");
             }
 
             // Update the username
-            await user.update({ username: newUsername });
+            await UserRepository.update(userId, { username: newUsername });
 
             Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });
             return ApiResponse.success({ username: newUsername }, "Username updated successfully");
@@ -54,7 +54,7 @@ export class UserSettingsService {
             Logger.info("[UserSettingsService] Updating password", { userId });
 
             // Find the user
-            const user = await Users.findByPk(userId);
+            const user = await UserRepository.findById(userId);
             if (!user) {
                 Logger.error("[UserSettingsService] User not found", { userId });
                 return ApiResponse.error("User not found");
@@ -71,7 +71,7 @@ export class UserSettingsService {
             const newPassHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
             // Update the password
-            await user.update({ pass_hash: newPassHash });
+            await UserRepository.update(userId, { pass_hash: newPassHash });
 
             Logger.info("[UserSettingsService] Password updated successfully", { userId });
             return ApiResponse.success(null, "Password updated successfully");

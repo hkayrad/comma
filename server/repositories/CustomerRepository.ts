@@ -11,6 +11,40 @@ export class CustomerRepository {
         this.domain = domain;
     }
 
+	private getModel() {
+		const { ReceivableCustomers, PayableCustomers } = require("../models");
+		return this.domain === "receivable" ? ReceivableCustomers : PayableCustomers;
+	}
+
+	async create(customerData: any, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.create(customerData, { transaction });
+	}
+
+	async findById(id: UUID, companyId: UUID, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
+	}
+
+	async update(id: UUID, companyId: UUID, updateData: any, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
+	}
+
+	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: any) {
+		const Model = this.getModel();
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
+		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
+	}
+
+	async findAllIdAndName(companyId: UUID) {
+		const Model = this.getModel();
+		return await Model.findAll({
+			attributes: ["id", "name"],
+			where: { company_id: companyId },
+		});
+	}
+
 	async findAllWithSummary(
 		companyId: UUID,
 		limit: number,

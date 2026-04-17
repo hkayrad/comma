@@ -1,7 +1,7 @@
 import { Logger } from "../lib/utils/logger";
 import dotenv from "dotenv";
 import { ConfigKey, ConfigValue } from "@common/types";
-import { Config } from "../models";
+import { ConfigRepository } from "../repositories/ConfigRepository";
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ export class ConfigService {
 		try {
 			Logger.debug("[ConfigService] Fetching all configs");
 
-			const rows = await Config.findAll();
+			const rows = await ConfigRepository.findAll();
 
 			const configs: { [key: string]: string } = {};
 
@@ -31,7 +31,7 @@ export class ConfigService {
 		try {
 			Logger.debug("[ConfigService] Fetching config", { configKey });
 
-			const config = await Config.findByPk(configKey);
+			const config = await ConfigRepository.findByKey(configKey);
 
 			if (!config) {
 				Logger.debug("[ConfigService] Config not found", { configKey });
@@ -51,11 +51,7 @@ export class ConfigService {
 		try {
 			Logger.info("[ConfigService] Setting config", { configKey });
 
-			// upsert handles "INSERT ... ON DUPLICATE KEY UPDATE"
-			await Config.upsert({
-				configKey: configKey,
-				configValue: configValue,
-			});
+			await ConfigRepository.upsert(configKey, configValue);
 
 			Logger.info("[ConfigService] Config set successfully", { configKey });
 			return true;

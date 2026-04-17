@@ -1,0 +1,126 @@
+import { sequelize } from "../lib/db/sequelize";
+import { QueryTypes, Transaction } from "sequelize";
+import { PaymentDto, UUID, SortItem, FilterItem } from "@common/types";
+import { ReceivablePayments, PayablePayments } from "../models";
+
+export type PaymentDomain = "receivable" | "payable";
+
+export class PaymentRepository {
+	private domain: PaymentDomain;
+
+	constructor(domain: PaymentDomain) {
+		this.domain = domain;
+	}
+
+	private getModel() {
+		return this.domain === "receivable" ? ReceivablePayments : PayablePayments;
+	}
+
+	async create(paymentData: any, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.create(paymentData, { transaction });
+	}
+
+	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
+	}
+
+	async update(id: UUID, companyId: UUID, updateData: any, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
+	}
+
+	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
+		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
+	}
+
+	async findAllWithPagination(
+		companyId: UUID,
+		limit: number,
+		offset: number,
+		sorting: SortItem[] = [],
+		filters: FilterItem[] = []
+	): Promise<{ rows: PaymentDto[]; count: number }> {
+		const colMap: Record<string, string> = {
+			customer_name: "c.name",
+			amount: "p.amount",
+			currency: "p.currency",
+			exchange_rate: "p.exchange_rate",
+			payment_method: "p.payment_method",
+			payment_date: "p.payment_date",
+			invoice_no: "p.invoice_no",
+			description: "p.description",
+			amount_in_try: "p.amount_in_try",
+		};
+
+		let whereClause = "WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL";
+		const replacements: any[] = [companyId];
+
+		if (filters && filters.length > 0) {
+			filters.forEach((filter) => {
+				const { id, value } = filter;
+				const dbCol = colMap[id];
+				if (!dbCol) return;
+
+				if (Array.isArray(value) && value.length > 0) {
+					whereClause += ` AND ${dbCol} IN (?)`;
+					replacements.push(value);
+				} else if (typeof value === "string" && value.trim() !== "") {
+					whereClause += ` AND ${dbCol} LIKE ?`;
+					replacements.push(`%${value}%`);
+				}
+			});
+		}
+
+		let orderClause = "ORDER BY p.payment_date DESC";
+		if (sorting && sorting.length > 0) {
+			const sortParts = sorting
+				.map((sort) => {
+					const dbCol = colMap[sort.id];
+					if (!dbCol) return null;
+					return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
+				})
+				.filter(Boolean);
+
+			if (sortParts.length > 0) {
+				orderClause = `ORDER BY ${sortParts.join(", ")}`;
+			}
+		}
+
+		const countQuery = `
+			SELECT COUNT(*) as count
+			FROM ${this.domain}_payments p
+			JOIN ${this.domain}_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+			${whereClause}
+		`;
+
+		const countResult = (await sequelize.query(countQuery, {
+			replacements,
+			type: QueryTypes.SELECT,
+		})) as { count: number }[];
+
+		const totalCount = countResult[0]?.count || 0;
+
+		const query = `
+			SELECT
+				p.*,
+				c.name AS customer_name,
+				c.tax_number AS customer_tax_number
+			FROM ${this.domain}_payments p
+			JOIN ${this.domain}_customers c ON p.customer_id = c.id AND p.company_id = c.company_id
+			${whereClause}
+			${orderClause}
+			LIMIT ? OFFSET ?
+		`;
+
+		const result = (await sequelize.query(query, {
+			replacements: [...replacements, limit, offset],
+			type: QueryTypes.SELECT,
+		})) as PaymentDto[];
+
+		return { rows: result, count: totalCount };
+	}
+}

@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { Users, RefreshTokens } from "../models";
+import { UserRepository } from "../repositories/UserRepository";
 import { sequelize } from "../lib/db/sequelize";
-import { Transaction, Op } from "sequelize";
+import { Transaction } from "sequelize";
 
 dotenv.config();
 
@@ -30,7 +30,7 @@ export class AuthService {
 
 			Logger.info("[AuthService] Login attempt", { username });
 
-			const user = await Users.findOne({ where: { username } });
+			const user = await UserRepository.findByUsername(username);
 
 			if (!user) {
 				Logger.error("[AuthService] User not found", { username });
@@ -110,12 +110,7 @@ export class AuthService {
 
 			// Cleanup expired tokens for this user
 			try {
-				const deletedCount = await RefreshTokens.destroy({
-					where: {
-						user_id: user.id,
-						expires_at: { [Op.lt]: new Date() },
-					},
-				});
+				const deletedCount = await UserRepository.deleteExpiredRefreshTokens(user.id);
 				Logger.debug("[AuthService] Cleanup expired tokens", {
 					userId: user.id,
 					deletedCount: deletedCount,
@@ -124,7 +119,7 @@ export class AuthService {
 				Logger.warn("[AuthService] Failed to cleanup expired tokens", { error: cleanupError.message });
 			}
 
-			await RefreshTokens.create({
+			await UserRepository.createRefreshToken({
 				user_id: user.id,
 				token_hash: refreshTokenHash,
 				expires_at: expiresAt,
@@ -167,7 +162,7 @@ export class AuthService {
 		try {
 			Logger.info("[AuthService] Completing 2FA login", { userId });
 
-			const user = await Users.findByPk(userId);
+			const user = await UserRepository.findById(userId);
 
 			if (!user) {
 				return {
@@ -199,17 +194,12 @@ export class AuthService {
 
 			// Cleanup expired tokens
 			try {
-				await RefreshTokens.destroy({
-					where: {
-						user_id: user.id,
-						expires_at: { [Op.lt]: new Date() },
-					},
-				});
+				await UserRepository.deleteExpiredRefreshTokens(user.id);
 			} catch (cleanupError: any) {
 				Logger.warn("[AuthService] Failed to cleanup expired tokens", { error: cleanupError.message });
 			}
 
-			await RefreshTokens.create({
+			await UserRepository.createRefreshToken({
 				user_id: user.id,
 				token_hash: refreshTokenHash,
 				expires_at: expiresAt,
@@ -248,11 +238,7 @@ export class AuthService {
 
 			return await sequelize.transaction(async (t) => {
 				// Find token in DB with locking
-				const dbToken = await RefreshTokens.findOne({
-					where: { token_hash: requestTokenHash },
-					lock: Transaction.LOCK.UPDATE,
-					transaction: t,
-				});
+				const dbToken = await UserRepository.findRefreshTokenByHash(requestTokenHash, t, Transaction.LOCK.UPDATE);
 
 				if (!dbToken) {
 					return {
@@ -267,7 +253,7 @@ export class AuthService {
 				// Check if revoked (Reuse Detection)
 				if (dbToken.revoked) {
 					Logger.warn("[AuthService] Reuse of revoked token detected! Revoking all tokens for user.", { userId: dbToken.user_id });
-					await RefreshTokens.update({ revoked: true }, { where: { user_id: dbToken.user_id }, transaction: t });
+					await UserRepository.revokeAllRefreshTokens(dbToken.user_id, t);
 					return {
 						success: false,
 						message: "Security alert: Token reuse detected. Re-login required.",
@@ -292,7 +278,7 @@ export class AuthService {
 
 				// Valid token. Fetch user info.
 				Logger.debug("Fetching user for token", { userId: dbToken.user_id });
-				const dbUser = await Users.findByPk(dbToken.user_id, { transaction: t });
+				const dbUser = await UserRepository.findById(dbToken.user_id, t);
 
 				if (!dbUser) {
 					return {
@@ -328,13 +314,13 @@ export class AuthService {
 				const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
 				Logger.debug("Creating new refresh token");
-				await RefreshTokens.create(
+				await UserRepository.createRefreshToken(
 					{
 						user_id: dbUser.id,
 						token_hash: newRefreshTokenHash,
 						expires_at: expiresAt,
 					},
-					{ transaction: t }
+					t
 				);
 
 				Logger.info("[AuthService] Token refresh successful", {
@@ -372,9 +358,7 @@ export class AuthService {
 		try {
 			const requestTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
 
-			const result = await RefreshTokens.destroy({
-				where: { token_hash: requestTokenHash },
-			});
+			const result = await UserRepository.deleteRefreshToken(requestTokenHash);
 
 			Logger.info("[AuthService] Logout successful (token deleted)", {
 				deletedCount: result,

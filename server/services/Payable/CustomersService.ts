@@ -1,10 +1,7 @@
 import { CustomerRepository } from "../../repositories/CustomerRepository";
-import { CustomerDto, DebtDto, PaymentDto, UUID , SortItem, FilterItem} from "@common/types";
+import { CustomerDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
-import { PayableCustomers } from "../../models";
-import { sequelize } from "../../lib/db/sequelize";
-import { QueryTypes, Op } from "sequelize";
 
 const repo = new CustomerRepository("payable");
 
@@ -20,7 +17,7 @@ export default class PayableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const newCustomer = await PayableCustomers.create({
+			const newCustomer = await repo.create({
 				name,
 				phone: phone || null,
 				is_company,
@@ -102,10 +99,7 @@ export default class PayableCustomersService {
 		try {
 			Logger.debug("[PayableCustomers] Fetching customer IDs and names", { companyId });
 
-			const result = await PayableCustomers.findAll({
-				attributes: ["id", "name"],
-				where: { company_id: companyId },
-			});
+			const result = await repo.findAllIdAndName(companyId);
 
 			Logger.debug("[PayableCustomers] Customer IDs and names fetched successfully", {
 				companyId,
@@ -141,25 +135,19 @@ export default class PayableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const [affectedRows] = await PayableCustomers.update(
-				{
-					name,
-					phone: phone || null,
-					is_company,
-					tax_number: tax_number || null,
-					tax_office: tax_office || null,
-					mersis_no: mersis_no || null,
-					email: email || null,
-					address: address || null,
-				},
-				{
-					where: { id, company_id: companyId },
-				},
-			);
+			const [affectedRows] = await repo.update(id, companyId, {
+				name,
+				phone: phone || null,
+				is_company,
+				tax_number: tax_number || null,
+				tax_office: tax_office || null,
+				mersis_no: mersis_no || null,
+				email: email || null,
+				address: address || null,
+			});
 
 			if (affectedRows === 0) {
-				// Check existence
-				const exists = await PayableCustomers.findOne({ where: { id, company_id: companyId } });
+				const exists = await repo.findById(id, companyId);
 				if (!exists) {
 					Logger.error("[PayableCustomers] Failed to update customer or customer not found", {
 						customerId: id,
@@ -167,14 +155,17 @@ export default class PayableCustomersService {
 					});
 					return ApiResponse.error("Failed to update customer or customer not found");
 				}
-				// If exists but no change, success
 			}
 
 			Logger.info("[PayableCustomers] Customer updated successfully", { customerId: id, companyId });
 			return ApiResponse.success(null, "Customer updated successfully");
 		} catch (err: unknown) {
 			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[PayableCustomers] Error updating customer", { customerId: id, companyId, error: error.message });
+			Logger.error("[PayableCustomers] Error updating customer", {
+				customerId: id,
+				companyId,
+				error: error.message,
+			});
 			return ApiResponse.error("Error updating customer");
 		}
 	}
@@ -188,24 +179,7 @@ export default class PayableCustomersService {
 				return ApiResponse.error("Customer ID is required");
 			}
 
-			// Set deleted_by before soft delete
-			const [updateCount] = await PayableCustomers.update(
-				{ deleted_by: userId },
-				{ where: { id, company_id: companyId } },
-			);
-
-			if (updateCount === 0) {
-				Logger.error("[PayableCustomers] Failed to find customer to delete", {
-					customerId: id,
-					companyId,
-				});
-				// If we can't update it, it probably doesn't exist or is already deleted
-				return ApiResponse.error("Failed to delete customer or customer not found");
-			}
-
-			const deletedCount = await PayableCustomers.destroy({
-				where: { id, company_id: companyId },
-			});
+			const deletedCount = await repo.delete(id, companyId, userId);
 
 			if (deletedCount === 0) {
 				Logger.error("[PayableCustomers] Failed to delete customer or customer not found", {
@@ -219,7 +193,11 @@ export default class PayableCustomersService {
 			return ApiResponse.success(null, "Customer deleted successfully");
 		} catch (err: unknown) {
 			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[PayableCustomers] Error deleting customer", { customerId: id, companyId, error: error.message });
+			Logger.error("[PayableCustomers] Error deleting customer", {
+				customerId: id,
+				companyId,
+				error: error.message,
+			});
 			return ApiResponse.error("Error deleting customer");
 		}
 	}

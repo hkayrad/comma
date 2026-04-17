@@ -1,9 +1,7 @@
 import { CreateUserDto, UserDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
-import { Users } from "../../models";
-import { sequelize } from "../../lib/db/sequelize";
-import { QueryTypes } from "sequelize";
+import { UserRepository } from "../../repositories/UserRepository";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -21,7 +19,7 @@ export class UserManagementService {
 			}
 
 			// Check if username already exists
-			const existingUser = await Users.findOne({ where: { username } });
+			const existingUser = await UserRepository.findByUsername(username);
 			if (existingUser) {
 				Logger.error("[UserManagementService] Username already exists", { username });
 				return ApiResponse.error("Username already exists");
@@ -30,13 +28,13 @@ export class UserManagementService {
 			// Hash the password
 			const passHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-			const newUser = await Users.create({
+			const newUser = await UserRepository.create({
 				company_id,
 				username,
 				pass_hash: passHash,
 				role: role ?? 0,
 				created_by: createdBy,
-			} as any);
+			});
 
 			Logger.info("[UserManagementService] User created successfully", { userId: newUser.id });
 			return ApiResponse.success(newUser.id, "User created successfully");
@@ -53,97 +51,15 @@ export class UserManagementService {
 
 			const offset = page * limit;
 
-			const colMap: Record<string, string> = {
-				username: "u.username",
-				role: "u.role",
-				created_at: "u.created_at",
-			};
-
-			let whereClause = "WHERE u.company_id = ? AND u.deleted_at IS NULL";
-			const replacements: any[] = [companyId];
-
-			if (filters && filters.length > 0) {
-				filters.forEach((filter) => {
-					const { id, value } = filter;
-
-					if (id === "role") {
-						const roleValues = Array.isArray(value) ? value : [value];
-						const mapped = roleValues.map((v) => parseInt(String(v), 10));
-						if (mapped.length > 0) {
-							whereClause += ` AND u.role IN (?)`;
-							replacements.push(mapped);
-						}
-						return;
-					}
-
-					const dbCol = colMap[id];
-					if (!dbCol) return;
-
-					if (Array.isArray(value) && value.length > 0) {
-						whereClause += ` AND ${dbCol} IN (?)`;
-						replacements.push(value);
-					} else if (typeof value === "string" && value.trim() !== "") {
-						whereClause += ` AND ${dbCol} LIKE ?`;
-						replacements.push(`%${value}%`);
-					}
-				});
-			}
-
-			let orderClause = "ORDER BY u.created_at DESC";
-			if (sorting && sorting.length > 0) {
-				const sortParts = sorting
-					.map((sort) => {
-						const dbCol = colMap[sort.id];
-						if (!dbCol) return null;
-						return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
-					})
-					.filter(Boolean);
-
-				if (sortParts.length > 0) {
-					orderClause = `ORDER BY ${sortParts.join(", ")}`;
-				}
-			}
-
-			const countQuery = `
-				SELECT COUNT(*) as count
-				FROM users u
-				${whereClause}
-			`;
-
-			const countResult = (await sequelize.query(countQuery, {
-				replacements,
-				type: QueryTypes.SELECT,
-			})) as { count: number }[];
-
-			const totalCount = countResult[0]?.count || 0;
-
-			const query = `
-				SELECT
-					u.id,
-					u.company_id,
-					u.username,
-					u.role,
-					u.created_at,
-					u.created_by,
-					u.updated_at
-				FROM users u
-				${whereClause}
-				${orderClause}
-				LIMIT ? OFFSET ?;
-			`;
-
-			const result = (await sequelize.query(query, {
-				replacements: [...replacements, limit, offset],
-				type: QueryTypes.SELECT,
-			})) as UserDto[];
+			const result = await UserRepository.findAllByCompany(companyId, limit, offset, sorting, filters);
 
 			Logger.debug("[UserManagementService] Users fetched successfully", {
 				companyId,
-				count: result.length,
-				totalCount,
+				count: result.rows.length,
+				totalCount: result.count,
 			});
 
-			return ApiResponse.success({ rows: result, count: totalCount }, "Users retrieved successfully");
+			return ApiResponse.success({ rows: result.rows, count: result.count }, "Users retrieved successfully");
 		} catch (err: unknown) {
 			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error fetching users", error);
@@ -155,31 +71,25 @@ export class UserManagementService {
 		Logger.info("[UserManagementService] GetById called", { id });
 
 		try {
-			const query = `
-				SELECT
-					u.id,
-					u.company_id,
-					u.username,
-					u.role,
-					u.created_at,
-					u.created_by,
-					u.updated_at
-				FROM users u
-				WHERE u.id = ? AND u.deleted_at IS NULL
-			`;
+			const user = await UserRepository.findById(id);
 
-			const result = (await sequelize.query(query, {
-				replacements: [id],
-				type: QueryTypes.SELECT,
-			})) as UserDto[];
-
-			if (!result || result.length === 0) {
+			if (!user || user.deleted_at !== null) {
 				Logger.warn("[UserManagementService] User not found", { id });
 				return ApiResponse.success(null, "User not found");
 			}
 
+			const userDto: UserDto = {
+				id: user.id,
+				company_id: user.company_id,
+				username: user.username,
+				role: user.role as any,
+				created_at: user.created_at,
+				created_by: user.created_by,
+				updated_at: user.updated_at,
+			};
+
 			Logger.info("[UserManagementService] Fetched user successfully", { id });
-			return ApiResponse.success(result[0], "User retrieved successfully");
+			return ApiResponse.success(userDto, "User retrieved successfully");
 		} catch (err: unknown) {
 			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[UserManagementService] Error fetching user", error);
@@ -197,7 +107,7 @@ export class UserManagementService {
 
 			if (username) {
 				// Check if username already exists for a different user
-				const existingUser = await Users.findOne({ where: { username } });
+				const existingUser = await UserRepository.findByUsername(username);
 				if (existingUser && existingUser.id !== id) {
 					Logger.error("[UserManagementService] Username already exists", { username });
 					return ApiResponse.error("Username already exists");
@@ -218,12 +128,10 @@ export class UserManagementService {
 				return ApiResponse.error("No update data provided");
 			}
 
-			const [affectedRows] = await Users.update(updateData, {
-				where: { id },
-			});
+			const [affectedRows] = await UserRepository.update(id, updateData);
 
 			if (affectedRows === 0) {
-				const exists = await Users.findByPk(id);
+				const exists = await UserRepository.findById(id);
 				if (!exists) {
 					Logger.warn("[UserManagementService] User not found", { id });
 					return ApiResponse.error("User not found");
@@ -243,13 +151,7 @@ export class UserManagementService {
 		try {
 			Logger.info("[UserManagementService] Delete called", { id });
 
-			// First update deleted_by
-			await Users.update({ deleted_by: deletedBy } as any, { where: { id } });
-
-			// Then soft delete
-			const deletedCount = await Users.destroy({
-				where: { id },
-			});
+			const deletedCount = await UserRepository.delete(id, deletedBy);
 
 			if (deletedCount === 0) {
 				Logger.warn("[UserManagementService] User not found", { id });
@@ -271,13 +173,10 @@ export class UserManagementService {
 
 			const passHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
-			const [affectedRows] = await Users.update(
-				{ pass_hash: passHash } as any,
-				{ where: { id } }
-			);
+			const [affectedRows] = await UserRepository.update(id, { pass_hash: passHash });
 
 			if (affectedRows === 0) {
-				const exists = await Users.findByPk(id);
+				const exists = await UserRepository.findById(id);
 				if (!exists) {
 					Logger.warn("[UserManagementService] User not found", { id });
 					return ApiResponse.error("User not found");

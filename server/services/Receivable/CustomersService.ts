@@ -1,10 +1,7 @@
 import { CustomerRepository } from "../../repositories/CustomerRepository";
-import { CustomerDto, CustomerIdName, DebtDto, PaymentDto, UUID , SortItem, FilterItem} from "@common/types";
+import { CustomerDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
-import { ReceivableCustomers } from "../../models";
-import { sequelize } from "../../lib/db/sequelize";
-import { QueryTypes } from "sequelize";
 
 const repo = new CustomerRepository("receivable");
 
@@ -20,7 +17,7 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const newCustomer = await ReceivableCustomers.create({
+			const newCustomer = await repo.create({
 				name,
 				phone: phone || null,
 				is_company,
@@ -102,10 +99,7 @@ export default class ReceivableCustomersService {
 		try {
 			Logger.debug("[ReceivableCustomers] Fetching customer IDs and names", { companyId });
 
-			const result = await ReceivableCustomers.findAll({
-				attributes: ["id", "name"],
-				where: { company_id: companyId },
-			});
+			const result = await repo.findAllIdAndName(companyId);
 
 			Logger.debug("[ReceivableCustomers] Customer IDs and names fetched successfully", {
 				companyId,
@@ -141,24 +135,19 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Name and customer type are required");
 			}
 
-			const [affectedRows] = await ReceivableCustomers.update(
-				{
-					name,
-					phone: phone || null,
-					is_company,
-					tax_number: tax_number || null,
-					tax_office: tax_office || null,
-					mersis_no: mersis_no || null,
-					email: email || null,
-					address: address || null,
-				},
-				{
-					where: { id, company_id: companyId },
-				}
-			);
+			const [affectedRows] = await repo.update(id, companyId, {
+				name,
+				phone: phone || null,
+				is_company,
+				tax_number: tax_number || null,
+				tax_office: tax_office || null,
+				mersis_no: mersis_no || null,
+				email: email || null,
+				address: address || null,
+			});
 
 			if (affectedRows === 0) {
-				const exists = await ReceivableCustomers.findOne({ where: { id, company_id: companyId } });
+				const exists = await repo.findById(id, companyId);
 				if (!exists) {
 					Logger.error("[ReceivableCustomers] Failed to update customer or customer not found", {
 						customerId: id,
@@ -190,14 +179,7 @@ export default class ReceivableCustomersService {
 				return ApiResponse.error("Customer ID is required");
 			}
 
-			await ReceivableCustomers.update(
-				{ deleted_by: userId },
-				{ where: { id, company_id: companyId } }
-			);
-
-			const deletedCount = await ReceivableCustomers.destroy({
-				where: { id, company_id: companyId },
-			});
+			const deletedCount = await repo.delete(id, companyId, userId);
 
 			if (deletedCount === 0) {
 				Logger.error("[ReceivableCustomers] Failed to delete customer or customer not found", {

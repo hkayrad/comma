@@ -11,6 +11,32 @@ export class DebtRepository {
         this.domain = domain;
     }
 
+	private getModel() {
+		const { ReceivableDebts, PayableDebts } = require("../models");
+		return this.domain === "receivable" ? ReceivableDebts : PayableDebts;
+	}
+
+	async create(debtData: any, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.create(debtData, { transaction });
+	}
+
+	async findById(id: UUID, companyId: UUID, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
+	}
+
+	async update(id: UUID, companyId: UUID, updateData: any, transaction?: any) {
+		const Model = this.getModel();
+		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
+	}
+
+	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: any) {
+		const Model = this.getModel();
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
+		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
+	}
+
 	async findAllWithSummary(
 		companyId: string,
 		limit: number,
@@ -162,4 +188,27 @@ export class DebtRepository {
 
         return result;
     }
+
+	async getMonthlyStats(companyId: string, start: Date, end: Date) {
+		const Model = this.getModel();
+		const { fn, col, literal, Op } = require("sequelize");
+
+		return await Model.findAll({
+			attributes: [
+				[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"],
+				[fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"],
+			],
+			where: {
+				company_id: companyId,
+				issue_date: {
+					[Op.gte]: start,
+					[Op.lt]: end,
+				},
+				deleted_at: null,
+			},
+			group: [fn("DATE_FORMAT", col("issue_date"), "%Y-%m")],
+			order: [[literal("month"), "ASC"]],
+			raw: true,
+		}) as unknown as { month: string; total: string }[];
+	}
 }

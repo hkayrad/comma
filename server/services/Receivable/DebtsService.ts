@@ -1,9 +1,6 @@
-import { DebtDto, InsertResult, Totals, UUID , SortItem, FilterItem} from "@common/types";
+import { DebtDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
-import { ReceivableDebts } from "../../models";
-import { sequelize } from "../../lib/db/sequelize";
-import { QueryTypes } from "sequelize";
 import { DebtRepository } from "../../repositories/DebtRepository";
 
 const repo = new DebtRepository("receivable");
@@ -48,7 +45,7 @@ export default class ReceivableDebtsService {
 				return ApiResponse.error("Customer, amount, issue date, VAT, currency, and exchange rate are required");
 			}
 
-			const newDebt = await ReceivableDebts.create({
+			const newDebt = await repo.create({
 				customer_id,
 				amount,
 				discount,
@@ -146,27 +143,22 @@ export default class ReceivableDebtsService {
 				return ApiResponse.error("Customer, amount, issue date, VAT, currency, and exchange rate are required");
 			}
 
-			const [affectedRows] = await ReceivableDebts.update(
-				{
-					customer_id,
-					amount,
-					discount,
-					vat,
-					withholding,
-					currency,
-					exchange_rate,
-					issue_date,
-					due_date: due_date || null,
-					invoice_no: invoice_no || null,
-					description: description || null,
-				},
-				{
-					where: { id, company_id: companyId },
-				},
-			);
+			const [affectedRows] = await repo.update(id, companyId, {
+				customer_id,
+				amount,
+				discount,
+				vat,
+				withholding,
+				currency,
+				exchange_rate,
+				issue_date,
+				due_date: due_date || null,
+				invoice_no: invoice_no || null,
+				description: description || null,
+			});
 
 			if (affectedRows === 0) {
-				const exists = await ReceivableDebts.findOne({ where: { id, company_id: companyId } });
+				const exists = await repo.findById(id, companyId);
 				if (!exists) {
 					Logger.error("[ReceivableDebts] No debt found with provided ID", { debtId: id, companyId });
 					return ApiResponse.error("No debt found with the provided ID");
@@ -191,11 +183,7 @@ export default class ReceivableDebtsService {
 				return ApiResponse.error("Debt ID is required");
 			}
 
-			await ReceivableDebts.update({ deleted_by: userId }, { where: { id, company_id: companyId } });
-
-			const deletedCount = await ReceivableDebts.destroy({
-				where: { id, company_id: companyId },
-			});
+			const deletedCount = await repo.delete(id, companyId, userId);
 
 			if (deletedCount === 0) {
 				Logger.error("[ReceivableDebts] No debt found with provided ID", { debtId: id, companyId });

@@ -2,9 +2,7 @@ import { CompanyDto, UUID , SortItem, FilterItem} from "@common/types";
 import { Logger } from "../../lib/utils/logger";
 import { ApiResponse } from "../../lib/utils/apiResponse";
 import dotenv from "dotenv";
-import { Companies } from "../../models";
-import { sequelize } from "../../lib/db/sequelize";
-import { QueryTypes } from "sequelize";
+import { CompanyRepository } from "../../repositories/CompanyRepository";
 
 dotenv.config();
 
@@ -20,7 +18,7 @@ export class CompanyManagementService {
 				return ApiResponse.error("Invalid company data");
 			}
 
-			const newCompany = await Companies.create({
+			const newCompany = await CompanyRepository.create({
 				name,
 				phone,
 				is_company,
@@ -46,108 +44,14 @@ export class CompanyManagementService {
 
 			const offset = page * limit;
 
-			const colMap: Record<string, string> = {
-				name: "c.name",
-				is_company: "c.is_company",
-				email: "c.email",
-				phone: "c.phone",
-				tax_number: "c.tax_number",
-				tax_office: "c.tax_office",
-				mersis_no: "c.mersis_no",
-				address: "c.address",
-				created_at: "c.created_at",
-			};
-
-			let whereClause = "WHERE c.deleted_at IS NULL";
-			const replacements: any[] = [];
-
-			if (filters && filters.length > 0) {
-				filters.forEach((filter) => {
-					const { id, value } = filter;
-
-					if (id === "is_company") {
-						const values = Array.isArray(value) ? value : [value];
-						const mapped = values.map((v) => parseInt(String(v), 10)).filter((v) => !isNaN(v));
-						if (mapped.length > 0) {
-							whereClause += ` AND c.is_company IN (?)`;
-							replacements.push(mapped);
-						}
-						return;
-					}
-
-					const dbCol = colMap[id];
-					if (!dbCol) return;
-
-					if (Array.isArray(value) && value.length > 0) {
-						whereClause += ` AND ${dbCol} IN (?)`;
-						replacements.push(value);
-					} else if (typeof value === "string" && value.trim() !== "") {
-						whereClause += ` AND ${dbCol} LIKE ?`;
-						replacements.push(`%${value}%`);
-					}
-				});
-			}
-
-			let orderClause = "ORDER BY c.created_at DESC";
-			if (sorting && sorting.length > 0) {
-				const sortParts = sorting
-					.map((sort) => {
-						const dbCol = colMap[sort.id];
-						if (!dbCol) return null;
-						return `${dbCol} ${sort.desc ? "DESC" : "ASC"}`;
-					})
-					.filter(Boolean);
-
-				if (sortParts.length > 0) {
-					orderClause = `ORDER BY ${sortParts.join(", ")}`;
-				}
-			}
-
-			const countQuery = `
-				SELECT COUNT(*) as count
-				FROM companies c
-				${whereClause}
-			`;
-
-			const countResult = (await sequelize.query(countQuery, {
-				replacements,
-				type: QueryTypes.SELECT,
-			})) as { count: number }[];
-
-			const totalCount = countResult[0]?.count || 0;
-
-			const query = `
-				SELECT
-					c.id,
-					c.name,
-					c.is_company,
-					c.email,
-					c.phone,
-					c.tax_number,
-					c.tax_office,
-					c.mersis_no,
-					c.address,
-					c.small_logo_path,
-					c.large_logo_path,
-					c.created_at,
-					c.updated_at
-				FROM companies c
-				${whereClause}
-				${orderClause}
-				LIMIT ? OFFSET ?;
-			`;
-
-			const result = (await sequelize.query(query, {
-				replacements: [...replacements, limit, offset],
-				type: QueryTypes.SELECT,
-			})) as CompanyDto[];
+			const result = await CompanyRepository.findAllWithPagination(limit, offset, sorting, filters);
 
 			Logger.debug("[CompanyManagementService] Companies fetched successfully", {
-				count: result.length,
-				totalCount,
+				count: result.rows.length,
+				totalCount: result.count,
 			});
 
-			return ApiResponse.success({ rows: result, count: totalCount }, "Companies retrieved successfully");
+			return ApiResponse.success({ rows: result.rows, count: result.count }, "Companies retrieved successfully");
 		} catch (err: unknown) {
 			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyManagementService] Error fetching companies", error);
@@ -160,7 +64,7 @@ export class CompanyManagementService {
 
 		try {
 			Logger.debug("[CompanyManagementService] Fetching company");
-			const company = await Companies.findByPk(id);
+			const company = await CompanyRepository.findById(id);
 
 			if (!company) {
 				Logger.warn("[CompanyManagementService] No company found");
@@ -189,33 +93,28 @@ export class CompanyManagementService {
 
 			Logger.debug("[CompanyManagementService] Updating company");
 
-			const [affectedRows] = await Companies.update(
-				{
-					name,
-					phone,
-					is_company,
-					tax_number,
-					tax_office,
-					mersis_no,
-					email,
-					address,
-				},
-				{
-					where: { id },
-				},
-			);
+			const [affectedRows] = await CompanyRepository.update(id, {
+				name,
+				phone,
+				is_company,
+				tax_number,
+				tax_office,
+				mersis_no,
+				email,
+				address,
+			});
 
 			if (affectedRows === 0) {
 				Logger.warn("[CompanyManagementService] No company found or no changes made");
 				// Check existence
-				const exists = await Companies.findByPk(id);
+				const exists = await CompanyRepository.findById(id);
 				if (!exists) {
 					return ApiResponse.success(null);
 				}
 				return ApiResponse.success(exists); // Return existing if no update
 			}
 
-			const updatedCompany = await Companies.findByPk(id);
+			const updatedCompany = await CompanyRepository.findById(id);
 			Logger.info("[CompanyManagementService] Updated company successfully");
 			return ApiResponse.success(updatedCompany);
 		} catch (err: unknown) {
@@ -230,10 +129,8 @@ export class CompanyManagementService {
 			Logger.info("[CompanyManagementService] Delete called", { id });
 
 			Logger.debug("[CompanyManagementService] Deleting company");
-			// Soft delete via paranoid: true
-			const deletedCount = await Companies.destroy({
-				where: { id },
-			});
+			
+			const deletedCount = await CompanyRepository.delete(id);
 
 			if (deletedCount === 0) {
 				Logger.warn("[CompanyManagementService] No company found");
