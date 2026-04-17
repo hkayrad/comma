@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
 import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
 import type { UpcomingDueDate } from "@/lib/types";
@@ -14,9 +15,19 @@ type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
 
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [dueDates, setDueDates] = useState<DueDateWithType[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
+
+    const getNavigationPath = (type: DueDateItemType): string => {
+        switch (type) {
+            case "receivable": return "/alacaklar";
+            case "payable": return "/borclar";
+            case "receivableCheck": return "/alacaklar/odemeler";
+            case "payableCheck": return "/borclar/odemeler";
+        }
+    };
 
     const fetchUpcomingDueDates = useCallback(async () => {
         setLoading(true);
@@ -133,7 +144,8 @@ export default function UpcomingDueDates() {
                     {displayedDueDates.map((item) => (
                         <div
                             key={`${item.type}-${item.id}`}
-                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                            onClick={() => navigate(getNavigationPath(item.type))}
+                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer group"
                         >
                             <div className="flex items-center gap-2 min-w-0">
                                 {item.days_remaining <= 0 && (
