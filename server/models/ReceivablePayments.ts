@@ -19,6 +19,7 @@ export class ReceivablePayments extends Model<
 	declare payment_date: Date;
 	declare description: CreationOptional<string | null>;
 	declare payment_method: "cash" | "card" | "bank_transfer" | "check";
+	declare due_date: CreationOptional<Date | null>;
 	declare created_at: CreationOptional<Date>;
 	declare created_by: string;
 	declare updated_at: CreationOptional<Date>;
@@ -91,6 +92,11 @@ ReceivablePayments.init(
 			type: DataTypes.ENUM("cash", "card", "bank_transfer", "check"),
 			allowNull: false,
 			defaultValue: "Cash",
+		},
+		due_date: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			defaultValue: null,
 		},
 		created_at: {
 			type: DataTypes.DATE,

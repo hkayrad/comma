@@ -5,16 +5,19 @@ const STORAGE_KEY = "dashboard-settings";
 interface DashboardSettings {
     showOverviewCards: boolean;
     showStatisticsChart: boolean;
+    useContextMenuForActions: boolean;
 }
 
 interface DashboardSettingsContextValue extends DashboardSettings {
     setShowOverviewCards: (value: boolean) => void;
     setShowStatisticsChart: (value: boolean) => void;
+    setUseContextMenuForActions: (value: boolean) => void;
 }
 
 const defaultSettings: DashboardSettings = {
     showOverviewCards: true,
     showStatisticsChart: true,
+    useContextMenuForActions: false,
 };
 
 function getStoredSettings(): DashboardSettings {
@@ -46,13 +49,19 @@ export function DashboardSettingsProvider({ children }: { children: ReactNode })
         setSettings((prev) => ({ ...prev, showStatisticsChart: value }));
     }, []);
 
+    const setUseContextMenuForActions = useCallback((value: boolean) => {
+        setSettings((prev) => ({ ...prev, useContextMenuForActions: value }));
+    }, []);
+
     return (
         <DashboardSettingsContext.Provider
             value={{
                 showOverviewCards: settings.showOverviewCards,
                 showStatisticsChart: settings.showStatisticsChart,
+                useContextMenuForActions: settings.useContextMenuForActions,
                 setShowOverviewCards,
                 setShowStatisticsChart,
+                setUseContextMenuForActions,
             }}
         >
             {children}

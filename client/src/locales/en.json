@@ -51,13 +51,13 @@
         "email": "Email",
         "index": "#",
         "phone": "Phone",
-        "actions.delete": "Delete customer",
+        "actions.delete": "Delete Customer",
         "actions.delete.confirm": "Delete Customer",
         "actions.delete.description": "This action will delete the customer record. Do you accept?",
         "actions.delete.title": "Are you sure?",
-        "actions.edit_details": "Edit customer information",
-        "actions.show_details": "Display customer information",
-        "actions.show_statement": "Display customer statement",
+        "actions.edit_details": "Edit Info",
+        "actions.show_details": "Show Info",
+        "actions.show_statement": "Customer Statement",
         "debt_status": "Debt Status",
         "is_company": "Type",
         "mersis_no": "Mersis No",
@@ -91,6 +91,8 @@
       "overdue": "Overdue",
       "receivable": "Receivable",
       "payable": "Payable",
+      "receivableCheck": "Received Check",
+      "payableCheck": "Issued Check",
       "paid": "Paid"
     }
   },
@@ -406,7 +408,9 @@
       "payment_date.validation.invalid": "Invalid date",
       "payment_method": "Payment Method",
       "payment_method.description": "Select a payment method",
-      "payment_method.validation.invalid": "Invalid payment method"
+      "payment_method.validation.invalid": "Invalid payment method",
+      "due_date": "Due Date",
+      "due_date.description": "Payment due date (optional)"
     }
   },
   "header": {
@@ -596,6 +600,7 @@
         "exchange_rate": "Exchange Rate",
         "invoice_no": "Invoice No",
         "payment_date": "Payment Date",
+        "due_date": "Due Date",
         "payment_method": "Payment Method"
       }
     }
@@ -636,7 +641,10 @@
       "label": "Page Settings",
       "description": "Control what's visible on this page",
       "overviewCards": "Overview Cards",
-      "statisticsChart": "Statistics Chart"
+      "statisticsChart": "Statistics Chart",
+      "generalTab": "General",
+      "tablesTab": "Tables",
+      "contextMenuActions": "Show table actions in right-click menu"
     },
     "sysAdmin": {
       "actions": "Admin Actions",

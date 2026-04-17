@@ -1,14 +1,15 @@
-import { fn, col, literal, Op } from "sequelize";
-import { ReceivableDebts } from "../models/ReceivableDebts";
-import { PayableDebts } from "../models/PayableDebts";
 import { Logger } from "../lib/utils/logger";
 import { ApiResponse } from "../lib/utils/apiResponse";
+import { DebtRepository } from "../repositories/DebtRepository";
 
 export interface MonthlyStatsData {
     month: string;
     receivable: number;
     payable: number;
 }
+
+const recRepo = new DebtRepository("receivable");
+const payRepo = new DebtRepository("payable");
 
 class StatsService {
     /**
@@ -34,40 +35,10 @@ class StatsService {
             }
 
             // Get receivable totals grouped by month
-            const receivables = await ReceivableDebts.findAll({
-                attributes: [
-                    [fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"],
-                    [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"],
-                ],
-                where: {
-                    company_id: companyId,
-                    issue_date: {
-                        [Op.gte]: start,
-                        [Op.lt]: end,
-                    },
-                },
-                group: [fn("DATE_FORMAT", col("issue_date"), "%Y-%m")],
-                order: [[literal("month"), "ASC"]],
-                raw: true,
-            }) as unknown as { month: string; total: string }[];
+            const receivables = await recRepo.getMonthlyStats(companyId, start, end);
 
             // Get payable totals grouped by month
-            const payables = await PayableDebts.findAll({
-                attributes: [
-                    [fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"],
-                    [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"],
-                ],
-                where: {
-                    company_id: companyId,
-                    issue_date: {
-                        [Op.gte]: start,
-                        [Op.lt]: end,
-                    },
-                },
-                group: [fn("DATE_FORMAT", col("issue_date"), "%Y-%m")],
-                order: [[literal("month"), "ASC"]],
-                raw: true,
-            }) as unknown as { month: string; total: string }[];
+            const payables = await payRepo.getMonthlyStats(companyId, start, end);
 
             // Create a map of all months in range
             const monthsMap = new Map<string, MonthlyStatsData>();
@@ -100,7 +71,8 @@ class StatsService {
 
             Logger.debug("[StatsService] Monthly stats fetched", { companyId, dataPoints: data.length });
             return ApiResponse.success(data, "Monthly stats retrieved successfully");
-        } catch (error: any) {
+        } catch (err: unknown) {
+        	const error = err instanceof Error ? err : new Error(String(err));
             Logger.error("[StatsService] Error fetching monthly stats", { companyId, error: error.message });
             return ApiResponse.error("Error fetching monthly stats");
         }

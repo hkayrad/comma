@@ -99,7 +99,8 @@ export class TwoFactorApi {
         },
       );
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error: any = err;
       Logger.error("[TwoFactorApi] Failed to verify 2FA", error);
       // Return error response data if available
       if (error.response?.data) {
@@ -127,7 +128,8 @@ export class TwoFactorApi {
         },
       );
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error: any = err;
       Logger.error("[TwoFactorApi] Failed to use recovery code", error);
       if (error.response?.data) {
         return error.response.data;
@@ -149,7 +151,8 @@ export class TwoFactorApi {
         // code,
       });
       return response.data;
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error: any = err;
       Logger.error("[TwoFactorApi] Failed to disable 2FA", error);
       if (error.response?.data) {
         return error.response.data;

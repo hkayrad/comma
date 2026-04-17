@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { AdminCompanyApi } from "@/lib/api/admin";
 import type {
@@ -353,6 +354,26 @@ export default function CompanyTable(props: Props) {
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
       addButton={addButton}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onManageUsers?.(c)}>
+            <Users className="mr-2 h-4 w-4" />
+            {t("user.role.manager")}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onEdit(c)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.edit_details")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("vars.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }

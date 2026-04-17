@@ -51,13 +51,13 @@
         "email": "E-posta",
         "index": "#",
         "phone": "Telefon",
-        "actions.delete": "Müşteriyi sil",
+        "actions.delete": "Müşteriyi Sil",
         "actions.delete.confirm": "Müşteriyi Sil",
         "actions.delete.description": "Bu işlem müşteri kaydını silecektir. Onaylıyor musunuz?",
         "actions.delete.title": "Emin misiniz?",
-        "actions.edit_details": "Müşteri bilgilerini düzenle",
-        "actions.show_details": "Müşteri detaylarını görüntüle",
-        "actions.show_statement": "Borç dökümünü görüntüle",
+        "actions.edit_details": "Bilgileri Düzenle",
+        "actions.show_details": "Bilgileri Göster",
+        "actions.show_statement": "Borç Dökümü",
         "debt_status": "Borç Durumu",
         "is_company": "Tür",
         "mersis_no": "Mersis No",
@@ -91,6 +91,8 @@
       "overdue": "Gecikmiş",
       "receivable": "Alacak",
       "payable": "Borç",
+      "receivableCheck": "Alınan Çek",
+      "payableCheck": "Verilen Çek",
       "paid": "Ödenmiş"
     }
   },
@@ -400,7 +402,9 @@
       "payment_date.validation.invalid": "Geçersiz tarih",
       "payment_method": "Ödeme Yöntemi",
       "payment_method.description": "Ödeme yöntemini seçin",
-      "payment_method.validation.invalid": "Geçersiz ödeme yöntemi"
+      "payment_method.validation.invalid": "Geçersiz ödeme yöntemi",
+      "due_date": "Vade Tarihi",
+      "due_date.description": "Ödemenin vade tarihi (opsiyonel)"
     }
   },
   "header": {
@@ -590,6 +594,7 @@
         "exchange_rate": "Kur",
         "invoice_no": "Fatura No",
         "payment_date": "Ödeme Tarihi",
+        "due_date": "Vade Tarihi",
         "payment_method": "Ödeme Yöntemi"
       }
     }
@@ -630,7 +635,10 @@
       "label": "Sayfa Ayarları",
       "description": "Bu sayfada nelerin görüneceğini kontrol edin",
       "overviewCards": "Özet Kartları",
-      "statisticsChart": "İstatistik Grafiği"
+      "statisticsChart": "İstatistik Grafiği",
+      "generalTab": "Ana Sayfa",
+      "tablesTab": "Tablolar",
+      "contextMenuActions": "Tablo aksiyonlarını sağ tık menüsünde göster"
     },
     "sysAdmin": {
       "actions": "Admin Eylemleri",

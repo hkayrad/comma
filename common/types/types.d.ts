@@ -93,6 +93,7 @@ export type PaymentDto = {
 	description?: string;
 	invoice_no?: string;
 	payment_date: Date;
+	due_date?: Date | null;
 	created_at?: Date;
 	updated_at?: Date;
 };
@@ -164,4 +165,14 @@ export type CreateUserDto = {
 	username: string;
 	password: string;
 	role: UserRole;
+};
+
+export type SortItem = {
+	id: string;
+	desc: boolean;
+};
+
+export type FilterItem = {
+	id: string;
+	value: string | string[] | boolean;
 };

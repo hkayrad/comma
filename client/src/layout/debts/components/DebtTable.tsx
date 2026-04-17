@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type {
@@ -585,6 +586,30 @@ export default function DebtTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onAddPayment(c)}>
+            <Wallet className="mr-2 h-4 w-4" />
+            {t(
+              type === "receivable"
+                ? "dashboard.addButton.actions.receivable.addPayment"
+                : "dashboard.addButton.actions.payable.addPayment",
+            )}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onEdit(c.id!)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("debt.table.column.actions.edit")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("debt.table.column.actions.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }

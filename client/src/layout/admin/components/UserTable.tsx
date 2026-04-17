@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { AdminUserApi } from "@/lib/api/admin";
 import type {
@@ -321,6 +322,26 @@ export default function UserTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onEdit(c)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.edit_details")}
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onResetPassword(c)}>
+            <KeyRound className="mr-2 h-4 w-4" />
+            {t("login.form.password")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("vars.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }

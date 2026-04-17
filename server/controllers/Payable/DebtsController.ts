@@ -19,7 +19,8 @@ router.post("/debts", async (req: Request<{}, {}, DebtDto>, res: Response) => {
 
 		Logger.info("[PayableDebtsController] Create debt result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error creating debt", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error creating debt" });
 	}
@@ -36,7 +37,8 @@ router.get("/debts/totals", async (req: Request<{}, {}, {}, { currency?: string 
 
 		Logger.debug("[PayableDebtsController] Get debt totals result", { companyId, currency, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error fetching debt totals", { companyId, currency, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching debt totals" });
 	}
@@ -56,7 +58,8 @@ router.get("/debts", async (req: Request, res: Response) => {
 
 		Logger.debug("[PayableDebtsController] Get all debts result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error fetching debts", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching debts" });
 	}
@@ -74,7 +77,8 @@ router.put("/debts/:id", async (req: Request<{ id: string }, {}, DebtDto>, res: 
 
 		Logger.info("[PayableDebtsController] Update debt result", { debtId: id, companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error updating debt", { debtId: id, companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error updating debt" });
 	}
@@ -91,7 +95,8 @@ router.delete("/debts/:id", async (req: Request<{ id: string }>, res: Response) 
 
 		Logger.info("[PayableDebtsController] Delete debt result", { debtId: id, companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error deleting debt", { debtId: id, companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error deleting debt" });
 	}
@@ -108,7 +113,8 @@ router.get("/debts/upcoming-due-dates", async (req: Request<{}, {}, {}, { days?:
 
 		Logger.debug("[PayableDebtsController] Get upcoming due dates result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[PayableDebtsController] Error fetching upcoming due dates", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching upcoming due dates" });
 	}

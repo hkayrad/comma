@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, PaymentDto, UUID } from "../../../../common/types";
+import type { ApiResponse, PaymentDto, UUID, UpcomingDueDate } from "../../../../common/types";
 import { Logger } from "../utils/logger";
 import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 
@@ -80,6 +80,24 @@ export class ReceivablePaymentApi {
 			return Promise.reject("Ödeme silinirken hata oluştu");
 		}
 	}
+
+	static async GetUpcomingChecks(daysThreshold: number = 7): Promise<UpcomingDueDate[]> {
+		try {
+			const { data: response } = await instance.get<ApiResponse<UpcomingDueDate[]>>(
+				`/receivables/payments/upcoming-checks?days=${daysThreshold}`,
+			);
+
+			if (response.status === 200) {
+				return Promise.resolve(response.data || []);
+			}
+
+			Logger.error("Error fetching upcoming checks:", response.message);
+			return Promise.resolve([]);
+		} catch (error) {
+			Logger.error("Error fetching upcoming checks:", error);
+			return Promise.resolve([]);
+		}
+	}
 }
 
 export class PayablePaymentApi {
@@ -157,6 +175,24 @@ export class PayablePaymentApi {
 		} catch (error) {
 			Logger.error("Error deleting payment:", error);
 			return Promise.reject("Ödeme silinirken hata oluştu");
+		}
+	}
+
+	static async GetUpcomingChecks(daysThreshold: number = 7): Promise<UpcomingDueDate[]> {
+		try {
+			const { data: response } = await instance.get<ApiResponse<UpcomingDueDate[]>>(
+				`/payables/payments/upcoming-checks?days=${daysThreshold}`,
+			);
+
+			if (response.status === 200) {
+				return Promise.resolve(response.data || []);
+			}
+
+			Logger.error("Error fetching upcoming checks:", response.message);
+			return Promise.resolve([]);
+		} catch (error) {
+			Logger.error("Error fetching upcoming checks:", error);
+			return Promise.resolve([]);
 		}
 	}
 }

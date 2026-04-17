@@ -4,7 +4,7 @@ import { Logger } from "../lib/utils/logger";
 import { ApiResponse } from "../lib/utils/apiResponse";
 import fs from "fs";
 import { CompanyDto, LogoSize, UUID } from "@common/types";
-import { Companies } from "../models";
+import { CompanyRepository } from "../repositories/CompanyRepository";
 import sharp from "sharp";
 
 // Ensure uploads directory exists
@@ -22,7 +22,7 @@ export class CompanyService {
 		try {
 			Logger.debug("[CompanyService] Fetching company details", { companyId });
 
-			const company = await Companies.findByPk(companyId);
+			const company = await CompanyRepository.findById(companyId);
 
 			if (company) {
 				Logger.info("[CompanyService] Company details fetched successfully", { companyId });
@@ -47,7 +47,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error fetching company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch company details");
 		}
@@ -64,33 +65,26 @@ export class CompanyService {
 		try {
 			Logger.debug("[CompanyService] Updating company details", { companyId });
 
-			const [affectedRows] = await Companies.update(
-				{
-					name: details.name,
-					is_company: details.is_company,
-					address: details.address || null,
-					phone: details.phone || null,
-					email: details.email || null,
-					tax_number: details.tax_number || null,
-					tax_office: details.tax_office || null,
-					mersis_no: details.mersis_no || null,
-				},
-				{
-					where: { id: companyId },
-				}
-			);
+			const [affectedRows] = await CompanyRepository.update(companyId, {
+				name: details.name,
+				is_company: details.is_company,
+				address: details.address || null,
+				phone: details.phone || null,
+				email: details.email || null,
+				tax_number: details.tax_number || null,
+				tax_office: details.tax_office || null,
+				mersis_no: details.mersis_no || null,
+			});
 
 			if (affectedRows > 0) {
 				Logger.info("[CompanyService] Company details updated successfully", { companyId });
 				return ApiResponse.success(null, "Company details updated successfully");
 			} else {
 				Logger.warn("[CompanyService] Company not found or no changes made", { companyId });
-				// Even if no changes, we can return success if it exists, but update returns 0 if nothing changed.
-				// Just returning success is usually fine, or check existence first.
-				// Given legacy behavior, if no error thrown, it's mostly success.
 				return ApiResponse.success(null, "Company details updated successfully");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error updating company details", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to update company details");
 		}
@@ -129,10 +123,7 @@ export class CompanyService {
 
 			await transformer.webp({ quality: 80 }).toFile(filePath);
 
-			await Companies.update(
-				{ [`${logoSize}_logo_path`]: fileName },
-				{ where: { id: companyId } }
-			);
+			await CompanyRepository.update(companyId, { [`${logoSize}_logo_path`]: fileName });
 
 			Logger.info("[CompanyService] Logo uploaded successfully", { logoSize, companyId, fileName });
 
@@ -143,7 +134,8 @@ export class CompanyService {
 				},
 				"Logo uploaded successfully",
 			);
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error uploading logo", { logoSize, companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to upload logo");
 		}
@@ -153,9 +145,7 @@ export class CompanyService {
 		Logger.debug("[CompanyService] Fetching logos", { companyId });
 
 		try {
-			const company = await Companies.findByPk(companyId, {
-				attributes: ["small_logo_path", "large_logo_path"],
-			});
+			const company = await CompanyRepository.findByIdWithSpecificFields(companyId, ["small_logo_path", "large_logo_path"]);
 
 			if (company) {
 				Logger.debug("[CompanyService] Logos fetched successfully", { companyId });
@@ -171,7 +161,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error fetching logos", { companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to fetch logos");
 		}
@@ -181,9 +172,7 @@ export class CompanyService {
 		Logger.info("[CompanyService] Deleting logo", { logoSize, companyId });
 
 		try {
-			const company = await Companies.findByPk(companyId, {
-				attributes: [`${logoSize}_logo_path`],
-			});
+			const company = await CompanyRepository.findByIdWithSpecificFields(companyId, [`${logoSize}_logo_path`]);
 
 			if (company) {
 				// @ts-ignore - dynamic access
@@ -198,10 +187,7 @@ export class CompanyService {
 						fs.unlinkSync(fullPath);
 					}
 
-					await Companies.update(
-						{ [`${logoSize}_logo_path`]: null },
-						{ where: { id: companyId } }
-					);
+					await CompanyRepository.update(companyId, { [`${logoSize}_logo_path`]: null });
 
 					Logger.info("[CompanyService] Logo deleted successfully", { logoSize, companyId });
 
@@ -214,7 +200,8 @@ export class CompanyService {
 				Logger.error("[CompanyService] Company not found", { logoSize, companyId });
 				return ApiResponse.error("Company not found");
 			}
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[CompanyService] Error deleting logo", { logoSize, companyId, error: error.message });
 			return ApiResponse.error(error.message || "Failed to delete logo");
 		}

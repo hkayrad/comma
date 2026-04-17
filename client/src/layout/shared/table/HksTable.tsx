@@ -7,6 +7,12 @@ import {
 } from "@/components/ui/table";
 import { useState, type ReactNode } from "react";
 import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
+import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -43,6 +49,7 @@ type Props = {
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   addButton?: ReactNode;
+  contextMenuItems?: (row: any) => ReactNode;
 };
 
 export default function HksTable(props: Props) {
@@ -61,7 +68,10 @@ export default function HksTable(props: Props) {
     columnVisibility: controlledColumnVisibility,
     onColumnVisibilityChange,
     addButton,
+    contextMenuItems,
   } = props;
+
+  const { useContextMenuForActions } = useDashboardSettings();
 
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [internalColumnFilters, setInternalColumnFilters] =
@@ -109,7 +119,7 @@ export default function HksTable(props: Props) {
         isServerSide && controlledColumnFilters
           ? controlledColumnFilters
           : internalColumnFilters,
-      columnVisibility: controlledColumnVisibility ?? internalColumnVisibility,
+      columnVisibility: { ...(controlledColumnVisibility ?? internalColumnVisibility), actions: !useContextMenuForActions },
     },
   });
 
@@ -144,6 +154,7 @@ export default function HksTable(props: Props) {
                           ${header.id === "currency" && "w-16"}
                           ${header.id === "payment_method" && "w-16"}
                           ${header.id === "payment_date" && "w-16"}
+                          ${header.id === "due_date" && "w-16"}
                         `}
                       >
                         {header.isPlaceholder
@@ -160,38 +171,62 @@ export default function HksTable(props: Props) {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="font-light"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={`
-                          py-1 px-1 select-none
-                          ${cell.column.id === "#" && "px-2"}
-                          ${cell.column.id === "is_company" && "w-16 text-center"}
-                          ${cell.column.id === "name" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "desciption" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "tax_office" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "invoice_no" && "w-36 overflow-hidden"}
-                          ${cell.column.id === "debt_status" && "w-fit text-center"}
-                          ${cell.column.id === "actions" && "w-fit"}
-                          ${cell.column.id === "currency" && "w-fit text-center"}
-                          ${cell.column.id === "payment_method" && "w-fit text-center"}
-                          ${cell.column.id === "payment_date" && "w-fit text-center"}
-                        `}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const isSelected = row.getIsSelected();
+
+                  const rowContent = row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={`
+                        py-1 px-1 select-none
+                        ${cell.column.id === "#" && "px-2"}
+                        ${cell.column.id === "is_company" && "w-16 text-center"}
+                        ${cell.column.id === "name" && "w-36 overflow-hidden"}
+                        ${cell.column.id === "desciption" && "w-36 overflow-hidden"}
+                        ${cell.column.id === "tax_office" && "w-36 overflow-hidden"}
+                        ${cell.column.id === "invoice_no" && "w-36 overflow-hidden"}
+                        ${cell.column.id === "debt_status" && "w-fit text-center"}
+                        ${cell.column.id === "actions" && "w-fit"}
+                        ${cell.column.id === "currency" && "w-fit text-center"}
+                        ${cell.column.id === "payment_method" && "w-fit text-center"}
+                        ${cell.column.id === "payment_date" && "w-fit text-center"}
+                        ${cell.column.id === "due_date" && "w-fit text-center"}
+                      `}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ));
+
+                  if (useContextMenuForActions && contextMenuItems) {
+                    const rowClasses = "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted font-light h-[45px]";
+
+                    return (
+                      <ContextMenu key={row.id}>
+                        <ContextMenuTrigger
+                          render={<tr className={rowClasses} data-state={isSelected && "selected"} />}
+                        >
+                          {rowContent}
+                        </ContextMenuTrigger>
+                        <ContextMenuContent className="w-48">
+                          {contextMenuItems(row.original)}
+                        </ContextMenuContent>
+                      </ContextMenu>
+                    );
+                  }
+
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={isSelected && "selected"}
+                      className="font-light"
+                    >
+                      {rowContent}
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell

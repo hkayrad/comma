@@ -18,7 +18,8 @@ router.post("/payments", async (req: Request, res: Response) => {
 
 		Logger.info("[ReceivablePaymentsController] Create payment result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivablePaymentsController] Error creating payment", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error creating payment" });
 	}
@@ -38,7 +39,8 @@ router.get("/payments", async (req: Request, res: Response) => {
 
 		Logger.debug("[ReceivablePaymentsController] Get all payments result", { companyId, success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivablePaymentsController] Error fetching payments", { companyId, error: error.message });
 		return res.status(500).json({ success: false, message: "Error fetching payments" });
 	}
@@ -60,7 +62,8 @@ router.put("/payments/:id", async (req: Request, res: Response) => {
 			success: response.success,
 		});
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivablePaymentsController] Error updating payment", {
 			paymentId: id,
 			companyId,
@@ -85,13 +88,32 @@ router.delete("/payments/:id", async (req: Request, res: Response) => {
 			success: response.success,
 		});
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ReceivablePaymentsController] Error deleting payment", {
 			paymentId,
 			companyId,
 			error: error.message,
 		});
 		return res.status(500).json({ success: false, message: "Error deleting payment" });
+	}
+});
+
+router.get("/payments/upcoming-checks", async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
+	const companyId = req.user.companyId;
+	const daysThreshold = parseInt(req.query.days as string) || 7;
+
+	Logger.debug("[ReceivablePaymentsController] Get upcoming checks request", { companyId, daysThreshold });
+
+	try {
+		const response = await ReceivablePaymentsService.GetUpcomingChecks(companyId, daysThreshold);
+
+		Logger.debug("[ReceivablePaymentsController] Get upcoming checks result", { companyId, success: response.success });
+		return res.json(response);
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
+		Logger.error("[ReceivablePaymentsController] Error fetching upcoming checks", { companyId, error: error.message });
+		return res.status(500).json({ success: false, message: "Error fetching upcoming checks" });
 	}
 });
 

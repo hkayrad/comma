@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import type {
@@ -311,6 +312,21 @@ export default function PaymentTable(props: Props) {
         cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
       },
       {
+        accessorKey: "due_date",
+        header: ({ column }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("payment.table.column.due_date")}
+          />
+        ),
+        cell: ({ row, column }) =>
+          row.getValue(column.id) ? (
+            <FormattedDate row={row} column={column} />
+          ) : (
+            <span className="text-muted-foreground">-</span>
+          ),
+      },
+      {
         accessorKey: "invoice_no",
         header: ({ column }) => (
           <SortableColumnHeader
@@ -356,6 +372,7 @@ export default function PaymentTable(props: Props) {
       },
       {
         id: "actions",
+        enableHiding: false,
         header: t("payment.table.column.actions"),
         cell: ({ row }) => (
           <div className="flex gap-2">
@@ -493,6 +510,22 @@ export default function PaymentTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      contextMenuItems={(c) => (
+        <>
+          <ContextMenuItem onClick={() => onEdit(c.id!)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {t("payment.table.column.actions.edit")}
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            onClick={() => handleDelete(c.id!)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t("payment.table.column.actions.delete")}
+          </ContextMenuItem>
+        </>
+      )}
     />
   );
 }

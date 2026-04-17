@@ -16,7 +16,8 @@ router.post("/", async (req, res) => {
 
 		Logger.info("[CompanyManagementController] Create company result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyManagementController] Error creating company", error);
 		res.status(500).json(ApiResponse.error("Failed to create company"));
 	}
@@ -35,7 +36,8 @@ router.get("/", async (req: Request, res: Response) => {
 
 		Logger.debug("[CompanyManagementController] Get companies result", { success: response.success });
 		return res.json(response);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyManagementController] Error getting companies", error);
 		res.status(500).json(ApiResponse.error("Failed to fetch companies"));
 	}
@@ -61,7 +63,8 @@ router.put("/:id", async (req, res) => {
 
 		Logger.info("[CompanyManagementController] Update company result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyManagementController] Error updating company", error);
 		res.status(500).json(ApiResponse.error("Failed to update company"));
 	}
@@ -75,7 +78,8 @@ router.delete("/:id", async (req, res) => {
 
 		Logger.info("[CompanyManagementController] Delete company result", { result });
 		res.json(result);
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[CompanyManagementController] Error deleting company", error);
 		res.status(500).json(ApiResponse.error("Failed to delete company"));
 	}

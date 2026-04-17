@@ -1,7 +1,7 @@
 import { Logger } from "../lib/utils/logger";
 import dotenv from "dotenv";
 import { ConfigKey, ConfigValue } from "@common/types";
-import { Config } from "../models";
+import { ConfigRepository } from "../repositories/ConfigRepository";
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ export class ConfigService {
 		try {
 			Logger.debug("[ConfigService] Fetching all configs");
 
-			const rows = await Config.findAll();
+			const rows = await ConfigRepository.findAll();
 
 			const configs: { [key: string]: string } = {};
 
@@ -20,7 +20,8 @@ export class ConfigService {
 
 			Logger.debug("[ConfigService] Configs fetched successfully", { count: Object.keys(configs).length });
 			return configs;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error fetching configs", error);
 			return {};
 		}
@@ -30,7 +31,7 @@ export class ConfigService {
 		try {
 			Logger.debug("[ConfigService] Fetching config", { configKey });
 
-			const config = await Config.findByPk(configKey);
+			const config = await ConfigRepository.findByKey(configKey);
 
 			if (!config) {
 				Logger.debug("[ConfigService] Config not found", { configKey });
@@ -39,7 +40,8 @@ export class ConfigService {
 
 			Logger.debug("[ConfigService] Config fetched successfully", { configKey });
 			return config.configValue;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error fetching config", error);
 			return null;
 		}
@@ -49,15 +51,12 @@ export class ConfigService {
 		try {
 			Logger.info("[ConfigService] Setting config", { configKey });
 
-			// upsert handles "INSERT ... ON DUPLICATE KEY UPDATE"
-			await Config.upsert({
-				configKey: configKey,
-				configValue: configValue,
-			});
+			await ConfigRepository.upsert(configKey, configValue);
 
 			Logger.info("[ConfigService] Config set successfully", { configKey });
 			return true;
-		} catch (error: any) {
+		} catch (err: unknown) {
+			const error = err instanceof Error ? err : new Error(String(err));
 			Logger.error("[ConfigService] Error setting config", { configKey, error });
 			return false;
 		}

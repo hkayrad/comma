@@ -26,7 +26,8 @@ router.get("/", async (req: Request, res: Response) => {
 
 		Logger.info("[ConfigController] Returning configs", { count: Object.keys(configs).length });
 		return res.json({ success: true, configs });
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ConfigController] Error fetching configs", { error: error.message });
 		return res.status(500).json({ success: false, message: "Error retrieving configs" });
 	}
@@ -46,7 +47,8 @@ router.get("/:configKey", async (req: Request, res: Response) => {
 
 		Logger.info("[ConfigController] Returning config value", { configKey });
 		return res.json({ success: true, configKey, configValue });
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ConfigController] Error fetching config", { configKey, error: error.message });
 		return res.status(500).json({ success: false, message: "Error retrieving config" });
 	}
@@ -80,7 +82,8 @@ router.post("/", async (req: Request, res: Response) => {
 
 		Logger.info("[ConfigController] Config set successfully", { configKey });
 		return res.json({ success: true, message: "Config set successfully" });
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ConfigController] Error setting config", { configKey, error: error.message });
 		return res.status(500).json({ success: false, message: "Error setting config" });
 	}
@@ -105,7 +108,8 @@ router.post("/start-maintenance", async (req: Request, res: Response) => {
 
 		Logger.info("[ConfigController] Maintenance mode started");
 		return res.json({ success: true, message: "Maintenance mode started successfully" });
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ConfigController] Error starting maintenance mode", { error: error.message });
 		return res.status(500).json({ success: false, message: "Error starting maintenance mode" });
 	}
@@ -130,7 +134,8 @@ router.post("/end-maintenance", async (req: Request, res: Response) => {
 
 		Logger.info("[ConfigController] Maintenance mode ended");
 		return res.json({ success: true, message: "Maintenance mode ended successfully" });
-	} catch (error: any) {
+	} catch (err: unknown) {
+		const error = err instanceof Error ? err : new Error(String(err));
 		Logger.error("[ConfigController] Error ending maintenance mode", { error: error.message });
 		return res.status(500).json({ success: false, message: "Error ending maintenance mode" });
 	}

@@ -1,6 +1,6 @@
 # Rules
 
-- You are strictly prohibited to use any tool to look inside a prohibited file or directory.
+- Remove temporary scripts after finishing the task
 
 # Project Context
 

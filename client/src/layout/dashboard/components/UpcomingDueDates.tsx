@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
+import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
 import type { UpcomingDueDate } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,20 +10,33 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 
-type DueDateWithType = UpcomingDueDate & { type: "receivable" | "payable" };
+type DueDateItemType = "receivable" | "payable" | "receivableCheck" | "payableCheck";
+type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
 
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [dueDates, setDueDates] = useState<DueDateWithType[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
 
+    const getNavigationPath = (type: DueDateItemType): string => {
+        switch (type) {
+            case "receivable": return "/alacaklar";
+            case "payable": return "/borclar";
+            case "receivableCheck": return "/alacaklar/odemeler";
+            case "payableCheck": return "/borclar/odemeler";
+        }
+    };
+
     const fetchUpcomingDueDates = useCallback(async () => {
         setLoading(true);
         try {
-            const [receivables, payables] = await Promise.all([
+            const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
                 ReceivableDebtApi.GetUpcomingDueDates(7),
                 PayableDebtApi.GetUpcomingDueDates(7),
+                ReceivablePaymentApi.GetUpcomingChecks(7),
+                PayablePaymentApi.GetUpcomingChecks(7),
             ]);
 
             const receivablesWithType: DueDateWithType[] = receivables.map((item) => ({
@@ -34,7 +49,17 @@ export default function UpcomingDueDates() {
                 type: "payable" as const,
             }));
 
-            const combined = [...receivablesWithType, ...payablesWithType].sort(
+            const receivableChecksWithType: DueDateWithType[] = receivableChecks.map((item) => ({
+                ...item,
+                type: "receivableCheck" as const,
+            }));
+
+            const payableChecksWithType: DueDateWithType[] = payableChecks.map((item) => ({
+                ...item,
+                type: "payableCheck" as const,
+            }));
+
+            const combined = [...receivablesWithType, ...payablesWithType, ...receivableChecksWithType, ...payableChecksWithType].sort(
                 (a, b) => a.days_remaining - b.days_remaining
             );
 
@@ -119,7 +144,8 @@ export default function UpcomingDueDates() {
                     {displayedDueDates.map((item) => (
                         <div
                             key={`${item.type}-${item.id}`}
-                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                            onClick={() => navigate(getNavigationPath(item.type))}
+                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer group"
                         >
                             <div className="flex items-center gap-2 min-w-0">
                                 {item.days_remaining <= 0 && (
@@ -132,7 +158,7 @@ export default function UpcomingDueDates() {
                                         <span className="mx-1">•</span>
                                         <span
                                             className={
-                                                item.type === "receivable"
+                                                item.type === "receivable" || item.type === "receivableCheck"
                                                     ? "text-green-600 dark:text-green-400"
                                                     : "text-red-600 dark:text-red-400"
                                             }

@@ -122,6 +122,7 @@ export default function PaymentDialog(props: Props) {
       .max(500, t("form.payment.description.validation.max", { max: 500 }))
       .optional()
       .or(z.literal("")),
+    due_date: z.date().optional().nullable(),
   });
 
   const form = useForm<z.infer<typeof PaymentFormSchema>>({
@@ -145,6 +146,7 @@ export default function PaymentDialog(props: Props) {
       payment_method: payment?.payment_method || "bank_transfer",
       invoice_no: payment?.invoice_no || invoiceNo || "",
       description: payment?.description || "",
+      due_date: payment?.due_date ? new Date(payment.due_date) : null,
     },
   });
 
@@ -433,6 +435,22 @@ export default function PaymentDialog(props: Props) {
               </FormControl>
               <FormDescription>
                 {t("form.payment.payment_method.description")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="due_date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>
+                {t("form.payment.due_date")}
+              </FormLabel>
+              <DateSelect field={field} allowFuture allowClear />
+              <FormDescription>
+                {t("form.payment.due_date.description")}
               </FormDescription>
               <FormMessage />
             </FormItem>

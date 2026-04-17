@@ -4,7 +4,7 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
-import { Users } from "../models";
+import { UserRepository } from "../repositories/UserRepository";
 import { Op } from "sequelize";
 
 dotenv.config();
@@ -61,7 +61,8 @@ export class TwoFactorService {
         margin: 2,
         width: 256,
       });
-    } catch (error: any) {
+    } catch (err: unknown) {
+    	const error = err instanceof Error ? err : new Error(String(err));
       Logger.error("[TwoFactorService] Failed to generate QR code", {
         error: error.message,
       });
@@ -184,9 +185,7 @@ export class TwoFactorService {
   static async checkRateLimit(
     userId: string,
   ): Promise<{ locked: boolean; remainingTime?: number }> {
-    const user = await Users.findByPk(userId, {
-      attributes: ["totp_failed_attempts", "totp_lockout_until"],
-    });
+    const user = await UserRepository.findById(userId);
 
     if (!user) {
       return { locked: false };
@@ -208,7 +207,7 @@ export class TwoFactorService {
   static async incrementFailedAttempts(
     userId: string,
   ): Promise<{ locked: boolean; attemptsRemaining: number }> {
-    const user = await Users.findByPk(userId);
+    const user = await UserRepository.findById(userId);
 
     if (!user) {
       throw new Error("User not found");
@@ -218,13 +217,10 @@ export class TwoFactorService {
 
     if (newAttempts >= MAX_FAILED_ATTEMPTS) {
       const lockoutUntil = new Date(Date.now() + LOCKOUT_DURATION_MS);
-      await Users.update(
-        {
-          totp_failed_attempts: newAttempts,
-          totp_lockout_until: lockoutUntil,
-        },
-        { where: { id: userId } },
-      );
+      await UserRepository.update(userId, {
+        totp_failed_attempts: newAttempts,
+        totp_lockout_until: lockoutUntil,
+      });
       Logger.warn(
         "[TwoFactorService] User locked out due to failed 2FA attempts",
         { userId },
@@ -232,10 +228,7 @@ export class TwoFactorService {
       return { locked: true, attemptsRemaining: 0 };
     }
 
-    await Users.update(
-      { totp_failed_attempts: newAttempts },
-      { where: { id: userId } },
-    );
+    await UserRepository.update(userId, { totp_failed_attempts: newAttempts });
 
     return {
       locked: false,
@@ -247,13 +240,10 @@ export class TwoFactorService {
    * Reset failed attempts after successful verification
    */
   static async resetFailedAttempts(userId: string): Promise<void> {
-    await Users.update(
-      {
-        totp_failed_attempts: 0,
-        totp_lockout_until: null,
-      },
-      { where: { id: userId } },
-    );
+    await UserRepository.update(userId, {
+      totp_failed_attempts: 0,
+      totp_lockout_until: null,
+    });
   }
 
   /**
@@ -262,7 +252,7 @@ export class TwoFactorService {
   static async initiateSetup(
     userId: string,
   ): Promise<{ qrCode: string; secret: string }> {
-    const user = await Users.findByPk(userId);
+    const user = await UserRepository.findById(userId);
 
     if (!user) {
       throw new Error("User not found");
@@ -300,16 +290,13 @@ export class TwoFactorService {
     const recoveryCodes = this.generateRecoveryCodes(10);
     const hashedCodes = await this.hashRecoveryCodes(recoveryCodes);
 
-    await Users.update(
-      {
-        totp_secret: encryptedSecret,
-        totp_enabled: true,
-        totp_recovery_codes: JSON.stringify(hashedCodes),
-        totp_failed_attempts: 0,
-        totp_lockout_until: null,
-      },
-      { where: { id: userId } },
-    );
+    await UserRepository.update(userId, {
+      totp_secret: encryptedSecret,
+      totp_enabled: true,
+      totp_recovery_codes: JSON.stringify(hashedCodes),
+      totp_failed_attempts: 0,
+      totp_lockout_until: null,
+    });
 
     Logger.info("[TwoFactorService] 2FA setup completed", { userId });
 
@@ -347,9 +334,7 @@ export class TwoFactorService {
       };
     }
 
-    const user = await Users.findByPk(userId, {
-      attributes: ["totp_secret", "totp_enabled"],
-    });
+    const user = await UserRepository.findById(userId);
 
     if (!user || !user.totp_enabled || !user.totp_secret) {
       return { success: false, message: "2FA not enabled for this user" };
@@ -399,9 +384,7 @@ export class TwoFactorService {
       };
     }
 
-    const user = await Users.findByPk(userId, {
-      attributes: ["totp_recovery_codes"],
-    });
+    const user = await UserRepository.findById(userId);
 
     if (!user || !user.totp_recovery_codes) {
       return { success: false, message: "No recovery codes found" };
@@ -424,14 +407,11 @@ export class TwoFactorService {
     hashedCodes[matchIndex] = "";
     const remainingCodes = hashedCodes.filter((c) => c !== "").length;
 
-    await Users.update(
-      {
-        totp_recovery_codes: JSON.stringify(hashedCodes),
-        totp_failed_attempts: 0,
-        totp_lockout_until: null,
-      },
-      { where: { id: userId } },
-    );
+    await UserRepository.update(userId, {
+      totp_recovery_codes: JSON.stringify(hashedCodes),
+      totp_failed_attempts: 0,
+      totp_lockout_until: null,
+    });
 
     Logger.info("[TwoFactorService] Recovery code used", {
       userId,
@@ -453,7 +433,7 @@ export class TwoFactorService {
     password: string,
   ): Promise<{ success: boolean; message: string }> {
     //, token: string
-    const user = await Users.findByPk(userId);
+    const user = await UserRepository.findById(userId);
 
     if (!user) {
       return { success: false, message: "User not found" };
@@ -471,24 +451,13 @@ export class TwoFactorService {
       return { success: false, message: "Invalid password" };
     }
 
-    // // Verify 2FA code
-    // if (user.totp_secret) {
-    //     const decryptedSecret = this.decryptSecret(user.totp_secret);
-    //     if (!this.verifyToken(decryptedSecret, token)) {
-    //         return { success: false, message: "Invalid 2FA code" };
-    //     }
-    // }
-
-    await Users.update(
-      {
-        totp_secret: null,
-        totp_enabled: false,
-        totp_recovery_codes: null,
-        totp_failed_attempts: 0,
-        totp_lockout_until: null,
-      },
-      { where: { id: userId } },
-    );
+    await UserRepository.update(userId, {
+      totp_secret: null,
+      totp_enabled: false,
+      totp_recovery_codes: null,
+      totp_failed_attempts: 0,
+      totp_lockout_until: null,
+    });
 
     Logger.info("[TwoFactorService] 2FA disabled", { userId });
 
@@ -499,9 +468,7 @@ export class TwoFactorService {
    * Check if 2FA is enabled for a user
    */
   static async isEnabled(userId: string): Promise<boolean> {
-    const user = await Users.findByPk(userId, {
-      attributes: ["totp_enabled"],
-    });
+    const user = await UserRepository.findById(userId);
     return user?.totp_enabled ?? false;
   }
 }

@@ -145,4 +145,8 @@ ALTER TABLE payable_payments ADD CONSTRAINT fk_payable_payments_customer FOREIGN
 -- Refresh Tokens
 ALTER TABLE refresh_tokens ADD CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
+-- Add due_date for check payments
+ALTER TABLE receivable_payments ADD COLUMN due_date DATE DEFAULT NULL;
+ALTER TABLE payable_payments ADD COLUMN due_date DATE DEFAULT NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
