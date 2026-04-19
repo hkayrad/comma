@@ -50,11 +50,37 @@ describe('CompanyService', () => {
     });
   });
 
+  describe('UploadLogo', () => {
+      it('should throw ValidationError if no file', async () => {
+          await expect(CompanyService.UploadLogo('small', null as any, '1')).rejects.toThrow(ValidationError);
+      });
+
+      it('should throw ValidationError if invalid type', async () => {
+          const mockFile = { mimetype: 'text/plain' };
+          await expect(CompanyService.UploadLogo('small', mockFile as any, '1')).rejects.toThrow(ValidationError);
+      });
+
+      it('should process and upload logo', async () => {
+          const mockFile = { mimetype: 'image/png', tempFilePath: '/tmp/test.png' };
+          vi.spyOn(CompanyRepository, 'update').mockResolvedValue([1]);
+
+          const result = await CompanyService.UploadLogo('small', mockFile as any, '1');
+          expect(result.filename).toContain('small-logo-1.webp');
+          expect(CompanyRepository.update).toHaveBeenCalled();
+          expect(sharp).toHaveBeenCalledWith('/tmp/test.png');
+      });
+  });
+
   describe('GetLogos', () => {
     it('should return logo paths', async () => {
       vi.spyOn(CompanyRepository, 'findByIdWithSpecificFields').mockResolvedValue({ small_logo_path: 'small.png' } as any);
       const result = await CompanyService.GetLogos('1');
       expect(result.smallLogo).toBe('/uploads/logos/small.png');
+    });
+
+    it('should throw NotFoundError if company not found', async () => {
+        vi.spyOn(CompanyRepository, 'findByIdWithSpecificFields').mockResolvedValue(null);
+        await expect(CompanyService.GetLogos('1')).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -69,6 +95,11 @@ describe('CompanyService', () => {
       
       expect(fs.unlinkSync).toHaveBeenCalled();
       expect(CompanyRepository.update).toHaveBeenCalledWith('1', { small_logo_path: null });
+    });
+
+    it('should throw NotFoundError if no logo found to delete', async () => {
+        vi.spyOn(CompanyRepository, 'findByIdWithSpecificFields').mockResolvedValue({ small_logo_path: null } as any);
+        await expect(CompanyService.DeleteLogo('small', '1')).rejects.toThrow(NotFoundError);
     });
   });
 });

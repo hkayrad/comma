@@ -48,12 +48,29 @@ describe('CustomerRepository', () => {
     });
 
     it('findById should return customer', async () => {
-      const found = await repo.findByIdWithSummary ? null : null; // dummy to trigger re-read
       const cust = await ReceivableCustomers.findOne({ where: { name: 'Test Rec Cust', company_id: testCompanyId } });
       expect(cust).not.toBeNull();
-      const foundActual = await repo.findById(cust!.id, testCompanyId);
-      expect(foundActual).not.toBeNull();
-      expect(foundActual?.name.trim()).toBe('Test Rec Cust');
+      const found = await repo.findById(cust!.id, testCompanyId);
+      expect(found).not.toBeNull();
+      expect(found?.name.trim()).toBe('Test Rec Cust');
+    });
+
+    it('findAllWithSummary should return customers with summary', async () => {
+        const result = await repo.findAllWithSummary(testCompanyId, 10, 0, [], [{ id: 'name', value: 'Test Rec Cust' }]);
+        expect(result.count).toBeGreaterThan(0);
+        expect(result.rows[0].name.trim()).toBe('Test Rec Cust');
+    });
+
+    it('getStatement should return customer statement', async () => {
+        const cust = await ReceivableCustomers.findOne({ where: { name: 'Test Rec Cust', company_id: testCompanyId } });
+        const result = await repo.getStatement(cust!.id, testCompanyId);
+        expect(result).not.toBeNull();
+        expect(result?.customer.name.trim()).toBe('Test Rec Cust');
+    });
+    
+    it('findAllIdAndName should return names', async () => {
+        const result = await repo.findAllIdAndName(testCompanyId);
+        expect(result.length).toBeGreaterThan(0);
     });
   });
 

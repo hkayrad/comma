@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.27% </span>
+                <span class="strong">61.36% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/44</span>
+                <span class='fraction'>27/44</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/7</span>
+                <span class='fraction'>4/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.27% </span>
+                <span class="strong">61.36% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/44</span>
+                <span class='fraction'>27/44</span>
             </div>
         
             
@@ -157,11 +157,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,7 +175,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,7 +183,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -195,7 +195,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -207,7 +207,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -215,15 +223,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -292,12 +292,12 @@ router.post("/logo/large", asyncHandler(<span class="fstat-no" title="function n
 <span class="cstat-no" title="statement not covered" >	res.json({ success: true, data, message: "Logo uploaded successfully" });</span>
 }));
 &nbsp;
-router.delete("/logo/small", asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-	const companyId = <span class="cstat-no" title="statement not covered" >req.user.companyId;</span>
-<span class="cstat-no" title="statement not covered" >	Logger.info("[CompanyController] Delete small logo request", { companyId });</span>
+router.delete("/logo/small", asyncHandler(async (req: Request, res: Response) =&gt; {
+	const companyId = req.user.companyId;
+	Logger.info("[CompanyController] Delete small logo request", { companyId });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await CompanyService.DeleteLogo("small", companyId);</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, message: "Logo deleted successfully" });</span>
+	await CompanyService.DeleteLogo("small", companyId);
+	res.json({ success: true, message: "Logo deleted successfully" });
 }));
 &nbsp;
 router.delete("/logo/large", asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
@@ -325,7 +325,7 @@ export default router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:33:46.359Z
+                at 2026-04-19T13:54:57.281Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

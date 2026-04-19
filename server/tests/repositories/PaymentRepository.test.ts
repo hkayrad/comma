@@ -21,11 +21,11 @@ describe('PaymentRepository', () => {
     testCompanyId = company.id;
 
     const user = await UserRepository.create({
-      company_id: testCompanyId,
-      username: TEST_USER_NAME,
-      pass_hash: 'hash',
-      role: 1,
-      created_by: '00000000-0000-0000-0000-000000000000'
+        company_id: testCompanyId,
+        username: TEST_USER_NAME,
+        pass_hash: 'hash',
+        role: 1,
+        created_by: '00000000-0000-0000-0000-000000000000'
     });
     testUserId = user.id;
 
@@ -75,9 +75,20 @@ describe('PaymentRepository', () => {
     });
 
     it('findById should return payment', async () => {
-      const pay = await ReceivablePayments.findOne({ where: { invoice_no: 'INV-REC-P1' } });
+      const pay = await ReceivablePayments.findOne({ where: { invoice_no: 'INV-REC-P1', company_id: testCompanyId } });
       const found = await repo.findById(pay!.id, testCompanyId);
       expect(found?.invoice_no).toBe('INV-REC-P1');
+    });
+
+    it('findAllWithPagination should return payments', async () => {
+        const result = await repo.findAllWithPagination(testCompanyId, 10, 0, [], [{ id: 'invoice_no', value: 'INV-REC-P1' }]);
+        expect(result.count).toBeGreaterThan(0);
+        expect(result.rows[0].invoice_no).toBe('INV-REC-P1');
+    });
+
+    it('getUpcomingChecks should return checks', async () => {
+        const result = await repo.getUpcomingChecks(testCompanyId);
+        expect(Array.isArray(result)).toBe(true);
     });
   });
 
@@ -101,7 +112,7 @@ describe('PaymentRepository', () => {
     });
 
     it('findById should return payment', async () => {
-      const pay = await PayablePayments.findOne({ where: { invoice_no: 'INV-PAY-P1' } });
+      const pay = await PayablePayments.findOne({ where: { invoice_no: 'INV-PAY-P1', company_id: testCompanyId } });
       const found = await repo.findById(pay!.id, testCompanyId);
       expect(found?.invoice_no).toBe('INV-PAY-P1');
     });

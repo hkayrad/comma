@@ -1,0 +1,80 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import PayablePaymentsService from '../../../services/Payable/PaymentsService';
+import { PaymentRepository } from '../../../repositories/PaymentRepository';
+import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+
+describe('PayablePaymentsService', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const validCompanyId = 'f47ac10b-58cc-4372-a567-0e02b2c3d470';
+  const validUserId = 'f47ac10b-58cc-4372-a567-0e02b2c3d471';
+
+  describe('Create', () => {
+    it('should throw ValidationError if required fields missing', async () => {
+      await expect(PayablePaymentsService.Create({} as any, validUserId, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
+    it('should create payment and return it', async () => {
+      vi.spyOn(PaymentRepository.prototype, 'create').mockResolvedValue({ id: 'new-id' } as any);
+      const result = await PayablePaymentsService.Create({
+        customer_id: '1', amount: 100, currency: 'TRY', exchange_rate: 1, 
+        payment_date: new Date(), payment_method: 'cash'
+      } as any, validUserId, validCompanyId);
+      expect(result.id).toBe('new-id');
+    });
+  });
+
+  describe('GetAll', () => {
+    it('should return paginated payments', async () => {
+      const mockResult = { rows: [], count: 0 };
+      vi.spyOn(PaymentRepository.prototype, 'findAllWithPagination').mockResolvedValue(mockResult);
+      const result = await PayablePaymentsService.GetAll(validCompanyId, 0, 10);
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('Update', () => {
+    it('should update payment', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'update').mockResolvedValue([1]);
+        await PayablePaymentsService.Update('1', {
+            customer_id: '1', amount: 100, currency: 'TRY', exchange_rate: 1, 
+            payment_date: new Date(), payment_method: 'cash'
+        } as any, validCompanyId);
+        expect(PaymentRepository.prototype.update).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundError if affectedRows is 0 and payment not found', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'update').mockResolvedValue([0]);
+        vi.spyOn(PaymentRepository.prototype, 'findById').mockResolvedValue(null);
+        await expect(PayablePaymentsService.Update('1', {
+            customer_id: '1', amount: 100, currency: 'TRY', exchange_rate: 1, 
+            payment_date: new Date(), payment_method: 'cash'
+        } as any, validCompanyId)).rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe('Delete', () => {
+    it('should delete payment', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'delete').mockResolvedValue(1);
+        await PayablePaymentsService.Delete('1', validUserId, validCompanyId);
+        expect(PaymentRepository.prototype.delete).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundError if nothing deleted', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'delete').mockResolvedValue(0);
+        await expect(PayablePaymentsService.Delete('1', validUserId, validCompanyId))
+            .rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe('GetUpcomingChecks', () => {
+      it('should return upcoming checks', async () => {
+          vi.spyOn(PaymentRepository.prototype, 'getUpcomingChecks').mockResolvedValue([]);
+          const result = await PayablePaymentsService.GetUpcomingChecks(validCompanyId);
+          expect(result).toEqual([]);
+      });
+  });
+});
