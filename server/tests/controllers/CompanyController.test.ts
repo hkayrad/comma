@@ -37,6 +37,40 @@ describe('CompanyController', () => {
     expect(response.body.success).toBe(true);
   });
 
+  it('PUT /companies should return 400 for empty body', async () => {
+      const response = await request(app)
+        .put('/companies')
+        .set('Cookie', [`access_token=${token}`])
+        .send({});
+      expect(response.status).toBe(400);
+  });
+
+  it('POST /companies/logo/small should return 400 if no file', async () => {
+    const response = await request(app)
+      .post('/companies/logo/small')
+      .set('Cookie', [`access_token=${token}`]);
+    expect(response.status).toBe(400);
+  });
+
+  it('POST /companies/logo/large should upload logo', async () => {
+    vi.spyOn(CompanyService, 'UploadLogo').mockResolvedValue({ filename: 'large.webp' } as any);
+    
+    const response = await request(app)
+      .post('/companies/logo/large')
+      .set('Cookie', [`access_token=${token}`])
+      .attach('logo', Buffer.from('test'), 'test.png');
+    
+    expect(response.status).toBe(200);
+    expect(response.body.data.filename).toBe('large.webp');
+  });
+
+  it('POST /companies/logo/large should return 400 if no file', async () => {
+    const response = await request(app)
+      .post('/companies/logo/large')
+      .set('Cookie', [`access_token=${token}`]);
+    expect(response.status).toBe(400);
+  });
+
   it('GET /companies/logos should return logo data', async () => {
     const mockLogos = { small: 'small.png', large: 'large.png' };
     vi.spyOn(CompanyService, 'GetLogos').mockResolvedValue(mockLogos as any);
@@ -59,4 +93,14 @@ describe('CompanyController', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
   });
+
+  it('DELETE /companies/logo/large should delete large logo', async () => {
+    vi.spyOn(CompanyService, 'DeleteLogo').mockResolvedValue(undefined);
+    const response = await request(app)
+      .delete('/companies/logo/large')
+      .set('Cookie', [`access_token=${token}`]);
+    
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+});
 });

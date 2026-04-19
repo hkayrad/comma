@@ -10,7 +10,7 @@ const sequelize = new Sequelize({
 	password: process.env.DB_PASSWORD,
 	database: process.env.DB_NAME,
 	dialectOptions: {
-		connectTimeout: 10000,
+		connectTimeout: 30000,
 	},
 	pool: {
 		max: 5,

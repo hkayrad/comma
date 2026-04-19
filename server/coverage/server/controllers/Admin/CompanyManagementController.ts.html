@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60.86% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/23</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60.86% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/23</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -135,21 +135,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -179,22 +179,22 @@ router.get("/", validate(paginationSchema, "query"), asyncHandler(async (req: Re
 	res.json({ success: true, data });
 }));
 &nbsp;
-router.get("/:id", asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-<span class="cstat-no" title="statement not covered" >	Logger.info("[CompanyManagementController] Get company by id");</span>
-	const data = <span class="cstat-no" title="statement not covered" >await CompanyManagementService.GetById(req.params.id);</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, data });</span>
+router.get("/:id", asyncHandler(async (req: Request, res: Response) =&gt; {
+	Logger.info("[CompanyManagementController] Get company by id");
+	const data = await CompanyManagementService.GetById(req.params.id);
+	res.json({ success: true, data });
 }));
 &nbsp;
-router.put("/:id", validate(companySchema), asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-<span class="cstat-no" title="statement not covered" >	Logger.info("[CompanyManagementController] Update company");</span>
-	const data = <span class="cstat-no" title="statement not covered" >await CompanyManagementService.Update(req.params.id, req.body);</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, data, message: "Company updated successfully" });</span>
+router.put("/:id", validate(companySchema), asyncHandler(async (req: Request, res: Response) =&gt; {
+	Logger.info("[CompanyManagementController] Update company");
+	const data = await CompanyManagementService.Update(req.params.id, req.body);
+	res.json({ success: true, data, message: "Company updated successfully" });
 }));
 &nbsp;
-router.delete("/:id", asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-<span class="cstat-no" title="statement not covered" >	Logger.info("[CompanyManagementController] Delete company");</span>
-<span class="cstat-no" title="statement not covered" >	await CompanyManagementService.Delete(req.params.id);</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, message: "Company deleted successfully" });</span>
+router.delete("/:id", asyncHandler(async (req: Request, res: Response) =&gt; {
+	Logger.info("[CompanyManagementController] Delete company");
+	await CompanyManagementService.Delete(req.params.id);
+	res.json({ success: true, message: "Company deleted successfully" });
 }));
 &nbsp;
 export default router;
@@ -205,7 +205,7 @@ export default router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:56:02.947Z
+                at 2026-04-19T14:43:01.653Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

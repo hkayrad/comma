@@ -74,11 +74,12 @@ export class TwoFactorService {
    * Encrypt a TOTP secret using AES-256-GCM
    */
   static encryptSecret(secret: string): string {
-    if (!ENCRYPTION_KEY) {
+    const encryptionKey = process.env.TOTP_ENCRYPTION_KEY;
+    if (!encryptionKey) {
       throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }
 
-    const key = Buffer.from(ENCRYPTION_KEY, "hex");
+    const key = Buffer.from(encryptionKey, "hex");
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
 
@@ -95,7 +96,8 @@ export class TwoFactorService {
    * Decrypt a TOTP secret
    */
   static decryptSecret(encryptedSecret: string): string {
-    if (!ENCRYPTION_KEY) {
+    const encryptionKey = process.env.TOTP_ENCRYPTION_KEY;
+    if (!encryptionKey) {
       throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }
 
@@ -105,7 +107,7 @@ export class TwoFactorService {
     }
 
     const [ivHex, authTagHex, encrypted] = parts;
-    const key = Buffer.from(ENCRYPTION_KEY, "hex");
+    const key = Buffer.from(encryptionKey, "hex");
     const iv = Buffer.from(ivHex, "hex");
     const authTag = Buffer.from(authTagHex, "hex");
 

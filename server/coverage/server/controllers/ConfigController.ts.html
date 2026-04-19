@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.36% </span>
+                <span class="strong">95.74% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>42/47</span>
+                <span class='fraction'>45/47</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>15/20</span>
+                <span class='fraction'>18/20</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.33% </span>
+                <span class="strong">95.55% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>42/45</span>
+                <span class='fraction'>43/45</span>
             </div>
         
             
@@ -198,34 +198,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -290,8 +290,8 @@ router.post("/", validate(configSchema), asyncHandler(async (req: Request, res: 
 	const { configKey, configValue } = body;
 	const user = req.user;
 &nbsp;
-	<span class="missing-if-branch" title="if path not taken" >I</span>if (!user || user.role !== 99) {
-<span class="cstat-no" title="statement not covered" >		throw new ForbiddenError("Unauthorized");</span>
+	if (!user || user.role !== 99) {
+		throw new ForbiddenError("Unauthorized");
 	}
 &nbsp;
 	await ConfigService.SetConfig(configKey, configValue);
@@ -301,7 +301,7 @@ router.post("/", validate(configSchema), asyncHandler(async (req: Request, res: 
 &nbsp;
 router.post("/start-maintenance", asyncHandler(async (req: Request, res: Response) =&gt; {
 	const user = req.user;
-	<span class="missing-if-branch" title="if path not taken" >I</span>if (!user || user.role !== 99) <span class="cstat-no" title="statement not covered" >throw new ForbiddenError("Unauthorized");</span>
+	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
 &nbsp;
 	Logger.debug("[ConfigController] Start maintenance request");
 	await ConfigService.StartMaintenanceMode();
@@ -311,7 +311,7 @@ router.post("/start-maintenance", asyncHandler(async (req: Request, res: Respons
 &nbsp;
 router.post("/end-maintenance", asyncHandler(async (req: Request, res: Response) =&gt; {
 	const user = req.user;
-	<span class="missing-if-branch" title="if path not taken" >I</span>if (!user || user.role !== 99) <span class="cstat-no" title="statement not covered" >throw new ForbiddenError("Unauthorized");</span>
+	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
 &nbsp;
 	Logger.debug("[ConfigController] End maintenance request");
 	await ConfigService.EndMaintenanceMode();
@@ -328,7 +328,7 @@ export default router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:56:02.947Z
+                at 2026-04-19T14:43:01.653Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

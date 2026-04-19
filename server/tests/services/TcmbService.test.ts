@@ -40,6 +40,15 @@ describe('TcmbService', () => {
     expect(rates?.date).toBe('19-04-2026');
     expect(rates?.usd.forexBuying).toBe('32.1234');
     expect(rates?.eur.forexBuying).toBe('34.1234');
+    expect(rates?.unixtime).toBe('1234567890');
+  });
+
+  it('should return null if PROXY_URL missing', async () => {
+      const old = process.env.PROXY_URL;
+      delete process.env.PROXY_URL;
+      const rates = await TcmbService.GetExchangeRates();
+      expect(rates).toBeNull();
+      process.env.PROXY_URL = old;
   });
 
   it('should return null if API returns non-ok response', async () => {
@@ -53,13 +62,42 @@ describe('TcmbService', () => {
     expect(rates).toBeNull();
   });
 
-  it('should return null if response is empty', async () => {
+  it('should return null if items array is missing or empty', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ items: [] })
+      json: async () => ({ totalCount: 0, items: [] })
     });
 
     const rates = await TcmbService.GetExchangeRates();
     expect(rates).toBeNull();
+
+    global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ totalCount: 0 })
+    });
+    expect(await TcmbService.GetExchangeRates()).toBeNull();
+  });
+
+  it('should return null if required currency data missing', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ items: [{ Tarih: 'X' }] })
+    });
+    expect(await TcmbService.GetExchangeRates()).toBeNull();
+  });
+
+  it('should return 0 for unixtime if missing', async () => {
+      global.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({ items: [{ Tarih: 'X', TP_DK_USD_A_YTL: '1', TP_DK_USD_S_YTL: '1', TP_DK_EUR_A_YTL: '1', TP_DK_EUR_S_YTL: '1' }] })
+      });
+      const rates = await TcmbService.GetExchangeRates();
+      expect(rates?.unixtime).toBe('0');
+  });
+
+  it('should return null if fetch throws', async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+      const rates = await TcmbService.GetExchangeRates();
+      expect(rates).toBeNull();
   });
 });

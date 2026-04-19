@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.69% </span>
+                <span class="strong">76.92% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/52</span>
+                <span class='fraction'>40/52</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.28% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/14</span>
+                <span class='fraction'>8/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/6</span>
+                <span class='fraction'>2/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.69% </span>
+                <span class="strong">76.92% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>30/52</span>
+                <span class='fraction'>40/52</span>
             </div>
         
             
@@ -323,26 +323,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
@@ -492,27 +492,27 @@ app.get("/health", (req, res) =&gt; {
 	res.status(200).json({ status: "ok" });
 });
 &nbsp;
-app.get(<span class="fstat-no" title="function not covered" >"/logo-proxy/:filename", (r</span>eq, res) =&gt; {
-	const filename = <span class="cstat-no" title="statement not covered" >req.params.filename;</span>
+app.get("/logo-proxy/:filename", (req, res) =&gt; {
+	const filename = req.params.filename;
 	// Security check: prevent directory traversal
-<span class="cstat-no" title="statement not covered" >	if (filename.includes("..") || filename.includes("/")) {</span>
-<span class="cstat-no" title="statement not covered" >		res.status(400).send("Invalid filename");</span>
-<span class="cstat-no" title="statement not covered" >		return;</span>
+	if (filename.includes("..") || filename.includes("/")) {
+		res.status(400).send("Invalid filename");
+		return;
 	}
 &nbsp;
-	const filePath = <span class="cstat-no" title="statement not covered" >path.join(process.cwd(), "uploads", "logos", filename);</span>
+	const filePath = path.join(process.cwd(), "uploads", "logos", filename);
 &nbsp;
 	// Check if file exists
-<span class="cstat-no" title="statement not covered" >	if (!fs.existsSync(filePath)) {</span>
-<span class="cstat-no" title="statement not covered" >		res.status(404).send("File not found");</span>
-<span class="cstat-no" title="statement not covered" >		return;</span>
+	if (!fs.existsSync(filePath)) {
+		res.status(404).send("File not found");
+		return;
 	}
 &nbsp;
 	// Set CORS headers explicitly
-<span class="cstat-no" title="statement not covered" >	res.setHeader("Access-Control-Allow-Origin", "*");</span>
+	res.setHeader("Access-Control-Allow-Origin", "*");
 &nbsp;
 	// Send file
-<span class="cstat-no" title="statement not covered" >	res.sendFile(filePath);</span>
+	res.sendFile(filePath);
 });
 &nbsp;
 app.use(AuthController);
@@ -580,7 +580,7 @@ export { app };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:56:02.947Z
+                at 2026-04-19T14:43:01.653Z
             </div>
         <script src="../prettify.js"></script>
         <script>

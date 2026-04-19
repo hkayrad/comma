@@ -9,7 +9,7 @@ describe('UserManagementController', () => {
     vi.restoreAllMocks();
   });
 
-const validCompanyId = '00000000-0000-0000-0000-000000000000';
+  const validCompanyId = '00000000-0000-0000-0000-000000000000';
   const adminToken = jwt.sign({ id: 'admin-id', role: 99, companyId: validCompanyId }, process.env.JWT_SECRET as string);
 
   describe('POST /admin/users', () => {
@@ -48,6 +48,30 @@ const validCompanyId = '00000000-0000-0000-0000-000000000000';
           
           expect(response.status).toBe(200);
           expect(response.body.data).toEqual(mockUser);
+      });
+  });
+
+  describe('PUT /admin/users/:id', () => {
+      it('should update user', async () => {
+          const mockUser = { id: '1', username: 'updated' };
+          vi.spyOn(UserManagementService, 'Update').mockResolvedValue(mockUser as any);
+          const response = await request(app)
+              .put('/admin/users/1')
+              .set('Cookie', [`access_token=${adminToken}`])
+              .send({ username: 'updated' });
+          expect(response.status).toBe(200);
+          expect(response.body.data).toEqual(mockUser);
+      });
+  });
+
+  describe('DELETE /admin/users/:id', () => {
+      it('should delete user', async () => {
+          vi.spyOn(UserManagementService, 'Delete').mockResolvedValue(undefined);
+          const response = await request(app)
+              .delete('/admin/users/1')
+              .set('Cookie', [`access_token=${adminToken}`]);
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
       });
   });
 
