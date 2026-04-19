@@ -134,32 +134,37 @@ app.use("/stats", StatsController);
 // Global error handler — must be registered AFTER all routes
 app.use(errorHandler);
 
-const listenPort =
-	process.env.SERVER_PORT ||
-	(() => {
-		throw new Error("SERVER_PORT not defined");
-	})();
+export { app };
 
-server.listen(listenPort, async () => {
-	Logger.info(`Server has been started`);
+if (process.env.NODE_ENV !== "test") {
+	const listenPort =
+		process.env.SERVER_PORT ||
+		(() => {
+			throw new Error("SERVER_PORT not defined");
+		})();
 
-	try {
-		await sequelize.authenticate();
-		Logger.info("Database connection established successfully.");
-	} catch (error) {
-		Logger.error("Unable to connect to the database:", error);
-	}
+	server.listen(listenPort, async () => {
+		Logger.info(`Server has been started`);
 
-	Logger.table({
-		"Server Port": listenPort,
-		"Client URL": process.env.CLIENT_URL,
-		"Database Host": process.env.DB_URL,
-		"Database User": process.env.DB_USER,
-		"Database Name": process.env.DB_NAME,
-		"JWT Issuer": process.env.JWT_ISSUER,
-		"JWT Audience": process.env.JWT_AUDIENCE,
-		"Refresh Token Expires In": `${process.env.JWT_EXPIRES_IN} (days)`,
-		"Proxy URL": process.env.PROXY_URL,
-		"Node Environment": process.env.NODE_ENV,
+		try {
+			await sequelize.authenticate();
+			Logger.info("Database connection established successfully.");
+		} catch (error) {
+			Logger.error("Unable to connect to the database:", error);
+		}
+
+		Logger.table({
+			"Server Port": listenPort,
+			"Client URL": process.env.CLIENT_URL,
+			"Database Host": process.env.DB_URL,
+			"Database User": process.env.DB_USER,
+			"Database Name": process.env.DB_NAME,
+			"JWT Issuer": process.env.JWT_ISSUER,
+			"JWT Audience": process.env.JWT_AUDIENCE,
+			"Refresh Token Expires In": `${process.env.JWT_EXPIRES_IN} (days)`,
+			"Proxy URL": process.env.PROXY_URL,
+			"Node Environment": process.env.NODE_ENV,
+		});
 	});
-});
+}
+
