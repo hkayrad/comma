@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { Logger } from "./utils/logger";
 import jwt from "jsonwebtoken";
-import { ApiResponse } from "./utils/apiResponse";
 
 dotenv.config();
 
@@ -17,18 +16,18 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
 		if (!accessToken) {
 			Logger.warn("[AuthMiddleware] Access token missing");
-			return res.status(401).json(ApiResponse.error("Unauthorized"));
+			return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 		}
 
 		jwt.verify(accessToken, process.env.JWT_SECRET as jwt.Secret, (err: any, user: any) => {
-			if (err) return res.status(401).json(ApiResponse.error("Unauthorized"));
+			if (err) return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 
 			req.user = user;
 			next();
 		});
 	} catch (error) {
 		Logger.error("[AuthMiddleware] Error verifying token", { error });
-		return res.status(401).json(ApiResponse.error("Unauthorized"));
+		return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 	}
 }
 
@@ -40,7 +39,7 @@ export function adminMiddleware(req: Request, res: Response, next: NextFunction)
 
 		if (role !== 99) {
 			Logger.warn("[AdminMiddleware] User is not an admin");
-			return res.status(403).json(ApiResponse.error("Forbidden"));
+			return res.status(403).json({ success: false, data: null, message: "Forbidden" });
 		}
 
 		next();

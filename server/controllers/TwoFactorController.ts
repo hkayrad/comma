@@ -1,9 +1,10 @@
 import express from "express";
 import { TwoFactorService } from "../services/TwoFactorService";
 import { Logger } from "../lib/utils/logger";
-import { ApiResponse } from "../lib/utils/apiResponse";
 import { authMiddleware } from "../lib/middleware";
-import { authRateLimiter } from "../lib/middleware/rateLimiter";
+import { authRateLimiter } from "../lib/utils/middleware/rateLimiter";
+import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
+import { UnauthorizedError, ValidationError } from "../lib/errors/AppError";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
@@ -20,7 +21,7 @@ const verify2FATempToken = (
   const tempToken = req.body.tempToken || req.headers["x-2fa-temp-token"];
 
   if (!tempToken) {
-    return res.status(401).json(ApiResponse.error("2FA temp token required"));
+    throw new UnauthorizedError("2FA temp token required");
   }
 
   try {
@@ -30,15 +31,14 @@ const verify2FATempToken = (
     };
 
     if (decoded.purpose !== "2fa_verification") {
-      return res.status(401).json(ApiResponse.error("Invalid token purpose"));
+      throw new UnauthorizedError("Invalid token purpose");
     }
 
     req.user = { id: decoded.id } as any;
     next();
   } catch (error) {
-    return res
-      .status(401)
-      .json(ApiResponse.error("Invalid or expired 2FA token"));
+    if (error instanceof UnauthorizedError) throw error;
+    throw new UnauthorizedError("Invalid or expired 2FA token");
   }
 };
 
@@ -46,323 +46,200 @@ const verify2FATempToken = (
  * GET /2fa/status
  * Check if 2FA is enabled for the current user
  */
-router.get("/status", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user?.id;
+router.get("/status", authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) throw new UnauthorizedError("Unauthorized");
 
-    if (!userId) {
-      return res.status(401).json(ApiResponse.error("Unauthorized"));
-    }
-
-    const enabled = await TwoFactorService.isEnabled(userId);
-    return res.json({ enabled });
-  } catch (err: unknown) {
-  	const error = err instanceof Error ? err : new Error(String(err));
-    Logger.error("[TwoFactorController] Error checking 2FA status", {
-      error: error.message,
-    });
-    return res
-      .status(500)
-      .json(ApiResponse.error("Failed to check 2FA status"));
-  }
-});
+  const enabled = await TwoFactorService.isEnabled(userId);
+  res.json({ enabled });
+}));
 
 /**
  * POST /2fa/setup
  * Initiate 2FA setup - returns QR code and temporary secret
  */
-router.post("/setup", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user?.id;
+router.post("/setup", authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) throw new UnauthorizedError("Unauthorized");
 
-    if (!userId) {
-      return res.status(401).json(ApiResponse.error("Unauthorized"));
-    }
+  const isEnabled = await TwoFactorService.isEnabled(userId);
+  if (isEnabled) throw new ValidationError("2FA is already enabled");
 
-    // Check if 2FA is already enabled
-    const isEnabled = await TwoFactorService.isEnabled(userId);
-    if (isEnabled) {
-      return res.status(400).json(ApiResponse.error("2FA is already enabled"));
-    }
+  const { qrCode, secret } = await TwoFactorService.initiateSetup(userId);
 
-    const { qrCode, secret } = await TwoFactorService.initiateSetup(userId);
+  const setupToken = jwt.sign(
+    { userId, secret, purpose: "2fa_setup" },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "10m" },
+  );
 
-    // Return QR code and secret (secret is needed for verification step)
-    // Secret is sent encrypted via a short-lived token
-    const setupToken = jwt.sign(
-      { userId, secret, purpose: "2fa_setup" },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "10m" },
-    );
-
-    return res.json({
-      qrCode,
-      secret,
-      setupToken,
-    });
-  } catch (err: unknown) {
-  	const error = err instanceof Error ? err : new Error(String(err));
-    Logger.error("[TwoFactorController] Error initiating 2FA setup", {
-      error: error.message,
-    });
-    return res
-      .status(500)
-      .json(ApiResponse.error("Failed to initiate 2FA setup"));
-  }
-});
+  res.json({ qrCode, secret, setupToken });
+}));
 
 /**
  * POST /2fa/verify-setup
  * Verify initial code and complete 2FA setup
  */
-router.post("/verify-setup", authMiddleware, async (req, res) => {
+router.post("/verify-setup", authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  const { setupToken, code } = req.body;
+
+  if (!userId) throw new UnauthorizedError("Unauthorized");
+  if (!setupToken || !code) throw new ValidationError("Setup token and verification code are required");
+
+  // Verify and decode the setup token
+  let decoded: { userId: string; secret: string; purpose: string };
   try {
-    const userId = req.user?.id;
-    const { setupToken, code } = req.body;
-
-    if (!userId) {
-      return res.status(401).json(ApiResponse.error("Unauthorized"));
-    }
-
-    if (!setupToken || !code) {
-      return res
-        .status(400)
-        .json(
-          ApiResponse.error("Setup token and verification code are required"),
-        );
-    }
-
-    // Verify and decode the setup token
-    let decoded: { userId: string; secret: string; purpose: string };
-    try {
-      decoded = jwt.verify(setupToken, process.env.JWT_SECRET as string) as any;
-    } catch {
-      return res
-        .status(400)
-        .json(ApiResponse.error("Setup session expired. Please start again."));
-    }
-
-    if (decoded.purpose !== "2fa_setup" || decoded.userId !== userId) {
-      return res.status(400).json(ApiResponse.error("Invalid setup token"));
-    }
-
-    const result = await TwoFactorService.completeSetup(
-      userId,
-      decoded.secret,
-      code,
-    );
-
-    if (!result.success) {
-      return res.status(400).json(ApiResponse.error(result.message));
-    }
-
-    Logger.info("[TwoFactorController] 2FA setup completed", { userId });
-
-    return res.json({
-      success: true,
-      recoveryCodes: result.recoveryCodes,
-      message: result.message,
-    });
-  } catch (err: unknown) {
-  	const error = err instanceof Error ? err : new Error(String(err));
-    Logger.error("[TwoFactorController] Error completing 2FA setup", {
-      error: error.message,
-    });
-    return res
-      .status(500)
-      .json(ApiResponse.error("Failed to complete 2FA setup"));
+    decoded = jwt.verify(setupToken, process.env.JWT_SECRET as string) as typeof decoded;
+  } catch {
+    throw new ValidationError("Setup session expired. Please start again.");
   }
-});
+
+  if (decoded.purpose !== "2fa_setup" || decoded.userId !== userId) {
+    throw new ValidationError("Invalid setup token");
+  }
+
+  const result = await TwoFactorService.completeSetup(userId, decoded.secret, code);
+
+  if (!result.success) {
+    throw new ValidationError(result.message);
+  }
+
+  Logger.info("[TwoFactorController] 2FA setup completed", { userId });
+
+  res.json({
+    success: true,
+    recoveryCodes: result.recoveryCodes,
+    message: result.message,
+  });
+}));
 
 /**
  * POST /2fa/verify
  * Verify 2FA code during login (uses temp token from partial auth)
  */
-router.post(
-  "/verify",
-  authRateLimiter,
-  verify2FATempToken,
-  async (req, res) => {
-    try {
-      const userId = req.user?.id;
-      const { code } = req.body;
+router.post("/verify", authRateLimiter, verify2FATempToken, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  const { code } = req.body;
 
-      if (!userId) {
-        return res.status(401).json(ApiResponse.error("Unauthorized"));
-      }
+  if (!userId) throw new UnauthorizedError("Unauthorized");
+  if (!code) throw new ValidationError("Verification code is required");
 
-      if (!code) {
-        return res
-          .status(400)
-          .json(ApiResponse.error("Verification code is required"));
-      }
+  const result = await TwoFactorService.verifyLogin(userId, code);
 
-      const result = await TwoFactorService.verifyLogin(userId, code);
+  if (!result.success) {
+    return res.status(401).json({
+      success: false,
+      locked: result.locked,
+      attemptsRemaining: result.attemptsRemaining,
+      remainingTime: result.remainingTime,
+      message: result.message,
+    });
+  }
 
-      if (!result.success) {
-        return res.status(401).json({
-          success: false,
-          locked: result.locked,
-          attemptsRemaining: result.attemptsRemaining,
-          remainingTime: result.remainingTime,
-          message: result.message,
-        });
-      }
+  // 2FA verified - issue full tokens
+  const { AuthService } = await import("../services/AuthService");
+  const loginResult = await AuthService.Complete2FALogin(userId);
 
-      // 2FA verified - issue full tokens
-      // Import the token generation logic from AuthService
-      const { AuthService } = await import("../services/AuthService");
-      const loginResult = await AuthService.Complete2FALogin(userId);
+  if (!loginResult.success) {
+    throw new UnauthorizedError("Failed to complete login");
+  }
 
-      if (!loginResult.success) {
-        return res
-          .status(500)
-          .json(ApiResponse.error("Failed to complete login"));
-      }
+  res.cookie("access_token", loginResult.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000,
+  });
+  res.cookie("refresh_token", loginResult.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
+    path: "/",
+  });
 
-      res.cookie("access_token", loginResult.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
-      res.cookie("refresh_token", loginResult.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge:
-          parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
-        path: "/",
-      });
-
-      return res.json({
-        success: true,
-        username: loginResult.user?.username,
-        role: loginResult.user?.role,
-      });
-    } catch (err: unknown) {
-    	const error = err instanceof Error ? err : new Error(String(err));
-      Logger.error("[TwoFactorController] Error verifying 2FA", {
-        error: error.message,
-      });
-      return res.status(500).json(ApiResponse.error("Failed to verify 2FA"));
-    }
-  },
-);
+  res.json({
+    success: true,
+    username: loginResult.user?.username,
+    role: loginResult.user?.role,
+  });
+}));
 
 /**
  * POST /2fa/recovery
  * Use a recovery code to bypass 2FA
  */
-router.post(
-  "/recovery",
-  authRateLimiter,
-  verify2FATempToken,
-  async (req, res) => {
-    try {
-      const userId = req.user?.id;
-      const { code } = req.body;
+router.post("/recovery", authRateLimiter, verify2FATempToken, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  const { code } = req.body;
 
-      if (!userId) {
-        return res.status(401).json(ApiResponse.error("Unauthorized"));
-      }
+  if (!userId) throw new UnauthorizedError("Unauthorized");
+  if (!code) throw new ValidationError("Recovery code is required");
 
-      if (!code) {
-        return res
-          .status(400)
-          .json(ApiResponse.error("Recovery code is required"));
-      }
+  const result = await TwoFactorService.useRecoveryCode(userId, code);
 
-      const result = await TwoFactorService.useRecoveryCode(userId, code);
+  if (!result.success) {
+    return res.status(401).json({
+      success: false,
+      message: result.message,
+    });
+  }
 
-      if (!result.success) {
-        return res.status(401).json({
-          success: false,
-          message: result.message,
-        });
-      }
+  // Recovery code verified - issue full tokens
+  const { AuthService } = await import("../services/AuthService");
+  const loginResult = await AuthService.Complete2FALogin(userId);
 
-      // Recovery code verified - issue full tokens
-      const { AuthService } = await import("../services/AuthService");
-      const loginResult = await AuthService.Complete2FALogin(userId);
+  if (!loginResult.success) {
+    throw new UnauthorizedError("Failed to complete login");
+  }
 
-      if (!loginResult.success) {
-        return res
-          .status(500)
-          .json(ApiResponse.error("Failed to complete login"));
-      }
+  res.cookie("access_token", loginResult.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 15 * 60 * 1000,
+  });
+  res.cookie("refresh_token", loginResult.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
+    path: "/",
+  });
 
-      res.cookie("access_token", loginResult.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000,
-      });
-      res.cookie("refresh_token", loginResult.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge:
-          parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
-        path: "/",
-      });
-
-      return res.json({
-        success: true,
-        remainingCodes: result.remainingCodes,
-        username: loginResult.user?.username,
-        role: loginResult.user?.role,
-      });
-    } catch (err: unknown) {
-    	const error = err instanceof Error ? err : new Error(String(err));
-      Logger.error("[TwoFactorController] Error using recovery code", {
-        error: error.message,
-      });
-      return res
-        .status(500)
-        .json(ApiResponse.error("Failed to use recovery code"));
-    }
-  },
-);
+  res.json({
+    success: true,
+    remainingCodes: result.remainingCodes,
+    username: loginResult.user?.username,
+    role: loginResult.user?.role,
+  });
+}));
 
 /**
  * POST /2fa/disable
  * Disable 2FA for the current user
  */
-router.post("/disable", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user?.id;
-    const { password, code } = req.body;
+router.post("/disable", authMiddleware, asyncHandler(async (req, res) => {
+  const userId = req.user?.id;
+  const { password } = req.body;
 
-    if (!userId) {
-      return res.status(401).json(ApiResponse.error("Unauthorized"));
-    }
+  if (!userId) throw new UnauthorizedError("Unauthorized");
+  if (!password) throw new ValidationError("Password is required to disable 2FA");
 
-    if (!password) {
-      return res
-        .status(400)
-        .json(ApiResponse.error("Password is required to disable 2FA"));
-    }
+  const result = await TwoFactorService.disable(userId, password);
 
-    const result = await TwoFactorService.disable(userId, password);
-
-    if (!result.success) {
-      return res.status(400).json(ApiResponse.error(result.message));
-    }
-
-    Logger.info("[TwoFactorController] 2FA disabled", { userId });
-
-    return res.json({
-      success: true,
-      message: result.message,
-    });
-  } catch (err: unknown) {
-  	const error = err instanceof Error ? err : new Error(String(err));
-    Logger.error("[TwoFactorController] Error disabling 2FA", {
-      error: error.message,
-    });
-    return res.status(500).json(ApiResponse.error("Failed to disable 2FA"));
+  if (!result.success) {
+    throw new ValidationError(result.message);
   }
-});
+
+  Logger.info("[TwoFactorController] 2FA disabled", { userId });
+
+  res.json({
+    success: true,
+    message: result.message,
+  });
+}));
 
 export default router;
+

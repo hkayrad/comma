@@ -18,12 +18,12 @@ export class AdminCompanyApi {
 			if (filters) params.append("filters", JSON.stringify(filters));
 
 			const { data: response } = await instance.get<{
-				status: number;
+				success: boolean;
 				data: { rows: CompanyDto[]; count: number };
 				message: string;
 			}>(`/admin/companies?${params.toString()}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return response.data;
 			}
 			return null;
@@ -90,12 +90,12 @@ export class AdminUserApi {
 			if (filters) params.append("filters", JSON.stringify(filters));
 
 			const { data: response } = await instance.get<{
-				status: number;
+				success: boolean;
 				data: { rows: UserDto[]; count: number };
 				message: string;
 			}>(`/admin/users/company/${companyId}?${params.toString()}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return response.data;
 			}
 			return null;

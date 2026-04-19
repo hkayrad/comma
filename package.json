@@ -1,0 +1,17 @@
+{
+  "name": "comma-monorepo",
+  "private": true,
+  "version": "2.8.0",
+  "workspaces": [
+    "common",
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "echo 'Run npm run dev in client/ and server/ separately'",
+    "build": "npm run build --workspace=common && npm run build --workspace=client && npm run build --workspace=server",
+    "build:common": "npm run build --workspace=common",
+    "build:client": "npm run build --workspace=client",
+    "build:server": "npm run build --workspace=server"
+  }
+}

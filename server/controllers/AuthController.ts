@@ -1,22 +1,20 @@
 import express from "express";
 import { AuthService } from "../services/AuthService";
 import { Logger } from "../lib/utils/logger";
-import { ApiResponse } from "../lib/utils/apiResponse";
 import dotenv from "dotenv";
-import { authRateLimiter } from "../lib/middleware/rateLimiter";
+import { authRateLimiter } from "../lib/utils/middleware/rateLimiter";
+import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
+import { UnauthorizedError, ValidationError } from "../lib/errors/AppError";
+import { validate } from "../lib/utils/middleware/validate";
+import { loginSchema } from "@common/schemas";
 
 dotenv.config();
 
 const router = express.Router();
 
-router.post("/login", authRateLimiter, async (req, res) => {
+router.post("/login", authRateLimiter, validate(loginSchema), asyncHandler(async (req, res) => {
 	const { username, password } = req.body;
-	Logger.info("[AuthController] Login attempt", { username: username });
-
-	if (!username || !password) {
-		Logger.warn("[AuthController] Missing credentials", { username: !!username, password: !!password });
-		return res.status(400).json(ApiResponse.error("Username and password are required"));
-	}
+	Logger.info("[AuthController] Login attempt", { username });
 
 	const response = await AuthService.Login(username, password);
 
@@ -25,16 +23,17 @@ router.post("/login", authRateLimiter, async (req, res) => {
 	Logger.info("[AuthController] Login result", { username, success, requires2FA });
 
 	if (!success) {
-		return res.status(401).json(ApiResponse.error(message));
+		throw new UnauthorizedError(message);
 	}
 
 	// If 2FA is required, return temp token for client to use for 2FA verification
 	if (requires2FA) {
-		return res.json({
+		res.json({
 			requires2FA: true,
 			tempToken: tempToken,
 			username: user?.username,
 		});
+		return;
 	}
 
 	// Normal login - set cookies
@@ -51,27 +50,27 @@ router.post("/login", authRateLimiter, async (req, res) => {
 		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
 		path: "/",
 	});
-	return res.json({ username: user?.username, role: user?.role });
-});
+	res.json({ username: user?.username, role: user?.role });
+}));
 
-router.post("/refresh", authRateLimiter, async (req, res) => {
+router.post("/refresh", authRateLimiter, asyncHandler(async (req, res) => {
 	const reqRefreshToken = req.cookies.refresh_token;
 
 	if (!reqRefreshToken) {
-		return res.status(401).json(ApiResponse.error("Refresh token is missing"));
+		throw new UnauthorizedError("Refresh token is missing");
 	}
 
 	const response = await AuthService.RefreshToken(reqRefreshToken);
 
 	if (!response) {
-		return res.status(401).json(ApiResponse.error("Token refresh failed"));
+		throw new UnauthorizedError("Token refresh failed");
 	}
 
 	const { success, accessToken, refreshToken, message, user } = response;
 
-	Logger.info("[AuthController] Refresh result", { username: user?.username, success: success });
+	Logger.info("[AuthController] Refresh result", { username: user?.username, success });
 
-	if (!success) return res.status(401).json(ApiResponse.error(message));
+	if (!success) throw new UnauthorizedError(message);
 
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
@@ -88,10 +87,10 @@ router.post("/refresh", authRateLimiter, async (req, res) => {
 		path: "/",
 	});
 
-	return res.json({ username: user?.username, role: user?.role });
-});
+	res.json({ username: user?.username, role: user?.role });
+}));
 
-router.post("/logout", async (req, res) => {
+router.post("/logout", asyncHandler(async (req, res) => {
 	const refreshToken = req.cookies.refresh_token;
 
 	if (refreshToken) {
@@ -102,7 +101,7 @@ router.post("/logout", async (req, res) => {
 	res.clearCookie("refresh_token", {
 		path: "/",
 	});
-	return res.json({ message: "Logged out successfully" });
-});
+	res.json({ message: "Logged out successfully" });
+}));
 
 export default router;

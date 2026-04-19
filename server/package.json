@@ -1,7 +1,7 @@
 {
-  "name": "comma",
+  "name": "@comma/server",
   "private": true,
-  "version": "2.7.3",
+  "version": "2.8.0",
   "scripts": {
     "dev": "npx tsx --watch index.ts",
     "build": "tsc --build",
@@ -9,15 +9,14 @@
     "serve": "node dist/index.js"
   },
   "dependencies": {
+    "@comma/common": "*",
     "bcrypt": "^6.0.0",
-    "body-parser": "^2.2.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-fileupload": "^1.5.2",
     "express-rate-limit": "^8.2.1",
-    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.3",
     "mariadb": "^3.4.5",
     "otpauth": "^9.4.1",

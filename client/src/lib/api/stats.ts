@@ -17,7 +17,7 @@ export class StatsApi {
 
             const { data: response } = await instance.get<ApiResponse<MonthlyStatsData[]>>(`/stats/monthly?${params.toString()}`);
 
-            if (response.status === 200) {
+            if (response.success) {
                 return Promise.resolve(response.data || []);
             }
 

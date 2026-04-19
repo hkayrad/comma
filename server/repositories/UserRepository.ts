@@ -1,7 +1,36 @@
 import { Users, RefreshTokens } from "../models";
-import { UserDto, CreateUserDto, UUID, SortItem, FilterItem } from "@common/types";
+import { UserDto, UUID, SortItem, FilterItem } from "@common/types";
 import { sequelize } from "../lib/db/sequelize";
-import { QueryTypes, Transaction, Op } from "sequelize";
+import { QueryTypes, Transaction, LOCK } from "sequelize";
+
+/** Data required to create a new user */
+interface CreateUserData {
+	company_id: string;
+	username: string;
+	pass_hash: string;
+	role: number;
+	created_by: string;
+}
+
+/** Fields that can be updated on a user record */
+interface UserUpdateData {
+	username?: string;
+	pass_hash?: string;
+	role?: number;
+	deleted_by?: string;
+	totp_secret?: string | null;
+	totp_enabled?: boolean;
+	totp_recovery_codes?: string | null;
+	totp_failed_attempts?: number;
+	totp_lockout_until?: Date | null;
+}
+
+/** Data required to create a refresh token */
+interface RefreshTokenData {
+	user_id: string;
+	token_hash: string;
+	expires_at: Date;
+}
 
 export class UserRepository {
 	static async findByUsername(username: string, transaction?: Transaction) {
@@ -12,16 +41,16 @@ export class UserRepository {
 		return await Users.findByPk(id, { transaction });
 	}
 
-	static async create(userData: any, transaction?: Transaction) {
-		return await Users.create(userData, { transaction });
+	static async create(userData: CreateUserData, transaction?: Transaction) {
+		return await Users.create(userData as Users["_creationAttributes"], { transaction });
 	}
 
-	static async update(id: UUID, updateData: any, transaction?: Transaction) {
-		return await Users.update(updateData, { where: { id }, transaction });
+	static async update(id: UUID, updateData: UserUpdateData, transaction?: Transaction) {
+		return await Users.update(updateData as Partial<Users>, { where: { id }, transaction });
 	}
 
 	static async delete(id: UUID, deletedBy: UUID, transaction?: Transaction) {
-		await Users.update({ deleted_by: deletedBy } as any, { where: { id }, transaction });
+		await Users.update({ deleted_by: deletedBy } as Partial<Users>, { where: { id }, transaction });
 		return await Users.destroy({ where: { id }, transaction });
 	}
 
@@ -39,7 +68,7 @@ export class UserRepository {
 		};
 
 		let whereClause = "WHERE u.company_id = ? AND u.deleted_at IS NULL";
-		const replacements: any[] = [companyId];
+		const replacements: (string | number | number[] | string[])[] = [companyId];
 
 		if (filters && filters.length > 0) {
 			filters.forEach((filter) => {
@@ -60,7 +89,7 @@ export class UserRepository {
 
 				if (Array.isArray(value) && value.length > 0) {
 					whereClause += ` AND ${dbCol} IN (?)`;
-					replacements.push(value);
+					replacements.push(value as string[]);
 				} else if (typeof value === "string" && value.trim() !== "") {
 					whereClause += ` AND ${dbCol} LIKE ?`;
 					replacements.push(`%${value}%`);
@@ -120,11 +149,11 @@ export class UserRepository {
 	}
 
 	// Refresh Tokens specific operations
-	static async createRefreshToken(tokenData: any, transaction?: Transaction) {
-		return await RefreshTokens.create(tokenData, { transaction });
+	static async createRefreshToken(tokenData: RefreshTokenData, transaction?: Transaction) {
+		return await RefreshTokens.create(tokenData as RefreshTokens["_creationAttributes"], { transaction });
 	}
 
-	static async findRefreshTokenByHash(tokenHash: string, transaction?: Transaction, lock?: any) {
+	static async findRefreshTokenByHash(tokenHash: string, transaction?: Transaction, lock?: LOCK) {
 		return await RefreshTokens.findOne({
 			where: { token_hash: tokenHash },
 			lock,
@@ -133,6 +162,7 @@ export class UserRepository {
 	}
 
 	static async deleteExpiredRefreshTokens(userId: UUID, transaction?: Transaction) {
+		const { Op } = await import("sequelize");
 		return await RefreshTokens.destroy({
 			where: {
 				user_id: userId,
