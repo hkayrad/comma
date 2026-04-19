@@ -1,5 +1,5 @@
 import { sequelize } from "../lib/db/sequelize";
-import { QueryTypes } from "sequelize";
+import { QueryTypes, Transaction } from "sequelize";
 import { CustomerDto, DebtDto, PaymentDto, UUID, SortItem, FilterItem } from "@common/types";
 
 export type CustomerDomain = "receivable" | "payable";
@@ -16,24 +16,24 @@ export class CustomerRepository {
 		return this.domain === "receivable" ? ReceivableCustomers : PayableCustomers;
 	}
 
-	async create(customerData: any, transaction?: any) {
+	async create(customerData: Omit<CustomerDto, "id" | "total_debt" | "total_payments" | "remaining_debt" | "created_at" | "updated_at"> & { company_id: string; created_by: string }, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.create(customerData, { transaction });
 	}
 
-	async findById(id: UUID, companyId: UUID, transaction?: any) {
+	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
 	}
 
-	async update(id: UUID, companyId: UUID, updateData: any, transaction?: any) {
+	async update(id: UUID, companyId: UUID, updateData: Partial<CustomerDto>, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
 	}
 
-	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: any) {
+	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
-		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
+		await Model.update({ deleted_by: deletedBy }, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
@@ -64,7 +64,7 @@ export class CustomerRepository {
         };
 
         let whereClause = "WHERE c.company_id = ? AND c.deleted_at IS NULL";
-        const replacements: any[] = [companyId];
+        const replacements: (string | number | number[] | string[])[] = [companyId];
 
         if (filters && filters.length > 0) {
             filters.forEach((filter) => {
@@ -101,7 +101,7 @@ export class CustomerRepository {
 
                 if (Array.isArray(value) && value.length > 0) {
                     whereClause += ` AND ${dbCol} IN (?)`;
-                    replacements.push(value);
+                    replacements.push(value as string[]);
                 } else if (typeof value === "string" && value.trim() !== "") {
                     whereClause += ` AND ${dbCol} LIKE ?`;
                     replacements.push(`%${value}%`);
@@ -221,7 +221,7 @@ export class CustomerRepository {
             AND c.deleted_at IS NULL
         `;
 
-		const debtParams: any[] = [customerId, companyId];
+		const debtParams: (string)[] = [customerId, companyId];
 
 		if (startDate) {
 			debtsQuery += ` AND d.issue_date >= ?`;
@@ -255,7 +255,7 @@ export class CustomerRepository {
             AND c.deleted_at IS NULL
         `;
 
-		const paymentParams: any[] = [customerId, companyId];
+		const paymentParams: (string)[] = [customerId, companyId];
 
 		if (startDate) {
 			paymentsQuery += ` AND p.payment_date >= ?`;

@@ -8,7 +8,7 @@ export class ReceivableCustomerApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/customers", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -37,7 +37,7 @@ export class ReceivableCustomerApi {
 				`/receivables/customers?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -53,7 +53,7 @@ export class ReceivableCustomerApi {
 		try {
 			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/receivables/customers/id-name");
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 
@@ -79,7 +79,7 @@ export class ReceivableCustomerApi {
 				`/receivables/customers/${id}/statement?${queryParams.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -95,7 +95,7 @@ export class ReceivableCustomerApi {
 		try {
 			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivables/customers/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -111,7 +111,7 @@ export class ReceivableCustomerApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/customers/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve();
 			}
 
@@ -129,7 +129,7 @@ export class PayableCustomerApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/customers", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -158,7 +158,7 @@ export class PayableCustomerApi {
 				`/payables/customers?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -174,7 +174,7 @@ export class PayableCustomerApi {
 		try {
 			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payables/customers");
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 
@@ -190,7 +190,7 @@ export class PayableCustomerApi {
 		try {
 			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/payables/customers/id-name");
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 
@@ -216,7 +216,7 @@ export class PayableCustomerApi {
 				`/payables/customers/${id}/statement?${queryParams.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -232,7 +232,7 @@ export class PayableCustomerApi {
 		try {
 			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payables/customers/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -248,7 +248,7 @@ export class PayableCustomerApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/customers/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve();
 			}
 

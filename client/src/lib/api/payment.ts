@@ -8,7 +8,7 @@ export class ReceivablePaymentApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/payments", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -37,7 +37,7 @@ export class ReceivablePaymentApi {
 				`/receivables/payments?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -53,7 +53,7 @@ export class ReceivablePaymentApi {
 		try {
 			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivables/payments/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -69,7 +69,7 @@ export class ReceivablePaymentApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/payments/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(true);
 			}
 
@@ -87,7 +87,7 @@ export class ReceivablePaymentApi {
 				`/receivables/payments/upcoming-checks?days=${daysThreshold}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 
@@ -105,7 +105,7 @@ export class PayablePaymentApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/payments", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -134,7 +134,7 @@ export class PayablePaymentApi {
 				`/payables/payments?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -150,7 +150,7 @@ export class PayablePaymentApi {
 		try {
 			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payables/payments/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -166,7 +166,7 @@ export class PayablePaymentApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/payments/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(true);
 			}
 
@@ -184,7 +184,7 @@ export class PayablePaymentApi {
 				`/payables/payments/upcoming-checks?days=${daysThreshold}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 

@@ -1,194 +1,93 @@
-import { CreateUserDto, UserDto, UUID , SortItem, FilterItem} from "@common/types";
+import { CreateUserDto, UserDto, UUID, SortItem, FilterItem } from "@common/types";
 import { Logger } from "../../lib/utils/logger";
-import { ApiResponse } from "../../lib/utils/apiResponse";
 import { UserRepository } from "../../repositories/UserRepository";
+import { NotFoundError, ValidationError } from "../../lib/errors/AppError";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
 export class UserManagementService {
 	static async Create(user: CreateUserDto, createdBy: UUID) {
-		try {
-			Logger.info("[UserManagementService] Creating user", { username: user.username, companyId: user.company_id });
+		Logger.info("[UserManagement] Creating user", { username: user.username, companyId: user.company_id });
 
-			const { company_id, username, password, role } = user;
+		const { company_id, username, password, role } = user;
+		if (!company_id || !username || !password) throw new ValidationError("Company ID, username, and password are required");
 
-			if (!company_id || !username || !password) {
-				Logger.error("[UserManagementService] Invalid user data", { user });
-				return ApiResponse.error("Invalid user data");
-			}
+		const existingUser = await UserRepository.findByUsername(username);
+		if (existingUser) throw new ValidationError("Username already exists");
 
-			// Check if username already exists
-			const existingUser = await UserRepository.findByUsername(username);
-			if (existingUser) {
-				Logger.error("[UserManagementService] Username already exists", { username });
-				return ApiResponse.error("Username already exists");
-			}
+		const passHash = await bcrypt.hash(password, SALT_ROUNDS);
+		const newUser = await UserRepository.create({
+			company_id, username, pass_hash: passHash, role: role ?? 0, created_by: createdBy,
+		});
 
-			// Hash the password
-			const passHash = await bcrypt.hash(password, SALT_ROUNDS);
-
-			const newUser = await UserRepository.create({
-				company_id,
-				username,
-				pass_hash: passHash,
-				role: role ?? 0,
-				created_by: createdBy,
-			});
-
-			Logger.info("[UserManagementService] User created successfully", { userId: newUser.id });
-			return ApiResponse.success(newUser.id, "User created successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error creating user", error);
-			return ApiResponse.error("Failed to create user");
-		}
+		Logger.info("[UserManagement] User created successfully", { userId: newUser.id });
+		return newUser.id;
 	}
 
 	static async GetAllByCompany(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
-		try {
-			Logger.info("[UserManagementService] GetAllByCompany called", { companyId, page, limit, sorting, filters });
-
-			const offset = page * limit;
-
-			const result = await UserRepository.findAllByCompany(companyId, limit, offset, sorting, filters);
-
-			Logger.debug("[UserManagementService] Users fetched successfully", {
-				companyId,
-				count: result.rows.length,
-				totalCount: result.count,
-			});
-
-			return ApiResponse.success({ rows: result.rows, count: result.count }, "Users retrieved successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error fetching users", error);
-			return ApiResponse.error("Failed to fetch users");
-		}
+		Logger.info("[UserManagement] GetAllByCompany", { companyId, page, limit });
+		const offset = page * limit;
+		const result = await UserRepository.findAllByCompany(companyId, limit, offset, sorting, filters);
+		Logger.debug("[UserManagement] Users fetched", { companyId, count: result.rows.length, totalCount: result.count });
+		return { rows: result.rows, count: result.count };
 	}
 
 	static async GetById(id: UUID) {
-		Logger.info("[UserManagementService] GetById called", { id });
+		Logger.info("[UserManagement] GetById", { id });
+		const user = await UserRepository.findById(id);
+		if (!user || user.deleted_at !== null) throw new NotFoundError("User not found");
 
-		try {
-			const user = await UserRepository.findById(id);
+		const userDto: UserDto = {
+			id: user.id, company_id: user.company_id, username: user.username,
+			role: user.role as UserDto["role"],
+			created_at: user.created_at, created_by: user.created_by, updated_at: user.updated_at,
+		};
 
-			if (!user || user.deleted_at !== null) {
-				Logger.warn("[UserManagementService] User not found", { id });
-				return ApiResponse.success(null, "User not found");
-			}
-
-			const userDto: UserDto = {
-				id: user.id,
-				company_id: user.company_id,
-				username: user.username,
-				role: user.role as any,
-				created_at: user.created_at,
-				created_by: user.created_by,
-				updated_at: user.updated_at,
-			};
-
-			Logger.info("[UserManagementService] Fetched user successfully", { id });
-			return ApiResponse.success(userDto, "User retrieved successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error fetching user", error);
-			return ApiResponse.error("Failed to fetch user");
-		}
+		Logger.info("[UserManagement] Fetched user successfully", { id });
+		return userDto;
 	}
 
 	static async Update(id: UUID, userData: Partial<UserDto & { password?: string }>, updatedBy: UUID) {
-		try {
-			Logger.info("[UserManagementService] Update called", { id, userData });
+		Logger.info("[UserManagement] Update", { id });
+		const { username, role, password } = userData;
+		const updateData: Record<string, unknown> = {};
 
-			const { username, role, password } = userData;
-
-			const updateData: any = {};
-
-			if (username) {
-				// Check if username already exists for a different user
-				const existingUser = await UserRepository.findByUsername(username);
-				if (existingUser && existingUser.id !== id) {
-					Logger.error("[UserManagementService] Username already exists", { username });
-					return ApiResponse.error("Username already exists");
-				}
-				updateData.username = username;
-			}
-
-			if (role !== undefined) {
-				updateData.role = role;
-			}
-
-			if (password) {
-				updateData.pass_hash = await bcrypt.hash(password, SALT_ROUNDS);
-			}
-
-			if (Object.keys(updateData).length === 0) {
-				Logger.warn("[UserManagementService] No update data provided");
-				return ApiResponse.error("No update data provided");
-			}
-
-			const [affectedRows] = await UserRepository.update(id, updateData);
-
-			if (affectedRows === 0) {
-				const exists = await UserRepository.findById(id);
-				if (!exists) {
-					Logger.warn("[UserManagementService] User not found", { id });
-					return ApiResponse.error("User not found");
-				}
-			}
-
-			Logger.info("[UserManagementService] Updated user successfully", { id });
-			return ApiResponse.success({ id }, "User updated successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error updating user", error);
-			return ApiResponse.error("Failed to update user");
+		if (username) {
+			const existingUser = await UserRepository.findByUsername(username);
+			if (existingUser && existingUser.id !== id) throw new ValidationError("Username already exists");
+			updateData.username = username;
 		}
+		if (role !== undefined) updateData.role = role;
+		if (password) updateData.pass_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+		if (Object.keys(updateData).length === 0) throw new ValidationError("No update data provided");
+
+		const [affectedRows] = await UserRepository.update(id, updateData);
+		if (affectedRows === 0) {
+			const exists = await UserRepository.findById(id);
+			if (!exists) throw new NotFoundError("User not found");
+		}
+
+		Logger.info("[UserManagement] Updated user successfully", { id });
+		return { id };
 	}
 
 	static async Delete(id: UUID, deletedBy: UUID) {
-		try {
-			Logger.info("[UserManagementService] Delete called", { id });
-
-			const deletedCount = await UserRepository.delete(id, deletedBy);
-
-			if (deletedCount === 0) {
-				Logger.warn("[UserManagementService] User not found", { id });
-				return ApiResponse.error("User not found");
-			}
-
-			Logger.info("[UserManagementService] Deleted user successfully", { id });
-			return ApiResponse.success({ id }, "User deleted successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error deleting user", error);
-			return ApiResponse.error("Failed to delete user");
-		}
+		Logger.info("[UserManagement] Delete", { id });
+		const deletedCount = await UserRepository.delete(id, deletedBy);
+		if (deletedCount === 0) throw new NotFoundError("User not found");
+		Logger.info("[UserManagement] Deleted user successfully", { id });
 	}
 
 	static async ResetPassword(id: UUID, newPassword: string) {
-		try {
-			Logger.info("[UserManagementService] ResetPassword called", { id });
-
-			const passHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-			const [affectedRows] = await UserRepository.update(id, { pass_hash: passHash });
-
-			if (affectedRows === 0) {
-				const exists = await UserRepository.findById(id);
-				if (!exists) {
-					Logger.warn("[UserManagementService] User not found", { id });
-					return ApiResponse.error("User not found");
-				}
-			}
-
-			Logger.info("[UserManagementService] Password reset successfully", { id });
-			return ApiResponse.success({ id }, "Password reset successfully");
-		} catch (err: unknown) {
-			const error = err instanceof Error ? err : new Error(String(err));
-			Logger.error("[UserManagementService] Error resetting password", error);
-			return ApiResponse.error("Failed to reset password");
+		Logger.info("[UserManagement] ResetPassword", { id });
+		const passHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+		const [affectedRows] = await UserRepository.update(id, { pass_hash: passHash });
+		if (affectedRows === 0) {
+			const exists = await UserRepository.findById(id);
+			if (!exists) throw new NotFoundError("User not found");
 		}
+		Logger.info("[UserManagement] Password reset successfully", { id });
 	}
 }

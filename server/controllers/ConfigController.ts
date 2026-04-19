@@ -1,144 +1,86 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import { ConfigService } from "../services/ConfigService";
 import { Logger } from "../lib/utils/logger";
 import { configMiddleware } from "../lib/middleware";
+import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
+import { ValidationError, ForbiddenError } from "../lib/errors/AppError";
+import { validate } from "../lib/utils/middleware/validate";
+import { configSchema } from "@common/schemas";
 
 interface ConfigKeyValue {
 	configKey: string;
 	configValue: string;
 }
 
-type Configs = Record<string, string>;
-
 const router = express.Router();
 
 router.use(configMiddleware);
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", asyncHandler(async (req: Request, res: Response) => {
 	Logger.debug("[ConfigController] Get all configs");
-	try {
-		const configs: Configs = await ConfigService.GetConfigs();
+	const configs = await ConfigService.GetConfigs();
 
-		if (!configs || Object.keys(configs).length === 0) {
-			Logger.debug("[ConfigController] No configs found");
-			return res.status(404).json({ success: false, message: "No configs found" });
-		}
-
-		Logger.info("[ConfigController] Returning configs", { count: Object.keys(configs).length });
-		return res.json({ success: true, configs });
-	} catch (err: unknown) {
-		const error = err instanceof Error ? err : new Error(String(err));
-		Logger.error("[ConfigController] Error fetching configs", { error: error.message });
-		return res.status(500).json({ success: false, message: "Error retrieving configs" });
+	if (!configs || Object.keys(configs).length === 0) {
+		Logger.debug("[ConfigController] No configs found");
+		res.status(404).json({ success: false, message: "No configs found" });
+		return;
 	}
-});
 
-router.get("/:configKey", async (req: Request, res: Response) => {
+	Logger.info("[ConfigController] Returning configs", { count: Object.keys(configs).length });
+	res.json({ success: true, configs });
+}));
+
+router.get("/:configKey", asyncHandler(async (req: Request, res: Response) => {
 	const configKey = req.params.configKey;
 	Logger.debug("[ConfigController] Get config", { configKey });
 
-	try {
-		const configValue = await ConfigService.GetConfig(configKey);
+	const configValue = await ConfigService.GetConfig(configKey);
 
-		if (configValue === null || configValue === undefined) {
-			Logger.debug("[ConfigController] Config not found", { configKey });
-			return res.status(404).json({ success: false, message: "Config not found" });
-		}
-
-		Logger.info("[ConfigController] Returning config value", { configKey });
-		return res.json({ success: true, configKey, configValue });
-	} catch (err: unknown) {
-		const error = err instanceof Error ? err : new Error(String(err));
-		Logger.error("[ConfigController] Error fetching config", { configKey, error: error.message });
-		return res.status(500).json({ success: false, message: "Error retrieving config" });
+	if (configValue === null || configValue === undefined) {
+		Logger.debug("[ConfigController] Config not found", { configKey });
+		res.status(404).json({ success: false, message: "Config not found" });
+		return;
 	}
-});
 
-router.post("/", async (req: Request, res: Response) => {
+	Logger.info("[ConfigController] Returning config value", { configKey });
+	res.json({ success: true, configKey, configValue });
+}));
+
+router.post("/", validate(configSchema), asyncHandler(async (req: Request, res: Response) => {
 	Logger.debug("[ConfigController] Set config request", { body: req.body });
 
-	const body = req.body as Partial<ConfigKeyValue>;
-	const configKey = body.configKey;
-	const configValue = body.configValue;
+	const body = req.body as ConfigKeyValue;
+	const { configKey, configValue } = body;
 	const user = req.user;
 
 	if (!user || user.role !== 99) {
-		Logger.warn("[ConfigController] Unauthorized user", { user });
-		return res.status(403).json({ success: false, message: "Unauthorized" });
+		throw new ForbiddenError("Unauthorized");
 	}
 
-	if (!configKey || !configValue) {
-		Logger.warn("[ConfigController] Missing configKey or configValue", { body });
-		return res.status(400).json({ success: false, message: "configKey and configValue are required" });
-	}
+	await ConfigService.SetConfig(configKey, configValue);
+	Logger.info("[ConfigController] Config set successfully", { configKey });
+	res.json({ success: true, message: "Config set successfully" });
+}));
 
-	try {
-		const result = await ConfigService.SetConfig(configKey, configValue);
-
-		if (!result) {
-			Logger.error("[ConfigController] Failed to set config", { configKey });
-			return res.status(500).json({ success: false, message: "Failed to set config" });
-		}
-
-		Logger.info("[ConfigController] Config set successfully", { configKey });
-		return res.json({ success: true, message: "Config set successfully" });
-	} catch (err: unknown) {
-		const error = err instanceof Error ? err : new Error(String(err));
-		Logger.error("[ConfigController] Error setting config", { configKey, error: error.message });
-		return res.status(500).json({ success: false, message: "Error setting config" });
-	}
-});
-
-router.post("/start-maintenance", async (req: Request, res: Response) => {
+router.post("/start-maintenance", asyncHandler(async (req: Request, res: Response) => {
 	const user = req.user;
-
-	if (!user || user.role !== 99) {
-		Logger.warn("[ConfigController] Unauthorized user", { user });
-		return res.status(403).json({ success: false, message: "Unauthorized" });
-	}
+	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
 
 	Logger.debug("[ConfigController] Start maintenance request");
-	try {
-		const result = await ConfigService.StartMaintenanceMode();
+	await ConfigService.StartMaintenanceMode();
+	Logger.info("[ConfigController] Maintenance mode started");
+	res.json({ success: true, message: "Maintenance mode started successfully" });
+}));
 
-		if (!result) {
-			Logger.error("[ConfigController] Failed to start maintenance mode");
-			return res.status(500).json({ success: false, message: "Failed to start maintenance mode" });
-		}
-
-		Logger.info("[ConfigController] Maintenance mode started");
-		return res.json({ success: true, message: "Maintenance mode started successfully" });
-	} catch (err: unknown) {
-		const error = err instanceof Error ? err : new Error(String(err));
-		Logger.error("[ConfigController] Error starting maintenance mode", { error: error.message });
-		return res.status(500).json({ success: false, message: "Error starting maintenance mode" });
-	}
-});
-
-router.post("/end-maintenance", async (req: Request, res: Response) => {
+router.post("/end-maintenance", asyncHandler(async (req: Request, res: Response) => {
 	const user = req.user;
-
-	if (!user || user.role !== 99) {
-		Logger.warn("[ConfigController] Unauthorized user", { user });
-		return res.status(403).json({ success: false, message: "Unauthorized" });
-	}
+	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
 
 	Logger.debug("[ConfigController] End maintenance request");
-	try {
-		const result = await ConfigService.EndMaintenanceMode();
-
-		if (!result) {
-			Logger.error("[ConfigController] Failed to end maintenance mode");
-			return res.status(500).json({ success: false, message: "Failed to end maintenance mode" });
-		}
-
-		Logger.info("[ConfigController] Maintenance mode ended");
-		return res.json({ success: true, message: "Maintenance mode ended successfully" });
-	} catch (err: unknown) {
-		const error = err instanceof Error ? err : new Error(String(err));
-		Logger.error("[ConfigController] Error ending maintenance mode", { error: error.message });
-		return res.status(500).json({ success: false, message: "Error ending maintenance mode" });
-	}
-});
+	await ConfigService.EndMaintenanceMode();
+	Logger.info("[ConfigController] Maintenance mode ended");
+	res.json({ success: true, message: "Maintenance mode ended successfully" });
+}));
 
 export default router;
+

@@ -1,5 +1,3 @@
-//! BUNLARI AYRI DOSYALARA AYIR
-
 export type OverviewViewType = "receivable" | "payable";
 export type AvailablePaymentMethod = "cash" | "bank_transfer" | "check" | "card";
 export type AvailableCurrency = "TRY" | "USD" | "EUR";
@@ -35,13 +33,13 @@ export type DecodedJwtToken = {
 export type CustomerDto = {
 	id?: UUID;
 	name: string;
-	phone?: string;
+	phone?: string | null;
 	is_company: boolean;
-	tax_number?: string;
-	tax_office?: string;
-	mersis_no?: string;
-	email?: string;
-	address?: string;
+	tax_number?: string | null;
+	tax_office?: string | null;
+	mersis_no?: string | null;
+	email?: string | null;
+	address?: string | null;
 	total_debt?: number;
 	total_payments?: number;
 	remaining_debt?: number;
@@ -53,7 +51,7 @@ export type DebtDto = {
 	id?: UUID;
 	company_id?: UUID;
 	customer_id: UUID;
-	invoice_no?: string;
+	invoice_no?: string | null;
 	amount: number;
 	vat: number;
 	withholding: number;
@@ -62,7 +60,7 @@ export type DebtDto = {
 	discount: number;
 	total?: number;
 	total_in_try?: number;
-	description?: string;
+	description?: string | null;
 	issue_date: Date;
 	due_date?: Date | null;
 	created_at?: Date;
@@ -90,8 +88,8 @@ export type PaymentDto = {
 	exchange_rate: number;
 	amount_in_try?: number;
 	payment_method: AvailablePaymentMethod;
-	description?: string;
-	invoice_no?: string;
+	description?: string | null;
+	invoice_no?: string | null;
 	payment_date: Date;
 	due_date?: Date | null;
 	created_at?: Date;
@@ -102,14 +100,14 @@ export type CompanyDto = {
 	id?: UUID;
 	name: string;
 	is_company: boolean;
-	address?: string;
-	phone?: string;
-	email?: string;
-	tax_number?: string;
-	tax_office?: string;
-	mersis_no?: string;
-	small_logo_path?: string;
-	large_logo_path?: string;
+	address?: string | null;
+	phone?: string | null;
+	email?: string | null;
+	tax_number?: string | null;
+	tax_office?: string | null;
+	mersis_no?: string | null;
+	small_logo_path?: string | null;
+	large_logo_path?: string | null;
 	created_at?: Date;
 	updated_at?: Date;
 };

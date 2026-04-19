@@ -27,8 +27,10 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@comma/common": ["../common/src/index.ts"],
+      "@comma/common/*": ["../common/src/*"]
     }
   },
-  "include": ["src", "../common/types.d.ts"]
+  "include": ["src", "../common/src/types.ts"]
 }

@@ -4,7 +4,6 @@ import fs from "fs";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import bodyParser from "body-parser";
 import http from "http";
 import fileUpload from "express-fileupload";
 import AuthController from "./controllers/AuthController";
@@ -25,11 +24,19 @@ import TwoFactorController from "./controllers/TwoFactorController";
 import StatsController from "./controllers/StatsController";
 import { Logger } from "./lib/utils/logger";
 import { sequelize } from "./lib/db/sequelize";
+import { errorHandler } from "./lib/utils/middleware/errorHandler";
+
+export interface AuthenticatedUser {
+	id: string;
+	companyId: string;
+	username: string;
+	role: number;
+}
 
 declare global {
 	namespace Express {
 		interface Request {
-			user: any;
+			user: AuthenticatedUser;
 		}
 	}
 }
@@ -53,7 +60,7 @@ app.use(
 		credentials: true,
 	}),
 );
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 app.use(
 	fileUpload({
@@ -123,6 +130,9 @@ app.use("/admin/users", UserManagementController);
 app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);
 app.use("/stats", StatsController);
+
+// Global error handler — must be registered AFTER all routes
+app.use(errorHandler);
 
 const listenPort =
 	process.env.SERVER_PORT ||

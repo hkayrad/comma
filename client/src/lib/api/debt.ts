@@ -8,7 +8,7 @@ export class ReceivableDebtApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/debts", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -37,7 +37,7 @@ export class ReceivableDebtApi {
 				`/receivables/debts?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -55,7 +55,7 @@ export class ReceivableDebtApi {
 				params: { currency },
 			});
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -72,7 +72,7 @@ export class ReceivableDebtApi {
 			Logger.info(data)
 			const { data: response } = await instance.put<ApiResponse<null>>(`/receivables/debts/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -88,7 +88,7 @@ export class ReceivableDebtApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/debts/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(true);
 			}
 
@@ -106,7 +106,7 @@ export class ReceivableDebtApi {
 				`/receivables/debts/upcoming-due-dates?days=${daysThreshold}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 
@@ -124,7 +124,7 @@ export class PayableDebtApi {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/debts", data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -153,7 +153,7 @@ export class PayableDebtApi {
 				`/payables/debts?${params.toString()}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || { rows: [], count: 0 });
 			}
 
@@ -171,7 +171,7 @@ export class PayableDebtApi {
 				params: { currency },
 			});
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -187,7 +187,7 @@ export class PayableDebtApi {
 		try {
 			const { data: response } = await instance.put<ApiResponse<null>>(`/payables/debts/${id}`, data);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data);
 			}
 
@@ -203,7 +203,7 @@ export class PayableDebtApi {
 		try {
 			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/debts/${id}`);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(true);
 			}
 
@@ -221,7 +221,7 @@ export class PayableDebtApi {
 				`/payables/debts/upcoming-due-dates?days=${daysThreshold}`,
 			);
 
-			if (response.status === 200) {
+			if (response.success) {
 				return Promise.resolve(response.data || []);
 			}
 

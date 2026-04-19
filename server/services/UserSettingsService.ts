@@ -1,6 +1,6 @@
 import { Logger } from "../lib/utils/logger";
-import { ApiResponse } from "../lib/utils/apiResponse";
 import { UserRepository } from "../repositories/UserRepository";
+import { NotFoundError, ValidationError, UnauthorizedError } from "../lib/errors/AppError";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -10,75 +10,37 @@ export class UserSettingsService {
      * Update the username for a user after verifying their current password
      */
     static async UpdateUsername(userId: string, newUsername: string, currentPassword: string) {
-        try {
-            Logger.info("[UserSettingsService] Updating username", { userId });
+        Logger.info("[UserSettingsService] Updating username", { userId });
 
-            // Find the user
-            const user = await UserRepository.findById(userId);
-            if (!user) {
-                Logger.error("[UserSettingsService] User not found", { userId });
-                return ApiResponse.error("User not found");
-            }
+        const user = await UserRepository.findById(userId);
+        if (!user) throw new NotFoundError("User not found");
 
-            // Verify current password
-            const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
-            if (!passwordMatch) {
-                Logger.warn("[UserSettingsService] Invalid current password", { userId });
-                return ApiResponse.error("Current password is incorrect");
-            }
+        const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
+        if (!passwordMatch) throw new UnauthorizedError("Current password is incorrect");
 
-            // Check if username is already taken
-            const existingUser = await UserRepository.findByUsername(newUsername);
-            if (existingUser && existingUser.id !== userId) {
-                Logger.warn("[UserSettingsService] Username already taken", { newUsername });
-                return ApiResponse.error("Username is already taken");
-            }
-
-            // Update the username
-            await UserRepository.update(userId, { username: newUsername });
-
-            Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });
-            return ApiResponse.success({ username: newUsername }, "Username updated successfully");
-        } catch (err: unknown) {
-        	const error = err instanceof Error ? err : new Error(String(err));
-            Logger.error("[UserSettingsService] Error updating username", { userId, error: error.message });
-            return ApiResponse.error("Failed to update username");
+        const existingUser = await UserRepository.findByUsername(newUsername);
+        if (existingUser && existingUser.id !== userId) {
+            throw new ValidationError("Username is already taken");
         }
+
+        await UserRepository.update(userId, { username: newUsername });
+        Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });
     }
 
     /**
      * Update the password for a user after verifying their current password
      */
     static async UpdatePassword(userId: string, currentPassword: string, newPassword: string) {
-        try {
-            Logger.info("[UserSettingsService] Updating password", { userId });
+        Logger.info("[UserSettingsService] Updating password", { userId });
 
-            // Find the user
-            const user = await UserRepository.findById(userId);
-            if (!user) {
-                Logger.error("[UserSettingsService] User not found", { userId });
-                return ApiResponse.error("User not found");
-            }
+        const user = await UserRepository.findById(userId);
+        if (!user) throw new NotFoundError("User not found");
 
-            // Verify current password
-            const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
-            if (!passwordMatch) {
-                Logger.warn("[UserSettingsService] Invalid current password", { userId });
-                return ApiResponse.error("Current password is incorrect");
-            }
+        const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
+        if (!passwordMatch) throw new UnauthorizedError("Current password is incorrect");
 
-            // Hash the new password
-            const newPassHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-            // Update the password
-            await UserRepository.update(userId, { pass_hash: newPassHash });
-
-            Logger.info("[UserSettingsService] Password updated successfully", { userId });
-            return ApiResponse.success(null, "Password updated successfully");
-        } catch (err: unknown) {
-        	const error = err instanceof Error ? err : new Error(String(err));
-            Logger.error("[UserSettingsService] Error updating password", { userId, error: error.message });
-            return ApiResponse.error("Failed to update password");
-        }
+        const newPassHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+        await UserRepository.update(userId, { pass_hash: newPassHash });
+        Logger.info("[UserSettingsService] Password updated successfully", { userId });
     }
 }
