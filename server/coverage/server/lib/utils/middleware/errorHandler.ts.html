@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.5% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -115,28 +115,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -155,10 +155,10 @@ import { Logger } from "../logger";
  * logs them, and returns a consistent JSON response.
  */
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-	<span class="missing-if-branch" title="else path not taken" >E</span>if (err instanceof AppError) {
+	if (err instanceof AppError) {
 		// Operational errors — expected failures (validation, not found, etc.)
-		<span class="missing-if-branch" title="if path not taken" >I</span>if (err.statusCode &gt;= 500) {
-<span class="cstat-no" title="statement not covered" >			Logger.error(`[ErrorHandler] ${err.message}`, { statusCode: err.statusCode, stack: err.stack });</span>
+		if (err.statusCode &gt;= 500) {
+			Logger.error(`[ErrorHandler] ${err.message}`, { statusCode: err.statusCode, stack: err.stack });
 		} else {
 			Logger.warn(`[ErrorHandler] ${err.message}`, { statusCode: err.statusCode });
 		}
@@ -171,15 +171,15 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 	}
 &nbsp;
 	// Unexpected errors — programming bugs, unhandled cases
-<span class="cstat-no" title="statement not covered" >	Logger.error("[ErrorHandler] Unexpected error", {</span>
+	Logger.error("[ErrorHandler] Unexpected error", {
 		message: err.message,
 		stack: err.stack,
 	});
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	res.status(500).json({</span>
+	res.status(500).json({
 		success: false,
 		message: process.env.NODE_ENV === "production"
-			? "Internal server error"
+			? <span class="branch-0 cbranch-no" title="branch not covered" >"Internal server error"</span>
 			: err.message,
 	});
 }
@@ -190,7 +190,7 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:01:17.545Z
+                at 2026-04-19T13:33:46.359Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

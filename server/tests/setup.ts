@@ -8,16 +8,15 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
 
 beforeAll(async () => {
   try {
-    // Authenticate and sync the database before running tests
+    // Authenticate the database before running tests
     await sequelize.authenticate();
-    // In a real MariaDB test DB, we might want to be careful with sync({ force: true })
-    // but for testing purposes it ensures a clean state.
-    // Uncomment the next line if you want to wipe the test DB every time tests start.
-    // await sequelize.sync({ force: true });
     
-    console.log('Database connected for testing.');
+    // NOTE: We are using the development database for testing.
+    // DO NOT USE sequelize.sync({ force: true }) or truncate tables here.
+    
+    console.log('Database connected for testing (using development database).');
   } catch (error) {
-    console.error('Unable to connect to the test database:', error);
+    console.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 });

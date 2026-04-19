@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>4/16</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/16</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -109,32 +109,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -152,27 +152,27 @@ const router = express.Router();
 router.use(authMiddleware);
 &nbsp;
 // Update username
-router.put("/username", validate(updateUsernameSchema), asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-<span class="cstat-no" title="statement not covered" >	Logger.info("[UserSettingsController] Update username request");</span>
+router.put("/username", validate(updateUsernameSchema), asyncHandler(async (req: Request, res: Response) =&gt; {
+	Logger.info("[UserSettingsController] Update username request");
 &nbsp;
-	const { newUsername, currentPassword } = <span class="cstat-no" title="statement not covered" >req.body;</span>
-	const userId = <span class="cstat-no" title="statement not covered" >req.user.id;</span>
+	const { newUsername, currentPassword } = req.body;
+	const userId = req.user.id;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await UserSettingsService.UpdateUsername(userId, newUsername, currentPassword);</span>
-<span class="cstat-no" title="statement not covered" >	Logger.info("[UserSettingsController] Username updated successfully", { userId });</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, message: "Username updated successfully" });</span>
+	await UserSettingsService.UpdateUsername(userId, newUsername, currentPassword);
+	Logger.info("[UserSettingsController] Username updated successfully", { userId });
+	res.json({ success: true, message: "Username updated successfully" });
 }));
 &nbsp;
 // Update password
-router.put("/password", validate(updatePasswordSchema), asyncHandler(<span class="fstat-no" title="function not covered" >async (r</span>eq: Request, res: Response) =&gt; {
-<span class="cstat-no" title="statement not covered" >	Logger.info("[UserSettingsController] Update password request");</span>
+router.put("/password", validate(updatePasswordSchema), asyncHandler(async (req: Request, res: Response) =&gt; {
+	Logger.info("[UserSettingsController] Update password request");
 &nbsp;
-	const { currentPassword, newPassword } = <span class="cstat-no" title="statement not covered" >req.body;</span>
-	const userId = <span class="cstat-no" title="statement not covered" >req.user.id;</span>
+	const { currentPassword, newPassword } = req.body;
+	const userId = req.user.id;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await UserSettingsService.UpdatePassword(userId, currentPassword, newPassword);</span>
-<span class="cstat-no" title="statement not covered" >	Logger.info("[UserSettingsController] Password updated successfully", { userId });</span>
-<span class="cstat-no" title="statement not covered" >	res.json({ success: true, message: "Password updated successfully" });</span>
+	await UserSettingsService.UpdatePassword(userId, currentPassword, newPassword);
+	Logger.info("[UserSettingsController] Password updated successfully", { userId });
+	res.json({ success: true, message: "Password updated successfully" });
 }));
 &nbsp;
 export default router;
@@ -184,7 +184,7 @@ export default router;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:01:17.545Z
+                at 2026-04-19T13:33:46.359Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

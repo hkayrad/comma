@@ -9,7 +9,6 @@ describe('Auth Controller', () => {
         .post('/login')
         .send({ username: 'nonexistentuser', password: 'wrongpassword' });
       
-      // Depending on how UnauthorizedError is handled, it might be 401
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message');
     });

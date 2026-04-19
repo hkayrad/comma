@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeError } from './errorUtils';
+import { normalizeError } from '../../../lib/utils/errorUtils';
 
 describe('errorUtils', () => {
   describe('normalizeError', () => {

@@ -1,6 +1,7 @@
 import { sequelize } from "../lib/db/sequelize";
-import { QueryTypes, Transaction } from "sequelize";
+import { QueryTypes, Transaction, fn, col, literal, Op } from "sequelize";
 import { DebtDto, Totals, UUID, SortItem, FilterItem, UpcomingDueDate } from "@common/types";
+import { ReceivableDebts, PayableDebts } from "../models";
 
 export type DebtDomain = "receivable" | "payable";
 
@@ -12,13 +13,12 @@ export class DebtRepository {
     }
 
 	private getModel() {
-		const { ReceivableDebts, PayableDebts } = require("../models");
 		return this.domain === "receivable" ? ReceivableDebts : PayableDebts;
 	}
 
 	async create(debtData: Record<string, unknown>, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.create(debtData, { transaction });
+		return await Model.create(debtData as any, { transaction });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
@@ -28,12 +28,12 @@ export class DebtRepository {
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<DebtDto>, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
+		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
-		await Model.update({ deleted_by: deletedBy }, { where: { id, company_id: companyId }, transaction });
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
@@ -106,7 +106,6 @@ export class DebtRepository {
 
 	async getMonthlyStats(companyId: string, start: Date, end: Date) {
 		const Model = this.getModel();
-		const { fn, col, literal, Op } = require("sequelize");
 		return await Model.findAll({
 			attributes: [[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"], [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"]],
 			where: { company_id: companyId, issue_date: { [Op.gte]: start, [Op.lt]: end }, deleted_at: null },

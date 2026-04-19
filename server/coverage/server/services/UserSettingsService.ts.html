@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">4.34% </span>
+                <span class="strong">91.3% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/23</span>
+                <span class='fraction'>21/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.26% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/19</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -114,45 +114,45 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Logger } from "../lib/utils/logger";
@@ -167,38 +167,38 @@ export class UserSettingsService {
      * Update the username for a user after verifying their current password
      */
     static async UpdateUsername(userId: string, newUsername: string, currentPassword: string) {
-<span class="cstat-no" title="statement not covered" >        Logger.info("[UserSettingsService] Updating username", { userId });</span>
+        Logger.info("[UserSettingsService] Updating username", { userId });
 &nbsp;
-        const user = <span class="cstat-no" title="statement not covered" >await UserRepository.findById(userId);</span>
-<span class="cstat-no" title="statement not covered" >        if (!user) <span class="cstat-no" title="statement not covered" >throw new NotFoundError("User not found");</span></span>
+        const user = await UserRepository.findById(userId);
+        if (!user) throw new NotFoundError("User not found");
 &nbsp;
-        const passwordMatch = <span class="cstat-no" title="statement not covered" >await bcrypt.compare(currentPassword, user.pass_hash);</span>
-<span class="cstat-no" title="statement not covered" >        if (!passwordMatch) <span class="cstat-no" title="statement not covered" >throw new UnauthorizedError("Current password is incorrect");</span></span>
+        const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
+        if (!passwordMatch) throw new UnauthorizedError("Current password is incorrect");
 &nbsp;
-        const existingUser = <span class="cstat-no" title="statement not covered" >await UserRepository.findByUsername(newUsername);</span>
-<span class="cstat-no" title="statement not covered" >        if (existingUser &amp;&amp; existingUser.id !== userId) {</span>
-<span class="cstat-no" title="statement not covered" >            throw new ValidationError("Username is already taken");</span>
+        const existingUser = await UserRepository.findByUsername(newUsername);
+        if (existingUser &amp;&amp; existingUser.id !== userId) {
+            throw new ValidationError("Username is already taken");
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await UserRepository.update(userId, { username: newUsername });</span>
-<span class="cstat-no" title="statement not covered" >        Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });</span>
+        await UserRepository.update(userId, { username: newUsername });
+        Logger.info("[UserSettingsService] Username updated successfully", { userId, newUsername });
     }
 &nbsp;
     /**
      * Update the password for a user after verifying their current password
      */
     static async UpdatePassword(userId: string, currentPassword: string, newPassword: string) {
-<span class="cstat-no" title="statement not covered" >        Logger.info("[UserSettingsService] Updating password", { userId });</span>
+        Logger.info("[UserSettingsService] Updating password", { userId });
 &nbsp;
-        const user = <span class="cstat-no" title="statement not covered" >await UserRepository.findById(userId);</span>
-<span class="cstat-no" title="statement not covered" >        if (!user) <span class="cstat-no" title="statement not covered" >throw new NotFoundError("User not found");</span></span>
+        const user = await UserRepository.findById(userId);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) <span class="cstat-no" title="statement not covered" >throw new NotFoundError("User not found");</span>
 &nbsp;
-        const passwordMatch = <span class="cstat-no" title="statement not covered" >await bcrypt.compare(currentPassword, user.pass_hash);</span>
-<span class="cstat-no" title="statement not covered" >        if (!passwordMatch) <span class="cstat-no" title="statement not covered" >throw new UnauthorizedError("Current password is incorrect");</span></span>
+        const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!passwordMatch) <span class="cstat-no" title="statement not covered" >throw new UnauthorizedError("Current password is incorrect");</span>
 &nbsp;
-        const newPassHash = <span class="cstat-no" title="statement not covered" >await bcrypt.hash(newPassword, SALT_ROUNDS);</span>
-<span class="cstat-no" title="statement not covered" >        await UserRepository.update(userId, { pass_hash: newPassHash });</span>
-<span class="cstat-no" title="statement not covered" >        Logger.info("[UserSettingsService] Password updated successfully", { userId });</span>
+        const newPassHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+        await UserRepository.update(userId, { pass_hash: newPassHash });
+        Logger.info("[UserSettingsService] Password updated successfully", { userId });
     }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -208,7 +208,7 @@ export class UserSettingsService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:01:17.545Z
+                at 2026-04-19T13:33:46.359Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

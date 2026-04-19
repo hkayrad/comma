@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">1.92% </span>
+                <span class="strong">16% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/52</span>
+                <span class='fraction'>8/50</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">5.71% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/35</span>
+                <span class='fraction'>2/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">8.33% </span>
+                <span class="strong">41.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/12</span>
+                <span class='fraction'>5/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">2.08% </span>
+                <span class="strong">17.39% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/48</span>
+                <span class='fraction'>8/46</span>
             </div>
         
             
@@ -180,14 +180,18 @@
 <a name='L115'></a><a href='#L115'>115</a>
 <a name='L116'></a><a href='#L116'>116</a>
 <a name='L117'></a><a href='#L117'>117</a>
-<a name='L118'></a><a href='#L118'>118</a>
-<a name='L119'></a><a href='#L119'>119</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L118'></a><a href='#L118'>118</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -195,18 +199,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -288,9 +287,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -300,8 +298,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { sequelize } from "../lib/db/sequelize";
-import { QueryTypes, Transaction } from "sequelize";
+import { QueryTypes, Transaction, fn, col, literal, Op } from "sequelize";
 import { DebtDto, Totals, UUID, SortItem, FilterItem, UpcomingDueDate } from "@common/types";
+import { ReceivableDebts, PayableDebts } from "../models";
 &nbsp;
 export type DebtDomain = "receivable" | "payable";
 &nbsp;
@@ -312,29 +311,28 @@ export class DebtRepository {
         this.domain = domain;
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >	private g</span>etModel() {
-		const { ReceivableDebts, PayableDebts } = <span class="cstat-no" title="statement not covered" >require("../models");</span>
-<span class="cstat-no" title="statement not covered" >		return this.domain === "receivable" ? ReceivableDebts : PayableDebts;</span>
+	private getModel() {
+		return this.domain === "receivable" ? ReceivableDebts : PayableDebts;
 	}
 &nbsp;
-	async <span class="fstat-no" title="function not covered" >create(d</span>ebtData: Record&lt;string, unknown&gt;, transaction?: Transaction) {
-		const Model = <span class="cstat-no" title="statement not covered" >this.getModel();</span>
-<span class="cstat-no" title="statement not covered" >		return await Model.create(debtData, { transaction });</span>
+	async create(debtData: Record&lt;string, unknown&gt;, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.create(debtData as any, { transaction });
 	}
 &nbsp;
-	async <span class="fstat-no" title="function not covered" >findById(i</span>d: UUID, companyId: UUID, transaction?: Transaction) {
-		const Model = <span class="cstat-no" title="statement not covered" >this.getModel();</span>
-<span class="cstat-no" title="statement not covered" >		return await Model.findOne({ where: { id, company_id: companyId }, transaction });</span>
+	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
 	}
 &nbsp;
 	async <span class="fstat-no" title="function not covered" >update(i</span>d: UUID, companyId: UUID, updateData: Partial&lt;DebtDto&gt;, transaction?: Transaction) {
 		const Model = <span class="cstat-no" title="statement not covered" >this.getModel();</span>
-<span class="cstat-no" title="statement not covered" >		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });</span>
+<span class="cstat-no" title="statement not covered" >		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });</span>
 	}
 &nbsp;
 	async <span class="fstat-no" title="function not covered" >delete(i</span>d: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
 		const Model = <span class="cstat-no" title="statement not covered" >this.getModel();</span>
-<span class="cstat-no" title="statement not covered" >		await Model.update({ deleted_by: deletedBy }, { where: { id, company_id: companyId }, transaction });</span>
+<span class="cstat-no" title="statement not covered" >		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });</span>
 <span class="cstat-no" title="statement not covered" >		return await Model.destroy({ where: { id, company_id: companyId }, transaction });</span>
 	}
 &nbsp;
@@ -405,10 +403,9 @@ export class DebtRepository {
 <span class="cstat-no" title="statement not covered" >        return (await sequelize.query(query, { replacements: [companyId, daysThreshold], type: QueryTypes.SELECT })) as UpcomingDueDate[];</span>
     }
 &nbsp;
-	async <span class="fstat-no" title="function not covered" >getMonthlyStats(c</span>ompanyId: string, start: Date, end: Date) {
-		const Model = <span class="cstat-no" title="statement not covered" >this.getModel();</span>
-		const { fn, col, literal, Op } = <span class="cstat-no" title="statement not covered" >require("sequelize");</span>
-<span class="cstat-no" title="statement not covered" >		return await Model.findAll({</span>
+	async getMonthlyStats(companyId: string, start: Date, end: Date) {
+		const Model = this.getModel();
+		return await Model.findAll({
 			attributes: [[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"], [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"]],
 			where: { company_id: companyId, issue_date: { [Op.gte]: start, [Op.lt]: end }, deleted_at: null },
 			group: [fn("DATE_FORMAT", col("issue_date"), "%Y-%m")],
@@ -424,7 +421,7 @@ export class DebtRepository {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-19T13:01:17.545Z
+                at 2026-04-19T13:33:46.359Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -1,6 +1,7 @@
 import { sequelize } from "../lib/db/sequelize";
 import { QueryTypes, Transaction } from "sequelize";
 import { CustomerDto, DebtDto, PaymentDto, UUID, SortItem, FilterItem } from "@common/types";
+import { ReceivableCustomers, PayableCustomers } from "../models";
 
 export type CustomerDomain = "receivable" | "payable";
 
@@ -12,13 +13,12 @@ export class CustomerRepository {
     }
 
 	private getModel() {
-		const { ReceivableCustomers, PayableCustomers } = require("../models");
 		return this.domain === "receivable" ? ReceivableCustomers : PayableCustomers;
 	}
 
 	async create(customerData: Omit<CustomerDto, "id" | "total_debt" | "total_payments" | "remaining_debt" | "created_at" | "updated_at"> & { company_id: string; created_by: string }, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.create(customerData, { transaction });
+		return await Model.create(customerData as any, { transaction });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
@@ -28,12 +28,12 @@ export class CustomerRepository {
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<CustomerDto>, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.update(updateData, { where: { id, company_id: companyId }, transaction });
+		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
-		await Model.update({ deleted_by: deletedBy }, { where: { id, company_id: companyId }, transaction });
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
