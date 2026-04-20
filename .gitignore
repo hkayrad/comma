@@ -37,3 +37,6 @@ build.bat
 build.ps1
 server/.env.test
 server/coverage/
+
+CodeReviewReport.md
+docs/
