@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../../errors/AppError";
-import { Logger } from "../logger";
+import { AppError } from "@/lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
 
 /**
  * Global error handling middleware.

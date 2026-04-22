@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
-import PayablePaymentsService from "../../services/Payable/PaymentsService";
-import { authMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils/logger";
-import { asyncHandler } from "../../lib/utils/middleware/asyncHandler";
-import { validate } from "../../lib/utils/middleware/validate";
+import PayablePaymentsService from "@/services/Payable/PaymentsService";
+import { authMiddleware } from "@/lib/middleware";
+import { Logger } from "@/lib/utils/logger";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { validate } from "@/lib/utils/middleware/validate";
 import { paymentSchema, paginationSchema } from "@common/schemas";
 
 const router = express.Router();

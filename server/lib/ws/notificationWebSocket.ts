@@ -3,7 +3,7 @@ import { Server } from "http";
 import { IncomingMessage } from "http";
 import jwt from "jsonwebtoken";
 import { DecodedJwtToken } from "@common/types";
-import { Logger } from "../utils/logger";
+import { Logger } from "@/lib/utils/logger";
 import { UserRole } from "@common/enums";
 
 interface AuthenticatedWebSocket extends WebSocket {

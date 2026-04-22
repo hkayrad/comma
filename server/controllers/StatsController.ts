@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
-import { authMiddleware } from "../lib/middleware";
-import { Logger } from "../lib/utils/logger";
-import StatsService from "../services/StatsService";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
+import { authMiddleware } from "@/lib/middleware";
+import { Logger } from "@/lib/utils/logger";
+import StatsService from "@/services/StatsService";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 
 const router = express.Router();
 

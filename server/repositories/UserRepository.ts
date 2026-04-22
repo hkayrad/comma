@@ -1,6 +1,6 @@
-import { Users, RefreshTokens } from "../models";
+import { Users, RefreshTokens } from "@/models";
 import { UserDto, UUID, SortItem, FilterItem } from "@common/types";
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction, LOCK } from "sequelize";
 
 /** Data required to create a new user */

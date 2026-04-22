@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
-import { authMiddleware, adminMiddleware, configMiddleware } from '../../lib/middleware';
+import { authMiddleware, adminMiddleware, configMiddleware } from '@/lib/middleware';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@common/enums';
 

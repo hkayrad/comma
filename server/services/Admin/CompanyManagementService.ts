@@ -1,7 +1,7 @@
 import { CompanyDto, UUID, SortItem, FilterItem } from "@common/types";
-import { Logger } from "../../lib/utils/logger";
-import { CompanyRepository } from "../../repositories/CompanyRepository";
-import { NotFoundError, ValidationError } from "../../lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
+import { CompanyRepository } from "@/repositories/CompanyRepository";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 
 export class CompanyManagementService {
 	static async Create(company: CompanyDto) {

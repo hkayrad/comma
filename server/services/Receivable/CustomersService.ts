@@ -1,7 +1,7 @@
-import { CustomerRepository } from "../../repositories/CustomerRepository";
+import { CustomerRepository } from "@/repositories/CustomerRepository";
 import { CustomerDto, UUID, SortItem, FilterItem } from "@common/types";
-import { Logger } from "../../lib/utils/logger";
-import { NotFoundError, ValidationError } from "../../lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 
 const repo = new CustomerRepository("receivable");
 

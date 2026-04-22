@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { app } from '../../../index';
-import PayableDebtsService from '../../../services/Payable/DebtsService';
+import { app } from '@/index';
+import PayableDebtsService from '@/services/Payable/DebtsService';
 import jwt from 'jsonwebtoken';
 
 describe('PayableDebtsController', () => {

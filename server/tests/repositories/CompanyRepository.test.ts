@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { CompanyRepository } from '../../repositories/CompanyRepository';
-import { Companies } from '../../models';
+import { CompanyRepository } from '@/repositories/CompanyRepository';
+import { Companies } from '@/models';
 
 describe('CompanyRepository', () => {
   const TEST_NAME = 'UNIQUE_REPO_CO_NAME_V4';

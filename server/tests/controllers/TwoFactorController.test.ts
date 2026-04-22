@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { app } from '../../index';
-import { TwoFactorService } from '../../services/TwoFactorService';
-import { AuthService } from '../../services/AuthService';
+import { app } from '@/index';
+import { TwoFactorService } from '@/services/TwoFactorService';
+import { AuthService } from '@/services/AuthService';
 import jwt from 'jsonwebtoken';
 
 describe('TwoFactorController', () => {

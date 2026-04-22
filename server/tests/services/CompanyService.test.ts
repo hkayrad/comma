@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CompanyService } from '../../services/CompanyService';
-import { CompanyRepository } from '../../repositories/CompanyRepository';
-import { NotFoundError, ValidationError } from '../../lib/errors/AppError';
+import { CompanyService } from '@/services/CompanyService';
+import { CompanyRepository } from '@/repositories/CompanyRepository';
+import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 import fs from 'fs';
 import sharp from 'sharp';
 

@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
-import { authMiddleware } from "../lib/middleware";
-import { CompanyService } from "../services/CompanyService";
-import { Logger } from "../lib/utils/logger";
+import { authMiddleware } from "@/lib/middleware";
+import { CompanyService } from "@/services/CompanyService";
+import { Logger } from "@/lib/utils/logger";
 import { UploadedFile } from "express-fileupload";
 import { CompanyDto } from "@common/types";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
-import { ValidationError } from "../lib/errors/AppError";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { ValidationError } from "@/lib/errors/AppError";
 
 const router = express.Router();
 

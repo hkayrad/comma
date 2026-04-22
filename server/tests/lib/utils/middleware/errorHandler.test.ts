@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { errorHandler } from '../../../../lib/utils/middleware/errorHandler';
-import { AppError, ValidationError } from '../../../../lib/errors/AppError';
+import { errorHandler } from '@/lib/utils/middleware/errorHandler';
+import { AppError, ValidationError } from '@/lib/errors/AppError';
 import { Request, Response } from 'express';
 
 describe('errorHandler', () => {

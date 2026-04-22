@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema, ZodError } from "zod";
-import { ValidationError } from "../../errors/AppError";
+import { ValidationError } from "@/lib/errors/AppError";
 
 /**
  * Express middleware factory that validates request data against a Zod schema.

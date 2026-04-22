@@ -1,5 +1,5 @@
 import { ExchangeRates } from "@common/types";
-import { Logger } from "../lib/utils/logger";
+import { Logger } from "@/lib/utils/logger";
 
 function formatDate(date: Date): string {
 	const day = String(date.getDate()).padStart(2, "0");

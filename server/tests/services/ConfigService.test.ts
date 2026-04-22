@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { ConfigService } from '../../services/ConfigService';
-import { Config } from '../../models';
+import { ConfigService } from '@/services/ConfigService';
+import { Config } from '@/models';
 
 describe('ConfigService', () => {
   const TEST_KEY = 'TEST_AUTO_CONFIG_KEY';

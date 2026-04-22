@@ -1,7 +1,7 @@
 import { CreateUserDto, UserDto, UUID, SortItem, FilterItem } from "@common/types";
-import { Logger } from "../../lib/utils/logger";
-import { UserRepository } from "../../repositories/UserRepository";
-import { NotFoundError, ValidationError } from "../../lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
+import { UserRepository } from "@/repositories/UserRepository";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;

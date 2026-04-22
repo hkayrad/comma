@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { CompanyManagementService } from '../../../services/Admin/CompanyManagementService';
-import { CompanyRepository } from '../../../repositories/CompanyRepository';
-import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import { CompanyManagementService } from '@/services/Admin/CompanyManagementService';
+import { CompanyRepository } from '@/repositories/CompanyRepository';
+import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 
 describe('CompanyManagementService', () => {
   beforeEach(() => {

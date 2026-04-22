@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TwoFactorService } from '../../services/TwoFactorService';
-import { UserRepository } from '../../repositories/UserRepository';
+import { TwoFactorService } from '@/services/TwoFactorService';
+import { UserRepository } from '@/repositories/UserRepository';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import * as OTPAuth from 'otpauth';

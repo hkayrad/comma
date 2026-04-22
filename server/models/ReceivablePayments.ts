@@ -1,5 +1,5 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import { ReceivableCustomers } from "./ReceivableCustomers";
 import { Companies } from "./Companies";
 import { Users } from "./Users";

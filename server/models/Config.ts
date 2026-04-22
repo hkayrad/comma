@@ -1,5 +1,5 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 
 export class Config extends Model<InferAttributes<Config>, InferCreationAttributes<Config>> {
 	declare configKey: string;

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import PayableDebtsService from '../../../services/Payable/DebtsService';
-import { DebtRepository } from '../../../repositories/DebtRepository';
-import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import PayableDebtsService from '@/services/Payable/DebtsService';
+import { DebtRepository } from '@/repositories/DebtRepository';
+import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 
 describe('PayableDebtsService', () => {
   beforeEach(() => {

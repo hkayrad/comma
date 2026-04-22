@@ -1,11 +1,11 @@
 import express from "express";
-import { AuthService } from "../services/AuthService";
-import { Logger } from "../lib/utils/logger";
+import { AuthService } from "@/services/AuthService";
+import { Logger } from "@/lib/utils/logger";
 import dotenv from "dotenv";
-import { authRateLimiter } from "../lib/utils/middleware/rateLimiter";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
-import { UnauthorizedError, ValidationError } from "../lib/errors/AppError";
-import { validate } from "../lib/utils/middleware/validate";
+import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { UnauthorizedError, ValidationError } from "@/lib/errors/AppError";
+import { validate } from "@/lib/utils/middleware/validate";
 import { loginSchema } from "@common/schemas";
 
 dotenv.config();

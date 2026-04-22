@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
-import ReceivablePaymentsService from "../../services/Receivable/PaymentsService";
-import { Logger } from "../../lib/utils/logger";
-import { authMiddleware } from "../../lib/middleware";
-import { asyncHandler } from "../../lib/utils/middleware/asyncHandler";
-import { validate } from "../../lib/utils/middleware/validate";
+import ReceivablePaymentsService from "@/services/Receivable/PaymentsService";
+import { Logger } from "@/lib/utils/logger";
+import { authMiddleware } from "@/lib/middleware";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { validate } from "@/lib/utils/middleware/validate";
 import { paymentSchema, paginationSchema } from "@common/schemas";
 
 const router = express.Router();

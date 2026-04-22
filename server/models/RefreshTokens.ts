@@ -1,5 +1,5 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import { Users } from "./Users";
 
 export class RefreshTokens extends Model<InferAttributes<RefreshTokens>, InferCreationAttributes<RefreshTokens>> {

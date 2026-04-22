@@ -1,5 +1,5 @@
-import { Logger } from "../lib/utils/logger";
-import { DebtRepository } from "../repositories/DebtRepository";
+import { Logger } from "@/lib/utils/logger";
+import { DebtRepository } from "@/repositories/DebtRepository";
 
 export interface MonthlyStatsData {
     month: string;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ReceivableDebts, PayableDebts, ReceivablePayments, PayablePayments } from '../../models';
+import { ReceivableDebts, PayableDebts, ReceivablePayments, PayablePayments } from '@/models';
 import { ADMIN_USER_ID } from '@common/constants';
 
 describe("Models Virtual Fields", () => {

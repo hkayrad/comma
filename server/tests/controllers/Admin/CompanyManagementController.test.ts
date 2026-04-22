@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { app } from '../../../index';
-import { CompanyManagementService } from '../../../services/Admin/CompanyManagementService';
+import { app } from '@/index';
+import { CompanyManagementService } from '@/services/Admin/CompanyManagementService';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@common/enums';
 import { ADMIN_COMPANY_ID, ADMIN_USER_ID } from '@common/constants';

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UserManagementService } from '../../../services/Admin/UserManagementService';
-import { UserRepository } from '../../../repositories/UserRepository';
+import { UserManagementService } from '@/services/Admin/UserManagementService';
+import { UserRepository } from '@/repositories/UserRepository';
 import bcrypt from 'bcrypt';
-import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 
 describe('UserManagementService', () => {
   beforeEach(() => {

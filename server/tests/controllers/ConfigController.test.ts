@@ -1,8 +1,8 @@
 import { describe, it, expect, afterAll, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { app } from '../../index';
-import { Config } from '../../models';
-import { ConfigService } from '../../services/ConfigService';
+import { app } from '@/index';
+import { Config } from '@/models';
+import { ConfigService } from '@/services/ConfigService';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@common/enums';
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Server } from 'http';
-import NotificationWebSocket from '../../../lib/ws/notificationWebSocket';
+import NotificationWebSocket from '@/lib/ws/notificationWebSocket';
 import { WebSocket, WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
-import { Logger } from '../../../lib/utils/logger';
+import { Logger } from '@/lib/utils/logger';
 import { UserRole } from '@common/enums';
 
 vi.mock('ws', async () => {

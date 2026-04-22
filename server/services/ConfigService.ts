@@ -1,6 +1,6 @@
-import { Logger } from "../lib/utils/logger";
+import { Logger } from "@/lib/utils/logger";
 import { ConfigKey, ConfigValue } from "@common/types";
-import { ConfigRepository } from "../repositories/ConfigRepository";
+import { ConfigRepository } from "@/repositories/ConfigRepository";
 
 export class ConfigService {
 	static async GetConfigs(): Promise<{ [key: string]: string }> {

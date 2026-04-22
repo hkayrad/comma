@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
-import { adminMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils/logger";
-import { CompanyManagementService } from "../../services/Admin/CompanyManagementService";
-import { asyncHandler } from "../../lib/utils/middleware/asyncHandler";
-import { validate } from "../../lib/utils/middleware/validate";
+import { adminMiddleware } from "@/lib/middleware";
+import { Logger } from "@/lib/utils/logger";
+import { CompanyManagementService } from "@/services/Admin/CompanyManagementService";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { validate } from "@/lib/utils/middleware/validate";
 import { companySchema, paginationSchema } from "@common/schemas";
 
 const router = express.Router();

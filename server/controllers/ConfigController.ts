@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
-import { ConfigService } from "../services/ConfigService";
-import { Logger } from "../lib/utils/logger";
-import { configMiddleware } from "../lib/middleware";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
-import { ValidationError, ForbiddenError } from "../lib/errors/AppError";
-import { validate } from "../lib/utils/middleware/validate";
+import { ConfigService } from "@/services/ConfigService";
+import { Logger } from "@/lib/utils/logger";
+import { configMiddleware } from "@/lib/middleware";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { ValidationError, ForbiddenError } from "@/lib/errors/AppError";
+import { validate } from "@/lib/utils/middleware/validate";
 import { configSchema } from "@common/schemas";
 import { UserRole } from "@common/enums";
 

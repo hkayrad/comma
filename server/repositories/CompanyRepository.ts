@@ -1,6 +1,6 @@
-import { Companies } from "../models";
+import { Companies } from "@/models";
 import { CompanyDto, UUID, SortItem, FilterItem } from "@common/types";
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction } from "sequelize";
 
 export class CompanyRepository {

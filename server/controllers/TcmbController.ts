@@ -1,9 +1,9 @@
 import express from "express";
-import { Logger } from "../lib/utils/logger";
-import { authMiddleware } from "../lib/middleware";
-import { TcmbService } from "../services/TcmbService";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
-import { AppError } from "../lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
+import { authMiddleware } from "@/lib/middleware";
+import { TcmbService } from "@/services/TcmbService";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { AppError } from "@/lib/errors/AppError";
 
 const router = express.Router();
 

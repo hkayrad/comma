@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll } from 'vitest';
-import { ConfigRepository } from '../../repositories/ConfigRepository';
-import { Config } from '../../models';
+import { ConfigRepository } from '@/repositories/ConfigRepository';
+import { Config } from '@/models';
 
 describe('ConfigRepository', () => {
   const TEST_KEY = 'REPO_TEST_KEY';

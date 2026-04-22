@@ -1,7 +1,7 @@
-import { sequelize } from "../lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction } from "sequelize";
 import { CustomerDto, DebtDto, PaymentDto, UUID, SortItem, FilterItem } from "@common/types";
-import { ReceivableCustomers, PayableCustomers } from "../models";
+import { ReceivableCustomers, PayableCustomers } from "@/models";
 
 export type CustomerDomain = "receivable" | "payable";
 

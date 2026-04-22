@@ -1,10 +1,10 @@
 import express from "express";
-import { TwoFactorService } from "../services/TwoFactorService";
-import { Logger } from "../lib/utils/logger";
-import { authMiddleware } from "../lib/middleware";
-import { authRateLimiter } from "../lib/utils/middleware/rateLimiter";
-import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
-import { UnauthorizedError, ValidationError } from "../lib/errors/AppError";
+import { TwoFactorService } from "@/services/TwoFactorService";
+import { Logger } from "@/lib/utils/logger";
+import { authMiddleware } from "@/lib/middleware";
+import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { UnauthorizedError, ValidationError } from "@/lib/errors/AppError";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
@@ -138,7 +138,7 @@ router.post("/verify", authRateLimiter, verify2FATempToken, asyncHandler(async (
   }
 
   // 2FA verified - issue full tokens
-  const { AuthService } = await import("../services/AuthService");
+  const { AuthService } = await import("@/services/AuthService");
   const loginResult = await AuthService.Complete2FALogin(userId);
 
   if (!loginResult.success) {
@@ -187,7 +187,7 @@ router.post("/recovery", authRateLimiter, verify2FATempToken, asyncHandler(async
   }
 
   // Recovery code verified - issue full tokens
-  const { AuthService } = await import("../services/AuthService");
+  const { AuthService } = await import("@/services/AuthService");
   const loginResult = await AuthService.Complete2FALogin(userId);
 
   if (!loginResult.success) {

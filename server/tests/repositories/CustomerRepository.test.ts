@@ -1,8 +1,8 @@
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
-import { CustomerRepository } from '../../repositories/CustomerRepository';
-import { CompanyRepository } from '../../repositories/CompanyRepository';
-import { UserRepository } from '../../repositories/UserRepository';
-import { ReceivableCustomers, PayableCustomers, Companies, Users } from '../../models';
+import { CustomerRepository } from '@/repositories/CustomerRepository';
+import { CompanyRepository } from '@/repositories/CompanyRepository';
+import { UserRepository } from '@/repositories/UserRepository';
+import { ReceivableCustomers, PayableCustomers, Companies, Users } from '@/models';
 import { ADMIN_USER_ID } from '@common/constants';
 
 describe('CustomerRepository', () => {

@@ -1,7 +1,7 @@
 import { PaymentDto, UUID, SortItem, FilterItem } from "@common/types";
-import { Logger } from "../../lib/utils/logger";
-import { PaymentRepository } from "../../repositories/PaymentRepository";
-import { NotFoundError, ValidationError } from "../../lib/errors/AppError";
+import { Logger } from "@/lib/utils/logger";
+import { PaymentRepository } from "@/repositories/PaymentRepository";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 
 const repo = new PaymentRepository("receivable");
 

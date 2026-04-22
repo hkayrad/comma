@@ -1,10 +1,10 @@
-import { Logger } from "../lib/utils/logger";
+import { Logger } from "@/lib/utils/logger";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { UserRepository } from "../repositories/UserRepository";
-import { sequelize } from "../lib/db/sequelize";
+import { UserRepository } from "@/repositories/UserRepository";
+import { sequelize } from "@/lib/db/sequelize";
 import { Transaction } from "sequelize";
 
 dotenv.config();

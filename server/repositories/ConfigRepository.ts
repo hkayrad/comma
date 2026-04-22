@@ -1,4 +1,4 @@
-import { Config } from "../models";
+import { Config } from "@/models";
 import { ConfigKey, ConfigValue } from "@common/types";
 
 export class ConfigRepository {

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AuthService } from '../../services/AuthService';
-import { UserRepository } from '../../repositories/UserRepository';
+import { AuthService } from '@/services/AuthService';
+import { UserRepository } from '@/repositories/UserRepository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { sequelize } from '../../lib/db/sequelize';
+import { sequelize } from '@/lib/db/sequelize';
 import { Transaction } from 'sequelize';
 
 describe('AuthService', () => {

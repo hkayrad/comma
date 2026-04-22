@@ -1,9 +1,9 @@
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
-import { DebtRepository } from '../../repositories/DebtRepository';
-import { CustomerRepository } from '../../repositories/CustomerRepository';
-import { CompanyRepository } from '../../repositories/CompanyRepository';
-import { UserRepository } from '../../repositories/UserRepository';
-import { ReceivableDebts, PayableDebts, ReceivableCustomers, PayableCustomers, Companies, Users } from '../../models';
+import { DebtRepository } from '@/repositories/DebtRepository';
+import { CustomerRepository } from '@/repositories/CustomerRepository';
+import { CompanyRepository } from '@/repositories/CompanyRepository';
+import { UserRepository } from '@/repositories/UserRepository';
+import { ReceivableDebts, PayableDebts, ReceivableCustomers, PayableCustomers, Companies, Users } from '@/models';
 import { ADMIN_USER_ID } from '@common/constants';
 
 describe('DebtRepository', () => {

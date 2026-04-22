@@ -1,4 +1,4 @@
-import { sequelize } from "./lib/db/sequelize";
+import { sequelize } from "@/lib/db/sequelize";
 import "./models"; 
 
 async function sync() {

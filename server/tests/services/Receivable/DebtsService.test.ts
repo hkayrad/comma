@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ReceivableDebtsService from '../../../services/Receivable/DebtsService';
-import { DebtRepository } from '../../../repositories/DebtRepository';
-import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import ReceivableDebtsService from '@/services/Receivable/DebtsService';
+import { DebtRepository } from '@/repositories/DebtRepository';
+import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 import { ADMIN_COMPANY_ID } from '@common/constants';
 
 describe('ReceivableDebtsService', () => {

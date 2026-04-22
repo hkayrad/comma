@@ -1,10 +1,10 @@
-import { Logger } from "../lib/utils/logger";
+import { Logger } from "@/lib/utils/logger";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
-import { UserRepository } from "../repositories/UserRepository";
+import { UserRepository } from "@/repositories/UserRepository";
 import { Op } from "sequelize";
 
 dotenv.config();

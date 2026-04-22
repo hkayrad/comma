@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import { app } from '../index';
+import { app } from '@/index';
 import fs from 'fs';
 import path from 'path';
 

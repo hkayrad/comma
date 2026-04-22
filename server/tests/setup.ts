@@ -1,5 +1,5 @@
 import { beforeAll, afterAll } from 'vitest';
-import { sequelize } from '../lib/db/sequelize';
+import { sequelize } from '@/lib/db/sequelize';
 import dotenv from 'dotenv';
 import path from 'path';
 

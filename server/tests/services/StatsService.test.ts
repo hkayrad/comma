@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import StatsService from '../../services/StatsService';
-import { DebtRepository } from '../../repositories/DebtRepository';
+import StatsService from '@/services/StatsService';
+import { DebtRepository } from '@/repositories/DebtRepository';
 
 describe('StatsService', () => {
   beforeEach(() => {

@@ -4,7 +4,7 @@
   "version": "2.9.0",
   "scripts": {
     "dev": "npx tsx --watch index.ts",
-    "build": "tsc --build",
+    "build": "tsc --build && tsc-alias",
     "postbuild": "node -e \"const fs=require('fs'); fs.copyFileSync('package.json', 'dist/package.json'); fs.copyFileSync('package-lock.json', 'dist/package-lock.json');\"",
     "serve": "node dist/index.js",
     "test": "vitest run",

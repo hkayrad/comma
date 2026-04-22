@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TcmbService } from '../../services/TcmbService';
+import { TcmbService } from '@/services/TcmbService';
 
 describe('TcmbService', () => {
   const originalFetch = global.fetch;

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
-import { app } from '../../index';
-import { TcmbService } from '../../services/TcmbService';
+import { app } from '@/index';
+import { TcmbService } from '@/services/TcmbService';
 import jwt from 'jsonwebtoken';
 
 describe('TcmbController', () => {

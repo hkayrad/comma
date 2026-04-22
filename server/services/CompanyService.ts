@@ -1,11 +1,11 @@
 import { UploadedFile } from "express-fileupload";
 import path from "path";
-import { Logger } from "../lib/utils/logger";
+import { Logger } from "@/lib/utils/logger";
 import fs from "fs";
 import { CompanyDto, LogoSize, UUID } from "@common/types";
-import { CompanyRepository } from "../repositories/CompanyRepository";
+import { CompanyRepository } from "@/repositories/CompanyRepository";
 import sharp from "sharp";
-import { NotFoundError, ValidationError } from "../lib/errors/AppError";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve(process.cwd(), "uploads", "logos");

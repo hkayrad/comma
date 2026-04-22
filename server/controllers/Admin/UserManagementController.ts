@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express";
-import { adminMiddleware } from "../../lib/middleware";
-import { Logger } from "../../lib/utils/logger";
-import { UserManagementService } from "../../services/Admin/UserManagementService";
-import { asyncHandler } from "../../lib/utils/middleware/asyncHandler";
-import { ValidationError } from "../../lib/errors/AppError";
-import { validate } from "../../lib/utils/middleware/validate";
+import { adminMiddleware } from "@/lib/middleware";
+import { Logger } from "@/lib/utils/logger";
+import { UserManagementService } from "@/services/Admin/UserManagementService";
+import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
+import { ValidationError } from "@/lib/errors/AppError";
+import { validate } from "@/lib/utils/middleware/validate";
 import { createUserSchema, paginationSchema } from "@common/schemas";
-import { authRateLimiter } from "../../lib/utils/middleware/rateLimiter";
+import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 
 const router = express.Router();
 
