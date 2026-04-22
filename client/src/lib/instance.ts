@@ -1,4 +1,6 @@
 import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import i18n from "../i18n";
+import { mapBackendErrorToTranslationKey } from "./utils/errorMapper";
 
 const instance = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
@@ -31,7 +33,8 @@ instance.interceptors.response.use(
 
 		// Don't intercept refresh requests themselves to avoid loops
 		if (originalRequest?.url?.includes("/refresh")) {
-			return Promise.reject(error);
+			const errorKey = mapBackendErrorToTranslationKey(error);
+			return Promise.reject(new Error(i18n.t(errorKey as any)));
 		}
 
 		if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
@@ -43,7 +46,12 @@ instance.interceptors.response.use(
 						return instance(originalRequest);
 					})
 					.catch((err) => {
-						return Promise.reject(err);
+						// If it's already a localized Error, just pass it through
+						if (err instanceof Error && !(err as any).isAxiosError) {
+							return Promise.reject(err);
+						}
+						const errorKey = mapBackendErrorToTranslationKey(err);
+						return Promise.reject(new Error(i18n.t(errorKey as any)));
 					});
 			}
 
@@ -63,13 +71,15 @@ instance.interceptors.response.use(
 				if (!window.location.pathname.includes("/login")) {
 					window.location.href = "/login";
 				}
-				return Promise.reject(refreshError);
+				const errorKey = mapBackendErrorToTranslationKey(refreshError);
+				return Promise.reject(new Error(i18n.t(errorKey as any)));
 			} finally {
 				isRefreshing = false;
 			}
 		}
 
-		return Promise.reject(error);
+		const errorKey = mapBackendErrorToTranslationKey(error);
+		return Promise.reject(new Error(i18n.t(errorKey as any)));
 	},
 );
 

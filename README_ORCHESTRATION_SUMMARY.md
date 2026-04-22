@@ -69,9 +69,12 @@ The following items from the initial report were deferred or identified as out-o
   - Integrated `tsc-alias` into the production build process to resolve paths in `dist/`.
   - Exhaustively refactored 100+ server files (controllers, services, repositories, models, lib, and tests) to use `@/` aliases, eliminating deep relative imports (`../../../`).
   - Verified full system integrity: build succeeds, all 327 unit tests pass, and development runtime boots correctly.
-- **Import Standardization**: Continue refactoring deep relative imports (`../../../`) to use the `@common/` workspace alias across the monorepo.
+- **Import Standardization (COMPLETED & VERIFIED)**: Standardized all common imports across the monorepo to use the `@comma/common` workspace alias and eliminated redundant intermediate proxy type files in `lib/types.d.ts`.
+  - Verified full system integrity: builds succeed and all tests pass with standardized alias resolution.
 
-### 3. Code Quality & Documentation
-- **Migration Views**: Ensure all required database views (e.g., `vw_receivable_total_debt_by_company`) are formally documented in the migration scripts.
-- **Documentation Cleanup**: Update `CODING_CONVENTIONS.md` to remove outdated Zod implementation TODOs that have since been completed.
-- **Global Error Mapping**: Implement a centralized utility to map backend error codes to frontend `i18next` translation keys for more consistent user feedback.
+### 3. Code Quality & Documentation (COMPLETED & VERIFIED)
+- **Migration Views**: Formally documented all 10 database views in `migration.sql` with SQL block comments detailing business purpose, logic, and dependencies.
+- **Documentation Cleanup**: Updated `CODING_CONVENTIONS.md` to remove obsolete Zod implementation TODOs and formally documented the centralized `@comma/common/schemas` validation architecture.
+- **Global Error Mapping**: Implemented a centralized error mapping utility (`errorMapper.ts`) integrated into the global Axios response interceptor.
+  - API errors are now automatically translated into human-readable English and Turkish via `i18next` before reaching UI components.
+  - Verified localization of `toast.promise` notifications across the client application.

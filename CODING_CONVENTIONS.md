@@ -45,7 +45,7 @@ This document outlines the coding standards and architectural patterns for the C
 - **Directories:** Use feature-based grouping (e.g., `Receivable/`, `Payable/`, `Admin/`).
 
 ### 3. API Standards
-- **Responses:** Always return responses using the `ApiResponse` utility for consistent JSON structure.
+- **Responses:** Always return responses using the `ApiResponse` utility for consistent JSON structure. All API responses should adhere to the `ApiResponse` type defined in `@comma/common/types`.
 - **Error Handling:** Use `try-catch` blocks in controllers and services. Log errors using the custom `Logger` utility.
 - **Status Codes:** Use appropriate HTTP status codes (200 for success, 500 for server errors, 401 for unauthorized).
 
@@ -56,7 +56,7 @@ This document outlines the coding standards and architectural patterns for the C
 
 ### 5. Middleware
 - **Auth:** Protect routes using `authMiddleware`.
-- **Validation:** (TODO) Implement request body validation using Zod or a similar library.
+- **Validation:** Utilize centralized Zod schemas from the `@comma/common/schemas` package for consistent validation across the frontend (request composition/forms) and backend (payload validation).
 
 ---
 

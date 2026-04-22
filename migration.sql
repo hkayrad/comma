@@ -154,6 +154,12 @@ ALTER TABLE payable_payments ADD COLUMN due_date DATE DEFAULT NULL;
 -- ---------------------------------------------------------
 
 -- Receivable Debt Summary
+/*
+ * Purpose: Provides a summary of total debt per customer for receivables.
+ * Logic: Sums (amount + vat) multiplied by exchange_rate to get total debt in base currency (TRY).
+ * Dependencies: receivable_debts
+ * Grouping: customer_id, company_id
+ */
 CREATE OR REPLACE VIEW vw_receivable_debt_summary AS 
 SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
 FROM receivable_debts 
@@ -161,6 +167,12 @@ WHERE deleted_at IS NULL AND deleted_by IS NULL
 GROUP BY customer_id, company_id;
 
 -- Receivable Payment Summary
+/*
+ * Purpose: Provides a summary of total payments per customer for receivables.
+ * Logic: Sums amount multiplied by exchange_rate to get total payments in base currency (TRY).
+ * Dependencies: receivable_payments
+ * Grouping: customer_id, company_id
+ */
 CREATE OR REPLACE VIEW vw_receivable_payment_summary AS 
 SELECT customer_id, company_id, SUM(amount * exchange_rate) AS total_payments 
 FROM receivable_payments 
@@ -168,6 +180,12 @@ WHERE deleted_at IS NULL AND deleted_by IS NULL
 GROUP BY customer_id, company_id;
 
 -- Receivable Total Debt By Company
+/*
+ * Purpose: Provides total receivable debt aggregated at the company level for dashboard metrics.
+ * Logic: Sums (amount + vat) and their TRY equivalents across all active customers of a company.
+ * Dependencies: receivable_debts, receivable_customers
+ * Grouping: company_id
+ */
 CREATE OR REPLACE VIEW vw_receivable_total_debt_by_company AS 
 SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
 FROM receivable_debts d 
@@ -176,6 +194,12 @@ WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND
 GROUP BY d.company_id;
 
 -- Receivable Total Payments By Company
+/*
+ * Purpose: Provides total receivable payments aggregated at the company level for dashboard metrics.
+ * Logic: Sums amount and its TRY equivalent across all active customers of a company.
+ * Dependencies: receivable_payments, receivable_customers
+ * Grouping: company_id
+ */
 CREATE OR REPLACE VIEW vw_receivable_total_payments_by_company AS 
 SELECT p.company_id, COALESCE(SUM(p.amount), 0) AS total, COALESCE(SUM(p.amount * p.exchange_rate), 0) AS total_in_try 
 FROM receivable_payments p 
@@ -184,6 +208,12 @@ WHERE p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND
 GROUP BY p.company_id;
 
 -- Payable Debt Summary
+/*
+ * Purpose: Provides a summary of total debt per customer for payables.
+ * Logic: Sums (amount + vat) multiplied by exchange_rate to get total debt in base currency (TRY).
+ * Dependencies: payable_debts
+ * Grouping: customer_id, company_id
+ */
 CREATE OR REPLACE VIEW vw_payable_debt_summary AS 
 SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
 FROM payable_debts 
@@ -191,6 +221,12 @@ WHERE deleted_at IS NULL AND deleted_by IS NULL
 GROUP BY customer_id, company_id;
 
 -- Payable Payment Summary
+/*
+ * Purpose: Provides a summary of total payments per customer for payables.
+ * Logic: Sums amount multiplied by exchange_rate to get total payments in base currency (TRY).
+ * Dependencies: payable_payments
+ * Grouping: customer_id, company_id
+ */
 CREATE OR REPLACE VIEW vw_payable_payment_summary AS 
 SELECT customer_id, company_id, SUM(amount * exchange_rate) AS total_payments 
 FROM payable_payments 
@@ -198,6 +234,12 @@ WHERE deleted_at IS NULL AND deleted_by IS NULL
 GROUP BY customer_id, company_id;
 
 -- Payable Total Debt By Company
+/*
+ * Purpose: Provides total payable debt aggregated at the company level for dashboard metrics.
+ * Logic: Sums (amount + vat) and their TRY equivalents across all active customers of a company.
+ * Dependencies: payable_debts, payable_customers
+ * Grouping: company_id
+ */
 CREATE OR REPLACE VIEW vw_payable_total_debt_by_company AS 
 SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
 FROM payable_debts d 
@@ -206,6 +248,12 @@ WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND
 GROUP BY d.company_id;
 
 -- Payable Total Payments By Company
+/*
+ * Purpose: Provides total payable payments aggregated at the company level for dashboard metrics.
+ * Logic: Sums amount and its TRY equivalent across all active customers of a company.
+ * Dependencies: payable_payments, payable_customers
+ * Grouping: company_id
+ */
 CREATE OR REPLACE VIEW vw_payable_total_payments_by_company AS 
 SELECT p.company_id, COALESCE(SUM(p.amount), 0) AS total, COALESCE(SUM(p.amount * p.exchange_rate), 0) AS total_in_try 
 FROM payable_payments p 
@@ -214,6 +262,12 @@ WHERE p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND
 GROUP BY p.company_id;
 
 -- Receivable Payment By Invoice
+/*
+ * Purpose: Tracks total payments made against specific invoices for receivables.
+ * Logic: Sums amount multiplied by exchange_rate grouped by invoice number.
+ * Dependencies: receivable_payments
+ * Grouping: company_id, customer_id, invoice_no
+ */
 CREATE OR REPLACE VIEW vw_receivable_payment_by_invoice AS
 SELECT 
     company_id, 
@@ -225,6 +279,12 @@ WHERE deleted_at IS NULL AND deleted_by IS NULL
 GROUP BY company_id, customer_id, invoice_no;
 
 -- Payable Payment By Invoice
+/*
+ * Purpose: Tracks total payments made against specific invoices for payables.
+ * Logic: Sums amount multiplied by exchange_rate grouped by invoice number.
+ * Dependencies: payable_payments
+ * Grouping: company_id, customer_id, invoice_no
+ */
 CREATE OR REPLACE VIEW vw_payable_payment_by_invoice AS
 SELECT 
     company_id, 

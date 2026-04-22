@@ -838,5 +838,14 @@
       "enable": "Enable 2FA",
       "disable": "Disable 2FA"
     }
+  },
+  "api_errors": {
+    "validation": "Validation failed",
+    "not_found": "Resource not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "internal_server_error": "Internal server error",
+    "network_error": "Network error",
+    "unknown": "An unknown error occurred"
   }
 }

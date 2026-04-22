@@ -832,5 +832,14 @@
       "enable": "2FA'yı Etkinleştir",
       "disable": "2FA'yı Devre Dışı Bırak"
     }
+  },
+  "api_errors": {
+    "validation": "Doğrulama hatası",
+    "not_found": "Kaynak bulunamadı",
+    "unauthorized": "Yetkisiz erişim",
+    "forbidden": "Erişim yasaklandı",
+    "internal_server_error": "Sunucu hatası",
+    "network_error": "Ağ hatası",
+    "unknown": "Bilinmeyen bir hata oluştu"
   }
 }
