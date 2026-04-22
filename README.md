@@ -109,12 +109,19 @@ The application will be available at:
 
 ## Architecture
 
+### Monorepo & Shared Code
+The `@comma/common` package facilitates cross-workspace type safety and schema validation. By centralizing Zod schemas and TypeScript interfaces, we ensure that the frontend and backend are always in sync regarding data structures and validation rules.
+
+### Performance & Aggregations
+The application leverages high-performance SQL views (e.g., `vw_receivable_debt_summary`, `vw_payable_payment_summary`) for complex financial aggregations. This offloads heavy computation to the database layer, ensuring fast response times even with large datasets.
+
 ### Technology Stack
 
 #### Frontend
 - **React 19.2.3** - Modern UI library with hooks
 - **TypeScript 5.9.3** - Type-safe development
 - **Vite 7.3.0** - Fast build tool and dev server
+- **Zustand 5.0.0** - Lightweight state management
 - **Tailwind CSS 4.1.18** - Utility-first styling
 - **Shadcn/ui** - High-quality component library
 - **Tanstack Table** - Powerful data grid solution
@@ -126,6 +133,7 @@ The application will be available at:
 - **Node.js** - JavaScript runtime
 - **Express 5.2.1** - Web framework
 - **TypeScript 5.9.3** - Type-safe backend development
+- **tsc-alias** - Path alias resolution for builds
 - **Sequelize 6.37.7** - ORM for database operations
 - **MariaDB 3.4.5** - Database engine
 - **JWT 9.0.3** - Authentication tokens
@@ -135,23 +143,35 @@ The application will be available at:
 
 ### Project Structure
 
+The project uses a monorepo-style structure with a dedicated shared workspace for cross-cutting concerns.
+
 ```
 comma/
-├── client/                 # React frontend application
+├── client/                 # React frontend application (Vite)
 │   ├── src/
 │   │   ├── layout/        # Page components and layouts
 │   │   ├── components/    # Reusable UI components
-│   │   ├── contexts/      # React Context providers
+│   │   ├── stores/        # Zustand state stores
 │   │   ├── lib/          # Utilities and API clients
 │   │   └── locales/      # Internationalization files
 │   ├── package.json
 │   └── vite.config.ts
-├── server/                # Node.js backend application
+├── server/                # Node.js backend application (Express)
 │   ├── controllers/      # Route handlers
 │   ├── services/         # Business logic layer
 │   ├── models/           # Database models
 │   ├── lib/              # Utilities and middleware
 │   └── index.ts          # Application entry point
+├── common/                # Shared workspace (@comma/common)
+│   ├── src/
+│   │   ├── auth/         # Auth-related types and schemas
+│   │   ├── customers/    # Customer-related types and schemas
+│   │   ├── debts/        # Debt-related types and schemas
+│   │   ├── payments/     # Payment-related types and schemas
+│   │   ├── companies/    # Company-related types and schemas
+│   │   ├── config/       # Config-related types and schemas
+│   │   └── shared/       # Shared utilities and base types
+│   └── package.json
 ├── build/                # Production build output
 ├── start.sh             # Development startup script
 ├── migration.sql        # Database schema migrations
@@ -159,6 +179,12 @@ comma/
 ├── CODING_CONVENTIONS.md # Development guidelines
 └── README.md           # This file
 ```
+
+### Path Aliases
+
+Standardized path aliases are used across the workspace to ensure clean imports:
+- `@/*`: Maps to the root source directory of the respective workspace (`client/src` or `server/`).
+- `@comma/common`: Maps to the shared `common/` workspace for type safety and schema validation.
 
 ## Performance
 

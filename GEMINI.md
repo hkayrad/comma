@@ -15,17 +15,24 @@
 
 ## Directory Structure
 
-*   `client/`: Frontend application source code.
-    *   `src/components/`: Reusable UI components that comes from shadcn or similar libraries.
+*   `client/`: Frontend application source code (Vite).
+    *   `src/components/`: Reusable UI components from shadcn or similar.
     *   `src/layout/`: Page layouts and views.
-    *   `src/layout/shared/`: User generated shared UI components.
+    *   `src/stores/`: Zustand state stores.
     *   `src/lib/`: Utilities and API clients.
-*   `server/`: Backend application source code.
+*   `server/`: Backend application source code (Express).
     *   `controllers/`: Request handlers.
     *   `services/`: Business logic.
     *   `models/`: Sequelize database models.
     *   `lib/db/`: Database configuration (`sequelize.ts`).
-*   `common/`: Shared type definitions (likely symlinked or copied).
+*   `common/`: Shared workspace (`@comma/common`).
+    *   `src/auth/`: Auth-related types and schemas.
+    *   `src/customers/`: Customer-related types and schemas.
+    *   `src/debts/`: Debt-related types and schemas.
+    *   `src/payments/`: Payment-related types and schemas.
+    *   `src/companies/`: Company-related types and schemas.
+    *   `src/config/`: Config-related types and schemas.
+    *   `src/shared/`: Shared utilities and base types.
 
 ## Building and Running
 
@@ -71,5 +78,8 @@ The project includes helper scripts in the root directory:
 
 *   **Language:** TypeScript is used for both client and server.
 *   **Styling:** Tailwind CSS with Shadcn/ui components.
+*   **State Management:** **Zustand** is the standard for frontend global state. React Context is deprecated for global state.
+*   **Path Aliases:** Always use `@/` for root source paths and `@comma/common` for shared code.
+*   **Validation:** Use centralized **Zod validation schemas** from `@comma/common/schemas` for all new API-related work.
 *   **API:** RESTful API design.
-*   **Database:** Sequelize ORM is used for database interactions. Avoid raw SQL where possible, though migrations might use it (`migration.sql`).
+*   **Database:** Sequelize ORM is used for database interactions. Avoid raw SQL where possible, though migrations might use it (`migration.sql`). High-performance SQL views are used for complex aggregations.

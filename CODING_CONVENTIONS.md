@@ -15,7 +15,8 @@ This document outlines the coding standards and architectural patterns for the C
 ### 2. State & Data Fetching
 - **Hooks:** Use `useState`, `useEffect`, and `useCallback` for local state and side effects.
 - **API Interaction:** Encapsulate API calls within static classes in `src/lib/api/` (e.g., `ReceivablePaymentApi.GetAll()`).
-- **Global Context:** Use React Context for global state (auth, config, dialogs) located in `src/contexts/`.
+- **Global State:** Use **Zustand** for global application state (auth, config, user settings). React Context is deprecated for global state and should only be used for low-frequency updates or dependency injection (e.g., dialogs, themes).
+- **Selectors:** Always use fine-grained selectors when consuming Zustand stores to prevent unnecessary full-tree re-renders.
 
 ### 3. Styling
 - **Tailwind CSS:** Use utility classes for all styling. Avoid custom CSS files unless strictly necessary.
@@ -25,9 +26,11 @@ This document outlines the coding standards and architectural patterns for the C
 - **Tanstack Table:** Use `@tanstack/react-table` for all data grids.
 - **Server-side Logic:** Implement server-side pagination, sorting, and filtering using the `HksTable` wrapper.
 
-### 5. TypeScript
+### 5. TypeScript & Imports
 - **Typing:** Favor `interface` or `type` for all data structures and props.
-- **Shared Types:** Utilize types from the root `common/` directory for consistency with the backend.
+- **Shared Resources:** Always use the `@comma/common` workspace alias for all shared types, enums, and constants.
+- **Root Aliases:** Use `@/` to refer to the `src/` root.
+- **Verbatim Module Syntax:** To ensure zero-cost emit and compliance with `verbatimModuleSyntax`, ALWAYS use `import type` when importing types or schemas from the common package.
 
 ---
 
@@ -46,7 +49,10 @@ This document outlines the coding standards and architectural patterns for the C
 
 ### 3. API Standards
 - **Responses:** Always return responses using the `ApiResponse` utility for consistent JSON structure. All API responses should adhere to the `ApiResponse` type defined in `@comma/common/types`.
-- **Error Handling:** Use `try-catch` blocks in controllers and services. Log errors using the custom `Logger` utility.
+- **Error Handling:**
+    - Use `try-catch` blocks in controllers and services.
+    - Backend errors are mapped to localized translation keys via the frontend's centralized global error mapper (Axios response interceptors).
+    - Components should utilize the standardized `i18next` localized error strings provided by the interceptor rather than manual string extraction.
 - **Status Codes:** Use appropriate HTTP status codes (200 for success, 500 for server errors, 401 for unauthorized).
 
 ### 4. Database & ORM
@@ -54,7 +60,7 @@ This document outlines the coding standards and architectural patterns for the C
 - **Raw SQL:** Use `sequelize.query` for complex reports or multi-join operations that are difficult to express via the ORM.
 - **Migrations:** Document database changes in SQL files (e.g., `migration.sql`).
 
-### 5. Middleware
+### 5. Middleware & Validation
 - **Auth:** Protect routes using `authMiddleware`.
 - **Validation:** Utilize centralized Zod schemas from the `@comma/common/schemas` package for consistent validation across the frontend (request composition/forms) and backend (payload validation).
 

@@ -579,3 +579,29 @@ Base URL: `/admin/companies`
     - `id` (string): The company ID.
 - **Response:**
     - Company details.
+
+## Error Responses
+
+The backend utilizes a standardized error handling architecture based on the `AppError` class and `ApiResponse` utility.
+
+### Standard Error Format
+
+All error responses follow a consistent JSON structure:
+
+```json
+{
+  "success": false,
+  "message": "Error message key or description",
+  "error": "Detailed error type (optional)",
+  "stack": "Stack trace (only in development mode)"
+}
+```
+
+### Frontend Integration
+
+The frontend uses a centralized global error mapper (Axios response interceptor) located in `client/src/lib/instance.ts`. This interceptor:
+1.  Intercepts all failed API requests.
+2.  Maps the backend error message (often a translation key) to a localized string using `i18next`.
+3.  Provides the localized error message to the calling component.
+
+This ensures that users always receive feedback in their preferred language without requiring manual error handling in every component.
