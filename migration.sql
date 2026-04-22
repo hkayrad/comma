@@ -149,4 +149,90 @@ ALTER TABLE refresh_tokens ADD CONSTRAINT fk_refresh_tokens_user FOREIGN KEY (us
 ALTER TABLE receivable_payments ADD COLUMN due_date DATE DEFAULT NULL;
 ALTER TABLE payable_payments ADD COLUMN due_date DATE DEFAULT NULL;
 
+-- ---------------------------------------------------------
+-- 4. VIEWS
+-- ---------------------------------------------------------
+
+-- Receivable Debt Summary
+CREATE OR REPLACE VIEW vw_receivable_debt_summary AS 
+SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
+FROM receivable_debts 
+WHERE deleted_at IS NULL AND deleted_by IS NULL 
+GROUP BY customer_id, company_id;
+
+-- Receivable Payment Summary
+CREATE OR REPLACE VIEW vw_receivable_payment_summary AS 
+SELECT customer_id, company_id, SUM(amount * exchange_rate) AS total_payments 
+FROM receivable_payments 
+WHERE deleted_at IS NULL AND deleted_by IS NULL 
+GROUP BY customer_id, company_id;
+
+-- Receivable Total Debt By Company
+CREATE OR REPLACE VIEW vw_receivable_total_debt_by_company AS 
+SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
+FROM receivable_debts d 
+JOIN receivable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id 
+WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 
+GROUP BY d.company_id;
+
+-- Receivable Total Payments By Company
+CREATE OR REPLACE VIEW vw_receivable_total_payments_by_company AS 
+SELECT p.company_id, COALESCE(SUM(p.amount), 0) AS total, COALESCE(SUM(p.amount * p.exchange_rate), 0) AS total_in_try 
+FROM receivable_payments p 
+JOIN receivable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id 
+WHERE p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 
+GROUP BY p.company_id;
+
+-- Payable Debt Summary
+CREATE OR REPLACE VIEW vw_payable_debt_summary AS 
+SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
+FROM payable_debts 
+WHERE deleted_at IS NULL AND deleted_by IS NULL 
+GROUP BY customer_id, company_id;
+
+-- Payable Payment Summary
+CREATE OR REPLACE VIEW vw_payable_payment_summary AS 
+SELECT customer_id, company_id, SUM(amount * exchange_rate) AS total_payments 
+FROM payable_payments 
+WHERE deleted_at IS NULL AND deleted_by IS NULL 
+GROUP BY customer_id, company_id;
+
+-- Payable Total Debt By Company
+CREATE OR REPLACE VIEW vw_payable_total_debt_by_company AS 
+SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
+FROM payable_debts d 
+JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id 
+WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 
+GROUP BY d.company_id;
+
+-- Payable Total Payments By Company
+CREATE OR REPLACE VIEW vw_payable_total_payments_by_company AS 
+SELECT p.company_id, COALESCE(SUM(p.amount), 0) AS total, COALESCE(SUM(p.amount * p.exchange_rate), 0) AS total_in_try 
+FROM payable_payments p 
+JOIN payable_customers c ON p.customer_id = c.id AND p.company_id = c.company_id 
+WHERE p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 
+GROUP BY p.company_id;
+
+-- Receivable Payment By Invoice
+CREATE OR REPLACE VIEW vw_receivable_payment_by_invoice AS
+SELECT 
+    company_id, 
+    customer_id,
+    invoice_no, 
+    COALESCE(SUM(amount * exchange_rate), 0) AS total_paid
+FROM receivable_payments
+WHERE deleted_at IS NULL AND deleted_by IS NULL
+GROUP BY company_id, customer_id, invoice_no;
+
+-- Payable Payment By Invoice
+CREATE OR REPLACE VIEW vw_payable_payment_by_invoice AS
+SELECT 
+    company_id, 
+    customer_id,
+    invoice_no, 
+    COALESCE(SUM(amount * exchange_rate), 0) AS total_paid
+FROM payable_payments
+WHERE deleted_at IS NULL AND deleted_by IS NULL
+GROUP BY company_id, customer_id, invoice_no;
+
 SET FOREIGN_KEY_CHECKS = 1;

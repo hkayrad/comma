@@ -84,8 +84,10 @@ export class DebtRepository {
 
         const query = `
             SELECT d.*, c.name AS customer_name, c.tax_number AS customer_tax_number,
-            (SELECT COALESCE(SUM(p.amount_in_try), 0) >= (d.total_in_try) FROM ${this.domain}_payments p WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL) AS is_paid
-            FROM ${this.domain}_debts d JOIN ${this.domain}_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+            (COALESCE(p.total_paid, 0) >= (d.amount + d.vat) * d.exchange_rate) AS is_paid
+            FROM ${this.domain}_debts d 
+            JOIN ${this.domain}_customers c ON d.customer_id = c.id AND c.company_id = d.company_id
+            LEFT JOIN vw_${this.domain}_payment_by_invoice p ON p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.customer_id = d.customer_id
             ${whereClause} ${orderClause} LIMIT ? OFFSET ?;`;
 
         const result = (await sequelize.query(query, { replacements: [...replacements, limit, offset], type: QueryTypes.SELECT })) as DebtDto[];
@@ -100,7 +102,7 @@ export class DebtRepository {
     }
 
 	async getUpcomingDueDates(companyId: string, daysThreshold: number = 7): Promise<UpcomingDueDate[]> {
-        const query = `SELECT d.id, d.total, d.currency, d.due_date, DATEDIFF(d.due_date, CURDATE()) as days_remaining, c.name as customer_name FROM ${this.domain}_debts d JOIN ${this.domain}_customers c ON d.customer_id = c.id AND c.company_id = d.company_id WHERE d.company_id = ? AND d.deleted_at IS NULL AND c.deleted_at IS NULL AND d.due_date IS NOT NULL AND d.due_date >= CURDATE() AND d.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY) AND (SELECT COALESCE(SUM(p.amount_in_try), 0) FROM ${this.domain}_payments p WHERE p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.deleted_at IS NULL AND p.deleted_by IS NULL) < d.total_in_try ORDER BY d.due_date ASC LIMIT 10;`;
+        const query = `SELECT d.id, (d.amount + d.vat) as total, d.currency, d.due_date, DATEDIFF(d.due_date, CURDATE()) as days_remaining, c.name as customer_name FROM ${this.domain}_debts d JOIN ${this.domain}_customers c ON d.customer_id = c.id AND c.company_id = d.company_id LEFT JOIN vw_${this.domain}_payment_by_invoice p ON p.invoice_no = d.invoice_no AND p.company_id = d.company_id AND p.customer_id = d.customer_id WHERE d.company_id = ? AND d.deleted_at IS NULL AND c.deleted_at IS NULL AND d.due_date IS NOT NULL AND d.due_date >= CURDATE() AND d.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY) AND COALESCE(p.total_paid, 0) < (d.amount + d.vat) * d.exchange_rate ORDER BY d.due_date ASC LIMIT 10;`;
         return (await sequelize.query(query, { replacements: [companyId, daysThreshold], type: QueryTypes.SELECT })) as UpcomingDueDate[];
     }
 

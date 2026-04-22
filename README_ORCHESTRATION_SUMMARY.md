@@ -54,7 +54,10 @@ Cleaned up redundant validation logic and resolved build issues.
 The following items from the initial report were deferred or identified as out-of-scope for the current orchestration and should be addressed in future sessions:
 
 ### 1. Performance & Frontend Optimization
-- **Inefficient Debt Status Subquery**: Refactor the `is_paid` status logic in `DebtRepository.ts` to use JOINs or database views instead of inline subqueries to improve retrieval speed.
+- **Inefficient Debt Status Subquery (COMPLETED)**: Refactored `DebtRepository.ts` to use `LEFT JOIN` on optimized database views instead of inline subqueries.
+  - Created `vw_receivable_payment_by_invoice` and `vw_payable_payment_by_invoice` views.
+  - Standardized `migration.sql` to include all required application views.
+  - Improved `is_paid` status calculation using explicit TRY-base arithmetic and customer-safe joining.
 - **Context Re-render Bottleneck**: Refactor the frontend `UserProvider` to prevent full-tree re-renders on state changes (e.g., by splitting context or using `memo`).
 
 ### 2. Architecture & Consistency
