@@ -1,4 +1,4 @@
-import { CompanyDto, UUID, SortItem, FilterItem } from "@common/types";
+import type { CompanyDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { CompanyRepository } from "@/repositories/CompanyRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";

@@ -1,4 +1,4 @@
-import type { CustomerDto, OverviewViewType } from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { Button } from "@/components/ui/button";
 import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

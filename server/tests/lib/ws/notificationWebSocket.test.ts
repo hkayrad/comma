@@ -4,7 +4,7 @@ import NotificationWebSocket from '@/lib/ws/notificationWebSocket';
 import { WebSocket, WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
 import { Logger } from '@/lib/utils/logger';
-import { UserRole } from '@common/enums';
+import { UserRole } from '@comma/common/enums';
 
 vi.mock('ws', async () => {
     class MockWebSocketServer {

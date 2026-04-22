@@ -11,7 +11,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
-import type { CustomerIdName, DebtDto, OverviewViewType } from "@/lib/types";
+import type { CustomerIdName, DebtDto, OverviewViewType } from "@comma/common";
 import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";

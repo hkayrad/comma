@@ -20,7 +20,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import CancelButton from "@/layout/shared/CancelButton";
 import { CompanyApi } from "@/lib/api/company";
-import type { CompanyDto } from "@/lib/types";
+import type { CompanyDto } from "@comma/common";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

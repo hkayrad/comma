@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { CustomerDto, OverviewViewType } from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Mail, MapPin, Phone, Hash, Calendar, BanknoteX } from "lucide-react";
 import { useTranslation } from "react-i18next";

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
-import type { CustomerDto, OverviewViewType } from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

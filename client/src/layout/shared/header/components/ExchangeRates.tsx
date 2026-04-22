@@ -1,6 +1,6 @@
 import { TCMBApi } from "@/lib/api/tcmb";
 import { useCallback, useEffect, useState } from "react";
-import type { ExchangeRates } from "@/lib/types";
+import type { ExchangeRates } from "@comma/common";
 import {
   Tooltip,
   TooltipContent,

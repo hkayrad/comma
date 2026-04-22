@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { PaymentDto } from "@/lib/types";
+import type { PaymentDto } from "@comma/common";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import PaymentTable from "./components/PaymentTable";

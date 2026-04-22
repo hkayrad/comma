@@ -2,10 +2,10 @@ import express, { Request, Response } from "express";
 import ReceivableCustomersService from "@/services/Receivable/CustomersService";
 import { authMiddleware } from "@/lib/middleware";
 import { Logger } from "@/lib/utils/logger";
-import { CustomerDto } from "@common/types";
+import { CustomerDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { customerSchema, paginationSchema } from "@common/schemas";
+import { customerSchema, paginationSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 

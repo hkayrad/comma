@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import path from "path";
 import { Logger } from "@/lib/utils/logger";
 import fs from "fs";
-import { CompanyDto, LogoSize, UUID } from "@common/types";
+import type { CompanyDto, LogoSize, UUID } from "@comma/common/types";
 import { CompanyRepository } from "@/repositories/CompanyRepository";
 import sharp from "sharp";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";

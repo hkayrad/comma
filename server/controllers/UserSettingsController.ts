@@ -4,7 +4,7 @@ import { Logger } from "@/lib/utils/logger";
 import { UserSettingsService } from "@/services/UserSettingsService";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { updateUsernameSchema, updatePasswordSchema } from "@common/schemas";
+import { updateUsernameSchema, updatePasswordSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 

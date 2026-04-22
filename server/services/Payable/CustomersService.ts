@@ -1,5 +1,5 @@
 import { CustomerRepository } from "@/repositories/CustomerRepository";
-import { CustomerDto, UUID, SortItem, FilterItem } from "@common/types";
+import type { CustomerDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 

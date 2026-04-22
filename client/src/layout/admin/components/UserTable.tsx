@@ -1,4 +1,4 @@
-import type { UserDto } from "@/lib/types";
+import type { UserDto } from "@comma/common";
 import { Button } from "@/components/ui/button";
 import { KeyRound, Pencil, Trash2 } from "lucide-react";
 import {

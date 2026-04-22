@@ -4,7 +4,7 @@ import { Logger } from "@/lib/utils/logger";
 import { CompanyManagementService } from "@/services/Admin/CompanyManagementService";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { companySchema, paginationSchema } from "@common/schemas";
+import { companySchema, paginationSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 

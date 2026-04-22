@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
 import { AdminUserApi } from "@/lib/api/admin";
-import type { UserDto } from "@/lib/types";
+import type { UserDto } from "@comma/common";
 import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

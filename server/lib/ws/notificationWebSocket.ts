@@ -2,9 +2,9 @@ import { WebSocketServer, WebSocket } from "ws";
 import { Server } from "http";
 import { IncomingMessage } from "http";
 import jwt from "jsonwebtoken";
-import { DecodedJwtToken } from "@common/types";
+import { DecodedJwtToken } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
-import { UserRole } from "@common/enums";
+import { UserRole } from "@comma/common/enums";
 
 interface AuthenticatedWebSocket extends WebSocket {
 	isAlive: boolean;

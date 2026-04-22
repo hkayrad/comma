@@ -4,7 +4,7 @@ import { app } from '@/index';
 import { Config } from '@/models';
 import { ConfigService } from '@/services/ConfigService';
 import jwt from 'jsonwebtoken';
-import { UserRole } from '@common/enums';
+import { UserRole } from '@comma/common/enums';
 
 describe('Config Controller Integration', () => {
   const TEST_KEY = 'INTEGRATION_TEST_KEY';

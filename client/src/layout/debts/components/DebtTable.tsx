@@ -1,4 +1,4 @@
-import type { DebtDto } from "@/lib/types";
+import type { DebtDto } from "@comma/common";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Wallet } from "lucide-react";
 import {
@@ -127,7 +127,7 @@ export default function DebtTable(props: Props) {
             type={type}
             amount={Number(debt.total_in_try)}
             currency="TRY"
-            invoiceNo={debt.invoice_no}
+            invoiceNo={debt.invoice_no ?? undefined}
             exchangeRate={1}
           />
         ),

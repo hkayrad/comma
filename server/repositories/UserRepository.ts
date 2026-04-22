@@ -1,5 +1,5 @@
 import { Users, RefreshTokens } from "@/models";
-import { UserDto, UUID, SortItem, FilterItem } from "@common/types";
+import type { UserDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction, LOCK } from "sequelize";
 

@@ -1,6 +1,6 @@
 import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction } from "sequelize";
-import { PaymentDto, UUID, SortItem, FilterItem, UpcomingDueDate } from "@common/types";
+import type { PaymentDto, UUID, SortItem, FilterItem, UpcomingDueDate } from "@comma/common/types";
 import { ReceivablePayments, PayablePayments } from "@/models";
 
 export type PaymentDomain = "receivable" | "payable";

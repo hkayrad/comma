@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ReceivableCustomersService from '@/services/Receivable/CustomersService';
 import { CustomerRepository } from '@/repositories/CustomerRepository';
 import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
-import { ADMIN_COMPANY_ID } from '@common/constants';
+import { ADMIN_COMPANY_ID } from '@comma/common/constants';
 
 describe('ReceivableCustomersService', () => {
   beforeEach(() => {

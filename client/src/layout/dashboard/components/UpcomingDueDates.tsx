@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
 import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
-import type { UpcomingDueDate } from "@/lib/types";
+import type { UpcomingDueDate } from "@comma/common";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

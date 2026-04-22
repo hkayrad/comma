@@ -1,4 +1,4 @@
-import type { PaymentDto } from "@/lib/types";
+import type { PaymentDto } from "@comma/common";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import {

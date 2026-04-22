@@ -3,8 +3,8 @@ import request from 'supertest';
 import { app } from '@/index';
 import { CompanyManagementService } from '@/services/Admin/CompanyManagementService';
 import jwt from 'jsonwebtoken';
-import { UserRole } from '@common/enums';
-import { ADMIN_COMPANY_ID, ADMIN_USER_ID } from '@common/constants';
+import { UserRole } from '@comma/common/enums';
+import { ADMIN_COMPANY_ID, ADMIN_USER_ID } from '@comma/common/constants';
 
 describe('CompanyManagementController', () => {
   beforeEach(() => {

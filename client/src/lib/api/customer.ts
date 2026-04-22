@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "../../../../common/types";
+import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "@comma/common";
 import { Logger } from "../utils/logger";
 import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 

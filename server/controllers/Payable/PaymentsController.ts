@@ -4,7 +4,7 @@ import { authMiddleware } from "@/lib/middleware";
 import { Logger } from "@/lib/utils/logger";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { paymentSchema, paginationSchema } from "@common/schemas";
+import { paymentSchema, paginationSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 

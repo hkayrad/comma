@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { UserDto, CompanyDto } from "@/lib/types";
+import type { UserDto, CompanyDto } from "@comma/common";
 import { AdminUserApi } from "@/lib/api/admin";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";

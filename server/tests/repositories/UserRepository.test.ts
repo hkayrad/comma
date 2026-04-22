@@ -2,8 +2,8 @@ import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import { UserRepository } from '@/repositories/UserRepository';
 import { CompanyRepository } from '@/repositories/CompanyRepository';
 import { Users, Companies, RefreshTokens } from '@/models';
-import { UserRole } from '@common/enums';
-import { ADMIN_USER_ID } from '@common/constants';
+import { UserRole } from '@comma/common/enums';
+import { ADMIN_USER_ID } from '@comma/common/constants';
 
 describe('UserRepository', () => {
   const TEST_USERNAME = 'TEST_REPO_USER_COMP';

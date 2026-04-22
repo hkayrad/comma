@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { ApiResponse } from "../../../../common/types";
+import type { ApiResponse } from "@comma/common";
 import { Logger } from "../utils/logger";
 
 export interface MonthlyStatsData {

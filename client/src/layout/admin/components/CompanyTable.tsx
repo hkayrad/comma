@@ -1,4 +1,4 @@
-import type { CompanyDto } from "@/lib/types";
+import type { CompanyDto } from "@comma/common";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Users } from "lucide-react";
 import {

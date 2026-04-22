@@ -1,4 +1,4 @@
-import { DebtDto, UUID, SortItem, FilterItem } from "@common/types";
+import type { DebtDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { DebtRepository } from "@/repositories/DebtRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";

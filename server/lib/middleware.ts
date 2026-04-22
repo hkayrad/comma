@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { Logger } from "@/lib/utils/logger";
 import jwt from "jsonwebtoken";
-import { UserRole } from "@common/enums";
+import { UserRole } from "@comma/common/enums";
 
 dotenv.config();
 

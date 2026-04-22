@@ -6,7 +6,7 @@ import type {
   DebtDto,
   PaymentDto,
   CompanyDto,
-} from "@/lib/types";
+} from "@comma/common";
 import { CompanyApi } from "@/lib/api/company";
 import { Button } from "@/components/ui/button";
 import {

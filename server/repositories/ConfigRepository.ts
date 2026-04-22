@@ -1,5 +1,5 @@
 import { Config } from "@/models";
-import { ConfigKey, ConfigValue } from "@common/types";
+import { ConfigKey, ConfigValue } from "@comma/common/types";
 
 export class ConfigRepository {
 	static async findAll(): Promise<{ configKey: string; configValue: string }[]> {

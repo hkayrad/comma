@@ -1,5 +1,5 @@
 import { Companies } from "@/models";
-import { CompanyDto, UUID, SortItem, FilterItem } from "@common/types";
+import { CompanyDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction } from "sequelize";
 

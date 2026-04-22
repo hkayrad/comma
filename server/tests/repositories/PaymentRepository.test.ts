@@ -4,7 +4,7 @@ import { CustomerRepository } from '@/repositories/CustomerRepository';
 import { CompanyRepository } from '@/repositories/CompanyRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { ReceivablePayments, PayablePayments, ReceivableCustomers, PayableCustomers, Companies, Users } from '@/models';
-import { ADMIN_USER_ID } from '@common/constants';
+import { ADMIN_USER_ID } from '@comma/common/constants';
 
 describe('PaymentRepository', () => {
   const TEST_COMPANY_NAME = 'TEST_PAY_REPO_CO_COMP';

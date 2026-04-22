@@ -1,5 +1,5 @@
 import { Logger } from "@/lib/utils/logger";
-import { ConfigKey, ConfigValue } from "@common/types";
+import type { ConfigKey, ConfigValue } from "@comma/common/types";
 import { ConfigRepository } from "@/repositories/ConfigRepository";
 
 export class ConfigService {

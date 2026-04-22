@@ -4,7 +4,7 @@ import { CustomerRepository } from '@/repositories/CustomerRepository';
 import { CompanyRepository } from '@/repositories/CompanyRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { ReceivableDebts, PayableDebts, ReceivableCustomers, PayableCustomers, Companies, Users } from '@/models';
-import { ADMIN_USER_ID } from '@common/constants';
+import { ADMIN_USER_ID } from '@comma/common/constants';
 
 describe('DebtRepository', () => {
   const TEST_COMPANY_NAME = 'TEST_DEBT_REPO_CO_COMP_V4';

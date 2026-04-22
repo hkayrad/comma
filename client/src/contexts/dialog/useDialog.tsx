@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { CustomerDto } from "@/lib/types";
+import type { CustomerDto } from "@comma/common";
 import type { ReactNode } from "react";
 
 export interface DialogConfig {

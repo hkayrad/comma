@@ -11,7 +11,9 @@
     "paths": {
       "@/*": ["./*"],
       "@common": ["../common/src/index"],
-      "@common/*": ["../common/src/*"]
+      "@common/*": ["../common/src/*"],
+      "@comma/common": ["../common/src/index"],
+      "@comma/common/*": ["../common/src/*"]
     }
   },
   "include": [

@@ -3,7 +3,7 @@ import request from 'supertest';
 import { app } from '@/index';
 import { UserManagementService } from '@/services/Admin/UserManagementService';
 import jwt from 'jsonwebtoken';
-import { UserRole, ADMIN_COMPANY_ID } from '@common';
+import { UserRole, ADMIN_COMPANY_ID } from '@comma/common';
 
 describe('UserManagementController', () => {
   beforeEach(() => {

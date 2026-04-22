@@ -1,4 +1,4 @@
-import { ExchangeRates } from "@common/types";
+import type { ExchangeRates } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 
 function formatDate(date: Date): string {

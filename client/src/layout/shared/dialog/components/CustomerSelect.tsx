@@ -21,7 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDialog } from "@/contexts/dialog";
-import type { CustomerIdName } from "@/lib/types";
+import type { CustomerIdName } from "@comma/common";
 import { cn } from "@/lib/utils";
 import { ChevronsUpDown, IdCard, Plus } from "lucide-react";
 import { useState } from "react";

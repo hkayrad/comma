@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CustomerDto, OverviewViewType } from "@/lib/types";
+import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api/customer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";

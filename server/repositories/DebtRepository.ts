@@ -1,6 +1,6 @@
 import { sequelize } from "@/lib/db/sequelize";
 import { QueryTypes, Transaction, fn, col, literal, Op } from "sequelize";
-import { DebtDto, Totals, UUID, SortItem, FilterItem, UpcomingDueDate } from "@common/types";
+import type { DebtDto, Totals, UUID, SortItem, FilterItem, UpcomingDueDate } from "@comma/common/types";
 import { ReceivableDebts, PayableDebts } from "@/models";
 
 export type DebtDomain = "receivable" | "payable";

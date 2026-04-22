@@ -1,5 +1,5 @@
 import instance from "../instance";
-import type { CompanyDto, UserDto, CreateUserDto } from "../../../../common/types";
+import type { CompanyDto, UserDto, CreateUserDto } from "@comma/common";
 import { Logger } from "../utils/logger";
 import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 

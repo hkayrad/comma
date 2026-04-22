@@ -1,4 +1,4 @@
-import { CreateUserDto, UserDto, UUID, SortItem, FilterItem } from "@common/types";
+import type { CreateUserDto, UserDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { UserRepository } from "@/repositories/UserRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";

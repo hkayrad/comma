@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { CompanyDto } from "../../../common/types";
+import type { CompanyDto } from "@comma/common";
 import { format } from "date-fns";
 import "./lexend-regular";
 import i18n from "../i18n";

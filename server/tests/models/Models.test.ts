@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ReceivableDebts, PayableDebts, ReceivablePayments, PayablePayments } from '@/models';
-import { ADMIN_USER_ID } from '@common/constants';
+import { ADMIN_USER_ID } from '@comma/common/constants';
 
 describe("Models Virtual Fields", () => {
   it("ReceivableDebts virtual fields should work", () => {

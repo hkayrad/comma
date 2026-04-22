@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
-import type { OverviewViewType, Totals } from "@/lib/types";
+import type { OverviewViewType, Totals } from "@comma/common";
 import { copyToClipboard } from "@/lib/utils";
 import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

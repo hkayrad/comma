@@ -3,7 +3,7 @@ import request from 'supertest';
 import { app } from '@/index';
 import ReceivableCustomersService from '@/services/Receivable/CustomersService';
 import jwt from 'jsonwebtoken';
-import { ADMIN_COMPANY_ID } from '@common/constants';
+import { ADMIN_COMPANY_ID } from '@comma/common/constants';
 
 describe('ReceivableCustomersController', () => {
   beforeEach(() => {

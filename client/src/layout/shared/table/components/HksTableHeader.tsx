@@ -49,7 +49,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import AddButton from "./AddButton";
 import { CompanyApi } from "@/lib/api/company";
-import type { CompanyDto } from "@/lib/types";
+import type { CompanyDto } from "@comma/common";
 import { exportTablePDF } from "@/lib/pdf-table-export";
 import { Logger } from "@/lib/utils/logger";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
