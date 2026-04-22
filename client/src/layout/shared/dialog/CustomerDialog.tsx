@@ -52,7 +52,7 @@ export default function CustomerDialog(props: Props) {
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
 
   const CustomerFormSchema = useMemo(
     () =>

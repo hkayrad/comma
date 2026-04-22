@@ -1,10 +1,37 @@
-import { useContext } from "react";
-import { WebSocketContext } from "./webSocketContext";
+import { create } from "zustand";
 
-export const useWebSocket = () => {
-  const context = useContext(WebSocketContext);
-  if (context === undefined) {
-    throw new Error("useWebSocket must be used within a WebSocketProvider");
-  }
-  return context;
-};
+interface WebSocketStore {
+  isConnected: boolean;
+  setIsConnected: (connected: boolean) => void;
+
+  // Actions
+  reloadConnection: () => void;
+  sendStartMaintenanceNotification: (
+    startTime?: string,
+    endTime?: string,
+  ) => void;
+  sendEndMaintenanceNotification: () => void;
+  sendGetActiveUsersRequest: () => void;
+
+  setActions: (actions: {
+    reloadConnection: () => void;
+    sendStartMaintenanceNotification: (
+      startTime?: string,
+      endTime?: string,
+    ) => void;
+    sendEndMaintenanceNotification: () => void;
+    sendGetActiveUsersRequest: () => void;
+  }) => void;
+}
+
+export const useWebSocket = create<WebSocketStore>((set) => ({
+  isConnected: false,
+  setIsConnected: (isConnected) => set({ isConnected }),
+
+  reloadConnection: () => {},
+  sendStartMaintenanceNotification: () => {},
+  sendEndMaintenanceNotification: () => {},
+  sendGetActiveUsersRequest: () => {},
+
+  setActions: (actions) => set({ ...actions }),
+}));

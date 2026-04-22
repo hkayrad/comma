@@ -43,7 +43,7 @@ interface TwoFactorSetupProps {
 
 export default function TwoFactorSetup({ onComplete }: TwoFactorSetupProps) {
   const { t } = useTranslation();
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
   const [step, setStep] = useState<SetupStep>("check");
   const [loading, setLoading] = useState(true);
   const [qrCode, setQrCode] = useState<string | null>(null);

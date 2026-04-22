@@ -22,7 +22,7 @@ export default function Admin() {
     null,
   );
 
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
 
   const {

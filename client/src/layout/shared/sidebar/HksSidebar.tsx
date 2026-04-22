@@ -84,10 +84,11 @@ export default function HksSidebar() {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
   const { state } = useSidebar();
-  const { user, clearUser } = useUser();
+  const user = useUser((s) => s.user);
+  const clearUser = useUser((s) => s.clearUser);
   const { role } = useRole();
-  const { reloadConnection } = useWebSocket();
-  const { openDialog } = useDialog();
+  const reloadConnection = useWebSocket((s) => s.reloadConnection);
+  const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
   const [upcomingPaymentsCount, setUpcomingPaymentsCount] = useState(0);
 

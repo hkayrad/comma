@@ -17,9 +17,13 @@ import { toast } from "sonner";
 import CancelButton from "../CancelButton";
 
 export default function MaintenanceDialog() {
-  const { configs } = useConfig();
-  const { sendStartMaintenanceNotification, sendEndMaintenanceNotification } =
-    useWebSocket();
+  const configs = useConfig((s) => s.configs);
+  const sendStartMaintenanceNotification = useWebSocket(
+    (s) => s.sendStartMaintenanceNotification,
+  );
+  const sendEndMaintenanceNotification = useWebSocket(
+    (s) => s.sendEndMaintenanceNotification,
+  );
   const { t } = useTranslation();
 
   const DEFAULT_START_TIME = new Date(Date.now() + 60000)

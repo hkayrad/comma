@@ -2,7 +2,8 @@ import { Navigate, Outlet } from "react-router";
 import { useUser } from "@/contexts/user";
 
 export function RequireAuth(): React.ReactNode {
-  const { user, isLoading } = useUser();
+  const user = useUser((s) => s.user);
+  const isLoading = useUser((s) => s.isLoading);
 
   if (isLoading) {
     return null;
@@ -16,7 +17,8 @@ export function RequireAuth(): React.ReactNode {
 }
 
 export function RequireNoAuth(): React.ReactNode {
-  const { user, isLoading } = useUser();
+  const user = useUser((s) => s.user);
+  const isLoading = useUser((s) => s.isLoading);
 
   if (isLoading) {
     return null;

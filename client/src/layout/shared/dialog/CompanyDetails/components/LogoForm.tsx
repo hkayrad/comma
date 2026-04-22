@@ -17,7 +17,7 @@ import { toast } from "sonner";
 
 export default function LogoForm() {
   const { theme } = useTheme();
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
 
   const [smallLogo, setSmallLogo] = useState<File | null>(null);

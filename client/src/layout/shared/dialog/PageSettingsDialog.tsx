@@ -5,14 +5,20 @@ import { useTranslation } from "react-i18next";
 
 export default function PageSettingsDialog() {
     const { t } = useTranslation();
-    const {
-        showOverviewCards,
-        showStatisticsChart,
-        useContextMenuForActions,
-        setShowOverviewCards,
-        setShowStatisticsChart,
-        setUseContextMenuForActions,
-    } = useDashboardSettings();
+  const showOverviewCards = useDashboardSettings((s) => s.showOverviewCards);
+  const showStatisticsChart = useDashboardSettings((s) => s.showStatisticsChart);
+  const useContextMenuForActions = useDashboardSettings(
+    (s) => s.useContextMenuForActions,
+  );
+  const setShowOverviewCards = useDashboardSettings(
+    (s) => s.setShowOverviewCards,
+  );
+  const setShowStatisticsChart = useDashboardSettings(
+    (s) => s.setShowStatisticsChart,
+  );
+  const setUseContextMenuForActions = useDashboardSettings(
+    (s) => s.setUseContextMenuForActions,
+  );
 
     return (
         <div className="flex flex-col gap-6 mt-4">

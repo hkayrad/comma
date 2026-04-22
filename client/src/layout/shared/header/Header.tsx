@@ -26,7 +26,7 @@ import { useBreadcrumb } from "@/contexts/breadcrumb/useBreadcrumb";
 export default function Header() {
   const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
-  const { labels } = useBreadcrumb();
+  const labels = useBreadcrumb((s) => s.labels);
   const { t } = useTranslation();
 
   const pathSegments = location.pathname.split("/").filter(Boolean);

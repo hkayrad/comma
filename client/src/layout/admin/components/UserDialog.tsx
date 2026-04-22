@@ -57,7 +57,7 @@ export default function UserDialog(props: Props) {
   const { companyId, user, onSuccess } = props;
   const { t } = useTranslation();
 
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(UserFormSchema),

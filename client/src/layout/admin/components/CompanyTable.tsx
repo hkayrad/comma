@@ -69,7 +69,7 @@ export default function CompanyTable(props: Props) {
     addButton,
   } = props;
 
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
 
   const handleDelete = useCallback(

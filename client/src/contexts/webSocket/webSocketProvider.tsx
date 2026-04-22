@@ -5,7 +5,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { WebSocketContext } from "./webSocketContext";
 import { toast } from "sonner";
 import { Logger } from "@/lib/utils/logger";
 import { AuthApi } from "@/lib/api/auth";
@@ -13,6 +12,7 @@ import { TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useConfig } from "@/contexts/config";
 import { useTranslation } from "react-i18next";
+import { useWebSocket } from "./useWebSocket";
 
 interface WebSocketProviderProps {
   children: ReactNode;
@@ -25,11 +25,15 @@ export const WebSocketProvider = ({
   children,
   url,
 }: WebSocketProviderProps) => {
-  const [isConnected, setIsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const shouldReconnect = useRef(true);
-  const { refreshConfigs } = useConfig();
+  
+  const setIsConnected = useWebSocket((s) => s.setIsConnected);
+  const isConnected = useWebSocket((s) => s.isConnected);
+  const setActions = useWebSocket((s) => s.setActions);
+
+  const refreshConfigs = useConfig((s) => s.refreshConfigs);
   const navigate = useNavigate();
   const refreshConfigsRef = useRef(refreshConfigs);
   const navigateRef = useRef(navigate);
@@ -42,15 +46,12 @@ export const WebSocketProvider = ({
   }, [refreshConfigs, navigate]);
 
   const connect = useCallback(() => {
-    // Close existing connection if any
     if (ws.current) {
-      ws.current.onclose = null; // Prevent reconnection logic
+      ws.current.onclose = null;
       ws.current.close();
       ws.current = null;
     }
 
-    // Cookies are automatically sent with the WebSocket upgrade request
-    // No need to manually add token to URL
     ws.current = new WebSocket(url);
 
     ws.current.onopen = () => {
@@ -168,7 +169,7 @@ export const WebSocketProvider = ({
         Logger.error("Error parsing WebSocket message:", error);
       }
     };
-  }, [url, t]);
+  }, [url, t, setIsConnected]);
 
   const disconnect = useCallback(() => {
     shouldReconnect.current = false;
@@ -225,24 +226,27 @@ export const WebSocketProvider = ({
   }, [isConnected]);
 
   useEffect(() => {
+    setActions({
+      reloadConnection,
+      sendStartMaintenanceNotification,
+      sendEndMaintenanceNotification,
+      sendGetActiveUsersRequest,
+    });
+  }, [
+    setActions,
+    reloadConnection,
+    sendStartMaintenanceNotification,
+    sendEndMaintenanceNotification,
+    sendGetActiveUsersRequest,
+  ]);
+
+  useEffect(() => {
     shouldReconnect.current = true;
     connect();
     return () => disconnect();
   }, [connect, disconnect]);
 
-  return (
-    <WebSocketContext.Provider
-      value={{
-        isConnected,
-        reloadConnection,
-        sendStartMaintenanceNotification,
-        sendEndMaintenanceNotification,
-        sendGetActiveUsersRequest,
-      }}
-    >
-      {children}
-    </WebSocketContext.Provider>
-  );
+  return <>{children}</>;
 };
 
 const StartMaintenanceProgressBar = ({ duration }: { duration: number }) => {

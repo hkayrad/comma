@@ -27,6 +27,8 @@ export default defineConfig(({ mode }) => {
 			alias: {
 				"@": path.resolve(__dirname, "./src"),
 				"@common": path.resolve(__dirname, "../common/src"),
+				react: path.resolve(__dirname, "./node_modules/react"),
+				"react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
 			},
 		},
 	};

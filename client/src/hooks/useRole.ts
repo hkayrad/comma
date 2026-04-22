@@ -6,7 +6,7 @@ import { useMemo } from "react";
  * Provides utilities to check user roles and permissions
  */
 export const useRole = () => {
-	const { user } = useUser();
+	const user = useUser((s) => s.user);
 
 	const role = useMemo(() => user?.role ?? null, [user?.role]);
 

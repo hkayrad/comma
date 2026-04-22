@@ -59,9 +59,10 @@ export default function Login() {
   const [tempToken, setTempToken] = useState<string | null>(null);
   const [pendingUsername, setPendingUsername] = useState<string>("");
   const navigate = useNavigate();
-  const { reloadConnection } = useWebSocket();
+  const reloadConnection = useWebSocket((s) => s.reloadConnection);
   const { theme, setTheme } = useTheme();
-  const { login, setUser } = useUser();
+  const login = useUser((s) => s.login);
+  const setUser = useUser((s) => s.setUser);
   const { t, i18n } = useTranslation();
 
   const formSchema = loginSchema.extend({

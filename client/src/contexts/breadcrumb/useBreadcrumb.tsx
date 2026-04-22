@@ -1,10 +1,17 @@
-import { useContext } from "react";
-import { BreadcrumbContext } from "./breadcrumbContext";
+import { create } from "zustand";
 
-export function useBreadcrumb() {
-  const context = useContext(BreadcrumbContext);
-  if (context === undefined) {
-    throw new Error("useBreadcrumb must be used within a BreadcrumbProvider");
-  }
-  return context;
+interface BreadcrumbState {
+  labels: Record<string, string>;
+  setLabel: (id: string, label: string) => void;
 }
+
+export const useBreadcrumb = create<BreadcrumbState>((set) => ({
+  labels: {},
+  setLabel: (id, label) =>
+    set((state) => {
+      if (state.labels[id] === label) return state;
+      return {
+        labels: { ...state.labels, [id]: label },
+      };
+    }),
+}));

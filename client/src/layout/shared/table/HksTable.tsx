@@ -71,7 +71,9 @@ export default function HksTable(props: Props) {
     contextMenuItems,
   } = props;
 
-  const { useContextMenuForActions } = useDashboardSettings();
+  const useContextMenuForActions = useDashboardSettings(
+    (s) => s.useContextMenuForActions,
+  );
 
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [internalColumnFilters, setInternalColumnFilters] =

@@ -20,7 +20,7 @@ export default function UserManagement({ company, onBack }: Props) {
   const [users, setUsers] = useState<UserDto[]>([]);
   const [rowCount, setRowCount] = useState(0);
 
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
 
   const {

@@ -58,7 +58,10 @@ The following items from the initial report were deferred or identified as out-o
   - Created `vw_receivable_payment_by_invoice` and `vw_payable_payment_by_invoice` views.
   - Standardized `migration.sql` to include all required application views.
   - Improved `is_paid` status calculation using explicit TRY-base arithmetic and customer-safe joining.
-- **Context Re-render Bottleneck**: Refactor the frontend `UserProvider` to prevent full-tree re-renders on state changes (e.g., by splitting context or using `memo`).
+- **Context Re-render Bottleneck (COMPLETED)**: Refactored the frontend `UserProvider` to use **Zustand** with selectors, preventing full-tree re-renders on state changes.
+  - Replaced React Context with a global Zustand store in `useUser.tsx`.
+  - Updated all consuming components (`Login`, `AuthCheck`, `Sidebar`, etc.) to use fine-grained selectors.
+  - Retained `UserProvider` for lifecycle management (initial refresh) to maintain structural consistency.
 
 ### 2. Architecture & Consistency
 - **Server Path Aliases**: Configure `@/` path alias support in the server's `tsconfig.json` to match the frontend's convention.

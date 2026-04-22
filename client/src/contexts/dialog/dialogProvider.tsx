@@ -1,6 +1,5 @@
-import type { CustomerDto } from "@/lib/types";
-import { useState, type ReactNode } from "react";
-import { DialogContext } from "./dialogContext";
+import { type ReactNode } from "react";
+import { useDialog } from "./useDialog";
 import {
   Dialog,
   DialogContent,
@@ -10,75 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export interface DialogConfig {
-  title?: string;
-  description?: string;
-  content?: ReactNode;
-  footer?: ReactNode;
-  onClose?: () => void;
-  onSuccess?: () => void;
-  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "full";
-  showCloseButton?: boolean;
-}
-
 export const DialogProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  type DialogInstance = DialogConfig & {
-    id: string;
-    isOpen: boolean;
-    customerInfo: CustomerDto | null;
-  };
-
-  const [dialogs, setDialogs] = useState<DialogInstance[]>([]);
-
-  const openDialog = (
-    dialogConfig: DialogConfig,
-    customerInfo: CustomerDto | null = null,
-  ) => {
-    const newDialog: DialogInstance = {
-      ...dialogConfig,
-      id: crypto.randomUUID(),
-      isOpen: true,
-      customerInfo,
-    };
-    setDialogs((prev) => [...prev, newDialog]);
-  };
-
-  const closeDialog = () => {
-    setDialogs((prev) => {
-      // Find the last dialog that is currently open
-      let lastOpenIndex = -1;
-      for (let i = prev.length - 1; i >= 0; i--) {
-        if (prev[i].isOpen) {
-          lastOpenIndex = i;
-          break;
-        }
-      }
-
-      if (lastOpenIndex === -1) return prev;
-
-      const dialogToClose = prev[lastOpenIndex];
-
-      // Create new array with the target dialog set to isOpen: false
-      const newDialogs = [...prev];
-      newDialogs[lastOpenIndex] = { ...dialogToClose, isOpen: false };
-
-      // Schedule removal of this dialog after animation completes
-      setTimeout(() => {
-        // Trigger onClose callback if exists
-        if (dialogToClose.onClose) {
-          dialogToClose.onClose();
-        }
-
-        setDialogs((currentDialogs) =>
-          currentDialogs.filter((d) => d.id !== dialogToClose.id),
-        );
-      }, 0);
-
-      return newDialogs;
-    });
-  };
+  const dialogs = useDialog((state) => state.dialogs);
+  const closeDialog = useDialog((state) => state.closeDialog);
 
   const getSizeClass = (size?: string) => {
     switch (size) {
@@ -126,21 +61,8 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Derived state for context consumers
-  // We use the last dialog (top of stack) for context values to maintain backward compatibility
-  // or checks like "is there any dialog open?"
-  const activeDialog = dialogs.length > 0 ? dialogs[dialogs.length - 1] : null;
-  const isAnyOpen = dialogs.some((d) => d.isOpen);
-
   return (
-    <DialogContext.Provider
-      value={{
-        openDialog,
-        closeDialog,
-        isOpen: isAnyOpen,
-        customerInfo: activeDialog?.customerInfo ?? null,
-      }}
-    >
+    <>
       {children}
       {dialogs.map((dialog, index) => {
         const offset = dialogs.length - 1 - index;
@@ -182,6 +104,6 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
           </Dialog>
         );
       })}
-    </DialogContext.Provider>
+    </>
   );
 };

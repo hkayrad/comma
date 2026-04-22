@@ -75,7 +75,7 @@ export default function PaymentDialog(props: Props) {
     invoiceNo,
     exchangeRate,
   } = props;
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
     CustomerIdName[]

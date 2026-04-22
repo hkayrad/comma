@@ -60,7 +60,7 @@ type Props = {
 
 export default function DebtDialog(props: Props) {
   const { debt, customerId, type = "receivable" } = props;
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
     CustomerIdName[]

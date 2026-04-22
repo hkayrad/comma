@@ -30,8 +30,9 @@ import TwoFactorSetup from "./TwoFactorSetup";
 
 export default function UserSettingsDialog() {
   const { t } = useTranslation();
-  const { closeDialog } = useDialog();
-  const { user, setUser } = useUser();
+  const closeDialog = useDialog((s) => s.closeDialog);
+  const user = useUser((s) => s.user);
+  const setUser = useUser((s) => s.setUser);
   const [activeTab, setActiveTab] = useState("username");
 
   // Password visibility states

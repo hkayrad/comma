@@ -59,7 +59,8 @@ export default function Dashboard() {
   };
 
   const { t } = useTranslation();
-  const { showOverviewCards, showStatisticsChart } = useDashboardSettings();
+  const showOverviewCards = useDashboardSettings((s) => s.showOverviewCards);
+  const showStatisticsChart = useDashboardSettings((s) => s.showStatisticsChart);
 
   const handleTabChange = useCallback((value: string) => {
     setTabValue(value as OverviewViewType);

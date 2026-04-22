@@ -22,12 +22,14 @@ import MaintenanceDialog from "@/layout/shared/dialog/MaintenanceDialog";
 import { useTranslation } from "react-i18next";
 
 export default function SystemAdminSidebarContent() {
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const { state } = useSidebar();
-  const { sendGetActiveUsersRequest } = useWebSocket();
+  const sendGetActiveUsersRequest = useWebSocket(
+    (s) => s.sendGetActiveUsersRequest,
+  );
   const { t } = useTranslation();
 
-  const { configs } = useConfig();
+  const configs = useConfig((s) => s.configs);
 
   const handleToggleMaintenance = useCallback(async () => {
     openDialog({

@@ -35,7 +35,7 @@ export default function ResetPasswordDialog(props: Props) {
   const { userId, username, onSuccess } = props;
   const { t } = useTranslation();
 
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
 
   const ResetPasswordFormSchema = useMemo(
     () =>

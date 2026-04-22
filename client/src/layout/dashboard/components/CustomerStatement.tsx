@@ -39,7 +39,7 @@ export default function CustomerStatement() {
     location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
   const { customerId } = useParams();
   const navigate = useNavigate();
-  const { setLabel } = useBreadcrumb();
+  const setLabel = useBreadcrumb((s) => s.setLabel);
 
   const langMap: Record<string, Locale> = {
     tr: tr,

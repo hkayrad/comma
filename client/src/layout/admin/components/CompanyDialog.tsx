@@ -49,7 +49,7 @@ export default function CompanyDialog(props: Props) {
   const { company, onSuccess } = props;
   const { t } = useTranslation();
 
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
 
   const CompanyFormSchema = useMemo(
     () =>

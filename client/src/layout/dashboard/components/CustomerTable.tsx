@@ -77,7 +77,7 @@ export default function CustomerTable(props: Props) {
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const navigate = useNavigate();
   const { t } = useTranslation();
 

@@ -27,7 +27,7 @@ import { useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 
 export default function AddButton() {
-  const { openDialog } = useDialog();
+  const openDialog = useDialog((s) => s.openDialog);
   const location = useLocation();
   const { t } = useTranslation();
 

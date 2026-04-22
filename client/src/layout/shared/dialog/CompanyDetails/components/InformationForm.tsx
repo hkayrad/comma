@@ -41,7 +41,7 @@ import z from "zod";
 export default function InformationForm() {
   const [companyDetails, setCompanyDetails] = useState<CompanyDto | null>(null);
 
-  const { closeDialog } = useDialog();
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
 
   const CompanyFormSchema = z.object({

@@ -8,7 +8,7 @@ export default function MaintenanceBanner() {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
 
   const location = useLocation();
-  const { configs } = useConfig();
+  const configs = useConfig((s) => s.configs);
   const { t } = useTranslation();
 
   useEffect(() => {
