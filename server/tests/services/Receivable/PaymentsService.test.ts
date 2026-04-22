@@ -2,13 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ReceivablePaymentsService from '../../../services/Receivable/PaymentsService';
 import { PaymentRepository } from '../../../repositories/PaymentRepository';
 import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import { ADMIN_COMPANY_ID } from '@common/constants';
 
 describe('ReceivablePaymentsService', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  const validCompanyId = '00000000-0000-0000-0000-000000000000';
+  const validCompanyId = ADMIN_COMPANY_ID;
   const validUserId = '00000000-0000-0000-0000-000000000001';
 
   describe('Create', () => {

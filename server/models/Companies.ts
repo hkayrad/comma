@@ -5,15 +5,15 @@ import { UUID } from "../lib/types";
 export class Companies extends Model<InferAttributes<Companies>, InferCreationAttributes<Companies>> {
 	declare id: CreationOptional<UUID>;
 	declare name: string;
-	declare phone: string | null;
-	declare is_company: boolean;
-	declare tax_number: string | null;
-	declare tax_office: string | null;
-	declare mersis_no: string | null;
-	declare email: string | null;
-	declare address: string | null;
-	declare small_logo_path: string | null;
-	declare large_logo_path: string | null;
+	declare phone: CreationOptional<string | null>;
+	declare is_company: CreationOptional<boolean>;
+	declare tax_number: CreationOptional<string | null>;
+	declare tax_office: CreationOptional<string | null>;
+	declare mersis_no: CreationOptional<string | null>;
+	declare email: CreationOptional<string | null>;
+	declare address: CreationOptional<string | null>;
+	declare small_logo_path: CreationOptional<string | null>;
+	declare large_logo_path: CreationOptional<string | null>;
 	declare created_at: CreationOptional<Date>;
 	declare updated_at: CreationOptional<Date>;
 	declare deleted_at: CreationOptional<Date | null>;
@@ -28,11 +28,11 @@ Companies.init(
 			defaultValue: DataTypes.UUIDV4,
 		},
 		name: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: false,
 		},
 		phone: {
-			type: DataTypes.CHAR(20),
+			type: DataTypes.STRING(20),
 			allowNull: true,
 			defaultValue: null,
 		},
@@ -42,27 +42,27 @@ Companies.init(
 			defaultValue: true,
 		},
 		tax_number: {
-			type: DataTypes.CHAR(11),
+			type: DataTypes.STRING(11),
 			allowNull: true,
 			defaultValue: null,
 		},
 		tax_office: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},
 		mersis_no: {
-			type: DataTypes.CHAR(16),
+			type: DataTypes.STRING(16),
 			allowNull: true,
 			defaultValue: null,
 		},
 		email: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},
 		address: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},

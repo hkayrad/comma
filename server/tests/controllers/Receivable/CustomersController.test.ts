@@ -3,13 +3,14 @@ import request from 'supertest';
 import { app } from '../../../index';
 import ReceivableCustomersService from '../../../services/Receivable/CustomersService';
 import jwt from 'jsonwebtoken';
+import { ADMIN_COMPANY_ID } from '@common/constants';
 
 describe('ReceivableCustomersController', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  const validCompanyId = '00000000-0000-0000-0000-000000000000';
+  const validCompanyId = ADMIN_COMPANY_ID;
   const token = jwt.sign({ id: '1', role: 1, companyId: validCompanyId }, process.env.JWT_SECRET as string);
 
   describe('POST /receivables/customers', () => {

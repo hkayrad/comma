@@ -6,6 +6,7 @@ import { asyncHandler } from "../lib/utils/middleware/asyncHandler";
 import { ValidationError, ForbiddenError } from "../lib/errors/AppError";
 import { validate } from "../lib/utils/middleware/validate";
 import { configSchema } from "@common/schemas";
+import { UserRole } from "@common/enums";
 
 interface ConfigKeyValue {
 	configKey: string;
@@ -53,7 +54,7 @@ router.post("/", validate(configSchema), asyncHandler(async (req: Request, res: 
 	const { configKey, configValue } = body;
 	const user = req.user;
 
-	if (!user || user.role !== 99) {
+	if (!user || user.role !== UserRole.ADMIN) {
 		throw new ForbiddenError("Unauthorized");
 	}
 
@@ -64,7 +65,7 @@ router.post("/", validate(configSchema), asyncHandler(async (req: Request, res: 
 
 router.post("/start-maintenance", asyncHandler(async (req: Request, res: Response) => {
 	const user = req.user;
-	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
+	if (!user || user.role !== UserRole.ADMIN) throw new ForbiddenError("Unauthorized");
 
 	Logger.debug("[ConfigController] Start maintenance request");
 	await ConfigService.StartMaintenanceMode();
@@ -74,7 +75,7 @@ router.post("/start-maintenance", asyncHandler(async (req: Request, res: Respons
 
 router.post("/end-maintenance", asyncHandler(async (req: Request, res: Response) => {
 	const user = req.user;
-	if (!user || user.role !== 99) throw new ForbiddenError("Unauthorized");
+	if (!user || user.role !== UserRole.ADMIN) throw new ForbiddenError("Unauthorized");
 
 	Logger.debug("[ConfigController] End maintenance request");
 	await ConfigService.EndMaintenanceMode();

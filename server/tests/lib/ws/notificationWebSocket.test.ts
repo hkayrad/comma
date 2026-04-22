@@ -4,6 +4,7 @@ import NotificationWebSocket from '../../../lib/ws/notificationWebSocket';
 import { WebSocket, WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
 import { Logger } from '../../../lib/utils/logger';
+import { UserRole } from '@common/enums';
 
 vi.mock('ws', async () => {
     class MockWebSocketServer {
@@ -77,7 +78,7 @@ describe('NotificationWebSocket', () => {
 
     describe('handleMessage', () => {
         it('should send active users to admin', () => {
-            const ws: any = { userRole: '99', send: vi.fn() };
+            const ws: any = { userRole: String(UserRole.ADMIN), send: vi.fn() };
             const message = { type: 'GET_ACTIVE_USERS' };
             
             // @ts-ignore
@@ -97,7 +98,7 @@ describe('NotificationWebSocket', () => {
         });
 
         it('should broadcast notification for admin SEND_NOTIFICATION', () => {
-            const ws: any = { userRole: '99', send: vi.fn() };
+            const ws: any = { userRole: String(UserRole.ADMIN), send: vi.fn() };
             const message = { type: 'SEND_NOTIFICATION', title: 'Test', body: 'Body', notificationType: 'info' };
             
             const client1: any = { readyState: 1, send: vi.fn() };
@@ -121,7 +122,7 @@ describe('NotificationWebSocket', () => {
         });
 
         it('should broadcast to loginClients for maintenance notifications', () => {
-             const ws: any = { userRole: '99', send: vi.fn() };
+             const ws: any = { userRole: String(UserRole.ADMIN), send: vi.fn() };
              const message = { type: 'SEND_NOTIFICATION', title: 'M', body: 'B', notificationType: 'start_maintenance' };
              
              const loginClient: any = { readyState: 1, send: vi.fn() };

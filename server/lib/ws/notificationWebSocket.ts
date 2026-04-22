@@ -4,6 +4,7 @@ import { IncomingMessage } from "http";
 import jwt from "jsonwebtoken";
 import { DecodedJwtToken } from "@common/types";
 import { Logger } from "../utils/logger";
+import { UserRole } from "@common/enums";
 
 interface AuthenticatedWebSocket extends WebSocket {
 	isAlive: boolean;
@@ -112,7 +113,7 @@ export default class NotificationWebSocket {
 	private handleMessage(ws: AuthenticatedWebSocket, message: any) {
 		switch (message.type) {
 			case "SEND_NOTIFICATION":
-				if (ws.userRole !== "99") {
+				if (ws.userRole !== UserRole.ADMIN.toString()) {
 					ws.send(JSON.stringify({ type: "ERROR", message: "Unauthorized to send notifications" }));
 					return;
 				}
@@ -157,7 +158,7 @@ export default class NotificationWebSocket {
 			case "GET_ACTIVE_USERS":
 				Logger.info("GET_ACTIVE_USERS message received");
 
-				if (ws.userRole !== "99") {
+				if (ws.userRole !== UserRole.ADMIN.toString()) {
 					ws.send(JSON.stringify({ type: "ERROR", message: "Unauthorized to get active users" }));
 					return;
 				}

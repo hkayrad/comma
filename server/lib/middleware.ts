@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import { Logger } from "./utils/logger";
 import jwt from "jsonwebtoken";
+import { UserRole } from "@common/enums";
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ export function adminMiddleware(req: Request, res: Response, next: NextFunction)
 
 		const role = req.user.role;
 
-		if (role !== 99) {
+		if (role !== UserRole.ADMIN) {
 			Logger.warn("[AdminMiddleware] User is not an admin");
 			return res.status(403).json({ success: false, data: null, message: "Forbidden" });
 		}

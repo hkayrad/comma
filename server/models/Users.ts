@@ -1,24 +1,24 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "../lib/db/sequelize";
 import { Companies } from "./Companies";
 
 export class Users extends Model<InferAttributes<Users>, InferCreationAttributes<Users>> {
-	declare id: string;
+	declare id: CreationOptional<string>;
 	declare company_id: string;
 	declare username: string;
 	declare pass_hash: string;
-	declare role: number;
-	declare created_at: Date;
+	declare role: CreationOptional<number>;
+	declare created_at: CreationOptional<Date>;
 	declare created_by: string;
-	declare updated_at: Date;
-	declare deleted_at: Date;
-	declare deleted_by: string;
+	declare updated_at: CreationOptional<Date>;
+	declare deleted_at: CreationOptional<Date | null>;
+	declare deleted_by: CreationOptional<string | null>;
 	// 2FA fields
-	declare totp_secret: string | null;
-	declare totp_enabled: boolean;
-	declare totp_recovery_codes: string | null;
-	declare totp_failed_attempts: number;
-	declare totp_lockout_until: Date | null;
+	declare totp_secret: CreationOptional<string | null>;
+	declare totp_enabled: CreationOptional<boolean>;
+	declare totp_recovery_codes: CreationOptional<string | null>;
+	declare totp_failed_attempts: CreationOptional<number>;
+	declare totp_lockout_until: CreationOptional<Date | null>;
 }
 
 Users.init(
@@ -39,7 +39,7 @@ Users.init(
 			},
 		},
 		username: {
-			type: DataTypes.STRING,
+			type: DataTypes.STRING(255),
 			allowNull: false,
 			unique: true,
 		},
@@ -49,6 +49,8 @@ Users.init(
 		},
 		role: {
 			type: DataTypes.INTEGER({ length: 1 }),
+			allowNull: false,
+			defaultValue: 0,
 		},
 		// 2FA fields
 		totp_secret: {
@@ -118,5 +120,11 @@ Users.init(
 		updatedAt: "updated_at",
 		deletedAt: "deleted_at",
 		paranoid: true,
+		indexes: [
+			{
+				name: "idx_company_id",
+				fields: ["company_id"],
+			},
+		],
 	},
 );

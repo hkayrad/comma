@@ -38,6 +38,8 @@ import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "@/layout/shared/CancelButton";
 
+import { customerSchema } from "@common";
+
 type Props = {
   customer?: CustomerDto;
   type?: OverviewViewType;
@@ -54,7 +56,7 @@ export default function CustomerDialog(props: Props) {
 
   const CustomerFormSchema = useMemo(
     () =>
-      z.object({
+      customerSchema.extend({
         name: z
           .string({
             error: t("form.customer.name.validation.invalid"),

@@ -3,6 +3,7 @@ import { CustomerRepository } from '../../repositories/CustomerRepository';
 import { CompanyRepository } from '../../repositories/CompanyRepository';
 import { UserRepository } from '../../repositories/UserRepository';
 import { ReceivableCustomers, PayableCustomers, Companies, Users } from '../../models';
+import { ADMIN_USER_ID } from '@common/constants';
 
 describe('CustomerRepository', () => {
   const TEST_COMPANY_NAME = 'TEST_CUST_REPO_CO_COMPREHENSIVE_V3';
@@ -22,7 +23,7 @@ describe('CustomerRepository', () => {
       username: TEST_USER_NAME,
       pass_hash: 'hash',
       role: 1,
-      created_by: '00000000-0000-0000-0000-000000000000'
+      created_by: ADMIN_USER_ID
     });
     testUserId = user.id;
   });

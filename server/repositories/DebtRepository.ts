@@ -17,22 +17,22 @@ export class DebtRepository {
 	}
 
 	async create(debtData: Record<string, unknown>, transaction?: Transaction) {
-		const Model = this.getModel();
+		const Model = this.getModel() as any;
 		return await Model.create(debtData as any, { transaction });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
-		const Model = this.getModel();
+		const Model = this.getModel() as any;
 		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
 	}
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<DebtDto>, transaction?: Transaction) {
-		const Model = this.getModel();
+		const Model = this.getModel() as any;
 		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
-		const Model = this.getModel();
+		const Model = this.getModel() as any;
 		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
@@ -105,7 +105,7 @@ export class DebtRepository {
     }
 
 	async getMonthlyStats(companyId: string, start: Date, end: Date) {
-		const Model = this.getModel();
+		const Model = this.getModel() as any;
 		return await Model.findAll({
 			attributes: [[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"], [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"]],
 			where: { company_id: companyId, issue_date: { [Op.gte]: start, [Op.lt]: end }, deleted_at: null },

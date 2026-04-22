@@ -10,11 +10,11 @@ Config.init(
 	{
 		configKey: {
 			primaryKey: true,
-			type: DataTypes.CHAR(128),
+			type: DataTypes.STRING(128),
 			allowNull: false,
 		},
 		configValue: {
-			type: DataTypes.CHAR(128),
+			type: DataTypes.STRING(128),
 			allowNull: false,
 		},
 	},

@@ -53,6 +53,8 @@ import {
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
 
+import { paymentSchema } from "@common";
+
 type Props = {
   payment?: PaymentDto;
   customerId?: string;
@@ -84,7 +86,7 @@ export default function PaymentDialog(props: Props) {
   const CUSTOMER_API =
     type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const PaymentFormSchema = z.object({
+  const PaymentFormSchema = paymentSchema.extend({
     customer_id: z
       .string({
         error: t("form.payment.customer_id.validation.required"),
@@ -329,7 +331,7 @@ export default function PaymentDialog(props: Props) {
                     }}
                   />
                   <InputGroupAddon>
-                    {currencySign[form.watch("currency")]}
+                    {currencySign[form.watch("currency") as keyof typeof currencySign]}
                   </InputGroupAddon>
                 </InputGroup>
               </FormControl>

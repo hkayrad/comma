@@ -2,6 +2,8 @@ import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 import { UserRepository } from '../../repositories/UserRepository';
 import { CompanyRepository } from '../../repositories/CompanyRepository';
 import { Users, Companies, RefreshTokens } from '../../models';
+import { UserRole } from '@common/enums';
+import { ADMIN_USER_ID } from '@common/constants';
 
 describe('UserRepository', () => {
   const TEST_USERNAME = 'TEST_REPO_USER_COMP';
@@ -27,23 +29,23 @@ describe('UserRepository', () => {
       company_id: testCompanyId,
       username: TEST_USERNAME,
       pass_hash: 'hash',
-      role: 1,
-      created_by: '00000000-0000-0000-0000-000000000000'
+      role: UserRole.USER,
+      created_by: ADMIN_USER_ID
     });
     expect(user.username).toBe(TEST_USERNAME);
 
-    await UserRepository.update(user.id, { role: 99 });
+    await UserRepository.update(user.id, { role: UserRole.ADMIN });
     const found = await UserRepository.findById(user.id);
-    expect(found?.role).toBe(99);
+    expect(found?.role).toBe(UserRole.ADMIN);
 
-    await UserRepository.delete(user.id, '00000000-0000-0000-0000-000000000000');
+    await UserRepository.delete(user.id, ADMIN_USER_ID);
     const deleted = await UserRepository.findById(user.id);
     expect(deleted).toBeNull();
   });
 
   it('findAllByCompany should support complex filters and sorting', async () => {
-      const u1 = await UserRepository.create({ company_id: testCompanyId, username: 'U1', pass_hash: 'h', role: 1, created_by: '0' as any });
-      const u2 = await UserRepository.create({ company_id: testCompanyId, username: 'U2', pass_hash: 'h', role: 2, created_by: '0' as any });
+      const u1 = await UserRepository.create({ company_id: testCompanyId, username: 'U1', pass_hash: 'h', role: 1, created_by: ADMIN_USER_ID });
+      const u2 = await UserRepository.create({ company_id: testCompanyId, username: 'U2', pass_hash: 'h', role: 2, created_by: ADMIN_USER_ID });
 
       const filteredByRole = await UserRepository.findAllByCompany(testCompanyId, 10, 0, [], [{ id: 'role', value: ['1'] }]);
       expect(filteredByRole.rows.some(r => r.username === 'U1')).toBe(true);
@@ -58,7 +60,7 @@ describe('UserRepository', () => {
 
   describe('Refresh Tokens', () => {
       it('should manage refresh tokens', async () => {
-          const user = await UserRepository.create({ company_id: testCompanyId, username: 'T', pass_hash: 'h', role: 1, created_by: '0' as any });
+          const user = await UserRepository.create({ company_id: testCompanyId, username: 'T', pass_hash: 'h', role: 1, created_by: ADMIN_USER_ID });
           const tokenData = { user_id: user.id, token_hash: 'h1', expires_at: new Date(Date.now() + 10000) };
 
           await UserRepository.createRefreshToken(tokenData);
@@ -74,7 +76,7 @@ describe('UserRepository', () => {
       });
 
       it('should delete expired tokens', async () => {
-          const user = await UserRepository.create({ company_id: testCompanyId, username: 'E', pass_hash: 'h', role: 1, created_by: '0' as any });
+          const user = await UserRepository.create({ company_id: testCompanyId, username: 'E', pass_hash: 'h', role: 1, created_by: ADMIN_USER_ID });
           await UserRepository.createRefreshToken({ user_id: user.id, token_hash: 'hexp', expires_at: new Date(Date.now() - 1000) });
 
           await UserRepository.deleteExpiredRefreshTokens(user.id);

@@ -3,13 +3,15 @@ import request from 'supertest';
 import { app } from '../../../index';
 import { CompanyManagementService } from '../../../services/Admin/CompanyManagementService';
 import jwt from 'jsonwebtoken';
+import { UserRole } from '@common/enums';
+import { ADMIN_COMPANY_ID, ADMIN_USER_ID } from '@common/constants';
 
 describe('CompanyManagementController', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  const adminToken = jwt.sign({ id: '1', role: 99, companyId: '1' }, process.env.JWT_SECRET as string);
+  const adminToken = jwt.sign({ id: ADMIN_USER_ID, role: UserRole.ADMIN, companyId: ADMIN_COMPANY_ID }, process.env.JWT_SECRET as string);
 
   describe('POST /admin/companies', () => {
     it('should create a company', async () => {
@@ -28,7 +30,7 @@ describe('CompanyManagementController', () => {
     it('should get companies with pagination', async () => {
       const mockResult = { rows: [], count: 0 };
       vi.spyOn(CompanyManagementService, 'GetAll').mockResolvedValue(mockResult as any);
-      
+
       const response = await request(app)
         .get('/admin/companies?page=0&limit=10')
         .set('Cookie', [`access_token=${adminToken}`]);

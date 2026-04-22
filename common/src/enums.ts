@@ -1,4 +1,7 @@
+import { ADMIN_ROLE_ID, STAFF_ROLE_ID, USER_ROLE_ID } from "./constants";
+
 export enum UserRole {
-  ADMIN = 99,
-  USER = 1,
+  USER = USER_ROLE_ID,
+  STAFF = STAFF_ROLE_ID,
+  ADMIN = ADMIN_ROLE_ID,
 }

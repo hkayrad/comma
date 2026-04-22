@@ -3,14 +3,15 @@ import request from 'supertest';
 import { app } from '../../../index';
 import { UserManagementService } from '../../../services/Admin/UserManagementService';
 import jwt from 'jsonwebtoken';
+import { UserRole, ADMIN_COMPANY_ID } from '@common';
 
 describe('UserManagementController', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  const validCompanyId = '00000000-0000-0000-0000-000000000000';
-  const adminToken = jwt.sign({ id: 'admin-id', role: 99, companyId: validCompanyId }, process.env.JWT_SECRET as string);
+  const validCompanyId = ADMIN_COMPANY_ID;
+  const adminToken = jwt.sign({ id: 'admin-id', role: UserRole.ADMIN, companyId: validCompanyId }, process.env.JWT_SECRET as string);
 
   describe('POST /admin/users', () => {
     it('should create a user', async () => {

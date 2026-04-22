@@ -111,20 +111,20 @@ describe('Auth Controller', () => {
       expect(response.status).toBe(200);
       expect(AuthService.Logout).toHaveBeenCalledWith('valid-token');
       
-      const setCookie = response.headers['set-cookie'] || [];
-      const hasClearAccess = setCookie.some((c: string) => c.startsWith('access_token=;'));
-      const hasClearRefresh = setCookie.some((c: string) => c.startsWith('refresh_token=;'));
+      const setCookie = Array.isArray(response.headers["set-cookie"]) ? response.headers["set-cookie"] : [response.headers["set-cookie"] || ""];
+      const hasClearAccess = setCookie.some((c: string) => c.startsWith("access_token=;"));
+      const hasClearRefresh = setCookie.some((c: string) => c.startsWith("refresh_token=;"));
       expect(hasClearAccess).toBe(true);
       expect(hasClearRefresh).toBe(true);
     });
 
-    it('should clear cookies even without refresh token in request', async () => {
-      const response = await request(app).post('/logout');
+    it("should clear cookies even without refresh token in request", async () => {
+      const response = await request(app).post("/logout");
       expect(response.status).toBe(200);
-      
-      const setCookie = response.headers['set-cookie'] || [];
-      const hasClearAccess = setCookie.some((c: string) => c.startsWith('access_token=;'));
-      const hasClearRefresh = setCookie.some((c: string) => c.startsWith('refresh_token=;'));
+
+      const setCookie = Array.isArray(response.headers["set-cookie"]) ? response.headers["set-cookie"] : [response.headers["set-cookie"] || ""];
+      const hasClearAccess = setCookie.some((c: string) => c.startsWith("access_token=;"));
+      const hasClearRefresh = setCookie.some((c: string) => c.startsWith("refresh_token=;"));
       expect(hasClearAccess).toBe(true);
       expect(hasClearRefresh).toBe(true);
     });

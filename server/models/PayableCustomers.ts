@@ -5,19 +5,19 @@ import { Users } from "./Users";
 
 export class PayableCustomers extends Model<InferAttributes<PayableCustomers>, InferCreationAttributes<PayableCustomers>> {
 	declare id: CreationOptional<string>;
-	declare company_id: string;
+	declare company_id: CreationOptional<string>;
 	declare name: string;
 	declare phone: CreationOptional<string | null>;
-	declare is_company: boolean;
+	declare is_company: CreationOptional<boolean>;
 	declare tax_number: CreationOptional<string | null>;
 	declare tax_office: CreationOptional<string | null>;
 	declare mersis_no: CreationOptional<string | null>;
 	declare email: CreationOptional<string | null>;
 	declare address: CreationOptional<string | null>;
 	declare created_at: CreationOptional<Date>;
-	declare created_by: string;
+	declare created_by: CreationOptional<string>;
 	declare updated_at: CreationOptional<Date>;
-	declare deleted_at: CreationOptional<Date>;
+	declare deleted_at: CreationOptional<Date | null>;
 	declare deleted_by: CreationOptional<string | null>;
 }
 
@@ -39,11 +39,11 @@ PayableCustomers.init(
 			},
 		},
 		name: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: false,
 		},
 		phone: {
-			type: DataTypes.CHAR(20),
+			type: DataTypes.STRING(20),
 			allowNull: true,
 			defaultValue: null,
 		},
@@ -53,27 +53,27 @@ PayableCustomers.init(
 			defaultValue: true,
 		},
 		tax_number: {
-			type: DataTypes.CHAR(11),
+			type: DataTypes.STRING(11),
 			allowNull: true,
 			defaultValue: null,
 		},
 		tax_office: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},
 		mersis_no: {
-			type: DataTypes.CHAR(16),
+			type: DataTypes.STRING(16),
 			allowNull: true,
 			defaultValue: null,
 		},
 		email: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},
 		address: {
-			type: DataTypes.CHAR(255),
+			type: DataTypes.STRING(255),
 			allowNull: true,
 			defaultValue: null,
 		},
@@ -119,5 +119,11 @@ PayableCustomers.init(
 		updatedAt: "updated_at",
 		deletedAt: "deleted_at",
 		paranoid: true,
+		indexes: [
+			{
+				name: "idx_company_id",
+				fields: ["company_id"],
+			},
+		],
 	},
 );

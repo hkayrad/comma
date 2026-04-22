@@ -6,22 +6,22 @@ import { Users } from "./Users";
 
 export class ReceivableDebts extends Model<InferAttributes<ReceivableDebts>, InferCreationAttributes<ReceivableDebts>> {
 	declare id: CreationOptional<string>;
-	declare company_id: string;
-	declare customer_id: string;
+	declare company_id: CreationOptional<string>;
+	declare customer_id: CreationOptional<string>;
 	declare invoice_no: CreationOptional<string | null>;
 	declare amount: number;
-	declare discount: number;
+	declare discount: CreationOptional<number>;
 	declare vat: number;
-	declare withholding: number;
-	declare currency: string;
-	declare exchange_rate: number;
+	declare withholding: CreationOptional<number>;
+	declare currency: CreationOptional<string>;
+	declare exchange_rate: CreationOptional<number>;
 	declare total: CreationOptional<number>;
 	declare total_in_try: CreationOptional<number>;
 	declare description: CreationOptional<string | null>;
 	declare issue_date: Date;
 	declare due_date: CreationOptional<Date | null>;
 	declare created_at: CreationOptional<Date>;
-	declare created_by: string;
+	declare created_by: CreationOptional<string>;
 	declare updated_at: CreationOptional<Date>;
 	declare deleted_at: CreationOptional<Date>;
 	declare deleted_by: CreationOptional<string | null>;
@@ -76,7 +76,7 @@ ReceivableDebts.init(
 			defaultValue: 0.0,
 		},
 		currency: {
-			type: DataTypes.CHAR(3),
+			type: DataTypes.STRING(3),
 			allowNull: false,
 			defaultValue: "TRY",
 		},
@@ -155,5 +155,15 @@ ReceivableDebts.init(
 		updatedAt: "updated_at",
 		deletedAt: "deleted_at",
 		paranoid: true,
+		indexes: [
+			{
+				name: "idx_company_id",
+				fields: ["company_id"],
+			},
+			{
+				name: "idx_customer_id",
+				fields: ["customer_id"],
+			},
+		],
 	},
 );

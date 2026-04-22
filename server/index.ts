@@ -156,7 +156,6 @@ if (process.env.NODE_ENV !== "test") {
 		Logger.table({
 			"Server Port": listenPort,
 			"Client URL": process.env.CLIENT_URL,
-			"Database Host": process.env.DB_URL,
 			"Database User": process.env.DB_USER,
 			"Database Name": process.env.DB_NAME,
 			"JWT Issuer": process.env.JWT_ISSUER,

@@ -46,8 +46,8 @@ describe('CompanyManagementService', () => {
     it('should update company and return updated object', async () => {
       vi.spyOn(CompanyRepository, 'update').mockResolvedValue([1]);
       vi.spyOn(CompanyRepository, 'findById').mockResolvedValue({ name: 'Updated' } as any);
-      const result = await CompanyManagementService.Update('1', { name: 'Updated' } as any);
-      expect(result.name).toBe('Updated');
+      const result = await CompanyManagementService.Update("1", { name: "Updated" } as any);
+      expect(result?.name).toBe("Updated");
     });
 
     it('should throw NotFoundError if affectedRows is 0 and company not found', async () => {

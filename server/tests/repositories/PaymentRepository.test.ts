@@ -4,6 +4,7 @@ import { CustomerRepository } from '../../repositories/CustomerRepository';
 import { CompanyRepository } from '../../repositories/CompanyRepository';
 import { UserRepository } from '../../repositories/UserRepository';
 import { ReceivablePayments, PayablePayments, ReceivableCustomers, PayableCustomers, Companies, Users } from '../../models';
+import { ADMIN_USER_ID } from '@common/constants';
 
 describe('PaymentRepository', () => {
   const TEST_COMPANY_NAME = 'TEST_PAY_REPO_CO_COMP';
@@ -15,7 +16,7 @@ describe('PaymentRepository', () => {
   beforeAll(async () => {
     const company = await CompanyRepository.create({ name: TEST_COMPANY_NAME, is_company: true });
     testCompanyId = company.id;
-    const user = await UserRepository.create({ company_id: testCompanyId, username: TEST_USER_NAME, pass_hash: 'h', role: 1, created_by: '00000000-0000-0000-0000-000000000000' });
+    const user = await UserRepository.create({ company_id: testCompanyId, username: TEST_USER_NAME, pass_hash: 'h', role: 1, created_by: ADMIN_USER_ID });
     testUserId = user.id;
     const recCust = await new CustomerRepository('receivable').create({ company_id: testCompanyId, name: 'C', is_company: true, created_by: testUserId });
     testRecCustId = recCust.id;

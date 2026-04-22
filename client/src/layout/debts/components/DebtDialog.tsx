@@ -275,7 +275,7 @@ export default function DebtDialog(props: Props) {
                     }}
                   />
                   <InputGroupAddon>
-                    {currencySign[form.watch("currency")]}
+                    {currencySign[form.watch("currency") as keyof typeof currencySign]}
                   </InputGroupAddon>
                 </InputGroup>
               </FormControl>
@@ -309,7 +309,7 @@ export default function DebtDialog(props: Props) {
                       }}
                     />
                     <InputGroupAddon>
-                      {currencySign[form.watch("currency")]}
+                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
                     </InputGroupAddon>
                     <InputGroupAddon align="inline-end">
                       <Tooltip disableHoverablePopup>
@@ -382,7 +382,7 @@ export default function DebtDialog(props: Props) {
                       }}
                     />
                     <InputGroupAddon>
-                      {currencySign[form.watch("currency")]}
+                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
                     </InputGroupAddon>
                     <InputGroupAddon align="inline-end">
                       <Tooltip disableHoverablePopup>
@@ -453,7 +453,7 @@ export default function DebtDialog(props: Props) {
                       }}
                     />
                     <InputGroupAddon>
-                      {currencySign[form.watch("currency")]}
+                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
                     </InputGroupAddon>
                     <InputGroupAddon align="inline-end">
                       <Tooltip disableHoverablePopup>

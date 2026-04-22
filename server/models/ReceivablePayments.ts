@@ -9,19 +9,19 @@ export class ReceivablePayments extends Model<
 	InferCreationAttributes<ReceivablePayments>
 > {
 	declare id: CreationOptional<string>;
-	declare company_id: string;
-	declare customer_id: string;
+	declare company_id: CreationOptional<string>;
+	declare customer_id: CreationOptional<string>;
 	declare amount: number;
-	declare currency: string;
-	declare exchange_rate: number;
+	declare currency: CreationOptional<string>;
+	declare exchange_rate: CreationOptional<number>;
 	declare amount_in_try: CreationOptional<number>;
 	declare invoice_no: CreationOptional<string | null>;
 	declare payment_date: Date;
 	declare description: CreationOptional<string | null>;
-	declare payment_method: "cash" | "card" | "bank_transfer" | "check";
+	declare payment_method: CreationOptional<"cash" | "card" | "bank_transfer" | "check">;
 	declare due_date: CreationOptional<Date | null>;
 	declare created_at: CreationOptional<Date>;
-	declare created_by: string;
+	declare created_by: CreationOptional<string>;
 	declare updated_at: CreationOptional<Date>;
 	declare deleted_at: CreationOptional<Date>;
 	declare deleted_by: CreationOptional<string | null>;
@@ -59,7 +59,7 @@ ReceivablePayments.init(
 			allowNull: false,
 		},
 		currency: {
-			type: DataTypes.CHAR(3),
+			type: DataTypes.STRING(3),
 			allowNull: false,
 			defaultValue: "TRY",
 		},
@@ -140,5 +140,15 @@ ReceivablePayments.init(
 		updatedAt: "updated_at",
 		deletedAt: "deleted_at",
 		paranoid: true,
+		indexes: [
+			{
+				name: "idx_company_id",
+				fields: ["company_id"],
+			},
+			{
+				name: "idx_customer_id",
+				fields: ["customer_id"],
+			},
+		],
 	},
 );

@@ -38,6 +38,8 @@ import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "@/layout/shared/CancelButton";
 
+import { companySchema } from "@common";
+
 type Props = {
   company?: CompanyDto;
   onSuccess?: () => void;
@@ -51,7 +53,7 @@ export default function CompanyDialog(props: Props) {
 
   const CompanyFormSchema = useMemo(
     () =>
-      z.object({
+      companySchema.extend({
         name: z
           .string({
             message: t("form.company.name.validation.invalid"),

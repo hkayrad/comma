@@ -50,6 +50,8 @@ import {
 } from "@/components/ui/input-group";
 import TwoFactorVerify from "./TwoFactorVerify";
 
+import { loginSchema } from "@common";
+
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,13 +64,13 @@ export default function Login() {
   const { login, setUser } = useUser();
   const { t, i18n } = useTranslation();
 
-  const formSchema = z.object({
+  const formSchema = loginSchema.extend({
     username: z
       .string()
-      .max(20, { error: t("login.form.username.maxCharError") }),
+      .max(50, { message: t("login.form.username.maxCharError") }),
     password: z
       .string()
-      .max(50, { error: t("login.form.password.maxCharError") }),
+      .max(100, { message: t("login.form.password.maxCharError") }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({

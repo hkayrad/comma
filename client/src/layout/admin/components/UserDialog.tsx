@@ -30,13 +30,15 @@ import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "@/layout/shared/CancelButton";
 
+import { createUserSchema } from "@common";
+
 type Props = {
   companyId: string;
   user?: UserDto;
   onSuccess?: () => void;
 };
 
-const UserFormSchema = z.object({
+const UserFormSchema = createUserSchema.omit({ company_id: true }).extend({
   username: z
     .string()
     .min(3, "Username must be at least 3 characters")

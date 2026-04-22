@@ -4,6 +4,7 @@ import { app } from '../../index';
 import { Config } from '../../models';
 import { ConfigService } from '../../services/ConfigService';
 import jwt from 'jsonwebtoken';
+import { UserRole } from '@common/enums';
 
 describe('Config Controller Integration', () => {
   const TEST_KEY = 'INTEGRATION_TEST_KEY';
@@ -17,7 +18,7 @@ describe('Config Controller Integration', () => {
     await Config.destroy({ where: { configKey: TEST_KEY }, force: true });
   });
 
-  const adminToken = jwt.sign({ id: '1', role: 99, companyId: '1' }, process.env.JWT_SECRET as string);
+  const adminToken = jwt.sign({ id: '1', role: UserRole.ADMIN, companyId: '1' }, process.env.JWT_SECRET as string);
   const userToken = jwt.sign({ id: '2', role: 1, companyId: '1' }, process.env.JWT_SECRET as string);
 
   it('GET /configs should return 200', async () => {

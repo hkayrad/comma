@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 import { authMiddleware, adminMiddleware, configMiddleware } from '../../lib/middleware';
 import jwt from 'jsonwebtoken';
+import { UserRole } from '@common/enums';
 
 describe('Middleware', () => {
-	let mockRequest: Partial<Request>;
+	let mockRequest: any;
 	let mockResponse: Partial<Response>;
 	let nextFunction: NextFunction = vi.fn();
 
@@ -62,20 +63,20 @@ describe('Middleware', () => {
 	});
 
 	describe('adminMiddleware', () => {
-		it('should return 403 if user role is not 99', () => {
+		it('should return 403 if user role is not admin', () => {
 			mockRequest.cookies.access_token = 'token';
 			vi.spyOn(jwt, 'verify').mockImplementation((token, secret, callback: any) => {
-				callback(null, { role: 1 });
+				callback(null, { role: UserRole.USER });
 			});
 
 			adminMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);
 			expect(mockResponse.status).toHaveBeenCalledWith(403);
 		});
 
-		it('should call next if user role is 99', () => {
+		it('should call next if user role is admin', () => {
 			mockRequest.cookies.access_token = 'token';
 			vi.spyOn(jwt, 'verify').mockImplementation((token, secret, callback: any) => {
-				callback(null, { role: 99 });
+				callback(null, { role: UserRole.ADMIN });
 			});
 
 			adminMiddleware(mockRequest as Request, mockResponse as Response, nextFunction);

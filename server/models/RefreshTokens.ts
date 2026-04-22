@@ -54,5 +54,11 @@ RefreshTokens.init(
 		tableName: "refresh_tokens",
 		createdAt: "created_at",
 		updatedAt: false,
+		indexes: [
+			{
+				name: "idx_user_id",
+				fields: ["user_id"],
+			},
+		],
 	},
 );

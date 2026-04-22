@@ -2,13 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ReceivableDebtsService from '../../../services/Receivable/DebtsService';
 import { DebtRepository } from '../../../repositories/DebtRepository';
 import { NotFoundError, ValidationError } from '../../../lib/errors/AppError';
+import { ADMIN_COMPANY_ID } from '@common/constants';
 
 describe('ReceivableDebtsService', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  const validCompanyId = '00000000-0000-0000-0000-000000000000';
+  const validCompanyId = ADMIN_COMPANY_ID;
   const validUserId = '00000000-0000-0000-0000-000000000001';
 
   describe('Create', () => {
@@ -50,21 +51,41 @@ describe('ReceivableDebtsService', () => {
     });
   });
 
-  describe('Update', () => {
-    it('should update debt', async () => {
-        vi.spyOn(DebtRepository.prototype, 'update').mockResolvedValue([1]);
-        await ReceivableDebtsService.Update('1', {
-            customer_id: '1', amount: 100, vat: 20, currency: 'TRY', exchange_rate: 1, issue_date: new Date()
-        } as any, validCompanyId);
-        expect(DebtRepository.prototype.update).toHaveBeenCalled();
+  describe("Update", () => {
+    it("should update debt", async () => {
+      vi.spyOn(DebtRepository.prototype, "update").mockResolvedValue([1, []]);
+      await ReceivableDebtsService.Update(
+        "1",
+        {
+          customer_id: "1",
+          amount: 100,
+          vat: 20,
+          currency: "TRY",
+          exchange_rate: 1,
+          issue_date: new Date(),
+        } as any,
+        validCompanyId,
+      );
+      expect(DebtRepository.prototype.update).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundError if affectedRows is 0 and debt not found', async () => {
-        vi.spyOn(DebtRepository.prototype, 'update').mockResolvedValue([0]);
-        vi.spyOn(DebtRepository.prototype, 'findById').mockResolvedValue(null);
-        await expect(ReceivableDebtsService.Update('1', {
-            customer_id: '1', amount: 100, vat: 20, currency: 'TRY', exchange_rate: 1, issue_date: new Date()
-        } as any, validCompanyId)).rejects.toThrow(NotFoundError);
+    it("should throw NotFoundError if affectedRows is 0 and debt not found", async () => {
+      vi.spyOn(DebtRepository.prototype, "update").mockResolvedValue([0, []]);
+      vi.spyOn(DebtRepository.prototype, "findById").mockResolvedValue(null as any);
+      await expect(
+        ReceivableDebtsService.Update(
+          "1",
+          {
+            customer_id: "1",
+            amount: 100,
+            vat: 20,
+            currency: "TRY",
+            exchange_rate: 1,
+            issue_date: new Date(),
+          } as any,
+          validCompanyId,
+        ),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
