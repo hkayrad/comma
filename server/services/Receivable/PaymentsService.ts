@@ -65,6 +65,14 @@ export default class ReceivablePaymentsService {
 		Logger.info("[ReceivablePayments] Payment deleted successfully", { paymentId, companyId });
 	}
 
+	static async Restore(paymentId: UUID, userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivablePayments] Restoring payment", { paymentId, companyId, userId });
+		if (!paymentId) throw new ValidationError("Missing payment ID");
+
+		await repo.restore(paymentId, companyId);
+		Logger.info("[ReceivablePayments] Payment restored successfully", { paymentId, companyId });
+	}
+
 	static async GetUpcomingChecks(companyId: string, daysThreshold: number = 7) {
 		Logger.debug("[ReceivablePayments] Fetching upcoming checks", { companyId, daysThreshold });
 		const result = await repo.getUpcomingChecks(companyId, daysThreshold);

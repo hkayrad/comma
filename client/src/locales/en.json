@@ -511,7 +511,7 @@
       "delete": {
         "error": "There was an error while deleting the customer",
         "pending": "Deleting customer...",
-        "succes": "Customer deleted successfully"
+        "success": "Customer deleted successfully"
       },
       "update": {
         "error": "There was an error while updating the customer",
@@ -530,6 +530,10 @@
         "error": "There was an error while deleting debt",
         "pending": "Deleting debt...",
         "success": "Debt deleted successfully!"
+      },
+      "restore": {
+        "error": "Error restoring debt",
+        "success": "Debt restored successfully"
       },
       "update": {
         "error": "There was an error while updating debt",
@@ -760,6 +764,11 @@
       "has_receivable": "Outstanding Balance"
     },
     "delete": "Delete",
+    "download": "Download",
+    "undo": "Undo",
+    "show": "Show",
+    "edit": "Edit",
+    "debt": "Debt",
     "details": "Details",
     "email": "Email",
     "eur": "Euro (EUR)",

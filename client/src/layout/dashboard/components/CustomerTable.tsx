@@ -10,14 +10,7 @@ import {
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import {
-  Dialog,
   DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
@@ -78,6 +71,7 @@ export default function CustomerTable(props: Props) {
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
   const openDialog = useDialog((s) => s.openDialog);
+  const closeDialog = useDialog((s) => s.closeDialog);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -88,12 +82,37 @@ export default function CustomerTable(props: Props) {
         loading: t("notification.customer.delete.pending"),
         success: () => {
           sendRefreshEvent();
-          return t("notification.customer.delete.succes");
+          return t("notification.customer.delete.success");
         },
         error: t("notification.customer.delete.error"),
       });
     },
     [API, t],
+  );
+
+  const confirmDelete = useCallback(
+    (id: string) => {
+      openDialog({
+        title: t("dashboard.table.column.actions.delete.title"),
+        description: t("dashboard.table.column.actions.delete.description"),
+        content: null,
+        footer: (
+          <>
+            <DialogClose render={(props) => <CancelButton {...props} />} />
+            <Button
+              variant="destructive"
+              onClick={() => {
+                handleDelete(id);
+                closeDialog();
+              }}
+            >
+              {t("dashboard.table.column.actions.delete.confirm")}
+            </Button>
+          </>
+        ),
+      });
+    },
+    [handleDelete, openDialog, closeDialog, t],
   );
 
   const onEdit = useCallback(
@@ -515,57 +534,29 @@ export default function CustomerTable(props: Props) {
               </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverablePopup>
-              <Dialog>
-                <DialogTrigger
-                  render={(props) => (
-                    <TooltipTrigger
-                      {...props}
-                      render={(props) => (
-                        <Button
-                          {...props}
-                          nativeButton
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
-                    />
-                  )}
-                />
-
-                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  {t("dashboard.table.column.actions.delete")}
-                </TooltipContent>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {t("dashboard.table.column.actions.delete.title")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("dashboard.table.column.actions.delete.description")}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose
-                      render={(props) => <CancelButton {...props} />}
-                    />
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(row.original.id!)}
-                    >
-                      {t("dashboard.table.column.actions.delete.confirm")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                    onClick={() => confirmDelete(row.original.id!)}
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
+              />
+              <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                {t("dashboard.table.column.actions.delete")}
+              </TooltipContent>
             </Tooltip>
           </div>
         ),
       },
     ],
-    [handleDelete, navigate, onDetails, onEdit, type, t],
+    [confirmDelete, navigate, onDetails, onEdit, type, t],
   );
 
   const tags = useMemo(
@@ -703,7 +694,7 @@ export default function CustomerTable(props: Props) {
           <ContextMenuSeparator />
           <ContextMenuItem
             className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
-            onClick={() => handleDelete(c.id!)}
+            onClick={() => confirmDelete(c.id!)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             {t("dashboard.table.column.actions.delete")}

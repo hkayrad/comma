@@ -47,6 +47,15 @@ router.delete("/payments/:id", asyncHandler(async (req: Request, res: Response) 
 	res.json({ success: true, message: "Payment deleted successfully" });
 }));
 
+router.post("/payments/:id/restore", asyncHandler(async (req: Request, res: Response) => {
+	const paymentId = req.params.id;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[ReceivablePaymentsController] Restore payment request", { paymentId, companyId });
+
+	await ReceivablePaymentsService.Restore(paymentId, userId, companyId);
+	res.json({ success: true, message: "Restored successfully" });
+}));
+
 router.get("/payments/upcoming-checks", asyncHandler(async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
 	const companyId = req.user.companyId;
 	const daysThreshold = parseInt(req.query.days as string) || 7;

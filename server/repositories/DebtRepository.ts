@@ -37,6 +37,12 @@ export class DebtRepository {
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
+	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel() as any;
+		await Model.restore({ where: { id, company_id: companyId }, transaction });
+		return await Model.update({ deleted_by: null } as any, { where: { id, company_id: companyId }, transaction });
+	}
+
 	async findAllWithSummary(
 		companyId: string, limit: number, offset: number,
 		sorting: SortItem[] = [], filters: FilterItem[] = []

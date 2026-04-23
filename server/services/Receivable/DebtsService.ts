@@ -73,6 +73,14 @@ export default class ReceivableDebtsService {
 		Logger.info("[ReceivableDebts] Debt deleted successfully", { debtId: id, companyId });
 	}
 
+	static async Restore(id: UUID, userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivableDebts] Restoring debt", { debtId: id, companyId, userId });
+		if (!id) throw new ValidationError("Debt ID is required");
+
+		await repo.restore(id, companyId);
+		Logger.info("[ReceivableDebts] Debt restored successfully", { debtId: id, companyId });
+	}
+
 	static async GetUpcomingDueDates(companyId: string, daysThreshold: number = 7) {
 		Logger.debug("[ReceivableDebts] Fetching upcoming due dates", { companyId, daysThreshold });
 		const result = await repo.getUpcomingDueDates(companyId, daysThreshold);

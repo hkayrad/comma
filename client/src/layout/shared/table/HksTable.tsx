@@ -208,10 +208,16 @@ export default function HksTable(props: Props) {
                     return (
                       <ContextMenu key={row.id}>
                         <ContextMenuTrigger
-                          render={<tr className={rowClasses} data-state={isSelected && "selected"} />}
-                        >
-                          {rowContent}
-                        </ContextMenuTrigger>
+                          render={(props) => (
+                            <tr
+                              {...props}
+                              className={rowClasses}
+                              data-state={isSelected && "selected"}
+                            >
+                              {rowContent}
+                            </tr>
+                          )}
+                        />
                         <ContextMenuContent className="w-48">
                           {contextMenuItems(row.original)}
                         </ContextMenuContent>

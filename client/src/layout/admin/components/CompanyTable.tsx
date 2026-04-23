@@ -8,14 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { sendRefreshEvent } from "@/lib/utils";
 import {
-  Dialog,
   DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
@@ -70,6 +63,7 @@ export default function CompanyTable(props: Props) {
   } = props;
 
   const openDialog = useDialog((s) => s.openDialog);
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
@@ -79,12 +73,39 @@ export default function CompanyTable(props: Props) {
         loading: t("notification.customer.delete.pending"),
         success: () => {
           sendRefreshEvent();
-          return t("notification.customer.delete.succes");
+          return t("notification.customer.delete.success");
         },
         error: t("notification.customer.delete.error"),
       });
     },
     [t],
+  );
+
+  const confirmDelete = useCallback(
+    (company: CompanyDto) => {
+      openDialog({
+        title: t("dashboard.table.column.actions.delete.title"),
+        description: t("dashboard.table.column.actions.delete.description", {
+          name: company.name,
+        }),
+        content: null,
+        footer: (
+          <>
+            <DialogClose render={(props) => <CancelButton {...props} />} />
+            <Button
+              variant="destructive"
+              onClick={() => {
+                handleDelete(company.id!);
+                closeDialog();
+              }}
+            >
+              {t("dashboard.table.column.actions.delete.confirm")}
+            </Button>
+          </>
+        ),
+      });
+    },
+    [handleDelete, openDialog, closeDialog, t],
   );
 
   const getCompanyBadge = useCallback(
@@ -255,60 +276,29 @@ export default function CompanyTable(props: Props) {
               </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverablePopup>
-              <Dialog>
-                <DialogTrigger
-                  render={(props) => (
-                    <TooltipTrigger
-                      {...props}
-                      render={(props) => (
-                        <Button
-                          {...props}
-                          nativeButton
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
-                    />
-                  )}
-                />
-                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  {t("vars.delete")}
-                </TooltipContent>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {t("dashboard.table.column.actions.delete.title")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("dashboard.table.column.actions.delete.description", {
-                        name: row.original.name,
-                      })}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose
-                      render={(props) => (
-                        <CancelButton {...props} />
-                      )}
-                    />
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(row.original.id!)}
-                    >
-                      {t("dashboard.table.column.actions.delete.confirm")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                    onClick={() => confirmDelete(row.original)}
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
+              />
+              <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                {t("vars.delete")}
+              </TooltipContent>
             </Tooltip>
           </div>
         ),
       },
     ],
-    [t, onEdit, handleDelete, onManageUsers, getCompanyBadge],
+    [t, onEdit, confirmDelete, onManageUsers, getCompanyBadge],
   );
 
   const tags = useMemo(
@@ -367,7 +357,7 @@ export default function CompanyTable(props: Props) {
           <ContextMenuSeparator />
           <ContextMenuItem
             className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
-            onClick={() => handleDelete(c.id!)}
+            onClick={() => confirmDelete(c)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             {t("vars.delete")}

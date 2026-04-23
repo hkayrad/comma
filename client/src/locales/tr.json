@@ -505,7 +505,7 @@
       "delete": {
         "error": "Müşteri silinirken hata oluştu",
         "pending": "Müşteri siliniyor...",
-        "succes": "Müşteri başarıyla silindi"
+        "success": "Müşteri başarıyla silindi"
       },
       "update": {
         "error": "Müşteri güncellenirken hata oluştu",
@@ -524,6 +524,10 @@
         "error": "Borç silinirken hata oluştu",
         "pending": "Borç siliniyor...",
         "success": "Borç başarıyla silindi!"
+      },
+      "restore": {
+        "error": "Borç geri yüklenirken hata oluştu",
+        "success": "Borç başarıyla geri yüklendi"
       },
       "update": {
         "error": "Borç güncellenirken hata oluştu",
@@ -546,6 +550,10 @@
         "error": "Ödeme silinirken hata oluştu",
         "pending": "Ödeme siliniyor...",
         "success": "Ödeme başarıyla silindi"
+      },
+      "restore": {
+        "error": "Ödeme geri yüklenirken hata oluştu",
+        "success": "Ödeme başarıyla geri yüklendi"
       },
       "update": {
         "error": "Ödeme güncellenirken hata oluştu",
@@ -754,6 +762,11 @@
       "has_receivable": "Borcunuz Var"
     },
     "delete": "Sil",
+    "undo": "Geri Al",
+    "show": "Göster",
+    "download": "İndir",
+    "edit": "Düzenle",
+    "debt": "Borç",
     "details": "Detaylar",
     "email": "E-posta",
     "eur": "Euro (EUR)",

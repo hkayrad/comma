@@ -117,6 +117,22 @@ export class ReceivableDebtApi {
 			return Promise.resolve([]);
 		}
 	}
+
+	static async Restore(id: string): Promise<boolean> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/receivables/debts/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve(true);
+			}
+
+			Logger.error("Error restoring debt:", response.message);
+			return Promise.reject(response.message || "Borç geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring debt:", error);
+			return Promise.reject("Borç geri yüklenirken hata oluştu");
+		}
+	}
 }
 
 export class PayableDebtApi {
@@ -230,6 +246,22 @@ export class PayableDebtApi {
 		} catch (error) {
 			Logger.error("Error fetching upcoming due dates:", error);
 			return Promise.resolve([]);
+		}
+	}
+
+	static async Restore(id: string): Promise<boolean> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/payables/debts/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve(true);
+			}
+
+			Logger.error("Error restoring debt:", response.message);
+			return Promise.reject(response.message || "Borç geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring debt:", error);
+			return Promise.reject("Borç geri yüklenirken hata oluştu");
 		}
 	}
 }

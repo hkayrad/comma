@@ -8,14 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
 import {
-  Dialog,
   DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ContextMenuItem, ContextMenuSeparator } from "@/components/ui/context-menu";
 import { toast } from "sonner";
@@ -73,6 +66,7 @@ export default function PaymentTable(props: Props) {
   } = props;
 
   const openDialog = useDialog((s) => s.openDialog);
+  const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
@@ -89,6 +83,30 @@ export default function PaymentTable(props: Props) {
       });
     },
     [type, t],
+  );
+
+  const confirmDelete = useCallback(
+    (id: string) => {
+      openDialog({
+        title: t("payment.table.column.actions.delete.title"),
+        description: t("payment.table.column.actions.delete.description"),
+        footer: (
+          <>
+            <DialogClose render={(props) => <CancelButton {...props} />} />
+            <Button
+              variant="destructive"
+              onClick={() => {
+                handleDelete(id);
+                closeDialog();
+              }}
+            >
+              {t("payment.table.column.actions.delete.confirm")}
+            </Button>
+          </>
+        ),
+      });
+    },
+    [openDialog, closeDialog, handleDelete, t],
   );
 
   const onEdit = useCallback(
@@ -395,56 +413,29 @@ export default function PaymentTable(props: Props) {
               </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverablePopup>
-              <Dialog>
-                <DialogTrigger
-                  render={(props) => (
-                    <TooltipTrigger
-                      {...props}
-                      render={(props) => (
-                        <Button
-                          {...props}
-                          nativeButton
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
-                    />
-                  )}
-                />
-                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                  {t("payment.table.column.actions.delete")}
-                </TooltipContent>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {t("payment.table.column.actions.delete.title")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("payment.table.column.actions.delete.description")}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose
-                      render={(props) => <CancelButton {...props} />}
-                    ></DialogClose>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(row.original.id!)}
-                    >
-                      {t("payment.table.column.actions.delete.confirm")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                    onClick={() => confirmDelete(row.original.id!)}
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
+              />
+              <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                {t("payment.table.column.actions.delete")}
+              </TooltipContent>
             </Tooltip>
           </div>
         ),
       },
     ],
-    [handleDelete, onEdit, t],
+    [confirmDelete, onEdit, t],
   );
 
   const tags = useMemo(
@@ -519,7 +510,7 @@ export default function PaymentTable(props: Props) {
           <ContextMenuSeparator />
           <ContextMenuItem
             className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
-            onClick={() => handleDelete(c.id!)}
+            onClick={() => confirmDelete(c.id!)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             {t("payment.table.column.actions.delete")}

@@ -37,6 +37,12 @@ export class PaymentRepository {
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
+	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		await (Model as any).restore({ where: { id, company_id: companyId }, transaction });
+		return await Model.update({ deleted_by: null } as Record<string, unknown>, { where: { id, company_id: companyId }, transaction });
+	}
+
 	async findAllWithPagination(
 		companyId: UUID, limit: number, offset: number,
 		sorting: SortItem[] = [], filters: FilterItem[] = []

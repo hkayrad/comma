@@ -8,14 +8,14 @@ import i18n from "../i18n";
 
 // --- Constants ---
 
-const MARGIN = {
+export const MARGIN = {
     LEFT: 32,
     RIGHT: 32,
     TOP: 28,
     BOTTOM: 40,
 };
 
-const COLORS = {
+export const COLORS = {
     TEXT: {
         DEFAULT: [0, 0, 0] as [number, number, number],
         SECONDARY: [40, 40, 40] as [number, number, number],
@@ -36,11 +36,11 @@ const COLORS = {
     }
 };
 
-const FONT = "Lexend-Regular";
+export const FONT = "Lexend-Regular";
 
 // --- Interfaces ---
 
-interface LogoData {
+export interface LogoData {
     dataUrl: string;
     width: number;
     height: number;
@@ -48,7 +48,7 @@ interface LogoData {
 
 // --- Helper Functions ---
 
-async function loadLogo(url: string): Promise<LogoData | null> {
+export async function loadLogo(url: string): Promise<LogoData | null> {
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed to fetch logo: ${res.statusText}`);

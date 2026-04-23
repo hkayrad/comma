@@ -57,6 +57,15 @@ router.delete("/debts/:id", asyncHandler(async (req: Request<{ id: string }>, re
 	res.json({ success: true, message: "Debt deleted successfully" });
 }));
 
+router.post("/debts/:id/restore", asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[ReceivableDebtsController] Restore debt request", { debtId: id, companyId });
+
+	await ReceivableDebtsService.Restore(id, userId, companyId);
+	res.json({ success: true, message: "Restored successfully" });
+}));
+
 router.get("/debts/upcoming-due-dates", asyncHandler(async (req: Request<{}, {}, {}, { days?: string }>, res: Response) => {
 	const companyId = req.user.companyId;
 	const daysThreshold = parseInt(req.query.days as string) || 7;

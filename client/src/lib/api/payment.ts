@@ -98,6 +98,22 @@ export class ReceivablePaymentApi {
 			return Promise.resolve([]);
 		}
 	}
+
+	static async Restore(id: string): Promise<boolean> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/receivables/payments/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve(true);
+			}
+
+			Logger.error("Error restoring payment:", response.message);
+			return Promise.reject(response.message || "Ödeme geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring payment:", error);
+			return Promise.reject("Ödeme geri yüklenirken hata oluştu");
+		}
+	}
 }
 
 export class PayablePaymentApi {
@@ -193,6 +209,22 @@ export class PayablePaymentApi {
 		} catch (error) {
 			Logger.error("Error fetching upcoming checks:", error);
 			return Promise.resolve([]);
+		}
+	}
+
+	static async Restore(id: string): Promise<boolean> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/payables/payments/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve(true);
+			}
+
+			Logger.error("Error restoring payment:", response.message);
+			return Promise.reject(response.message || "Ödeme geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring payment:", error);
+			return Promise.reject("Ödeme geri yüklenirken hata oluştu");
 		}
 	}
 }
