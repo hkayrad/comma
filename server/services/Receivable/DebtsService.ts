@@ -77,7 +77,8 @@ export default class ReceivableDebtsService {
 		Logger.info("[ReceivableDebts] Restoring debt", { debtId: id, companyId, userId });
 		if (!id) throw new ValidationError("Debt ID is required");
 
-		await repo.restore(id, companyId);
+		const [affectedCount] = await repo.restore(id, companyId);
+		if (affectedCount === 0) throw new NotFoundError("No debt found with the provided ID");
 		Logger.info("[ReceivableDebts] Debt restored successfully", { debtId: id, companyId });
 	}
 

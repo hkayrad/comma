@@ -82,7 +82,8 @@ export class UserManagementService {
 
 	static async Restore(id: UUID) {
 		Logger.info("[UserManagement] Restore", { id });
-		await UserRepository.restore(id);
+		const restoredCount = await UserRepository.restore(id);
+		if (restoredCount === 0) throw new NotFoundError("User not found");
 		Logger.info("[UserManagement] Restored user successfully", { id });
 	}
 

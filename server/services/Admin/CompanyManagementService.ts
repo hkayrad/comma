@@ -62,7 +62,8 @@ export class CompanyManagementService {
 
 	static async Restore(id: UUID) {
 		Logger.info("[CompanyManagement] Restore called", { id });
-		await CompanyRepository.restore(id);
+		const restoredCount = await CompanyRepository.restore(id);
+		if (restoredCount === 0) throw new NotFoundError("Company not found");
 		Logger.info("[CompanyManagement] Restored company successfully", { id });
 	}
 }

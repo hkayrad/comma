@@ -53,7 +53,7 @@ router.delete("/:id", authRateLimiter, asyncHandler(async (req: Request, res: Re
 // Restore user
 router.post("/:id/restore", authRateLimiter, asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[UserManagementController] Restore user");
-	await UserManagementService.Restore(req.params.id, req.user.id);
+	await UserManagementService.Restore(req.params.id);
 	res.json({ success: true, message: "User restored successfully" });
 }));
 

@@ -129,7 +129,11 @@ export default class ReceivableCustomersService {
 			throw new ValidationError("Customer ID is required");
 		}
 
-		await repo.restore(id, companyId);
+		const restoredCount = await repo.restore(id, companyId);
+
+		if (restoredCount === 0) {
+			throw new NotFoundError("Customer not found");
+		}
 
 		Logger.info("[ReceivableCustomers] Customer restored successfully", { customerId: id, companyId });
 	}

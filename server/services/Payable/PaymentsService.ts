@@ -69,7 +69,8 @@ export default class PayablePaymentsService {
 		Logger.info("[PayablePayments] Restoring payment", { paymentId, companyId, userId });
 		if (!paymentId) throw new ValidationError("Missing payment ID");
 
-		await repo.restore(paymentId, companyId);
+		const [affectedCount] = await repo.restore(paymentId, companyId);
+		if (affectedCount === 0) throw new NotFoundError("No payment found with the given ID");
 		Logger.info("[PayablePayments] Payment restored successfully", { paymentId, companyId });
 	}
 
