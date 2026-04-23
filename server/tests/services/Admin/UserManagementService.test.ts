@@ -93,6 +93,19 @@ describe('UserManagementService', () => {
       });
   });
 
+  describe('Restore', () => {
+      it('should restore user', async () => {
+          vi.spyOn(UserRepository, 'restore').mockResolvedValue(1);
+          await UserManagementService.Restore('1');
+          expect(UserRepository.restore).toHaveBeenCalledWith('1');
+      });
+
+      it('should throw NotFoundError if not restored', async () => {
+          vi.spyOn(UserRepository, 'restore').mockResolvedValue(0);
+          await expect(UserManagementService.Restore('1')).rejects.toThrow(NotFoundError);
+      });
+  });
+
   describe('ResetPassword', () => {
       it('should reset password successfully', async () => {
           vi.spyOn(UserRepository, 'update').mockResolvedValue([1]);

@@ -75,4 +75,16 @@ describe('PayableCustomersController', () => {
           expect(response.body.success).toBe(true);
       });
   });
+
+  describe('POST /payables/customers/:id/restore', () => {
+      it('should restore customer', async () => {
+          vi.spyOn(PayableCustomersService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post('/payables/customers/1/restore')
+              .set('Cookie', [`access_token=${token}`]);
+          
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+      });
+  });
 });

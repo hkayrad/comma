@@ -71,6 +71,19 @@ describe('ReceivablePaymentsController', () => {
       });
   });
 
+  describe('POST /receivables/payments/:id/restore', () => {
+      it('should restore payment', async () => {
+          vi.spyOn(ReceivablePaymentsService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post(`/receivables/payments/${validPaymentId}/restore`)
+              .set('Cookie', [`access_token=${token}`]);
+          
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+          expect(ReceivablePaymentsService.Restore).toHaveBeenCalledWith(validPaymentId, '1', validCompanyId);
+      });
+  });
+
   describe('GET /receivables/payments/upcoming-checks', () => {
       it('should get upcoming checks', async () => {
           vi.spyOn(ReceivablePaymentsService, 'GetUpcomingChecks').mockResolvedValue([]);

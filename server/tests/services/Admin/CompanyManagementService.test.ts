@@ -69,4 +69,17 @@ describe('CompanyManagementService', () => {
       await expect(CompanyManagementService.Delete('1')).rejects.toThrow(NotFoundError);
     });
   });
+
+  describe('Restore', () => {
+    it('should restore company', async () => {
+      vi.spyOn(CompanyRepository, 'restore').mockResolvedValue(1);
+      await CompanyManagementService.Restore('1');
+      expect(CompanyRepository.restore).toHaveBeenCalledWith('1');
+    });
+
+    it('should throw NotFoundError if nothing restored', async () => {
+      vi.spyOn(CompanyRepository, 'restore').mockResolvedValue(0);
+      await expect(CompanyManagementService.Restore('1')).rejects.toThrow(NotFoundError);
+    });
+  });
 });

@@ -76,6 +76,17 @@ describe('UserManagementController', () => {
       });
   });
 
+  describe('POST /admin/users/:id/restore', () => {
+      it('should restore user', async () => {
+          vi.spyOn(UserManagementService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post('/admin/users/1/restore')
+              .set('Cookie', [`access_token=${adminToken}`]);
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+      });
+  });
+
   describe('POST /admin/users/:id/reset-password', () => {
       it('should reset password', async () => {
           vi.spyOn(UserManagementService, 'ResetPassword').mockResolvedValue(undefined);

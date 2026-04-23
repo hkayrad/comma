@@ -84,6 +84,19 @@ describe('ReceivableDebtsController', () => {
       });
   });
 
+  describe('POST /receivables/debts/:id/restore', () => {
+      it('should restore debt', async () => {
+          vi.spyOn(ReceivableDebtsService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post(`/receivables/debts/${validDebtId}/restore`)
+              .set('Cookie', [`access_token=${token}`]);
+          
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+          expect(ReceivableDebtsService.Restore).toHaveBeenCalledWith(validDebtId, '1', validCompanyId);
+      });
+  });
+
   describe('GET /receivables/debts/upcoming-due-dates', () => {
       it('should get upcoming due dates', async () => {
           vi.spyOn(ReceivableDebtsService, 'GetUpcomingDueDates').mockResolvedValue([]);

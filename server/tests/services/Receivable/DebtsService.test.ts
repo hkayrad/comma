@@ -103,6 +103,20 @@ describe('ReceivableDebtsService', () => {
     });
   });
 
+  describe('Restore', () => {
+    it('should restore debt', async () => {
+        vi.spyOn(DebtRepository.prototype, 'restore').mockResolvedValue([1]);
+        await ReceivableDebtsService.Restore('1', validUserId, validCompanyId);
+        expect(DebtRepository.prototype.restore).toHaveBeenCalledWith('1', validCompanyId);
+    });
+
+    it('should throw NotFoundError if nothing restored', async () => {
+        vi.spyOn(DebtRepository.prototype, 'restore').mockResolvedValue([0]);
+        await expect(ReceivableDebtsService.Restore('1', validUserId, validCompanyId))
+            .rejects.toThrow(NotFoundError);
+    });
+  });
+
   describe('GetUpcomingDueDates', () => {
       it('should return upcoming due dates', async () => {
           vi.spyOn(DebtRepository.prototype, 'getUpcomingDueDates').mockResolvedValue([]);

@@ -75,4 +75,15 @@ describe('CompanyManagementController', () => {
           expect(response.body.success).toBe(true);
       });
   });
+
+  describe('POST /admin/companies/:id/restore', () => {
+      it('should restore company', async () => {
+          vi.spyOn(CompanyManagementService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post('/admin/companies/1/restore')
+              .set('Cookie', [`access_token=${adminToken}`]);
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+      });
+  });
 });

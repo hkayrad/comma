@@ -71,6 +71,20 @@ describe('ReceivablePaymentsService', () => {
     });
   });
 
+  describe('Restore', () => {
+    it('should restore payment', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'restore').mockResolvedValue([1]);
+        await ReceivablePaymentsService.Restore('1', validUserId, validCompanyId);
+        expect(PaymentRepository.prototype.restore).toHaveBeenCalledWith('1', validCompanyId);
+    });
+
+    it('should throw NotFoundError if nothing restored', async () => {
+        vi.spyOn(PaymentRepository.prototype, 'restore').mockResolvedValue([0]);
+        await expect(ReceivablePaymentsService.Restore('1', validUserId, validCompanyId))
+            .rejects.toThrow(NotFoundError);
+    });
+  });
+
   describe('GetUpcomingChecks', () => {
       it('should return upcoming checks', async () => {
           vi.spyOn(PaymentRepository.prototype, 'getUpcomingChecks').mockResolvedValue([]);

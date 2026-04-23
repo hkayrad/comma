@@ -77,4 +77,18 @@ describe('ReceivableCustomersService', () => {
             .rejects.toThrow(NotFoundError);
     });
   });
+
+  describe('Restore', () => {
+    it('should restore customer', async () => {
+        vi.spyOn(CustomerRepository.prototype, 'restore').mockResolvedValue(1);
+        await ReceivableCustomersService.Restore('1', validUserId, validCompanyId);
+        expect(CustomerRepository.prototype.restore).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundError if nothing restored', async () => {
+        vi.spyOn(CustomerRepository.prototype, 'restore').mockResolvedValue(0);
+        await expect(ReceivableCustomersService.Restore('1', validUserId, validCompanyId))
+            .rejects.toThrow(NotFoundError);
+    });
+  });
 });

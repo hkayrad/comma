@@ -71,6 +71,18 @@ describe('PayablePaymentsController', () => {
       });
   });
 
+  describe('POST /payables/payments/:id/restore', () => {
+    it('should restore payment', async () => {
+        vi.spyOn(PayablePaymentsService, 'Restore').mockResolvedValue(undefined);
+        const response = await request(app)
+            .post(`/payables/payments/${validPaymentId}/restore`)
+            .set('Cookie', [`access_token=${token}`]);
+        
+        expect(response.status).toBe(200);
+        expect(response.body.success).toBe(true);
+    });
+  });
+
   describe('GET /payables/payments/upcoming-checks', () => {
       it('should get upcoming checks', async () => {
           vi.spyOn(PayablePaymentsService, 'GetUpcomingChecks').mockResolvedValue([]);

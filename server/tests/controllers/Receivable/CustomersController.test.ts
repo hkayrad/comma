@@ -76,4 +76,16 @@ describe('ReceivableCustomersController', () => {
           expect(response.body.success).toBe(true);
       });
   });
+
+  describe('POST /receivables/customers/:id/restore', () => {
+      it('should restore customer', async () => {
+          vi.spyOn(ReceivableCustomersService, 'Restore').mockResolvedValue(undefined);
+          const response = await request(app)
+              .post('/receivables/customers/1/restore')
+              .set('Cookie', [`access_token=${token}`]);
+          
+          expect(response.status).toBe(200);
+          expect(response.body.success).toBe(true);
+      });
+  });
 });
