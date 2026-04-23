@@ -80,6 +80,12 @@ export class UserManagementService {
 		Logger.info("[UserManagement] Deleted user successfully", { id });
 	}
 
+	static async Restore(id: UUID) {
+		Logger.info("[UserManagement] Restore", { id });
+		await UserRepository.restore(id);
+		Logger.info("[UserManagement] Restored user successfully", { id });
+	}
+
 	static async ResetPassword(id: UUID, newPassword: string) {
 		Logger.info("[UserManagement] ResetPassword", { id });
 		const passHash = await bcrypt.hash(newPassword, SALT_ROUNDS);

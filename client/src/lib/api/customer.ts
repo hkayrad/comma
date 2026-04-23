@@ -122,6 +122,22 @@ export class ReceivableCustomerApi {
 			return Promise.reject("Müşteri silinirken hata oluştu");
 		}
 	}
+
+	static async Restore(id: string): Promise<void> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/receivables/customers/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve();
+			}
+
+			Logger.error("Error restoring customer:", response.message);
+			return Promise.reject(response.message || "Müşteri geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring customer:", error);
+			return Promise.reject("Müşteri geri yüklenirken hata oluştu");
+		}
+	}
 }
 
 export class PayableCustomerApi {
@@ -257,6 +273,22 @@ export class PayableCustomerApi {
 		} catch (error) {
 			Logger.error("Error deleting customer:", error);
 			return Promise.reject("Müşteri silinirken hata oluştu");
+		}
+	}
+
+	static async Restore(id: string): Promise<void> {
+		try {
+			const { data: response } = await instance.post<ApiResponse<null>>(`/payables/customers/${id}/restore`);
+
+			if (response.success) {
+				return Promise.resolve();
+			}
+
+			Logger.error("Error restoring customer:", response.message);
+			return Promise.reject(response.message || "Müşteri geri yüklenirken hata oluştu");
+		} catch (error) {
+			Logger.error("Error restoring customer:", error);
+			return Promise.reject("Müşteri geri yüklenirken hata oluştu");
 		}
 	}
 }

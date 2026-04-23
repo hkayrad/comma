@@ -42,4 +42,10 @@ router.delete("/:id", asyncHandler(async (req: Request, res: Response) => {
 	res.json({ success: true, message: "Company deleted successfully" });
 }));
 
+router.post("/:id/restore", asyncHandler(async (req: Request, res: Response) => {
+	Logger.info("[CompanyManagementController] Restore company");
+	await CompanyManagementService.Restore(req.params.id);
+	res.json({ success: true, message: "Restored successfully" });
+}));
+
 export default router;

@@ -121,4 +121,16 @@ export default class PayableCustomersService {
 
 		Logger.info("[PayableCustomers] Customer deleted successfully", { customerId: id, companyId });
 	}
+
+	static async Restore(id: UUID, userId: UUID, companyId: UUID) {
+		Logger.info("[PayableCustomers] Restoring customer", { customerId: id, companyId });
+
+		if (!id) {
+			throw new ValidationError("Customer ID is required");
+		}
+
+		await repo.restore(id, companyId);
+
+		Logger.info("[PayableCustomers] Customer restored successfully", { customerId: id, companyId });
+	}
 }

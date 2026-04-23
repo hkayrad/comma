@@ -70,17 +70,28 @@ export default function PaymentTable(props: Props) {
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
-    (id: string) => {
+    async (id: string) => {
       const API = type === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
-      const promise = API.Delete(id);
-      toast.promise(promise, {
-        loading: t("notification.payment.delete.pending"),
-        success: () => {
-          sendRefreshEvent();
-          return t("notification.payment.delete.success");
-        },
-        error: t("notification.payment.delete.error"),
-      });
+      try {
+        await API.Delete(id);
+        sendRefreshEvent();
+        toast.success(t("notification.payment.delete.success"), {
+          action: {
+            label: t("vars.undo"),
+            onClick: async () => {
+              try {
+                await API.Restore(id);
+                sendRefreshEvent();
+                toast.success(t("notification.payment.restore.success"));
+              } catch (error) {
+                toast.error(t("notification.payment.restore.error"));
+              }
+            },
+          },
+        });
+      } catch (error) {
+        toast.error(t("notification.payment.delete.error"));
+      }
     },
     [type, t],
   );

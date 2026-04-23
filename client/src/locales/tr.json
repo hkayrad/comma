@@ -470,6 +470,20 @@
         "error": "Bakım modu başlatılamadı.",
         "pending": "Bakım modu başlatılıyor...",
         "success": "Bakım modu başlatıldı."
+      },
+      "company": {
+        "restore": {
+          "error": "Şirket geri yüklenirken hata oluştu",
+          "pending": "Şirket geri yükleniyor...",
+          "success": "Şirket başarıyla geri yüklendi"
+        }
+      },
+      "user": {
+        "restore": {
+          "error": "Kullanıcı geri yüklenirken hata oluştu",
+          "pending": "Kullanıcı geri yükleniyor...",
+          "success": "Kullanıcı başarıyla geri yüklendi"
+        }
       }
     },
     "auth": {
@@ -511,6 +525,11 @@
         "error": "Müşteri güncellenirken hata oluştu",
         "pending": "Müşteri güncelleniyor...",
         "success": "Müşteri başarıyla güncellendi"
+      },
+      "restore": {
+        "error": "Müşteri geri yüklenirken hata oluştu",
+        "pending": "Müşteri geri yükleniyor...",
+        "success": "Müşteri başarıyla geri yüklendi"
       }
     },
     "debt": {

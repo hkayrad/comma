@@ -37,6 +37,11 @@ export class CustomerRepository {
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
 
+	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await (Model as any).restore({ where: { id, company_id: companyId }, transaction });
+	}
+
 	async findAllIdAndName(companyId: UUID) {
 		const Model = this.getModel();
 		return await Model.findAll({

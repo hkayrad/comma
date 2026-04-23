@@ -121,4 +121,16 @@ export default class ReceivableCustomersService {
 
 		Logger.info("[ReceivableCustomers] Customer deleted successfully", { customerId: id, companyId });
 	}
+
+	static async Restore(id: UUID, userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivableCustomers] Restoring customer", { customerId: id, companyId });
+
+		if (!id) {
+			throw new ValidationError("Customer ID is required");
+		}
+
+		await repo.restore(id, companyId);
+
+		Logger.info("[ReceivableCustomers] Customer restored successfully", { customerId: id, companyId });
+	}
 }

@@ -71,17 +71,28 @@ export default function DebtTable(props: Props) {
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
-    (id: string) => {
+    async (id: string) => {
       const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
-      const promise = API.Delete(id);
-      toast.promise(promise, {
-        loading: t("notification.debt.delete.pending"),
-        success: () => {
-          sendRefreshEvent();
-          return t("notification.debt.delete.success");
-        },
-        error: t("notification.debt.delete.error"),
-      });
+      try {
+        await API.Delete(id);
+        sendRefreshEvent();
+        toast.success(t("notification.debt.delete.success"), {
+          action: {
+            label: t("vars.undo"),
+            onClick: async () => {
+              try {
+                await API.Restore(id);
+                sendRefreshEvent();
+                toast.success(t("notification.debt.restore.success"));
+              } catch (error) {
+                toast.error(t("notification.debt.restore.error"));
+              }
+            },
+          },
+        });
+      } catch (error) {
+        toast.error(t("notification.debt.delete.error"));
+      }
     },
     [type, t],
   );

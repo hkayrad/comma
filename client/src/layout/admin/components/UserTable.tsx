@@ -66,16 +66,27 @@ export default function UserTable(props: Props) {
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
-    (id: string) => {
-      const promise = AdminUserApi.Delete(id);
-      toast.promise(promise, {
-        loading: t("notification.customer.delete.pending"),
-        success: () => {
-          sendRefreshEvent();
-          return t("notification.customer.delete.success");
-        },
-        error: t("notification.customer.delete.error"),
-      });
+    async (id: string) => {
+      try {
+        await AdminUserApi.Delete(id);
+        sendRefreshEvent();
+        toast.success(t("notification.customer.delete.success"), {
+          action: {
+            label: t("vars.undo"),
+            onClick: async () => {
+              try {
+                await AdminUserApi.Restore(id);
+                sendRefreshEvent();
+                toast.success(t("notification.customer.restore.success"));
+              } catch (error) {
+                toast.error(t("notification.customer.restore.error"));
+              }
+            },
+          },
+        });
+      } catch (error) {
+        toast.error(t("notification.customer.delete.error"));
+      }
     },
     [t],
   );

@@ -24,6 +24,10 @@ export class CompanyRepository {
 		return await Companies.destroy({ where: { id }, transaction });
 	}
 
+	static async restore(id: UUID, transaction?: Transaction) {
+		return await (Companies as any).restore({ where: { id }, transaction });
+	}
+
 	static async findAllWithPagination(
 		limit: number, offset: number,
 		sorting: SortItem[] = [], filters: FilterItem[] = []

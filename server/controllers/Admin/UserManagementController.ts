@@ -50,6 +50,13 @@ router.delete("/:id", authRateLimiter, asyncHandler(async (req: Request, res: Re
 	res.json({ success: true, message: "User deleted successfully" });
 }));
 
+// Restore user
+router.post("/:id/restore", authRateLimiter, asyncHandler(async (req: Request, res: Response) => {
+	Logger.info("[UserManagementController] Restore user");
+	await UserManagementService.Restore(req.params.id, req.user.id);
+	res.json({ success: true, message: "User restored successfully" });
+}));
+
 // Reset user password
 router.post("/:id/reset-password", authRateLimiter, asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[UserManagementController] Reset user password");

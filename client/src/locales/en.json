@@ -476,6 +476,20 @@
         "error": "Could not start the maintenance mode.",
         "pending": "Starting maintenance mode...",
         "success": "Maintenance mode started."
+      },
+      "company": {
+        "restore": {
+          "error": "There was an error while restoring the company",
+          "pending": "Restoring company...",
+          "success": "Company restored successfully"
+        }
+      },
+      "user": {
+        "restore": {
+          "error": "There was an error while restoring the user",
+          "pending": "Restoring user...",
+          "success": "User restored successfully"
+        }
       }
     },
     "auth": {
@@ -517,6 +531,11 @@
         "error": "There was an error while updating the customer",
         "pending": "Updating customer...",
         "success": "Customer updated successfully"
+      },
+      "restore": {
+        "error": "There was an error while restoring the customer",
+        "pending": "Restoring customer...",
+        "success": "Customer restored successfully"
       }
     },
     "debt": {

@@ -72,6 +72,16 @@ export class AdminCompanyApi {
 			throw error;
 		}
 	}
+
+	static async Restore(id: string) {
+		try {
+			const response = await instance.post(`/admin/companies/${id}/restore`);
+			return response.data;
+		} catch (error) {
+			Logger.error(`Error restoring company ${id}:`, error);
+			throw error;
+		}
+	}
 }
 
 export class AdminUserApi {
@@ -141,6 +151,16 @@ export class AdminUserApi {
 			return response.data;
 		} catch (error) {
 			Logger.error(`Error deleting user ${id}:`, error);
+			throw error;
+		}
+	}
+
+	static async Restore(id: string) {
+		try {
+			const response = await instance.post(`/admin/users/${id}/restore`);
+			return response.data;
+		} catch (error) {
+			Logger.error(`Error restoring user ${id}:`, error);
 			throw error;
 		}
 	}

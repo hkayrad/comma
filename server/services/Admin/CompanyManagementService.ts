@@ -59,4 +59,10 @@ export class CompanyManagementService {
 		if (deletedCount === 0) throw new NotFoundError("Company not found");
 		Logger.info("[CompanyManagement] Deleted company successfully", { id });
 	}
+
+	static async Restore(id: UUID) {
+		Logger.info("[CompanyManagement] Restore called", { id });
+		await CompanyRepository.restore(id);
+		Logger.info("[CompanyManagement] Restored company successfully", { id });
+	}
 }

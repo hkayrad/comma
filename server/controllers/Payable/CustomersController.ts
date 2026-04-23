@@ -68,5 +68,14 @@ router.delete("/customers/:id", asyncHandler(async (req: Request<{ id: string }>
 	res.json({ success: true, message: "Customer deleted successfully" });
 }));
 
+router.post("/customers/:id/restore", asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[PayableCustomersController] Restore customer request", { customerId: id, companyId });
+
+	await PayableCustomersService.Restore(id, userId, companyId);
+	res.json({ success: true, message: "Restored successfully" });
+}));
+
 export default router;
 

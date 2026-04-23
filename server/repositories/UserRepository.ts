@@ -54,6 +54,10 @@ export class UserRepository {
 		return await Users.destroy({ where: { id }, transaction });
 	}
 
+	static async restore(id: UUID, transaction?: Transaction) {
+		return await (Users as any).restore({ where: { id }, transaction });
+	}
+
 	static async findAllByCompany(
 		companyId: UUID,
 		limit: number,
