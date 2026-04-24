@@ -550,6 +550,8 @@ export default function PaymentDialog(props: Props) {
           queryClient.invalidateQueries({ queryKey: ["totals"] });
           queryClient.invalidateQueries({ queryKey: ["payments"] });
           queryClient.invalidateQueries({ queryKey: ["customers"] });
+          queryClient.invalidateQueries({ queryKey: ["debts"] });
+          queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
           return payment
             ? t("notification.payment.update.success")
             : t("notification.payment.add.success");

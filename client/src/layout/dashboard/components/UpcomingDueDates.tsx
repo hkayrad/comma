@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 type DueDateItemType = "receivable" | "payable" | "receivableCheck" | "payableCheck";
 type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
@@ -16,8 +17,6 @@ type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [dueDates, setDueDates] = useState<DueDateWithType[]>([]);
-    const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
 
     const getNavigationPath = (type: DueDateItemType): string => {
@@ -29,9 +28,9 @@ export default function UpcomingDueDates() {
         }
     };
 
-    const fetchUpcomingDueDates = useCallback(async () => {
-        setLoading(true);
-        try {
+    const { data: dueDates = [], isLoading } = useQuery({
+        queryKey: ["upcoming-due-dates"],
+        queryFn: async () => {
             const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
                 ReceivableDebtApi.GetUpcomingDueDates(7),
                 PayableDebtApi.GetUpcomingDueDates(7),
@@ -59,25 +58,12 @@ export default function UpcomingDueDates() {
                 type: "payableCheck" as const,
             }));
 
-            const combined = [...receivablesWithType, ...payablesWithType, ...receivableChecksWithType, ...payableChecksWithType].sort(
+            return [...receivablesWithType, ...payablesWithType, ...receivableChecksWithType, ...payableChecksWithType].sort(
                 (a, b) => a.days_remaining - b.days_remaining
             );
-
-            setDueDates(combined);
-        } catch (error) {
-            console.error("Error fetching upcoming due dates:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchUpcomingDueDates();
-
-        const handleRefresh = () => fetchUpcomingDueDates();
-        window.addEventListener("global:refresh", handleRefresh);
-        return () => window.removeEventListener("global:refresh", handleRefresh);
-    }, [fetchUpcomingDueDates]);
+        },
+        staleTime: 30000,
+    });
 
     const getDaysRemainingLabel = (days: number) => {
         if (days < 0) return t("dashboard.upcomingDueDates.overdue");
@@ -91,7 +77,7 @@ export default function UpcomingDueDates() {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <Card className="animate-pulse">
                 <CardHeader className="py-3">

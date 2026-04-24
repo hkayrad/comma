@@ -377,6 +377,20 @@ export default function DebtTable(props: Props) {
         cell: ({ row, column }) => <FormattedDate row={row} column={column} />,
       },
       {
+        accessorKey: "last_payment_date",
+        header: ({ column }) => (
+          <SortableColumnHeader
+            column={column}
+            title={t("debt.table.column.last_payment_date")}
+          />
+        ),
+        cell: ({ row, column }) => {
+          const date = row.getValue(column.id) as string | null;
+          if (!date) return <span className="text-muted-foreground">-</span>;
+          return <FormattedDate row={row} column={column} />;
+        },
+      },
+      {
         accessorKey: "due_date",
         header: ({ column }) => (
           <SortableColumnHeader

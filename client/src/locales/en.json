@@ -114,6 +114,7 @@
         "exchange_rate": "Exchange Rate",
         "invoice_no": "Invoice No",
         "issue_date": "Issue Date",
+        "last_payment_date": "Last Payment Date",
         "due_date": "Due Date",
         "total": "Total",
         "total_in_try": "Amount to be Paid",

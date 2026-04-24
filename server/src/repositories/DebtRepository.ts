@@ -131,6 +131,17 @@ export class DebtRepository {
                               AND p.deleted_at IS NULL
                         )`),
                         'is_paid'
+                    ],
+                    [
+                        literal(`(
+                            SELECT MAX(p.payment_date)
+                            FROM ${paymentTable} AS p
+                            WHERE p.invoice_no = \`${mainAlias}\`.invoice_no
+                              AND p.company_id = \`${mainAlias}\`.company_id
+                              AND p.customer_id = \`${mainAlias}\`.customer_id
+                              AND p.deleted_at IS NULL
+                        )`),
+                        'last_payment_date'
                     ]
                 ]
             },
@@ -154,7 +165,8 @@ export class DebtRepository {
                     ...d,
                     customer_name: d.customer?.name,
                     customer_tax_number: d.customer?.customer_tax_number,
-                    is_paid: !!d.is_paid
+                    is_paid: !!d.is_paid,
+                    last_payment_date: d.last_payment_date
                 };
             }) as any,
             count

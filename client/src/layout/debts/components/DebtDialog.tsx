@@ -625,6 +625,7 @@ export default function DebtDialog(props: Props) {
           queryClient.invalidateQueries({ queryKey: ["totals"] });
           queryClient.invalidateQueries({ queryKey: ["debts"] });
           queryClient.invalidateQueries({ queryKey: ["customers"] });
+          queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
           return debt
             ? t("notification.debt.update.success")
             : t("notification.debt.add.success");

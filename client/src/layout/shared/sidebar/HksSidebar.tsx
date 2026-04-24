@@ -78,6 +78,7 @@ import {
 } from "@/components/ui/popover";
 import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
 import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
+import { useQuery } from "@tanstack/react-query";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -90,27 +91,21 @@ export default function HksSidebar() {
   const reloadConnection = useWebSocket((s) => s.reloadConnection);
   const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
-  const [upcomingPaymentsCount, setUpcomingPaymentsCount] = useState(0);
-
-  const fetchUpcomingPaymentsCount = useCallback(async () => {
-    try {
+  const { data: upcomingDueDates = [] } = useQuery({
+    queryKey: ["upcoming-due-dates"],
+    queryFn: async () => {
       const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
         ReceivableDebtApi.GetUpcomingDueDates(7),
         PayableDebtApi.GetUpcomingDueDates(7),
         ReceivablePaymentApi.GetUpcomingChecks(7),
         PayablePaymentApi.GetUpcomingChecks(7),
       ]);
-      setUpcomingPaymentsCount(receivables.length + payables.length + receivableChecks.length + payableChecks.length);
-    } catch {
-      setUpcomingPaymentsCount(0);
-    }
-  }, []);
+      return [...receivables, ...payables, ...receivableChecks, ...payableChecks];
+    },
+    staleTime: 30000,
+  });
 
-  useEffect(() => {
-    fetchUpcomingPaymentsCount();
-    window.addEventListener("global:refresh", fetchUpcomingPaymentsCount);
-    return () => window.removeEventListener("global:refresh", fetchUpcomingPaymentsCount);
-  }, [fetchUpcomingPaymentsCount]);
+  const upcomingPaymentsCount = upcomingDueDates.length;
 
   const handleLogout = useCallback(async () => {
     const promise = AuthApi.Logout();
