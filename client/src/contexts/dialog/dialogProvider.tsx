@@ -75,8 +75,11 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
           <Dialog
             key={dialog.id}
             open={dialog.isOpen}
-            onOpenChange={(open) => {
-              if (!open) closeDialog();
+            onOpenChange={(open, details) => {
+              if (!open) {
+                if (details.reason === "outside-press") return;
+                closeDialog();
+              }
             }}
           >
             <DialogContent
