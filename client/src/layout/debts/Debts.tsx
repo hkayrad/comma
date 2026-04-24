@@ -1,4 +1,3 @@
-import type { DebtDto } from "@comma/common";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import DebtTable from "./components/DebtTable";
 import OverviewCards from "@/layout/shared/OverviewCards";
@@ -23,7 +22,7 @@ export default function Debts() {
     setColumnVisibility,
   } = useTableState({ key: `debts-${type}` });
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["debts", type, pagination, sorting, columnFilters],
     queryFn: async () => {
       const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;

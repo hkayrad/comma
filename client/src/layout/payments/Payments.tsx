@@ -1,4 +1,3 @@
-import type { PaymentDto } from "@comma/common";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import PaymentTable from "./components/PaymentTable";
@@ -23,7 +22,7 @@ export default function Payments() {
     setColumnVisibility,
   } = useTableState({ key: `payments-${type}` });
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["payments", type, pagination, sorting, columnFilters],
     queryFn: async () => {
       const API = type === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
