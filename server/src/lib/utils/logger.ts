@@ -54,6 +54,11 @@ export class Logger {
 		}
 	}
 
+	private static sanitize(input: any): string {
+		const str = typeof input === "string" ? input : JSON.stringify(input);
+		return str.replace(/[\r\n]+/g, " ");
+	}
+
 	static table(data: any) {
 		const timestamp = Logger.getFormattedDate();
 		console.group(`${timestamp} [TABLE]`);
@@ -69,7 +74,7 @@ export class Logger {
 			const timestamp = Logger.getFormattedDate();
 			console.debug(`${timestamp} [DEBUG] `, message, ...optionalParams);
 
-			const logMessage = `${timestamp} [DEBUG] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+			const logMessage = `${timestamp} [DEBUG] ${Logger.sanitize(message)} ${optionalParams.length > 0 ? Logger.sanitize(optionalParams) : ""}`;
 			Logger.writeToFile(logMessage);
 		}
 	}
@@ -78,7 +83,7 @@ export class Logger {
 		const timestamp = Logger.getFormattedDate();
 		console.info(`${timestamp} [INFO] `, message, ...optionalParams);
 
-		const logMessage = `${timestamp} [INFO] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${timestamp} [INFO] ${Logger.sanitize(message)} ${optionalParams.length > 0 ? Logger.sanitize(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 
@@ -86,7 +91,7 @@ export class Logger {
 		const timestamp = Logger.getFormattedDate();
 		console.warn(`${timestamp} [WARN] `, message, ...optionalParams);
 
-		const logMessage = `${timestamp} [WARN] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${timestamp} [WARN] ${Logger.sanitize(message)} ${optionalParams.length > 0 ? Logger.sanitize(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 
@@ -94,7 +99,7 @@ export class Logger {
 		const timestamp = Logger.getFormattedDate();
 		console.error(`${timestamp} [ERROR] `, message, ...optionalParams);
 
-		const logMessage = `${timestamp} [ERROR] ${message} ${optionalParams.length > 0 ? JSON.stringify(optionalParams) : ""}`;
+		const logMessage = `${timestamp} [ERROR] ${Logger.sanitize(message)} ${optionalParams.length > 0 ? Logger.sanitize(optionalParams) : ""}`;
 		Logger.writeToFile(logMessage);
 	}
 }

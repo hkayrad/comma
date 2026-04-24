@@ -25,6 +25,7 @@ import StatsController from "@/controllers/StatsController";
 import { Logger } from "@/lib/utils/logger";
 import { sequelize } from "@/lib/db/sequelize";
 import { errorHandler } from "@/lib/utils/middleware/errorHandler";
+import { globalRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 
 export interface AuthenticatedUser {
 	id: string;
@@ -47,6 +48,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.set("trust proxy", 1);
+app.use(globalRateLimiter);
 
 new NotificationWebSocket(server);
 
@@ -88,13 +90,7 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/logo-proxy/:filename", (req, res) => {
-	const filename = req.params.filename;
-	// Security check: prevent directory traversal
-	if (filename.includes("..") || filename.includes("/")) {
-		res.status(400).send("Invalid filename");
-		return;
-	}
-
+	const filename = path.basename(req.params.filename);
 	const filePath = path.join(process.cwd(), "uploads", "logos", filename);
 
 	// Check if file exists
@@ -154,15 +150,10 @@ if (process.env.NODE_ENV !== "test") {
 		}
 
 		Logger.table({
-			"Server Port": listenPort,
-			"Client URL": process.env.CLIENT_URL,
-			"Database User": process.env.DB_USER,
-			"Database Name": process.env.DB_NAME,
-			"JWT Issuer": process.env.JWT_ISSUER,
-			"JWT Audience": process.env.JWT_AUDIENCE,
-			"Refresh Token Expires In": `${process.env.JWT_EXPIRES_IN} (days)`,
-			"Proxy URL": process.env.PROXY_URL,
 			"Node Environment": process.env.NODE_ENV,
+			"Server Port": listenPort,
+			"Database Status": "Connected",
+			"JWT Status": "Initialized",
 		});
 	});
 }
