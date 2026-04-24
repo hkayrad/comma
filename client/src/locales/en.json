@@ -897,5 +897,18 @@
     "internal_server_error": "Internal server error",
     "network_error": "Network error",
     "unknown": "An unknown error occurred"
+  },
+  "error": {
+    "chunkLoad": {
+      "title": "Application Updated",
+      "description": "A new version of the application is available. Please refresh the page to continue."
+    },
+    "generic": {
+      "title": "An Error Occurred",
+      "description": "An unexpected error occurred. Please try again."
+    },
+    "action": {
+      "reload": "Refresh Page"
+    }
   }
 }

@@ -8,6 +8,7 @@ import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
 import { lazy, Suspense } from "react";
 import { Spinner } from "./components/ui/spinner";
 import { cn } from "./lib/utils";
+import { RootErrorBoundary } from "./components/shared/RootErrorBoundary";
 
 const Login = lazy(() => import("./layout/auth/Login"));
 const App = lazy(() => import("./layout/App"));
@@ -34,6 +35,7 @@ const PageLoader = ({ className }: { className?: string }) => (
 const router = createBrowserRouter([
   {
     Component: Root,
+    ErrorBoundary: RootErrorBoundary,
     children: [
       {
         path: "login",

@@ -906,5 +906,18 @@
     "internal_server_error": "Sunucu hatası",
     "network_error": "Ağ hatası",
     "unknown": "Bilinmeyen bir hata oluştu"
+  },
+  "error": {
+    "chunkLoad": {
+      "title": "Uygulama Güncellendi",
+      "description": "Uygulamanın yeni bir versiyonu mevcut. Devam etmek için lütfen sayfayı yenileyin."
+    },
+    "generic": {
+      "title": "Bir Hata Oluştu",
+      "description": "Beklenmedik bir hata oluştu. Lütfen tekrar deneyin."
+    },
+    "action": {
+      "reload": "Sayfayı Yenile"
+    }
   }
 }
