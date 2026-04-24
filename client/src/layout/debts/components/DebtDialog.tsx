@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,10 +15,8 @@ import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
   DollarSign,
   Euro,
   Plus,
@@ -55,7 +52,6 @@ import {
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
 import { getDebtFormSchema } from "@/lib/schemas/debtSchema";
-import type { DebtFormValues } from "@/lib/schemas/debtSchema";
 import { useDebtCalculations } from "../hooks/useDebtCalculations";
 
 type Props = {
@@ -587,7 +583,7 @@ export default function DebtDialog(props: Props) {
 
   const onSubmit = useCallback(
     (data: z.infer<typeof DebtFormSchema>) => {
-      let promise;
+      let promise: Promise<any>;
 
       const submitData = data.entries.map(entry => ({
         ...entry,
@@ -647,9 +643,10 @@ export default function DebtDialog(props: Props) {
     setCurrentPageIndex(fields.length);
   }, [append, fields.length, customerId]);
 
+  const watchedEntries = form.watch("entries");
   const grandTotals = useMemo(() => {
     const totals: Record<string, number> = { TRY: 0, USD: 0, EUR: 0 };
-    form.watch("entries").forEach((entry: any) => {
+    watchedEntries.forEach((entry: any) => {
       const amount = entry.amount || 0;
       const vat = entry.vat || 0;
       const discount = entry.discount || 0;
@@ -658,11 +655,33 @@ export default function DebtDialog(props: Props) {
       totals[entry.currency] = (totals[entry.currency] || 0) + total;
     });
     return totals;
-  }, [form.watch("entries")]);
+  }, [watchedEntries]);
+
+  const onInvalid = useCallback(
+    (errors: any) => {
+      if (errors.entries) {
+        const errorIndices = errors.entries
+          .map((entry: any, index: number) => (entry ? index + 1 : null))
+          .filter((index: number | null) => index !== null);
+
+        if (errorIndices.length > 0) {
+          toast.error(
+            t("notification.validation.error_on_pages", {
+              pages: errorIndices.join(", "),
+            }),
+          );
+        }
+      }
+    },
+    [t],
+  );
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        className="flex flex-col gap-4"
+      >
         {!debt && (
           <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg mb-2">
             <div className="flex items-center gap-2">

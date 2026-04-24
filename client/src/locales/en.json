@@ -464,8 +464,10 @@
     "description": "Please enter your credentials to access the system."
   },
   "notification": {
-    "accountDetails": {
-      "logos": {
+    "validation": {
+      "error_on_pages": "Validation error on entry: {{pages}}"
+    },
+    "accountDetails": {      "logos": {
         "delete": {
           "error": "There was an error while deleting logos",
           "pending": "Deleting logos...",

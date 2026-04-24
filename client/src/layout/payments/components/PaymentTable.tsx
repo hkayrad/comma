@@ -83,13 +83,13 @@ export default function PaymentTable(props: Props) {
                 await API.Restore(id);
                 sendRefreshEvent();
                 toast.success(t("notification.payment.restore.success"));
-              } catch (error) {
+              } catch (_error) {
                 toast.error(t("notification.payment.restore.error"));
               }
             },
           },
         });
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("notification.payment.delete.error"));
       }
     },

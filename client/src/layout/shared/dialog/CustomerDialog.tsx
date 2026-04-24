@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,10 +23,8 @@ import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
   Hash,
   IdCard,
   Landmark,
@@ -235,7 +232,7 @@ export default function CustomerDialog(props: Props) {
 
   const onSubmit = useCallback(
     (data: z.infer<typeof CustomerFormSchema>) => {
-      let promise;
+      let promise: Promise<any>;
 
       if (customer) promise = API.Update(customer.id!, data.entries[0]);
       else promise = API.CreateBatch(data.entries);
@@ -275,9 +272,31 @@ export default function CustomerDialog(props: Props) {
     setCurrentPageIndex(fields.length);
   }, [append, fields.length]);
 
+  const onInvalid = useCallback(
+    (errors: any) => {
+      if (errors.entries) {
+        const errorIndices = errors.entries
+          .map((entry: any, index: number) => (entry ? index + 1 : null))
+          .filter((index: number | null) => index !== null);
+
+        if (errorIndices.length > 0) {
+          toast.error(
+            t("notification.validation.error_on_pages", {
+              pages: errorIndices.join(", "),
+            }),
+          );
+        }
+      }
+    },
+    [t],
+  );
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        className="flex flex-col gap-4"
+      >
         {!customer && (
           <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg mb-2">
             <div className="flex items-center gap-2">
@@ -402,82 +421,91 @@ export default function CustomerDialog(props: Props) {
                   </FormItem>
                 )}
               />
-              {form.watch(`entries.${index}.is_company`) && (
-                <FormField
-                  control={form.control}
-                  name={`entries.${index}.tax_office`}
-                  render={({ field }) => (
+              {(() => {
+                const isCompany = form.watch(`entries.${index}.is_company`);
+                return isCompany && (
+                  <FormField
+                    control={form.control}
+                    name={`entries.${index}.tax_office`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("form.customer.tax_office")}</FormLabel>
+                        <FormControl>
+                          <InputGroup>
+                            <InputGroupInput
+                              type="text"
+                              placeholder="Eskişehir"
+                              {...field}
+                            />
+                            <InputGroupAddon>
+                              <Landmark />
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              })()}
+              <FormField
+                control={form.control}
+                name={`entries.${index}.tax_number`}
+                render={({ field }) => {
+                  const isCompany = form.watch(`entries.${index}.is_company`);
+                  return (
                     <FormItem>
-                      <FormLabel>{t("form.customer.tax_office")}</FormLabel>
+                      <FormLabel>
+                        {isCompany
+                          ? t("vars.tax_number")
+                          : t("vars.tckn")}
+                      </FormLabel>
                       <FormControl>
                         <InputGroup>
                           <InputGroupInput
                             type="text"
-                            placeholder="Eskişehir"
+                            placeholder={
+                              isCompany ? "1234567890" : "12345678901"
+                            }
                             {...field}
                           />
                           <InputGroupAddon>
-                            <Landmark />
+                            <Hash />
                           </InputGroupAddon>
                         </InputGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )}
-                />
-              )}
-              <FormField
-                control={form.control}
-                name={`entries.${index}.tax_number`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {form.watch(`entries.${index}.is_company`)
-                        ? t("vars.tax_number")
-                        : t("vars.tckn")}
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupInput
-                          type="text"
-                          placeholder={
-                            form.watch(`entries.${index}.is_company`) ? "1234567890" : "12345678901"
-                          }
-                          {...field}
-                        />
-                        <InputGroupAddon>
-                          <Hash />
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                  );
+                }}
               />
-              {form.watch(`entries.${index}.is_company`) && (
-                <FormField
-                  control={form.control}
-                  name={`entries.${index}.mersis_no`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("form.customer.mersis_no")}</FormLabel>
-                      <FormControl>
-                        <InputGroup>
-                          <InputGroupInput
-                            type="number"
-                            placeholder="1234567890123456"
-                            {...field}
-                          />
-                          <InputGroupAddon>
-                            <Archive />
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              {(() => {
+                const isCompany = form.watch(`entries.${index}.is_company`);
+                return isCompany && (
+                  <FormField
+                    control={form.control}
+                    name={`entries.${index}.mersis_no`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("form.customer.mersis_no")}</FormLabel>
+                        <FormControl>
+                          <InputGroup>
+                            <InputGroupInput
+                              type="number"
+                              placeholder="1234567890123456"
+                              {...field}
+                            />
+                            <InputGroupAddon>
+                              <Archive />
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                );
+              })()}
               <FormField
                 control={form.control}
                 name={`entries.${index}.phone`}

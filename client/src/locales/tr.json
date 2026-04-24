@@ -458,8 +458,10 @@
     "description": "Lütfen kullanıcı adı ve şifrenizi girerek sisteme giriş yapın."
   },
   "notification": {
-    "accountDetails": {
-      "logos": {
+    "validation": {
+      "error_on_pages": "{{pages}}. kayıtta doğrulama hatası var"
+    },
+    "accountDetails": {      "logos": {
         "delete": {
           "error": "Logo silinirken bir hata oluştu",
           "pending": "Logo siliniyor...",

@@ -70,7 +70,7 @@ export function StatementRowActions({
         await exportPaymentReceiptPDF(item as PaymentDto, company);
       }
       toast.success(t("dashboard.customerStatement.success.pdfExport"));
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("dashboard.customerStatement.error.pdfExport"));
     }
   }, [type, item, company, t]);
@@ -110,13 +110,13 @@ export function StatementRowActions({
               await api.Restore(item.id!);
               onRefresh();
               toast.success(t(`notification.${type}.restore.success`));
-            } catch (error) {
+            } catch (_error) {
               toast.error(t(`notification.${type}.restore.error`));
             }
           },
         },
       });
-    } catch (error) {
+    } catch (_error) {
       toast.error(t(`notification.${type}.delete.error`));
     }
   }, [type, item.id, DEBT_API, PAYMENT_API, onRefresh, t]);

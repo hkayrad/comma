@@ -88,13 +88,13 @@ export default function CustomerTable(props: Props) {
                 await API.Restore(id);
                 sendRefreshEvent();
                 toast.success(t("notification.customer.restore.success"));
-              } catch (error) {
+              } catch (_error) {
                 toast.error(t("notification.customer.restore.error"));
               }
             },
           },
         });
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("notification.customer.delete.error"));
       }
     },
@@ -567,7 +567,7 @@ export default function CustomerTable(props: Props) {
         ),
       },
     ],
-    [confirmDelete, navigate, onDetails, onEdit, type, t],
+    [confirmDelete, navigate, onDetails, onEdit, onAddDebt, onAddPayment, type, t],
   );
 
   const tags = useMemo(

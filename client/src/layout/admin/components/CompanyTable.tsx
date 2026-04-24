@@ -79,13 +79,13 @@ export default function CompanyTable(props: Props) {
                 await AdminCompanyApi.Restore(id);
                 sendRefreshEvent();
                 toast.success(t("notification.customer.restore.success"));
-              } catch (error) {
+              } catch (_error) {
                 toast.error(t("notification.customer.restore.error"));
               }
             },
           },
         });
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("notification.customer.delete.error"));
       }
     },

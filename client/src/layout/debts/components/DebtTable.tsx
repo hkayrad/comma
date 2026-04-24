@@ -84,13 +84,13 @@ export default function DebtTable(props: Props) {
                 await API.Restore(id);
                 sendRefreshEvent();
                 toast.success(t("notification.debt.restore.success"));
-              } catch (error) {
+              } catch (_error) {
                 toast.error(t("notification.debt.restore.error"));
               }
             },
           },
         });
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("notification.debt.delete.error"));
       }
     },
@@ -546,7 +546,7 @@ export default function DebtTable(props: Props) {
         ),
       },
     ],
-    [onEdit, confirmDelete, t, onAddPayment],
+    [onEdit, confirmDelete, type, t, onAddPayment],
   );
 
   const tags = useMemo(
