@@ -21,6 +21,11 @@ export class PaymentRepository {
 		return await (Model as any).create(paymentData, { transaction });
 	}
 
+	async createBatch(data: any[], transaction?: Transaction) {
+		const Model = this.getModel();
+		return await (Model as any).bulkCreate(data, { transaction });
+	}
+
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.findOne({ where: { id, company_id: companyId }, transaction });

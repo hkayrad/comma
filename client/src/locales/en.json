@@ -140,9 +140,16 @@
       "logos.small": "Small Logo",
       "title": "Account Details"
     },
+    "pagination": {
+      "previous": "Previous",
+      "page_indicator": "{{current}} / {{total}}",
+      "next": "Next"
+    },
     "customer": {
       "add": "Add Customer",
       "add.description": "Add a new customer",
+      "add_more": "Add More",
+      "remove": "Remove Entry",
       "couldNotFind": "Could not find the customer",
       "details": {
         "description": "{{tax_no_label}}: {{tax_no}} | Tax Office: {{tax_office}}",
@@ -156,6 +163,8 @@
     },
     "debt": {
       "add": "Add Debt",
+      "add_more": "Add More",
+      "remove": "Remove Entry",
       "edit": {
         "description": "Edit debt information",
         "title": "Edit Debt"
@@ -203,6 +212,8 @@
     },
     "payment": {
       "add": "Add Payment",
+      "add_more": "Add More",
+      "remove": "Remove Entry",
       "edit": {
         "description": "Edit payment information",
         "title": "Edit Payment"
@@ -374,7 +385,8 @@
       "discount.set.10%": "Set Discount to 10% of the amount",
       "discount.validation.invalid": "Invalid discount",
       "discount.validation.min": "Discount must be at least {{min}}",
-      "total": "Total: {{total}}"
+      "total": "Total: {{total}}",
+      "grand_total": "Grand Total ({{currency}})"
     },
     "payment": {
       "amount": "Amount",
@@ -410,7 +422,8 @@
       "payment_method.description": "Select a payment method",
       "payment_method.validation.invalid": "Invalid payment method",
       "due_date": "Due Date",
-      "due_date.description": "Payment due date (optional)"
+      "due_date.description": "Payment due date (optional)",
+      "grand_total": "Grand Total ({{currency}})"
     }
   },
   "header": {

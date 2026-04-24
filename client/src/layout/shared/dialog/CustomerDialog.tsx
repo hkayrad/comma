@@ -24,15 +24,21 @@ import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
   Hash,
   IdCard,
   Landmark,
   Mail,
   MapPinHouse,
   Phone,
+  Plus,
+  Trash2,
 } from "lucide-react";
-import { useCallback, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useMemo, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
@@ -49,12 +55,13 @@ type Props = {
 export default function CustomerDialog(props: Props) {
   const { customer, type = "receivable", onSuccess } = props;
   const { t } = useTranslation();
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
   const closeDialog = useDialog((s) => s.closeDialog);
 
-  const CustomerFormSchema = useMemo(
+  const SingleCustomerSchema = useMemo(
     () =>
       customerSchema.extend({
         name: z
@@ -186,18 +193,35 @@ export default function CustomerDialog(props: Props) {
     [t],
   );
 
+  const CustomerFormSchema = useMemo(
+    () =>
+      z.object({
+        entries: z.array(SingleCustomerSchema),
+      }),
+    [SingleCustomerSchema],
+  );
+
   const form = useForm<z.infer<typeof CustomerFormSchema>>({
     resolver: zodResolver(CustomerFormSchema),
     defaultValues: {
-      name: customer?.name || "",
-      phone: customer?.phone || "",
-      email: customer?.email || "",
-      tax_number: customer?.tax_number || "",
-      tax_office: customer?.tax_office || "",
-      mersis_no: customer?.mersis_no || undefined,
-      address: customer?.address || "",
-      is_company: customer ? Number(customer.is_company) === 1 : true,
+      entries: [
+        {
+          name: customer?.name || "",
+          phone: customer?.phone || "",
+          email: customer?.email || "",
+          tax_number: customer?.tax_number || "",
+          tax_office: customer?.tax_office || "",
+          mersis_no: customer?.mersis_no || undefined,
+          address: customer?.address || "",
+          is_company: customer ? Number(customer.is_company) === 1 : true,
+        },
+      ],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "entries",
   });
 
   const onCancel = useCallback(
@@ -213,8 +237,8 @@ export default function CustomerDialog(props: Props) {
     (data: z.infer<typeof CustomerFormSchema>) => {
       let promise;
 
-      if (customer) promise = API.Update(customer.id!, data);
-      else promise = API.Create(data);
+      if (customer) promise = API.Update(customer.id!, data.entries[0]);
+      else promise = API.CreateBatch(data.entries);
 
       toast.promise(promise, {
         loading: customer
@@ -237,247 +261,294 @@ export default function CustomerDialog(props: Props) {
     [form, closeDialog, API, customer, onSuccess, t],
   );
 
+  const addEntry = useCallback(() => {
+    append({
+      name: "",
+      phone: "",
+      email: "",
+      tax_number: "",
+      tax_office: "",
+      mersis_no: undefined,
+      address: "",
+      is_company: true,
+    });
+    setCurrentPageIndex(fields.length);
+  }, [append, fields.length]);
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-8"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.customer.name")}{" "}
-                <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="ABC Ltd. Şti."
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <IdCard />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.name.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="is_company"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.customer.is_company")}{" "}
-                <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <RadioGroup
-                  className="flex gap-8"
-                  value={String(field.value)}
-                  onValueChange={(value) => field.onChange(value === "true")}
-                >
-                  <div className="flex gap-2 items-center">
-                    <Radio value="true" id="company" />
-                    <label
-                      htmlFor="company"
-                      className="cursor-pointer select-none"
-                    >
-                      {t("vars.is_company.true")}
-                    </label>
-                  </div>
-                  <div className="flex gap-2 items-center">
-                    <Radio value="false" id="individual" />
-                    <label
-                      htmlFor="individual"
-                      className="cursor-pointer select-none"
-                    >
-                      {t("vars.is_company.false")}
-                    </label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.is_company.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {form.watch("is_company") && (
-          <FormField
-            control={form.control}
-            name="tax_office"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("form.customer.tax_office")}</FormLabel>
-                <FormControl>
-                  <InputGroup>
-                    <InputGroupInput
-                      type="text"
-                      placeholder="Eskişehir"
-                      {...field}
-                    />
-                    <InputGroupAddon>
-                      <Landmark />
-                    </InputGroupAddon>
-                  </InputGroup>
-                </FormControl>
-                <FormDescription>
-                  {t("form.customer.tax_office.description")}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-        <FormField
-          control={form.control}
-          name="tax_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                {form.watch("is_company")
-                  ? t("vars.tax_number")
-                  : t("vars.tckn")}
-              </FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder={
-                      form.watch("is_company") ? "1234567890" : "12345678901"
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {!customer && (
+          <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg mb-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPageIndex === 0}
+                onClick={() => setCurrentPageIndex(prev => prev - 1)}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                {t("dialog.pagination.previous")}
+              </Button>
+              <span className="text-sm font-medium">
+                {currentPageIndex + 1} / {fields.length}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPageIndex === fields.length - 1}
+                onClick={() => setCurrentPageIndex(prev => prev + 1)}
+              >
+                {t("dialog.pagination.next")}
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>            </div>
+            <div className="flex items-center gap-2">
+              {fields.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    remove(currentPageIndex);
+                    if (currentPageIndex >= fields.length - 1) {
+                      setCurrentPageIndex(Math.max(0, fields.length - 2));
                     }
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <Hash />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.tax_number.description", {
-                  tax_number_text: form.watch("is_company")
-                    ? t("form.customer.tax_number").toLowerCase()
-                    : t("form.customer.tax_number_alternative"),
-                })}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {form.watch("is_company") && (
-          <FormField
-            control={form.control}
-            name="mersis_no"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("form.customer.mersis_no")}</FormLabel>
-                <FormControl>
-                  <InputGroup>
-                    <InputGroupInput
-                      type="number"
-                      placeholder="1234567890123456"
-                      {...field}
-                    />
-                    <InputGroupAddon>
-                      <Archive />
-                    </InputGroupAddon>
-                  </InputGroup>
-                </FormControl>
-                <FormDescription>
-                  {t("form.customer.mersis_no.description")}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t("dialog.customer.remove")}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addEntry}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("dialog.customer.add_more")}
+              </Button>
+            </div>
+          </div>
         )}
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.customer.phone")}</FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="+90 555 555 55 55"
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <Phone />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.phone.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.customer.email")}</FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="ornek@sirket.com"
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <Mail />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.email.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("form.customer.address")}</FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="Örnek Mah. No:1 D:5"
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <MapPinHouse />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.customer.address.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex justify-end gap-2 col-span-2">
+
+        <div className="min-h-fit">
+          {fields.map((field, index) => index === currentPageIndex && (
+            <div key={field.id} className="grid grid-cols-2 gap-6 border-t pt-4 animate-in fade-in slide-in-from-right-2 duration-200">
+              <FormField
+                control={form.control}
+                name={`entries.${index}.name`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex gap-1">
+                      {t("form.customer.name")}{" "}
+                      <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="text"
+                          placeholder="ABC Ltd. Şti."
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <IdCard />
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`entries.${index}.is_company`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex gap-1">
+                      {t("form.customer.is_company")}{" "}
+                      <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        className="flex gap-8"
+                        value={String(field.value)}
+                        onValueChange={(value) => field.onChange(value === "true")}
+                      >
+                        <div className="flex gap-2 items-center">
+                          <Radio value="true" id={`company-${index}`} />
+                          <label
+                            htmlFor={`company-${index}`}
+                            className="cursor-pointer select-none"
+                          >
+                            {t("vars.is_company.true")}
+                          </label>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <Radio value="false" id={`individual-${index}`} />
+                          <label
+                            htmlFor={`individual-${index}`}
+                            className="cursor-pointer select-none"
+                          >
+                            {t("vars.is_company.false")}
+                          </label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.watch(`entries.${index}.is_company`) && (
+                <FormField
+                  control={form.control}
+                  name={`entries.${index}.tax_office`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("form.customer.tax_office")}</FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput
+                            type="text"
+                            placeholder="Eskişehir"
+                            {...field}
+                          />
+                          <InputGroupAddon>
+                            <Landmark />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <FormField
+                control={form.control}
+                name={`entries.${index}.tax_number`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {form.watch(`entries.${index}.is_company`)
+                        ? t("vars.tax_number")
+                        : t("vars.tckn")}
+                    </FormLabel>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="text"
+                          placeholder={
+                            form.watch(`entries.${index}.is_company`) ? "1234567890" : "12345678901"
+                          }
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <Hash />
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.watch(`entries.${index}.is_company`) && (
+                <FormField
+                  control={form.control}
+                  name={`entries.${index}.mersis_no`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("form.customer.mersis_no")}</FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput
+                            type="number"
+                            placeholder="1234567890123456"
+                            {...field}
+                          />
+                          <InputGroupAddon>
+                            <Archive />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              <FormField
+                control={form.control}
+                name={`entries.${index}.phone`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("form.customer.phone")}</FormLabel>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="text"
+                          placeholder="+90 555 555 55 55"
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <Phone />
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`entries.${index}.email`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("form.customer.email")}</FormLabel>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="text"
+                          placeholder="ornek@sirket.com"
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <Mail />
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`entries.${index}.address`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("form.customer.address")}</FormLabel>
+                    <FormControl>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="text"
+                          placeholder="Örnek Mah. No:1 D:5"
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <MapPinHouse />
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-end gap-2 mt-4">
           <CancelButton onClick={onCancel} />
           <Button type="submit">
             {customer ? t("dialog.customer.update") : t("dialog.customer.add")}

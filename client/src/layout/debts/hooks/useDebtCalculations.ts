@@ -1,45 +1,45 @@
 import { useCallback, useEffect, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import type { DebtFormValues } from "@/lib/schemas/debtSchema";
 
-export function useDebtCalculations(form: UseFormReturn<DebtFormValues>) {
+export function useDebtCalculations(form: UseFormReturn<any>, index?: number) {
+  const prefix = index !== undefined ? `entries.${index}.` : "";
   const [total, setTotal] = useState(0);
 
   const handleVatButtonClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, vatPercentage: number) => {
       e.preventDefault();
-      const amount = form.getValues("amount");
-      const discount = form.getValues("discount");
+      const amount = form.getValues(`${prefix}amount`);
+      const discount = form.getValues(`${prefix}discount`);
       form.setValue(
-        "vat",
+        `${prefix}vat`,
         Number(((amount - discount) * vatPercentage).toFixed(2)),
       );
     },
-    [form],
+    [form, prefix],
   );
 
   const handleDiscountButtonClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, discountPercentage: number) => {
       e.preventDefault();
-      const amount = form.getValues("amount");
+      const amount = form.getValues(`${prefix}amount`);
       form.setValue(
-        "discount",
+        `${prefix}discount`,
         Number((amount * discountPercentage).toFixed(2)),
       );
     },
-    [form],
+    [form, prefix],
   );
 
   const handleSetWithholdingButtonClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, percentage: number) => {
       e.preventDefault();
-      const vat = form.getValues("vat");
+      const vat = form.getValues(`${prefix}vat`);
       form.setValue(
-        "withholding",
+        `${prefix}withholding`,
         Number((vat * percentage).toFixed(2)),
       );
     },
-    [form],
+    [form, prefix],
   );
 
   const handleSetExchangeRateButtonClick = useCallback(
@@ -48,29 +48,29 @@ export function useDebtCalculations(form: UseFormReturn<DebtFormValues>) {
       const exchangeRatesString = sessionStorage.getItem("exchangeRates");
       const exchangeRates = exchangeRatesString && JSON.parse(exchangeRatesString);
 
-      const selectedCurrency = form.watch("currency").toLowerCase();
+      const selectedCurrency = form.watch(`${prefix}currency`).toLowerCase();
 
       if (exchangeRates && exchangeRates[selectedCurrency]) {
         form.setValue(
-          "exchange_rate",
+          `${prefix}exchange_rate`,
           parseFloat(exchangeRates[selectedCurrency].forexBuying),
         );
       }
     },
-    [form],
+    [form, prefix],
   );
 
-  const selectedCurrency = form.watch("currency");
+  const selectedCurrency = form.watch(`${prefix}currency`);
   useEffect(() => {
     if (selectedCurrency === "TRY") {
-      form.setValue("exchange_rate", 1);
+      form.setValue(`${prefix}exchange_rate`, 1);
     }
-  }, [form, selectedCurrency]);
+  }, [form, selectedCurrency, prefix]);
 
-  const watchedAmount = form.watch("amount");
-  const watchedVat = form.watch("vat");
-  const watchedDiscount = form.watch("discount");
-  const watchedWithholding = form.watch("withholding");
+  const watchedAmount = form.watch(`${prefix}amount`);
+  const watchedVat = form.watch(`${prefix}vat`);
+  const watchedDiscount = form.watch(`${prefix}discount`);
+  const watchedWithholding = form.watch(`${prefix}withholding`);
 
   useEffect(() => {
     const valAmount = watchedAmount || 0;

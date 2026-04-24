@@ -5,7 +5,7 @@ import { Logger } from "@/lib/utils/logger";
 import { CustomerDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { customerSchema, paginationSchema } from "@comma/common/schemas";
+import { customerSchema, paginationSchema, batchCustomerSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
@@ -19,6 +19,15 @@ router.post("/customers", validate(customerSchema), asyncHandler(async (req: Req
 
 	const id = await ReceivableCustomersService.Create(customer, userId, companyId);
 	res.json({ success: true, data: id, message: "Customer created successfully" });
+}));
+
+router.post("/customers/batch", validate(batchCustomerSchema), asyncHandler(async (req: Request<{}, {}, CustomerDto[]>, res: Response) => {
+	const customers = req.body;
+	const { companyId, id: userId } = req.user;
+	Logger.info("[ReceivableCustomersController] Create customers batch request", { companyId, count: customers.length });
+
+	const result = await ReceivableCustomersService.CreateBatch(customers, userId, companyId);
+	res.status(201).json({ success: true, data: result, message: "Customers created successfully" });
 }));
 
 router.get("/customers", validate(paginationSchema, "query"), asyncHandler(async (req: Request, res: Response) => {

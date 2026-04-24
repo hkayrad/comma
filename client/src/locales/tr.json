@@ -140,9 +140,16 @@
       "logos.small": "Küçük Logo",
       "title": "Hesap Detayları"
     },
+    "pagination": {
+      "previous": "Önceki",
+      "page_indicator": "{{total}} / {{current}}.",
+      "next": "Sonraki"
+    },
     "customer": {
       "add": "Müşteri Ekle",
       "add.description": "Yeni müşteri ekleyin",
+      "add_more": "Daha Fazla Ekle",
+      "remove": "Kaydı Sil",
       "couldNotFind": "Müşteri bulunamadı",
       "details": {
         "description": "{{tax_no_label}}: {{tax_no}} | Vergi Dairesi: {{tax_office}}",
@@ -156,6 +163,8 @@
     },
     "debt": {
       "add": "Borç Ekle",
+      "add_more": "Daha Fazla Ekle",
+      "remove": "Kaydı Sil",
       "edit": {
         "description": "Borç bilgilerini düzenleyin",
         "title": "Borç Düzenle"
@@ -203,6 +212,8 @@
     },
     "payment": {
       "add": "Ödeme Ekle",
+      "add_more": "Daha Fazla Ekle",
+      "remove": "Kaydı Sil",
       "edit": {
         "description": "Ödeme bilgilerini düzenleyin",
         "title": "Ödeme Düzenle"
@@ -368,7 +379,8 @@
       "discount.set.10%": "İskonto tutarını borç tutarının %10'u olarak ayarla",
       "discount.validation.invalid": "Geçersiz indirim",
       "discount.validation.min": "İskonto en az {{min}} olmalıdır",
-      "total": "Toplam: {{total}}"
+      "total": "Toplam: {{total}}",
+      "grand_total": "Genel Toplam ({{currency}})"
     },
     "payment": {
       "amount": "Miktar",
@@ -404,7 +416,8 @@
       "payment_method.description": "Ödeme yöntemini seçin",
       "payment_method.validation.invalid": "Geçersiz ödeme yöntemi",
       "due_date": "Vade Tarihi",
-      "due_date.description": "Ödemenin vade tarihi (opsiyonel)"
+      "due_date.description": "Ödemenin vade tarihi (opsiyonel)",
+      "grand_total": "Genel Toplam ({{currency}})"
     }
   },
   "header": {

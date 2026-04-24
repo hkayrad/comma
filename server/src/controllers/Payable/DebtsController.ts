@@ -5,7 +5,7 @@ import { Logger } from "@/lib/utils/logger";
 import { DebtDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { debtSchema, paginationSchema } from "@comma/common/schemas";
+import { debtSchema, paginationSchema, batchDebtSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
@@ -18,6 +18,15 @@ router.post("/debts", validate(debtSchema), asyncHandler(async (req: Request<{},
 
 	const id = await PayableDebtsService.Create(debt, userId, companyId);
 	res.json({ success: true, data: id, message: "Debt created successfully" });
+}));
+
+router.post("/debts/batch", validate(batchDebtSchema), asyncHandler(async (req: Request<{}, {}, DebtDto[]>, res: Response) => {
+	const debts = req.body;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[PayableDebtsController] Create debts batch request", { companyId, count: debts.length });
+
+	const result = await PayableDebtsService.CreateBatch(debts, userId, companyId);
+	res.status(201).json({ success: true, data: result, message: "Debts created successfully" });
 }));
 
 router.get("/debts/totals", asyncHandler(async (req: Request<{}, {}, {}, { currency?: string }>, res: Response) => {

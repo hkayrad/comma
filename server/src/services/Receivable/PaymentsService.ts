@@ -2,6 +2,7 @@ import type { PaymentDto, UUID, SortItem, FilterItem } from "@comma/common/types
 import { Logger } from "@/lib/utils/logger";
 import { PaymentRepository } from "@/repositories/PaymentRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
+import { sequelize } from "@/lib/db/sequelize";
 
 const repo = new PaymentRepository("receivable");
 
@@ -24,6 +25,30 @@ export default class ReceivablePaymentsService {
 
 		Logger.info("[ReceivablePayments] Payment created successfully", { paymentId: newPayment.id, companyId });
 		return newPayment;
+	}
+
+	static async CreateBatch(payments: PaymentDto[], userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivablePayments] Creating payments batch", { companyId, count: payments.length, userId });
+
+		const batchData = payments.map((payment) => ({
+			customer_id: payment.customer_id,
+			amount: payment.amount,
+			currency: payment.currency,
+			exchange_rate: payment.exchange_rate,
+			invoice_no: payment.invoice_no || null,
+			description: payment.description || null,
+			payment_date: payment.payment_date,
+			payment_method: payment.payment_method,
+			due_date: payment.due_date || null,
+			company_id: companyId,
+			created_by: userId,
+		}));
+
+		return await sequelize.transaction(async (t) => {
+			const result = await repo.createBatch(batchData, t);
+			Logger.info("[ReceivablePayments] Payments batch created successfully", { companyId, count: result.length });
+			return result;
+		});
 	}
 
 	static async GetAll(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {

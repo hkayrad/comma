@@ -40,6 +40,7 @@ type Props = {
   customerIdAndNames: CustomerIdName[];
   addNewCustomer?: boolean;
   onRefresh?: () => void;
+  namePrefix?: string;
 };
 
 export default function CustomerSelect(props: Props) {
@@ -49,6 +50,7 @@ export default function CustomerSelect(props: Props) {
     customerIdAndNames,
     addNewCustomer = false,
     onRefresh,
+    namePrefix = "",
   } = props;
 
   const openDialog = useDialog((s) => s.openDialog);
@@ -59,7 +61,7 @@ export default function CustomerSelect(props: Props) {
   return (
     <FormField
       control={form.control}
-      name="customer_id"
+      name={`${namePrefix}customer_id`}
       render={({ field }) => (
         <FormItem className="flex flex-col">
           <FormLabel>
@@ -113,7 +115,7 @@ export default function CustomerSelect(props: Props) {
                           key={customer.id}
                           data-checked={customer.id === field.value}
                           onSelect={() => {
-                            form.setValue("customer_id", customer.id);
+                            form.setValue(`${namePrefix}customer_id`, customer.id);
                             setIsCustomerSelectOpen(false);
                           }}
                         >

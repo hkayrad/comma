@@ -21,6 +21,11 @@ export class CustomerRepository {
 		return await Model.create(customerData as any, { transaction });
 	}
 
+	async createBatch(data: any[], transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.bulkCreate(data, { transaction });
+	}
+
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.findOne({ where: { id, company_id: companyId }, transaction });

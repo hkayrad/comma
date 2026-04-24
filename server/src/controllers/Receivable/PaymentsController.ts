@@ -4,7 +4,7 @@ import { Logger } from "@/lib/utils/logger";
 import { authMiddleware } from "@/lib/middleware";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { paymentSchema, paginationSchema } from "@comma/common/schemas";
+import { paymentSchema, paginationSchema, batchPaymentSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
@@ -17,6 +17,15 @@ router.post("/payments", validate(paymentSchema), asyncHandler(async (req: Reque
 
 	const data = await ReceivablePaymentsService.Create(payment, userId, companyId);
 	res.json({ success: true, data, message: "Payment created successfully" });
+}));
+
+router.post("/payments/batch", validate(batchPaymentSchema), asyncHandler(async (req: Request, res: Response) => {
+	const payments = req.body;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[ReceivablePaymentsController] Create payments batch request", { companyId, count: payments.length });
+
+	const result = await ReceivablePaymentsService.CreateBatch(payments, userId, companyId);
+	res.status(201).json({ success: true, data: result, message: "Payments created successfully" });
 }));
 
 router.get("/payments", validate(paginationSchema, "query"), asyncHandler(async (req: Request, res: Response) => {

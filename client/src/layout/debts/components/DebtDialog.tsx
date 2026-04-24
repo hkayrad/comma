@@ -16,14 +16,20 @@ import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
   DollarSign,
   Euro,
+  Plus,
   ReceiptText,
   TextInitial,
+  Trash2,
   TurkishLira,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import CustomerSelect from "@/layout/shared/dialog/components/CustomerSelect";
@@ -58,6 +64,461 @@ type Props = {
   type?: OverviewViewType;
 };
 
+function DebtEntry({
+  index,
+  form,
+  type,
+  customerIdAndNames,
+  handleFetchCustomerIdAndNames,
+  currencySign,
+  onRemove,
+  isOnlyEntry,
+  isEditMode,
+}: {
+  index: number;
+  form: UseFormReturn<any>;
+  type: OverviewViewType;
+  customerIdAndNames: CustomerIdName[];
+  handleFetchCustomerIdAndNames: () => void;
+  currencySign: Record<string, React.ReactNode>;
+  onRemove: (index: number) => void;
+  isOnlyEntry: boolean;
+  isEditMode: boolean;
+}) {
+  const { t } = useTranslation();
+  const {
+    total,
+    handleVatButtonClick,
+    handleDiscountButtonClick,
+    handleSetWithholdingButtonClick,
+    handleSetExchangeRateButtonClick,
+  } = useDebtCalculations(form, index);
+
+  const selectedCurrency = form.watch(`entries.${index}.currency`);
+
+  return (
+    <div className="p-4 grid grid-cols-2 gap-6 border-t">
+      <CustomerSelect
+        type={type}
+        form={form}
+        namePrefix={`entries.${index}.`}
+        customerIdAndNames={customerIdAndNames}
+        addNewCustomer
+        onRefresh={handleFetchCustomerIdAndNames}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.issue_date`}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>
+              {t("form.debt.issue_date")}{" "}
+              <span className="text-red-500">*</span>
+            </FormLabel>
+            <DateSelect field={field} />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.due_date`}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>
+              {t("form.debt.due_date")}
+            </FormLabel>
+            <DateSelect
+              field={field}
+              allowClear
+              allowFuture
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.currency`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.currency")}{" "}
+              <span className="text-red-500">*</span>
+            </FormLabel>
+            <FormControl>
+              <Select
+                name={field.name}
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="p-2">
+                  <SelectItem value="TRY">
+                    <TurkishLira />
+                    <span>{t("vars.try")}</span>
+                  </SelectItem>
+                  <SelectItem value="EUR">
+                    <Euro />
+                    <span>{t("vars.eur")}</span>
+                  </SelectItem>
+                  <SelectItem value="USD">
+                    <DollarSign />
+                    <span>{t("vars.usd")}</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.amount`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.amount")} <span className="text-red-500">*</span>
+            </FormLabel>
+            <FormControl>
+              <InputGroup>
+                <InputGroupInput
+                  type="number"
+                  placeholder="0.00"
+                  step="0.01"
+                  {...field}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const num = value === "" ? "" : parseFloat(value);
+                    field.onChange(Number.isNaN(num) ? undefined : num);
+                  }}
+                />
+                <InputGroupAddon>
+                  {currencySign[form.watch(`entries.${index}.currency`) as keyof typeof currencySign]}
+                </InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.discount`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.discount")}
+            </FormLabel>
+            <FormControl>
+              <div className="flex items-center gap-1">
+                <InputGroup>
+                  <InputGroupInput
+                    type="number"
+                    placeholder="0.00"
+                    step="0.01"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = value === "" ? "" : parseFloat(value);
+                      field.onChange(Number.isNaN(num) ? undefined : num);
+                    }}
+                  />
+                  <InputGroupAddon>
+                    {currencySign[form.watch(`entries.${index}.currency`) as keyof typeof currencySign]}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    <Tooltip disableHoverablePopup>
+                      <TooltipTrigger
+                        render={(props) => (
+                          <InputGroupButton
+                            {...props}
+                            size="xs"
+                            nativeButton
+                            onClick={(e) =>
+                              handleDiscountButtonClick(e, 0.05)
+                            }
+                          >
+                            %5
+                          </InputGroupButton>
+                        )}
+                      />
+                      <TooltipContent>
+                        <p>{t("form.debt.discount.set.5%")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip disableHoverablePopup>
+                      <TooltipTrigger
+                        render={(props) => (
+                          <InputGroupButton
+                            {...props}
+                            size="xs"
+                            nativeButton
+                            onClick={(e) => handleDiscountButtonClick(e, 0.1)}
+                          >
+                            %10
+                          </InputGroupButton>
+                        )}
+                      />
+                      <TooltipContent>
+                        <p>{t("form.debt.discount.set.10%")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.vat`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.vat")} <span className="text-red-500">*</span>
+            </FormLabel>
+            <FormControl>
+              <div className="flex items-center gap-1">
+                <InputGroup>
+                  <InputGroupInput
+                    type="number"
+                    placeholder="0.00"
+                    step="0.01"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = value === "" ? "" : parseFloat(value);
+                      field.onChange(Number.isNaN(num) ? undefined : num);
+                    }}
+                  />
+                  <InputGroupAddon>
+                    {currencySign[form.watch(`entries.${index}.currency`) as keyof typeof currencySign]}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    <Tooltip disableHoverablePopup>
+                      <TooltipTrigger
+                        render={(props) => (
+                          <InputGroupButton
+                            {...props}
+                            size="xs"
+                            nativeButton
+                            onClick={(e) => handleVatButtonClick(e, 0.1)}
+                          >
+                            %10
+                          </InputGroupButton>
+                        )}
+                      />
+                      <TooltipContent>
+                        <p>{t("form.debt.vat.set.10%")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip disableHoverablePopup>
+                      <TooltipTrigger
+                        render={(props) => (
+                          <InputGroupButton
+                            {...props}
+                            size="xs"
+                            nativeButton
+                            onClick={(e) => handleVatButtonClick(e, 0.2)}
+                          >
+                            %20
+                          </InputGroupButton>
+                        )}
+                      />
+                      <TooltipContent>
+                        <p>{t("form.debt.vat.set.20%")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.withholding`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.withholding")}
+            </FormLabel>
+            <FormControl>
+              <div className="flex items-center gap-1">
+                <InputGroup>
+                  <InputGroupInput
+                    type="number"
+                    placeholder="0.00"
+                    step="0.01"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const num = value === "" ? "" : parseFloat(value);
+                      field.onChange(Number.isNaN(num) ? undefined : num);
+                    }}
+                  />
+                  <InputGroupAddon>
+                    {currencySign[form.watch(`entries.${index}.currency`) as keyof typeof currencySign]}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    <Tooltip disableHoverablePopup>
+                      <TooltipTrigger
+                        render={(props) => (
+                          <InputGroupButton
+                            {...props}
+                            size="xs"
+                            nativeButton
+                            onClick={(e) =>
+                              handleSetWithholdingButtonClick(e, 0.5)
+                            }
+                          >
+                            %50
+                          </InputGroupButton>
+                        )}
+                      />
+                      <TooltipContent>
+                        <p>{t("form.debt.withholding.set.50%")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      {form.watch(`entries.${index}.currency`) !== "TRY" && (
+        <FormField
+          control={form.control}
+          name={`entries.${index}.exchange_rate`}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex gap-1">
+                {t("form.debt.exchange_rate")}{" "}
+                <span className="text-red-500">*</span>
+              </FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-1">
+                  <InputGroup>
+                    <InputGroupInput
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const num = value === "" ? "" : parseFloat(value);
+                        field.onChange(Number.isNaN(num) ? undefined : num);
+                      }}
+                    />
+                    <InputGroupAddon>{currencySign["TRY"]}</InputGroupAddon>
+                    <InputGroupAddon align="inline-end">
+                      <Tooltip disableHoverablePopup>
+                        <TooltipTrigger
+                          render={(props) => (
+                            <InputGroupButton
+                              {...props}
+                              size="xs"
+                              nativeButton
+                              onClick={handleSetExchangeRateButtonClick}
+                            >
+                              {t("form.debt.exchange_rate.set.label")}
+                            </InputGroupButton>
+                          )}
+                        />
+                        <TooltipContent>
+                          <p>{t("form.debt.exchange_rate.set.tooltip")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+      <FormField
+        control={form.control}
+        name={`entries.${index}.invoice_no`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.invoice_no")}
+            </FormLabel>
+            <FormControl>
+              <InputGroup>
+                <InputGroupInput
+                  type="text"
+                  placeholder="Fatura No"
+                  {...field}
+                />
+                <InputGroupAddon>
+                  <ReceiptText />
+                </InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.description`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex gap-1">
+              {t("form.debt.description")}
+            </FormLabel>
+            <FormControl>
+              <InputGroup>
+                <InputGroupInput
+                  type="text"
+                  placeholder="Açıklama"
+                  {...field}
+                />
+                <InputGroupAddon>
+                  <TextInitial />
+                </InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <div className="col-span-2 flex justify-between items-center bg-muted/30 p-2 rounded-md">
+        <div className="text-sm font-medium">
+          {t("form.debt.total", {
+            total: formatCurrency(total, selectedCurrency),
+          })}
+        </div>
+        {!isOnlyEntry && !isEditMode && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={() => onRemove(index)}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            {t("dialog.debt.remove")}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DebtDialog(props: Props) {
   const { debt, customerId, type = "receivable" } = props;
   const closeDialog = useDialog((s) => s.closeDialog);
@@ -65,27 +526,44 @@ export default function DebtDialog(props: Props) {
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
     CustomerIdName[]
   >([]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   const DEBT_API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
   const CUSTOMER_API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
-  const DebtFormSchema = useMemo(() => getDebtFormSchema(t), [t]);
+  const SingleDebtSchema = useMemo(() => getDebtFormSchema(t), [t]);
+  const DebtFormSchema = useMemo(
+    () =>
+      z.object({
+        entries: z.array(SingleDebtSchema),
+      }),
+    [SingleDebtSchema],
+  );
 
-  const form = useForm<DebtFormValues>({
+  const form = useForm<z.infer<typeof DebtFormSchema>>({
     resolver: zodResolver(DebtFormSchema),
     defaultValues: {
-      customer_id: debt?.customer_id || customerId || "",
-      amount: debt?.amount ? Number(debt.amount) : 0,
-      vat: debt?.vat ? Number(debt.vat) : 0,
-      withholding: debt?.withholding ? Number(debt.withholding) : 0,
-      discount: debt?.discount ? Number(debt.discount) : 0,
-      currency: debt?.currency || "TRY",
-      exchange_rate: debt?.exchange_rate ? Number(debt.exchange_rate) : 1,
-      issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
-      due_date: debt?.due_date ? new Date(debt.due_date) : null,
-      invoice_no: debt?.invoice_no || "",
-      description: debt?.description || "",
+      entries: [
+        {
+          customer_id: debt?.customer_id || customerId || "",
+          amount: debt?.amount ? Number(debt.amount) : 0,
+          vat: debt?.vat ? Number(debt.vat) : 0,
+          withholding: debt?.withholding ? Number(debt.withholding) : 0,
+          discount: debt?.discount ? Number(debt.discount) : 0,
+          currency: debt?.currency || "TRY",
+          exchange_rate: debt?.exchange_rate ? Number(debt.exchange_rate) : 1,
+          issue_date: debt?.issue_date ? new Date(debt.issue_date) : new Date(),
+          due_date: debt?.due_date ? new Date(debt.due_date) : null,
+          invoice_no: debt?.invoice_no || "",
+          description: debt?.description || "",
+        },
+      ],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "entries",
   });
 
   const handleFetchCustomerIdAndNames = useCallback(async () => {
@@ -97,14 +575,6 @@ export default function DebtDialog(props: Props) {
       Logger.error("Failed to fetch customer ID and names:", error);
     }
   }, [CUSTOMER_API]);
-
-  const { 
-    total, 
-    handleVatButtonClick, 
-    handleDiscountButtonClick, 
-    handleSetWithholdingButtonClick, 
-    handleSetExchangeRateButtonClick 
-  } = useDebtCalculations(form);
 
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -119,13 +589,13 @@ export default function DebtDialog(props: Props) {
     (data: z.infer<typeof DebtFormSchema>) => {
       let promise;
 
-      const submitData = {
-        ...data,
-        due_date: data.due_date || null,
-      };
+      const submitData = data.entries.map(entry => ({
+        ...entry,
+        due_date: entry.due_date || null,
+      }));
 
-      if (debt) promise = DEBT_API.Update(debt.id!, submitData);
-      else promise = DEBT_API.Create(submitData);
+      if (debt) promise = DEBT_API.Update(debt.id!, submitData[0]);
+      else promise = DEBT_API.CreateBatch(submitData);
 
       toast.promise(promise, {
         loading: debt
@@ -160,448 +630,125 @@ export default function DebtDialog(props: Props) {
     handleFetchCustomerIdAndNames();
   }, [handleFetchCustomerIdAndNames]);
 
-  const selectedCurrency = form.watch("currency");
+  const addEntry = useCallback(() => {
+    append({
+      customer_id: customerId || "",
+      amount: 0,
+      vat: 0,
+      withholding: 0,
+      discount: 0,
+      currency: "TRY",
+      exchange_rate: 1,
+      issue_date: new Date(),
+      due_date: null,
+      invoice_no: "",
+      description: "",
+    });
+    setCurrentPageIndex(fields.length);
+  }, [append, fields.length, customerId]);
+
+  const grandTotals = useMemo(() => {
+    const totals: Record<string, number> = { TRY: 0, USD: 0, EUR: 0 };
+    form.watch("entries").forEach((entry: any) => {
+      const amount = entry.amount || 0;
+      const vat = entry.vat || 0;
+      const discount = entry.discount || 0;
+      const withholding = entry.withholding || 0;
+      const total = amount - discount + vat - withholding;
+      totals[entry.currency] = (totals[entry.currency] || 0) + total;
+    });
+    return totals;
+  }, [form.watch("entries")]);
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-8"
-      >
-        <CustomerSelect
-          type={type}
-          form={form}
-          customerIdAndNames={customerIdAndNames}
-          addNewCustomer
-          onRefresh={handleFetchCustomerIdAndNames}
-        />
-        <FormField
-          control={form.control}
-          name="issue_date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                {t("form.debt.issue_date")}{" "}
-                <span className="text-red-500">*</span>
-              </FormLabel>
-              <DateSelect field={field} />
-              <FormDescription>
-                {t("form.debt.issue_date.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="due_date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>
-                {t("form.debt.due_date")}
-              </FormLabel>
-              <DateSelect
-                field={field}
-                allowClear
-                allowFuture
-              />
-              <FormDescription>
-                {t("form.debt.due_date.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.currency")}{" "}
-                <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <Select
-                  name={field.name}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        {!debt && (
+          <div className="flex items-center justify-between bg-muted/50 p-2 rounded-lg mb-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPageIndex === 0}
+                onClick={() => setCurrentPageIndex(prev => prev - 1)}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                {t("dialog.pagination.previous")}
+              </Button>
+              <span className="text-sm font-medium">
+                {currentPageIndex + 1} / {fields.length}
+              </span>              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={currentPageIndex === fields.length - 1}
+                onClick={() => setCurrentPageIndex(prev => prev + 1)}
+              >
+                {t("dialog.pagination.next")}
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {fields.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    remove(currentPageIndex);
+                    if (currentPageIndex >= fields.length - 1) {
+                      setCurrentPageIndex(Math.max(0, fields.length - 2));
+                    }
+                  }}
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="p-2">
-                    <SelectItem value="TRY">
-                      <TurkishLira />
-                      <span>{t("vars.try")}</span>
-                    </SelectItem>
-                    <SelectItem value="EUR">
-                      <Euro />
-                      <span>{t("vars.eur")}</span>
-                    </SelectItem>
-                    <SelectItem value="USD">
-                      <DollarSign />
-                      <span>{t("vars.usd")}</span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.currency.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.amount")} <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="number"
-                    placeholder="0.00"
-                    step="0.01"
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      const num = value === "" ? "" : parseFloat(value);
-                      field.onChange(Number.isNaN(num) ? undefined : num);
-                    }}
-                  />
-                  <InputGroupAddon>
-                    {currencySign[form.watch("currency") as keyof typeof currencySign]}
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.amount.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="discount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.discount")}
-              </FormLabel>
-              <FormControl>
-                <div className="flex items-center gap-1">
-                  <InputGroup>
-                    <InputGroupInput
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const num = value === "" ? "" : parseFloat(value);
-                        field.onChange(Number.isNaN(num) ? undefined : num);
-                      }}
-                    />
-                    <InputGroupAddon>
-                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
-                    </InputGroupAddon>
-                    <InputGroupAddon align="inline-end">
-                      <Tooltip disableHoverablePopup>
-                        <TooltipTrigger
-                          render={(props) => (
-                            <InputGroupButton
-                              {...props}
-                              size="xs"
-                              nativeButton
-                              onClick={(e) =>
-                                handleDiscountButtonClick(e, 0.05)
-                              }
-                            >
-                              %5
-                            </InputGroupButton>
-                          )}
-                        />
-                        <TooltipContent>
-                          <p>{t("form.debt.discount.set.5%")}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip disableHoverablePopup>
-                        <TooltipTrigger
-                          render={(props) => (
-                            <InputGroupButton
-                              {...props}
-                              size="xs"
-                              nativeButton
-                              onClick={(e) => handleDiscountButtonClick(e, 0.1)}
-                            >
-                              %10
-                            </InputGroupButton>
-                          )}
-                        />
-                        <TooltipContent>
-                          <p>{t("form.debt.discount.set.10%")}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.discount.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="vat"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.vat")} <span className="text-red-500">*</span>
-              </FormLabel>
-              <FormControl>
-                <div className="flex items-center gap-1">
-                  <InputGroup>
-                    <InputGroupInput
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const num = value === "" ? "" : parseFloat(value);
-                        field.onChange(Number.isNaN(num) ? undefined : num);
-                      }}
-                    />
-                    <InputGroupAddon>
-                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
-                    </InputGroupAddon>
-                    <InputGroupAddon align="inline-end">
-                      <Tooltip disableHoverablePopup>
-                        <TooltipTrigger
-                          render={(props) => (
-                            <InputGroupButton
-                              {...props}
-                              size="xs"
-                              nativeButton
-                              onClick={(e) => handleVatButtonClick(e, 0.1)}
-                            >
-                              %10
-                            </InputGroupButton>
-                          )}
-                        />
-                        <TooltipContent>
-                          <p>{t("form.debt.vat.set.10%")}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip disableHoverablePopup>
-                        <TooltipTrigger
-                          render={(props) => (
-                            <InputGroupButton
-                              {...props}
-                              size="xs"
-                              nativeButton
-                              onClick={(e) => handleVatButtonClick(e, 0.2)}
-                            >
-                              %20
-                            </InputGroupButton>
-                          )}
-                        />
-                        <TooltipContent>
-                          <p>{t("form.debt.vat.set.20%")}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.vat.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="withholding"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.withholding")}
-              </FormLabel>
-              <FormControl>
-                <div className="flex items-center gap-1">
-                  <InputGroup>
-                    <InputGroupInput
-                      type="number"
-                      placeholder="0.00"
-                      step="0.01"
-                      {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        const num = value === "" ? "" : parseFloat(value);
-                        field.onChange(Number.isNaN(num) ? undefined : num);
-                      }}
-                    />
-                    <InputGroupAddon>
-                      {currencySign[form.watch("currency") as keyof typeof currencySign]}
-                    </InputGroupAddon>
-                    <InputGroupAddon align="inline-end">
-                      <Tooltip disableHoverablePopup>
-                        <TooltipTrigger
-                          render={(props) => (
-                            <InputGroupButton
-                              {...props}
-                              size="xs"
-                              nativeButton
-                              onClick={(e) =>
-                                handleSetWithholdingButtonClick(e, 0.5)
-                              }
-                            >
-                              %50
-                            </InputGroupButton>
-                          )}
-                        />
-                        <TooltipContent>
-                          <p>{t("form.debt.withholding.set.50%")}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.withholding.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {form.watch("currency") !== "TRY" && (
-          <FormField
-            control={form.control}
-            name="exchange_rate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex gap-1">
-                  {t("form.debt.exchange_rate")}{" "}
-                  <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="flex items-center gap-1">
-                    <InputGroup>
-                      <InputGroupInput
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const num = value === "" ? "" : parseFloat(value);
-                          field.onChange(Number.isNaN(num) ? undefined : num);
-                        }}
-                      />
-                      <InputGroupAddon>{currencySign["TRY"]}</InputGroupAddon>
-                      <InputGroupAddon align="inline-end">
-                        <Tooltip disableHoverablePopup>
-                          <TooltipTrigger
-                            render={(props) => (
-                              <InputGroupButton
-                                {...props}
-                                size="xs"
-                                nativeButton
-                                onClick={handleSetExchangeRateButtonClick}
-                              >
-                                {t("form.debt.exchange_rate.set.label")}
-                              </InputGroupButton>
-                            )}
-                          />
-                          <TooltipContent>
-                            <p>{t("form.debt.exchange_rate.set.tooltip")}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </div>
-                </FormControl>
-                <FormDescription>
-                  {t("form.debt.exchange_rate.description")}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-        <FormField
-          control={form.control}
-          name="invoice_no"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.invoice_no")}
-              </FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="Fatura No"
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <ReceiptText />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.invoice_no.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="flex gap-1">
-                {t("form.debt.description")}
-              </FormLabel>
-              <FormControl>
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="Açıklama"
-                    {...field}
-                  />
-                  <InputGroupAddon>
-                    <TextInitial />
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-              <FormDescription>
-                {t("form.debt.description.description")}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="col-span-2 flex flex-row justify-between">
-          <div className="flex justify-end items-center text-lg font-semibold">
-            {t("form.debt.total", {
-              total: formatCurrency(total, selectedCurrency),
-            })}
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t("dialog.debt.remove")}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addEntry}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("dialog.debt.add_more")}
+              </Button>
+            </div>
           </div>
-          <div className="flex justify-end gap-2">
+        )}
+
+        <div className="min-h-fit">
+          {fields.map((field, index) => index === currentPageIndex && (
+            <div key={field.id} className="animate-in fade-in slide-in-from-right-2 duration-200">
+               <DebtEntry
+                  index={index}
+                  form={form}
+                  type={type}
+                  customerIdAndNames={customerIdAndNames}
+                  handleFetchCustomerIdAndNames={handleFetchCustomerIdAndNames}
+                  currencySign={currencySign}
+                  onRemove={(idx) => {
+                    remove(idx);
+                    setCurrentPageIndex(Math.max(0, currentPageIndex - 1));
+                  }}
+                  isOnlyEntry={fields.length === 1}
+                  isEditMode={!!debt}
+                />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-2 mt-4 border-t pt-4">
+          {Object.entries(grandTotals).map(([currency, total]) => total > 0 && (
+            <div key={currency} className="flex justify-between items-center text-lg font-semibold">
+              <span>{t("form.debt.grand_total", { currency })}</span>
+              <span>{formatCurrency(total, currency as any)}</span>
+            </div>
+          ))}
+          <div className="flex justify-end gap-2 mt-2">
             <CancelButton onClick={onCancel} />
             <Button type="submit">
               {debt ? t("dialog.debt.update") : t("dialog.debt.add")}

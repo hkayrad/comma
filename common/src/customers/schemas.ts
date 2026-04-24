@@ -10,3 +10,5 @@ export const customerSchema = z.object({
 	email: z.email().max(255).nullish().or(z.literal("")),
 	address: z.string().max(500).nullish(),
 });
+
+export const batchCustomerSchema = z.array(customerSchema).min(1);

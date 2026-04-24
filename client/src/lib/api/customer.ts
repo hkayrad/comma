@@ -4,6 +4,12 @@ import { Logger } from "../utils/logger";
 import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
 
 export class ReceivableCustomerApi {
+	static readonly BASE_URL = "/receivables/customers";
+
+	static async CreateBatch(data: CustomerDto[]): Promise<void> {
+		await instance.post(`${this.BASE_URL}/batch`, data);
+	}
+
 	static async Create(data: CustomerDto): Promise<UUID | null> {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/customers", data);
@@ -141,6 +147,12 @@ export class ReceivableCustomerApi {
 }
 
 export class PayableCustomerApi {
+	static readonly BASE_URL = "/payables/customers";
+
+	static async CreateBatch(data: CustomerDto[]): Promise<void> {
+		await instance.post(`${this.BASE_URL}/batch`, data);
+	}
+
 	static async Create(data: CustomerDto): Promise<UUID | null> {
 		try {
 			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/customers", data);

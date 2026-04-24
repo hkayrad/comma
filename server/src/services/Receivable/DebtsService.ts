@@ -2,6 +2,7 @@ import type { DebtDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { DebtRepository } from "@/repositories/DebtRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
+import { sequelize } from "@/lib/db/sequelize";
 
 const repo = new DebtRepository("receivable");
 
@@ -23,6 +24,32 @@ export default class ReceivableDebtsService {
 
 		Logger.info("[ReceivableDebts] Debt created successfully", { debtId: newDebt.id, companyId });
 		return newDebt.id;
+	}
+
+	static async CreateBatch(debts: DebtDto[], userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivableDebts] Creating debts batch", { companyId, count: debts.length, userId });
+
+		const batchData = debts.map((debt) => ({
+			customer_id: debt.customer_id,
+			amount: debt.amount,
+			discount: debt.discount || 0,
+			vat: debt.vat,
+			withholding: debt.withholding || 0,
+			currency: debt.currency,
+			exchange_rate: debt.exchange_rate,
+			issue_date: debt.issue_date,
+			due_date: debt.due_date || null,
+			invoice_no: debt.invoice_no || null,
+			description: debt.description || null,
+			company_id: companyId,
+			created_by: userId,
+		}));
+
+		return await sequelize.transaction(async (t) => {
+			const result = await repo.createBatch(batchData, t);
+			Logger.info("[ReceivableDebts] Debts batch created successfully", { companyId, count: result.length });
+			return result;
+		});
 	}
 
 	static async GetAll(companyId: string, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {

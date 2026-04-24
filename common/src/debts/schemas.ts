@@ -13,3 +13,5 @@ export const debtSchema = z.object({
 	issue_date: z.coerce.date(),
 	due_date: z.coerce.date().nullish(),
 });
+
+export const batchDebtSchema = z.array(debtSchema).min(1);

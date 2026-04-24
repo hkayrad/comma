@@ -11,3 +11,5 @@ export const paymentSchema = z.object({
 	payment_date: z.coerce.date(),
 	due_date: z.coerce.date().nullish(),
 });
+
+export const batchPaymentSchema = z.array(paymentSchema).min(1);

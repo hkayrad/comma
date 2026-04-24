@@ -2,6 +2,7 @@ import { CustomerRepository } from "@/repositories/CustomerRepository";
 import type { CustomerDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
+import { sequelize } from "@/lib/db/sequelize";
 
 const repo = new CustomerRepository("receivable");
 
@@ -30,6 +31,29 @@ export default class ReceivableCustomersService {
 
 		Logger.info("[ReceivableCustomers] Customer created successfully", { customerId: newCustomer.id, companyId });
 		return newCustomer.id;
+	}
+
+	static async CreateBatch(customers: CustomerDto[], userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivableCustomers] Creating customers batch", { companyId, count: customers.length, userId });
+
+		const batchData = customers.map((customer) => ({
+			name: customer.name,
+			phone: customer.phone || null,
+			is_company: customer.is_company,
+			tax_number: customer.tax_number || null,
+			tax_office: customer.tax_office || null,
+			mersis_no: customer.mersis_no || null,
+			email: customer.email || null,
+			address: customer.address || null,
+			company_id: companyId,
+			created_by: userId,
+		}));
+
+		return await sequelize.transaction(async (t) => {
+			const result = await repo.createBatch(batchData, t);
+			Logger.info("[ReceivableCustomers] Customers batch created successfully", { companyId, count: result.length });
+			return result;
+		});
 	}
 
 	static async GetAll(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
