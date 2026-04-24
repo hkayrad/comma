@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
-import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
-import type { UpcomingDueDate } from "@comma/common";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-
-type DueDateItemType = "receivable" | "payable" | "receivableCheck" | "payableCheck";
-type DueDateWithType = UpcomingDueDate & { type: DueDateItemType };
+import { useUpcomingDueDates, type DueDateItemType } from "@/hooks/use-upcoming-due-dates";
 
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
@@ -28,42 +22,7 @@ export default function UpcomingDueDates() {
         }
     };
 
-    const { data: dueDates = [], isLoading } = useQuery({
-        queryKey: ["upcoming-due-dates"],
-        queryFn: async () => {
-            const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
-                ReceivableDebtApi.GetUpcomingDueDates(7),
-                PayableDebtApi.GetUpcomingDueDates(7),
-                ReceivablePaymentApi.GetUpcomingChecks(7),
-                PayablePaymentApi.GetUpcomingChecks(7),
-            ]);
-
-            const receivablesWithType: DueDateWithType[] = receivables.map((item) => ({
-                ...item,
-                type: "receivable" as const,
-            }));
-
-            const payablesWithType: DueDateWithType[] = payables.map((item) => ({
-                ...item,
-                type: "payable" as const,
-            }));
-
-            const receivableChecksWithType: DueDateWithType[] = receivableChecks.map((item) => ({
-                ...item,
-                type: "receivableCheck" as const,
-            }));
-
-            const payableChecksWithType: DueDateWithType[] = payableChecks.map((item) => ({
-                ...item,
-                type: "payableCheck" as const,
-            }));
-
-            return [...receivablesWithType, ...payablesWithType, ...receivableChecksWithType, ...payableChecksWithType].sort(
-                (a, b) => a.days_remaining - b.days_remaining
-            );
-        },
-        staleTime: 30000,
-    });
+    const { data: dueDates = [], isLoading } = useUpcomingDueDates();
 
     const getDaysRemainingLabel = (days: number) => {
         if (days < 0) return t("dashboard.upcomingDueDates.overdue");

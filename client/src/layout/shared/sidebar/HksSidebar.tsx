@@ -76,9 +76,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ReceivableDebtApi, PayableDebtApi } from "@/lib/api/debt";
-import { ReceivablePaymentApi, PayablePaymentApi } from "@/lib/api/payment";
-import { useQuery } from "@tanstack/react-query";
+import { useUpcomingDueDates } from "@/hooks/use-upcoming-due-dates";
 
 export default function HksSidebar() {
   const navigate = useNavigate();
@@ -91,19 +89,7 @@ export default function HksSidebar() {
   const reloadConnection = useWebSocket((s) => s.reloadConnection);
   const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
-  const { data: upcomingDueDates = [] } = useQuery({
-    queryKey: ["upcoming-due-dates"],
-    queryFn: async () => {
-      const [receivables, payables, receivableChecks, payableChecks] = await Promise.all([
-        ReceivableDebtApi.GetUpcomingDueDates(7),
-        PayableDebtApi.GetUpcomingDueDates(7),
-        ReceivablePaymentApi.GetUpcomingChecks(7),
-        PayablePaymentApi.GetUpcomingChecks(7),
-      ]);
-      return [...receivables, ...payables, ...receivableChecks, ...payableChecks];
-    },
-    staleTime: 30000,
-  });
+  const { data: upcomingDueDates = [] } = useUpcomingDueDates();
 
   const upcomingPaymentsCount = upcomingDueDates.length;
 
