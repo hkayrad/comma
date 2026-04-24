@@ -7,11 +7,12 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
-import type { OverviewViewType, Totals } from "@comma/common";
+import type { OverviewViewType } from "@comma/common";
 import { copyToClipboard } from "@/lib/utils";
 import { BadgeAlert, BadgeCheck, BadgeTurkishLiraIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   type: OverviewViewType;
@@ -24,91 +25,61 @@ export default function OverviewCards(props: Props) {
   const currency = "TRY";
 
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [receivableTotals, setReceivableTotals] = useState<Totals | null>(null);
-  const [payableTotals, setPayableTotals] = useState<Totals | null>(null);
-  const [formattedTotals, setFormattedTotals] = useState({
-    total_debts: "₺0",
-    total_payments: "₺0",
-    remaining_debt: "₺0",
+  const { data: totals, isLoading } = useQuery({
+    queryKey: ["totals", type, currency],
+    queryFn: async () => {
+      if (type === "receivable") {
+        return await ReceivableDebtApi.GetTotals(currency);
+      } else {
+        return await PayableDebtApi.GetTotals(currency);
+      }
+    },
+    staleTime: 30000, // 30 seconds
+    gcTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const fetchReceivableTotals = useCallback(async () => {
-    const response = await ReceivableDebtApi.GetTotals(currency);
-    if (response) setReceivableTotals(response);
-  }, [currency]);
-
-  const fetchPayableTotals = useCallback(async () => {
-    const response = await PayableDebtApi.GetTotals(currency);
-    if (response) setPayableTotals(response);
-  }, [currency]);
-
-  const handleRefresh = useCallback(async () => {
-    setIsLoading(true);
-    await Promise.all([fetchReceivableTotals(), fetchPayableTotals()]);
-    setIsLoading(false);
-  }, [fetchReceivableTotals, fetchPayableTotals]);
-
   useEffect(() => {
-    handleRefresh();
+    const handleRefresh = () => {
+      queryClient.invalidateQueries({ queryKey: ["totals"] });
+    };
     window.addEventListener("global:refresh", handleRefresh);
     return () => {
       window.removeEventListener("global:refresh", handleRefresh);
     };
-  }, [currency, handleRefresh]);
+  }, [queryClient]);
 
-  useEffect(() => {
-    if (type === "receivable") {
-      if (receivableTotals) {
-        setFormattedTotals({
-          total_debts: Number(receivableTotals.total_debts || 0).toLocaleString(
-            "tr-TR",
-            {
-              style: "currency",
-              currency: currency,
-            },
-          ),
-          total_payments: Number(
-            receivableTotals.total_payments || 0,
-          ).toLocaleString("tr-TR", {
-            style: "currency",
-            currency: currency,
-          }),
-          remaining_debt: Number(
-            receivableTotals.remaining_debt || 0,
-          ).toLocaleString("tr-TR", {
-            style: "currency",
-            currency: currency,
-          }),
-        });
-      }
-    } else if (type === "payable") {
-      if (payableTotals) {
-        setFormattedTotals({
-          total_debts: Number(payableTotals.total_debts || 0).toLocaleString(
-            "tr-TR",
-            {
-              style: "currency",
-              currency: currency,
-            },
-          ),
-          total_payments: Number(
-            payableTotals.total_payments || 0,
-          ).toLocaleString("tr-TR", {
-            style: "currency",
-            currency: currency,
-          }),
-          remaining_debt: Number(
-            payableTotals.remaining_debt || 0,
-          ).toLocaleString("tr-TR", {
-            style: "currency",
-            currency: currency,
-          }),
-        });
-      }
+  const formattedTotals = useMemo(() => {
+    if (!totals) {
+      return {
+        total_debts: "₺0",
+        total_payments: "₺0",
+        remaining_debt: "₺0",
+      };
     }
-  }, [type, receivableTotals, payableTotals, currency]);
+
+    return {
+      total_debts: Number(totals.total_debts || 0).toLocaleString("tr-TR", {
+        style: "currency",
+        currency: currency,
+      }),
+      total_payments: Number(totals.total_payments || 0).toLocaleString(
+        "tr-TR",
+        {
+          style: "currency",
+          currency: currency,
+        },
+      ),
+      remaining_debt: Number(totals.remaining_debt || 0).toLocaleString(
+        "tr-TR",
+        {
+          style: "currency",
+          currency: currency,
+        },
+      ),
+    };
+  }, [totals, currency]);
 
   return (
     <div

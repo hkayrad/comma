@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils";
 import {
   DialogClose,
 } from "@/components/ui/dialog";
@@ -35,6 +35,7 @@ import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   data: PaymentDto[];
@@ -65,6 +66,7 @@ export default function PaymentTable(props: Props) {
     onColumnVisibilityChange,
   } = props;
 
+  const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
@@ -74,14 +76,18 @@ export default function PaymentTable(props: Props) {
       const API = type === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
       try {
         await API.Delete(id);
-        sendRefreshEvent();
+        queryClient.invalidateQueries({ queryKey: ["totals"] });
+        queryClient.invalidateQueries({ queryKey: ["payments"] });
+        queryClient.invalidateQueries({ queryKey: ["customers"] });
         toast.success(t("notification.payment.delete.success"), {
           action: {
             label: t("vars.undo"),
             onClick: async () => {
               try {
                 await API.Restore(id);
-                sendRefreshEvent();
+                queryClient.invalidateQueries({ queryKey: ["totals"] });
+                queryClient.invalidateQueries({ queryKey: ["payments"] });
+                queryClient.invalidateQueries({ queryKey: ["customers"] });
                 toast.success(t("notification.payment.restore.success"));
               } catch (_error) {
                 toast.error(t("notification.payment.restore.error"));
@@ -93,7 +99,7 @@ export default function PaymentTable(props: Props) {
         toast.error(t("notification.payment.delete.error"));
       }
     },
-    [type, t],
+    [type, t, queryClient],
   );
 
   const confirmDelete = useCallback(

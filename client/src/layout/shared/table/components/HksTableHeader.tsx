@@ -20,7 +20,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { sendRefreshEvent } from "@/lib/utils";
 import type { Table } from "@tanstack/react-table";
 import {
   ArrowUpDown,
@@ -53,6 +52,7 @@ import type { CompanyDto } from "@comma/common";
 import { exportTablePDF } from "@/lib/pdf-table-export";
 import { Logger } from "@/lib/utils/logger";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   table: Table<any>;
@@ -69,6 +69,7 @@ type Props = {
 
 export default function HksTableHeader(props: Props) {
   const { table, searchColumn, tags, addButton } = props;
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -254,7 +255,7 @@ export default function HksTableHeader(props: Props) {
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
-    sendRefreshEvent();
+    queryClient.invalidateQueries();
     toast.promise(
       new Promise<void>((resolve) => {
         setTimeout(() => {
@@ -268,7 +269,7 @@ export default function HksTableHeader(props: Props) {
         error: "Tablo yenileme başarısız oldu.",
       },
     );
-  }, []);
+  }, [queryClient]);
 
   const handleFilterToggle = useCallback(
     (tag: { column: string; value: string }) => {

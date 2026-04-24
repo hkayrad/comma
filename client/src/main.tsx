@@ -9,6 +9,10 @@ import { lazy, Suspense } from "react";
 import { Spinner } from "./components/ui/spinner";
 import { cn } from "./lib/utils";
 import { RootErrorBoundary } from "./components/shared/RootErrorBoundary";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 const Login = lazy(() => import("./layout/auth/Login"));
 const App = lazy(() => import("./layout/App"));
@@ -163,5 +167,8 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <RouterProvider router={router} />,
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>,
 );

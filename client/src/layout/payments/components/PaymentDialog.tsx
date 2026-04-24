@@ -11,7 +11,8 @@ import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import { PayablePaymentApi, ReceivablePaymentApi } from "@/lib/api/payment";
 import type { CustomerIdName, OverviewViewType, PaymentDto } from "@comma/common";
-import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -396,6 +397,7 @@ export default function PaymentDialog(props: Props) {
     invoiceNo,
     exchangeRate,
   } = props;
+  const queryClient = useQueryClient();
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
@@ -545,7 +547,9 @@ export default function PaymentDialog(props: Props) {
           form.reset();
           clearDraft();
           closeDialog();
-          sendRefreshEvent();
+          queryClient.invalidateQueries({ queryKey: ["totals"] });
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["customers"] });
           return payment
             ? t("notification.payment.update.success")
             : t("notification.payment.add.success");
@@ -555,7 +559,7 @@ export default function PaymentDialog(props: Props) {
           : t("notification.payment.add.error"),
       });
     },
-    [form, clearDraft, closeDialog, PAYMENT_API, payment, t],
+    [form, clearDraft, closeDialog, PAYMENT_API, payment, t, queryClient],
   );
 
   const currencySign = useMemo(

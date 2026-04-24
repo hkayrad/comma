@@ -142,12 +142,24 @@ ReceivablePayments.init(
 		paranoid: true,
 		indexes: [
 			{
-				name: "idx_company_id",
+				name: "idx_receivable_payments_company_id",
 				fields: ["company_id"],
 			},
 			{
-				name: "idx_customer_id",
+				name: "idx_receivable_payments_customer_id",
 				fields: ["customer_id"],
+			},
+			{
+				name: "idx_receivable_payments_invoice_no",
+				fields: ["invoice_no"],
+			},
+			{
+				name: "idx_receivable_payments_payment_date",
+				fields: ["payment_date"],
+			},
+			{
+				name: "idx_receivable_payments_deleted_at",
+				fields: ["deleted_at"],
 			},
 		],
 	},

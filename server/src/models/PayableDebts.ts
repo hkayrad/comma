@@ -157,12 +157,28 @@ PayableDebts.init(
 		paranoid: true,
 		indexes: [
 			{
-				name: "idx_company_id",
+				name: "idx_payable_debts_company_id",
 				fields: ["company_id"],
 			},
 			{
-				name: "idx_customer_id",
+				name: "idx_payable_debts_customer_id",
 				fields: ["customer_id"],
+			},
+			{
+				name: "idx_payable_debts_issue_date",
+				fields: ["issue_date"],
+			},
+			{
+				name: "idx_payable_debts_due_date",
+				fields: ["due_date"],
+			},
+			{
+				name: "idx_payable_debts_invoice_no",
+				fields: ["invoice_no"],
+			},
+			{
+				name: "idx_payable_debts_deleted_at",
+				fields: ["deleted_at"],
 			},
 		],
 	},

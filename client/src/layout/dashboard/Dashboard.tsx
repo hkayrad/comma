@@ -1,26 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
-import type { CustomerDto, OverviewViewType } from "@comma/common";
+import { useCallback, useState } from "react";
 import { ReceivableCustomerApi, PayableCustomerApi } from "@/lib/api/customer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import DashboardCharts from "./components/DashboardCharts";
 import CustomerTable from "./components/CustomerTable";
-import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
 import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { useTableState } from "@/hooks/use-table-state";
 import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
-  const [receivableCustomers, setReceivableCustomers] = useState<CustomerDto[]>(
-    [],
-  );
-  const [payableCustomers, setPayableCustomers] = useState<CustomerDto[]>([]);
-  const [tabValue, setTabValue] = useState<OverviewViewType>("receivable");
-
-  const [receivableRowCount, setReceivableRowCount] = useState(0);
-  const [payableRowCount, setPayableRowCount] = useState(0);
+  const [tabValue, setTabValue] = useState<"receivable" | "payable">("receivable");
 
   const {
     pagination: receivablePagination,
@@ -44,6 +36,32 @@ export default function Dashboard() {
     setColumnVisibility: setPayableVisibility,
   } = useTableState({ key: "dashboard-payable" });
 
+  const { data: receivableData } = useQuery({
+    queryKey: ["customers", "receivable", receivablePagination, receivableSorting, receivableFilters],
+    queryFn: async () => {
+      return await ReceivableCustomerApi.GetAll(
+        receivablePagination.pageIndex,
+        receivablePagination.pageSize,
+        receivableSorting,
+        receivableFilters,
+      );
+    },
+    staleTime: 30000,
+  });
+
+  const { data: payableData } = useQuery({
+    queryKey: ["customers", "payable", payablePagination, payableSorting, payableFilters],
+    queryFn: async () => {
+      return await PayableCustomerApi.GetAll(
+        payablePagination.pageIndex,
+        payablePagination.pageSize,
+        payableSorting,
+        payableFilters,
+      );
+    },
+    staleTime: 30000,
+  });
+
   const onReceivableFiltersChange: OnChangeFn<ColumnFiltersState> = (
     updaterOrValue,
   ) => {
@@ -63,51 +81,8 @@ export default function Dashboard() {
   const showStatisticsChart = useDashboardSettings((s) => s.showStatisticsChart);
 
   const handleTabChange = useCallback((value: string) => {
-    setTabValue(value as OverviewViewType);
+    setTabValue(value as "receivable" | "payable");
   }, []);
-
-  const fetchReceivableCustomers = useCallback(async () => {
-    const response = await ReceivableCustomerApi.GetAll(
-      receivablePagination.pageIndex,
-      receivablePagination.pageSize,
-      receivableSorting,
-      receivableFilters,
-    );
-    if (response) {
-      setReceivableCustomers(response.rows);
-      setReceivableRowCount(response.count);
-    } else {
-      Logger.error("Müşteriler getirilirken bir hata oluştu", response);
-    }
-  }, [receivablePagination, receivableSorting, receivableFilters]);
-
-  const fetchPayableCustomers = useCallback(async () => {
-    const response = await PayableCustomerApi.GetAll(
-      payablePagination.pageIndex,
-      payablePagination.pageSize,
-      payableSorting,
-      payableFilters,
-    );
-    if (response) {
-      setPayableCustomers(response.rows);
-      setPayableRowCount(response.count);
-    } else {
-      Logger.error("Müşteriler getirilirken bir hata oluştu", response);
-    }
-  }, [payablePagination, payableSorting, payableFilters]);
-
-  const handleRefresh = useCallback(() => {
-    fetchReceivableCustomers();
-    fetchPayableCustomers();
-  }, [fetchPayableCustomers, fetchReceivableCustomers]);
-
-  useEffect(() => {
-    handleRefresh();
-    window.addEventListener("global:refresh", handleRefresh);
-    return () => {
-      window.removeEventListener("global:refresh", handleRefresh);
-    };
-  }, [handleRefresh]);
 
   return (
     <div className="px-3 py-3 h-[calc(100vh-3.5rem)] overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
@@ -141,8 +116,8 @@ export default function Dashboard() {
         <TabsContent value="receivable">
           <CustomerTable
             type="receivable"
-            data={receivableCustomers}
-            rowCount={receivableRowCount}
+            data={receivableData?.rows || []}
+            rowCount={receivableData?.count || 0}
             pagination={receivablePagination}
             onPaginationChange={setReceivablePagination}
             sorting={receivableSorting}
@@ -156,8 +131,8 @@ export default function Dashboard() {
         <TabsContent value="payable">
           <CustomerTable
             type="payable"
-            data={payableCustomers}
-            rowCount={payableRowCount}
+            data={payableData?.rows || []}
+            rowCount={payableData?.count || 0}
             pagination={payablePagination}
             onPaginationChange={setPayablePagination}
             sorting={payableSorting}

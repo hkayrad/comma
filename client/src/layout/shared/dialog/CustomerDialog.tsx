@@ -19,7 +19,6 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import type { CustomerDto, OverviewViewType } from "@comma/common";
-import { sendRefreshEvent } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
@@ -41,6 +40,7 @@ import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "@/layout/shared/CancelButton";
 import { useFormDraft } from "@/hooks/use-form-draft";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { customerSchema } from "@common";
 
@@ -52,6 +52,7 @@ type Props = {
 
 export default function CustomerDialog(props: Props) {
   const { customer, type = "receivable", onSuccess } = props;
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const isPersisted = useRef(false);
@@ -270,7 +271,8 @@ export default function CustomerDialog(props: Props) {
           form.reset();
           clearDraft();
           closeDialog();
-          sendRefreshEvent();
+          queryClient.invalidateQueries({ queryKey: ["totals"] });
+          queryClient.invalidateQueries({ queryKey: ["customers"] });
           if (onSuccess) onSuccess();
           return customer
             ? t("notification.customer.update.success")
@@ -281,7 +283,7 @@ export default function CustomerDialog(props: Props) {
           : t("notification.customer.add.error"),
       });
     },
-    [form, clearDraft, closeDialog, API, customer, onSuccess, t],
+    [form, clearDraft, closeDialog, API, customer, onSuccess, t, queryClient],
   );
 
   const addEntry = useCallback(() => {

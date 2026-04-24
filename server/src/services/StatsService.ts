@@ -32,8 +32,10 @@ class StatsService {
             start.setMonth(start.getMonth() - monthCount);
         }
 
-        const receivables = await recRepo.getMonthlyStats(companyId, start, end);
-        const payables = await payRepo.getMonthlyStats(companyId, start, end);
+        const [receivables, payables] = await Promise.all([
+            recRepo.getMonthlyStats(companyId, start, end),
+            payRepo.getMonthlyStats(companyId, start, end),
+        ]);
 
         const monthsMap = new Map<string, MonthlyStatsData>();
 

@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import {
   DialogClose,
@@ -38,6 +38,7 @@ import { formattedNumber } from "@/lib/utils/table/formattedNumberSorting";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   data: CustomerDto[];
@@ -70,6 +71,7 @@ export default function CustomerTable(props: Props) {
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
+  const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
   const navigate = useNavigate();
@@ -79,14 +81,16 @@ export default function CustomerTable(props: Props) {
     async (id: string) => {
       try {
         await API.Delete(id);
-        sendRefreshEvent();
+        queryClient.invalidateQueries({ queryKey: ["totals"] });
+        queryClient.invalidateQueries({ queryKey: ["customers"] });
         toast.success(t("notification.customer.delete.success"), {
           action: {
             label: t("vars.undo"),
             onClick: async () => {
               try {
                 await API.Restore(id);
-                sendRefreshEvent();
+                queryClient.invalidateQueries({ queryKey: ["totals"] });
+                queryClient.invalidateQueries({ queryKey: ["customers"] });
                 toast.success(t("notification.customer.restore.success"));
               } catch (_error) {
                 toast.error(t("notification.customer.restore.error"));
@@ -98,7 +102,7 @@ export default function CustomerTable(props: Props) {
         toast.error(t("notification.customer.delete.error"));
       }
     },
-    [API, t],
+    [API, t, queryClient],
   );
 
   const confirmDelete = useCallback(

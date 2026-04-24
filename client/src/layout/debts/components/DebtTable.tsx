@@ -6,7 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { copyToClipboard, sendRefreshEvent } from "@/lib/utils";
+import { copyToClipboard } from "@/lib/utils";
 import {
   DialogClose,
 } from "@/components/ui/dialog";
@@ -36,6 +36,7 @@ import { useCallback, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   data: DebtDto[];
@@ -66,6 +67,7 @@ export default function DebtTable(props: Props) {
     onColumnVisibilityChange,
   } = props;
 
+  const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
@@ -75,14 +77,18 @@ export default function DebtTable(props: Props) {
       const API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
       try {
         await API.Delete(id);
-        sendRefreshEvent();
+        queryClient.invalidateQueries({ queryKey: ["totals"] });
+        queryClient.invalidateQueries({ queryKey: ["debts"] });
+        queryClient.invalidateQueries({ queryKey: ["customers"] });
         toast.success(t("notification.debt.delete.success"), {
           action: {
             label: t("vars.undo"),
             onClick: async () => {
               try {
                 await API.Restore(id);
-                sendRefreshEvent();
+                queryClient.invalidateQueries({ queryKey: ["totals"] });
+                queryClient.invalidateQueries({ queryKey: ["debts"] });
+                queryClient.invalidateQueries({ queryKey: ["customers"] });
                 toast.success(t("notification.debt.restore.success"));
               } catch (_error) {
                 toast.error(t("notification.debt.restore.error"));
@@ -94,7 +100,7 @@ export default function DebtTable(props: Props) {
         toast.error(t("notification.debt.delete.error"));
       }
     },
-    [type, t],
+    [type, t, queryClient],
   );
 
   const confirmDelete = useCallback(

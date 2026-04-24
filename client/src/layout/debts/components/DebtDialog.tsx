@@ -11,7 +11,8 @@ import { useDialog } from "@/contexts/dialog";
 import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
 import { PayableDebtApi, ReceivableDebtApi } from "@/lib/api/debt";
 import type { CustomerIdName, DebtDto, OverviewViewType } from "@comma/common";
-import { formatCurrency, sendRefreshEvent } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -512,6 +513,7 @@ function DebtEntry({
 
 export default function DebtDialog(props: Props) {
   const { debt, customerId, type = "receivable" } = props;
+  const queryClient = useQueryClient();
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
   const [customerIdAndNames, setCustomerIdAndNames] = useState<
@@ -620,7 +622,9 @@ export default function DebtDialog(props: Props) {
           form.reset();
           clearDraft();
           closeDialog();
-          sendRefreshEvent();
+          queryClient.invalidateQueries({ queryKey: ["totals"] });
+          queryClient.invalidateQueries({ queryKey: ["debts"] });
+          queryClient.invalidateQueries({ queryKey: ["customers"] });
           return debt
             ? t("notification.debt.update.success")
             : t("notification.debt.add.success");
@@ -630,7 +634,7 @@ export default function DebtDialog(props: Props) {
           : t("notification.debt.add.error"),
       });
     },
-    [form, clearDraft, closeDialog, DEBT_API, debt, t],
+    [form, clearDraft, closeDialog, DEBT_API, debt, t, queryClient],
   );
 
   const currencySign = useMemo(
