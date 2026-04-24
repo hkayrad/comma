@@ -149,6 +149,7 @@
       "add": "Add Customer",
       "add.description": "Add a new customer",
       "add_more": "Add More",
+      "save_as_draft": "Save as Draft",
       "remove": "Remove Entry",
       "couldNotFind": "Could not find the customer",
       "details": {
@@ -164,6 +165,7 @@
     "debt": {
       "add": "Add Debt",
       "add_more": "Add More",
+      "save_as_draft": "Save as Draft",
       "remove": "Remove Entry",
       "edit": {
         "description": "Edit debt information",
@@ -213,6 +215,7 @@
     "payment": {
       "add": "Add Payment",
       "add_more": "Add More",
+      "save_as_draft": "Save as Draft",
       "remove": "Remove Entry",
       "edit": {
         "description": "Edit payment information",
@@ -464,8 +467,12 @@
     "description": "Please enter your credentials to access the system."
   },
   "notification": {
-    "validation": {
-      "error_on_pages": "Validation error on entry: {{pages}}"
+    "draft": {
+      "save.success": "Draft saved successfully",
+      "save.error": "Failed to save draft",
+      "loaded": "Draft restored from previous session"
+    },
+    "validation": {      "error_on_pages": "Validation error on entry: {{pages}}"
     },
     "accountDetails": {      "logos": {
         "delete": {

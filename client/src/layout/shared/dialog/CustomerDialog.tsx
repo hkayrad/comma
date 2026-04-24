@@ -34,12 +34,13 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "@/layout/shared/CancelButton";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 import { customerSchema } from "@common";
 
@@ -53,6 +54,7 @@ export default function CustomerDialog(props: Props) {
   const { customer, type = "receivable", onSuccess } = props;
   const { t } = useTranslation();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const isPersisted = useRef(false);
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
 
@@ -216,6 +218,26 @@ export default function CustomerDialog(props: Props) {
     },
   });
 
+  const { saveDraft, clearDraft } = useFormDraft(
+    `draft_customer_${type}`,
+    form,
+    !customer
+  );
+
+  const handleSaveDraft = useCallback(() => {
+    saveDraft();
+    isPersisted.current = true;
+    closeDialog();
+  }, [saveDraft, closeDialog]);
+
+  useEffect(() => {
+    return () => {
+      if (!isPersisted.current && !customer) {
+        clearDraft();
+      }
+    };
+  }, [clearDraft, customer]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "entries",
@@ -224,10 +246,12 @@ export default function CustomerDialog(props: Props) {
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      isPersisted.current = false;
+      clearDraft();
       form.reset();
       closeDialog();
     },
-    [form, closeDialog],
+    [form, clearDraft, closeDialog],
   );
 
   const onSubmit = useCallback(
@@ -242,7 +266,9 @@ export default function CustomerDialog(props: Props) {
           ? t("notification.customer.update.pending")
           : t("notification.customer.add.pending"),
         success: () => {
+          isPersisted.current = true;
           form.reset();
+          clearDraft();
           closeDialog();
           sendRefreshEvent();
           if (onSuccess) onSuccess();
@@ -255,7 +281,7 @@ export default function CustomerDialog(props: Props) {
           : t("notification.customer.add.error"),
       });
     },
-    [form, closeDialog, API, customer, onSuccess, t],
+    [form, clearDraft, closeDialog, API, customer, onSuccess, t],
   );
 
   const addEntry = useCallback(() => {
@@ -578,6 +604,11 @@ export default function CustomerDialog(props: Props) {
 
         <div className="flex justify-end gap-2 mt-4">
           <CancelButton onClick={onCancel} />
+          {!customer && (
+            <Button type="button" variant="secondary" onClick={handleSaveDraft}>
+              {t("dialog.customer.save_as_draft")}
+            </Button>
+          )}
           <Button type="submit">
             {customer ? t("dialog.customer.update") : t("dialog.customer.add")}
           </Button>

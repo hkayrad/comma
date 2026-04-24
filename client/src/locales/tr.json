@@ -149,6 +149,7 @@
       "add": "Müşteri Ekle",
       "add.description": "Yeni müşteri ekleyin",
       "add_more": "Daha Fazla Ekle",
+      "save_as_draft": "Taslak Olarak Kaydet",
       "remove": "Kaydı Sil",
       "couldNotFind": "Müşteri bulunamadı",
       "details": {
@@ -162,6 +163,17 @@
       "update": "Müşteriyi Güncelle"
     },
     "debt": {
+      "add": "Borç Ekle",
+      "add_more": "Daha Fazla Ekle",
+      "save_as_draft": "Taslak Olarak Kaydet",
+      "remove": "Kaydı Sil",
+      "edit": {
+        "description": "Borç bilgilerini düzenleyin",
+        "title": "Borç Düzenle"
+      },
+      "update": "Borcu Güncelle"
+    },
+    "info": {
       "add": "Borç Ekle",
       "add_more": "Daha Fazla Ekle",
       "remove": "Kaydı Sil",
@@ -213,6 +225,7 @@
     "payment": {
       "add": "Ödeme Ekle",
       "add_more": "Daha Fazla Ekle",
+      "save_as_draft": "Taslak Olarak Kaydet",
       "remove": "Kaydı Sil",
       "edit": {
         "description": "Ödeme bilgilerini düzenleyin",
@@ -458,6 +471,11 @@
     "description": "Lütfen kullanıcı adı ve şifrenizi girerek sisteme giriş yapın."
   },
   "notification": {
+    "draft": {
+      "save.success": "Taslak başarıyla kaydedildi",
+      "save.error": "Taslak kaydedilemedi",
+      "loaded": "Önceki oturumdan kalan taslak geri yüklendi"
+    },
     "validation": {
       "error_on_pages": "{{pages}}. kayıtta doğrulama hatası var"
     },

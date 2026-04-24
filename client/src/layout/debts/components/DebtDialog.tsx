@@ -25,7 +25,7 @@ import {
   Trash2,
   TurkishLira,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -53,6 +53,7 @@ import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
 import { getDebtFormSchema } from "@/lib/schemas/debtSchema";
 import { useDebtCalculations } from "../hooks/useDebtCalculations";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 type Props = {
   debt?: DebtDto;
@@ -121,14 +122,8 @@ function DebtEntry({
         name={`entries.${index}.due_date`}
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>
-              {t("form.debt.due_date")}
-            </FormLabel>
-            <DateSelect
-              field={field}
-              allowClear
-              allowFuture
-            />
+            <FormLabel>{t("form.debt.due_date")}</FormLabel>
+            <DateSelect field={field} allowFuture allowClear />
             <FormMessage />
           </FormItem>
         )}
@@ -523,6 +518,7 @@ export default function DebtDialog(props: Props) {
     CustomerIdName[]
   >([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const isPersisted = useRef(false);
 
   const DEBT_API = type === "payable" ? PayableDebtApi : ReceivableDebtApi;
   const CUSTOMER_API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
@@ -557,6 +553,26 @@ export default function DebtDialog(props: Props) {
     },
   });
 
+  const { saveDraft, clearDraft } = useFormDraft(
+    `draft_debt_${type}`,
+    form,
+    !debt
+  );
+
+  const handleSaveDraft = useCallback(() => {
+    saveDraft();
+    isPersisted.current = true;
+    closeDialog();
+  }, [saveDraft, closeDialog]);
+
+  useEffect(() => {
+    return () => {
+      if (!isPersisted.current && !debt) {
+        clearDraft();
+      }
+    };
+  }, [clearDraft, debt]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "entries",
@@ -575,10 +591,12 @@ export default function DebtDialog(props: Props) {
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      isPersisted.current = false;
+      clearDraft();
       form.reset();
       closeDialog();
     },
-    [form, closeDialog],
+    [form, clearDraft, closeDialog],
   );
 
   const onSubmit = useCallback(
@@ -598,7 +616,9 @@ export default function DebtDialog(props: Props) {
           ? t("notification.debt.update.pending")
           : t("notification.debt.add.pending"),
         success: () => {
+          isPersisted.current = true;
           form.reset();
+          clearDraft();
           closeDialog();
           sendRefreshEvent();
           return debt
@@ -610,7 +630,7 @@ export default function DebtDialog(props: Props) {
           : t("notification.debt.add.error"),
       });
     },
-    [form, closeDialog, DEBT_API, debt, t],
+    [form, clearDraft, closeDialog, DEBT_API, debt, t],
   );
 
   const currencySign = useMemo(
@@ -769,6 +789,11 @@ export default function DebtDialog(props: Props) {
           ))}
           <div className="flex justify-end gap-2 mt-2">
             <CancelButton onClick={onCancel} />
+            {!debt && (
+              <Button type="button" variant="secondary" onClick={handleSaveDraft}>
+                {t("dialog.debt.save_as_draft")}
+              </Button>
+            )}
             <Button type="submit">
               {debt ? t("dialog.debt.update") : t("dialog.debt.add")}
             </Button>

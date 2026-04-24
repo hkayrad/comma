@@ -25,7 +25,7 @@ import {
   Trash2,
   TurkishLira,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, useForm, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 import CancelButton from "@/layout/shared/CancelButton";
+import { useFormDraft } from "@/hooks/use-form-draft";
 
 import { paymentSchema } from "@common";
 
@@ -401,6 +402,7 @@ export default function PaymentDialog(props: Props) {
     CustomerIdName[]
   >([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const isPersisted = useRef(false);
 
   const PAYMENT_API =
     type === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
@@ -481,6 +483,26 @@ export default function PaymentDialog(props: Props) {
     },
   });
 
+  const { saveDraft, clearDraft } = useFormDraft(
+    `draft_payment_${type}`,
+    form,
+    !payment
+  );
+
+  const handleSaveDraft = useCallback(() => {
+    saveDraft();
+    isPersisted.current = true;
+    closeDialog();
+  }, [saveDraft, closeDialog]);
+
+  useEffect(() => {
+    return () => {
+      if (!isPersisted.current && !payment) {
+        clearDraft();
+      }
+    };
+  }, [clearDraft, payment]);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "entries",
@@ -499,10 +521,12 @@ export default function PaymentDialog(props: Props) {
   const onCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      isPersisted.current = false;
+      clearDraft();
       form.reset();
       closeDialog();
     },
-    [form, closeDialog],
+    [form, clearDraft, closeDialog],
   );
 
   const onSubmit = useCallback(
@@ -517,7 +541,9 @@ export default function PaymentDialog(props: Props) {
           ? t("notification.payment.update.pending")
           : t("notification.payment.add.pending"),
         success: () => {
+          isPersisted.current = true;
           form.reset();
+          clearDraft();
           closeDialog();
           sendRefreshEvent();
           return payment
@@ -529,7 +555,7 @@ export default function PaymentDialog(props: Props) {
           : t("notification.payment.add.error"),
       });
     },
-    [form, closeDialog, PAYMENT_API, payment, t],
+    [form, clearDraft, closeDialog, PAYMENT_API, payment, t],
   );
 
   const currencySign = useMemo(
@@ -682,6 +708,11 @@ export default function PaymentDialog(props: Props) {
           ))}
           <div className="flex justify-end gap-2 mt-2">
             <CancelButton onClick={onCancel} />
+            {!payment && (
+              <Button type="button" variant="secondary" onClick={handleSaveDraft}>
+                {t("dialog.payment.save_as_draft")}
+              </Button>
+            )}
             <Button type="submit">
               {payment ? t("dialog.payment.update") : t("dialog.payment.add")}
             </Button>
