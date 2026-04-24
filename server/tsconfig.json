@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "./dist",
+    "rootDir": "./src",
     "target": "ES2020",
     "module": "commonjs",
     "strict": true,
@@ -9,18 +10,21 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./*"],
-      "@common": ["../common/src/index"],
-      "@common/*": ["../common/src/*"],
-      "@comma/common": ["../common/src/index"],
-      "@comma/common/*": ["../common/src/*"]
+      "@/*": ["./src/*"],
+      "@common": ["./src/common/index"],
+      "@common/*": ["./src/common/*"],
+      "@comma/common": ["./src/common/index"],
+      "@comma/common/*": ["./src/common/*"]
     }
   },
   "include": [
-    "**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/tests",
+    "src/**/*.test.ts",
+    "vitest.config.ts"
   ]
 }

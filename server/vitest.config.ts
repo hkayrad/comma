@@ -1,14 +1,18 @@
 import { defineConfig } from 'vitest/config';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ['./src/tests/setup.ts'],
     hookTimeout: 30000,
-    include: ['**/*.test.ts'],
+    include: ['src/**/*.test.ts'],
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@comma/common': path.resolve(__dirname, '../common/src'),
+      '@common': path.resolve(__dirname, '../common/src'),
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
