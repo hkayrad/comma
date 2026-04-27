@@ -27,6 +27,7 @@ import HksTable from "@/layout/shared/table/HksTable";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/components/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
@@ -70,6 +71,7 @@ export default function DebtTable(props: Props) {
   const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
+  const { openDebtDialog, openPaymentDialog } = useEntityDialogs();
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
@@ -136,7 +138,7 @@ export default function DebtTable(props: Props) {
         return;
       }
 
-      openDialog({
+      openDebtDialog({
         title: t("dialog.debt.edit.title"),
         description: t("dialog.debt.edit.description"),
         size: "3xl",
@@ -144,12 +146,12 @@ export default function DebtTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [data, type, openDialog, t],
+    [data, type, openDebtDialog, t],
   );
 
   const onAddPayment = useCallback(
     (debt: DebtDto) => {
-      openDialog({
+      openPaymentDialog({
         title: t("dialog.payment.add"),
         description:
           type === "receivable"
@@ -169,7 +171,7 @@ export default function DebtTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [openDialog, type, t],
+    [openPaymentDialog, type, t],
   );
 
   const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(

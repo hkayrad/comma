@@ -77,7 +77,9 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
             open={dialog.isOpen}
             onOpenChange={(open, details) => {
               if (!open) {
-                if (details.reason === "outside-press") return;
+                const closeOnOverlayClick = dialog.closeOnOverlayClick ?? true;
+                if (details.reason === "outside-press" && !closeOnOverlayClick)
+                  return;
                 closeDialog();
               }
             }}

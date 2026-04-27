@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import {
   Banknote,
   Plus,
@@ -27,7 +27,8 @@ import { useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 
 export default function AddButton() {
-  const openDialog = useDialog((s) => s.openDialog);
+  const { openCustomerDialog, openDebtDialog, openPaymentDialog } =
+    useEntityDialogs();
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -39,69 +40,69 @@ export default function AddButton() {
 
   const handleAddReceivableCustomer = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openCustomerDialog({
       title: t("dialog.receivableCustomer.add.title"),
       description: t("dialog.receivableCustomer.add.description"),
       size: "3xl",
       content: <CustomerDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openCustomerDialog, toggleAddMenu, t]);
 
   const handleAddReceivableDebt = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openDebtDialog({
       title: t("dialog.receivable.add.title"),
       description: t("dialog.receivable.add.description"),
       size: "3xl",
       content: <DebtDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openDebtDialog, toggleAddMenu, t]);
 
   const handleAddReceivablePayment = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openPaymentDialog({
       title: t("dialog.receivablePayment.add.title"),
       description: t("dialog.receivablePayment.add.description"),
       size: "3xl",
       content: <PaymentDialog type="receivable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openPaymentDialog, toggleAddMenu, t]);
 
   const handleAddPayableCustomer = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openCustomerDialog({
       title: t("dialog.payableCustomer.add.title"),
       description: t("dialog.payableCustomer.add.description"),
       size: "3xl",
       content: <CustomerDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openCustomerDialog, toggleAddMenu, t]);
 
   const handleAddPayableDebt = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openDebtDialog({
       title: t("dialog.payable.add.title"),
       description: t("dialog.payable.add.description"),
       size: "3xl",
       content: <DebtDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openDebtDialog, toggleAddMenu, t]);
 
   const handleAddPayablePayment = useCallback(() => {
     toggleAddMenu();
-    openDialog({
+    openPaymentDialog({
       title: t("dialog.payablePayment.add.title"),
       description: t("dialog.payablePayment.add.description"),
       size: "3xl",
       content: <PaymentDialog type="payable" />,
       showCloseButton: true,
     });
-  }, [openDialog, toggleAddMenu, t]);
+  }, [openPaymentDialog, toggleAddMenu, t]);
 
   return (
     <>

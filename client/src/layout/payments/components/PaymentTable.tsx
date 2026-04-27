@@ -27,6 +27,7 @@ import HksTable from "@/layout/shared/table/HksTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import FormattedCurrency from "@/layout/shared/table/components/FormattedCurrency";
 import FormattedDate from "@/layout/shared/table/components/FormattedDate";
 import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
@@ -69,6 +70,7 @@ export default function PaymentTable(props: Props) {
   const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
+  const { openPaymentDialog } = useEntityDialogs();
   const { t } = useTranslation();
 
   const handleDelete = useCallback(
@@ -135,7 +137,7 @@ export default function PaymentTable(props: Props) {
         return;
       }
 
-      openDialog({
+      openPaymentDialog({
         title: t("dialog.payment.edit.title"),
         description: t("dialog.payment.edit.description"),
         size: "3xl",
@@ -143,7 +145,7 @@ export default function PaymentTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [data, openDialog, type, t],
+    [data, openPaymentDialog, type, t],
   );
 
   const PaymentTableColumns: ColumnDef<PaymentDto>[] = useMemo(

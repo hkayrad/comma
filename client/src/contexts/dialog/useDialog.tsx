@@ -11,6 +11,7 @@ export interface DialogConfig {
   onSuccess?: () => void;
   size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "full";
   showCloseButton?: boolean;
+  closeOnOverlayClick?: boolean;
 }
 
 export interface DialogInstance extends DialogConfig {

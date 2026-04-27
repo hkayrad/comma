@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Button } from "@/components/ui/button";
 import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import {
@@ -58,6 +59,7 @@ export function StatementRowActions({
   const { t } = useTranslation();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
+  const { openDebtDialog, openPaymentDialog } = useEntityDialogs();
 
   const DEBT_API = overviewType === "payable" ? PayableDebtApi : ReceivableDebtApi;
   const PAYMENT_API = overviewType === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
@@ -70,14 +72,14 @@ export function StatementRowActions({
         await exportPaymentReceiptPDF(item as PaymentDto, company);
       }
       toast.success(t("dashboard.customerStatement.success.pdfExport"));
-    } catch (_error) {
+    } catch {
       toast.error(t("dashboard.customerStatement.error.pdfExport"));
     }
   }, [type, item, company, t]);
 
   const handleEdit = useCallback(() => {
     if (type === "debt") {
-      openDialog({
+      openDebtDialog({
         title: t("dialog.debt.edit.title"),
         description: t("dialog.debt.edit.description"),
         size: "3xl",
@@ -86,7 +88,7 @@ export function StatementRowActions({
         onSuccess: onRefresh,
       });
     } else {
-      openDialog({
+      openPaymentDialog({
         title: t("dialog.payment.edit.title"),
         description: t("dialog.payment.edit.description"),
         size: "3xl",
@@ -95,7 +97,7 @@ export function StatementRowActions({
         onSuccess: onRefresh,
       });
     }
-  }, [type, item, overviewType, openDialog, onRefresh, t]);
+  }, [type, item, overviewType, openDebtDialog, openPaymentDialog, onRefresh, t]);
 
   const handleDelete = useCallback(async () => {
     const api = type === "debt" ? DEBT_API : PAYMENT_API;

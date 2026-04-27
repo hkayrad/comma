@@ -27,6 +27,7 @@ import type {
 } from "@tanstack/react-table";
 import HksTable from "@/layout/shared/table/HksTable";
 import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
@@ -74,6 +75,7 @@ export default function CustomerTable(props: Props) {
   const queryClient = useQueryClient();
   const openDialog = useDialog((s) => s.openDialog);
   const closeDialog = useDialog((s) => s.closeDialog);
+  const { openCustomerDialog, openDebtDialog, openPaymentDialog } = useEntityDialogs();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -92,13 +94,13 @@ export default function CustomerTable(props: Props) {
                 queryClient.invalidateQueries({ queryKey: ["totals"] });
                 queryClient.invalidateQueries({ queryKey: ["customers"] });
                 toast.success(t("notification.customer.restore.success"));
-              } catch (_error) {
+              } catch {
                 toast.error(t("notification.customer.restore.error"));
               }
             },
           },
         });
-      } catch (_error) {
+      } catch {
         toast.error(t("notification.customer.delete.error"));
       }
     },
@@ -139,7 +141,7 @@ export default function CustomerTable(props: Props) {
         return;
       }
 
-      openDialog({
+      openCustomerDialog({
         title: t("dialog.customer.edit.title"),
         description: t("dialog.customer.edit.description"),
         size: "3xl",
@@ -147,7 +149,7 @@ export default function CustomerTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [data, openDialog, type, t],
+    [data, openCustomerDialog, type, t],
   );
 
   const onDetails = useCallback(
@@ -178,7 +180,7 @@ export default function CustomerTable(props: Props) {
 
   const onAddDebt = useCallback(
     (customerId: string) => {
-      openDialog({
+      openDebtDialog({
         title: t("dialog.debt.add"),
         description:
           type === "receivable"
@@ -189,12 +191,12 @@ export default function CustomerTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [openDialog, type, t],
+    [openDebtDialog, type, t],
   );
 
   const onAddPayment = useCallback(
     (customerId: string) => {
-      openDialog({
+      openPaymentDialog({
         title: t("dialog.payment.add"),
         description:
           type === "receivable"
@@ -205,7 +207,7 @@ export default function CustomerTable(props: Props) {
         showCloseButton: true,
       });
     },
-    [openDialog, type, t],
+    [openPaymentDialog, type, t],
   );
 
   const CustomerTableColumns: ColumnDef<CustomerDto>[] = useMemo(

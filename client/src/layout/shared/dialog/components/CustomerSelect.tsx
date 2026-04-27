@@ -20,7 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useDialog } from "@/contexts/dialog";
+import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import type { CustomerIdName } from "@comma/common";
 import { cn } from "@/lib/utils";
 import { ChevronsUpDown, IdCard, Plus } from "lucide-react";
@@ -53,7 +53,7 @@ export default function CustomerSelect(props: Props) {
     namePrefix = "",
   } = props;
 
-  const openDialog = useDialog((s) => s.openDialog);
+  const { openCustomerDialog } = useEntityDialogs();
   const { t } = useTranslation();
 
   const [isCustomerSelectOpen, setIsCustomerSelectOpen] = useState(false);
@@ -138,7 +138,7 @@ export default function CustomerSelect(props: Props) {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      openDialog({
+                      openCustomerDialog({
                         title: t("dialog.customer.add"),
                         description: t("dialog.customer.add.description"),
                         size: "3xl",
