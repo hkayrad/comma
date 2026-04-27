@@ -1,0 +1,42 @@
+# Build stage
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copy root package files
+COPY package.json package-lock.json ./
+
+# Copy workspace package files
+COPY common/package.json ./common/
+COPY server/package.json ./server/
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY common ./common
+COPY server ./server
+# Ensure server/src/common is a real directory (handles the junction issue in Docker)
+RUN rm -rf ./server/src/common
+COPY common/src ./server/src/common
+
+# Build server (this will also build common if needed, or use the local copy)
+RUN npm run build --workspace=server
+
+# Final stage
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Copy built assets from server/dist
+# server/package.json postbuild script already prepared dist/package.json
+COPY --from=builder /app/server/dist ./
+
+# Install production dependencies
+RUN npm install --production
+
+# Expose port
+EXPOSE 3000
+
+# Start the server
+CMD ["node", "index.js"]
