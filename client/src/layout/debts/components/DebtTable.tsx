@@ -81,7 +81,9 @@ export default function DebtTable(props: Props) {
         await API.Delete(id);
         queryClient.invalidateQueries({ queryKey: ["totals"] });
         queryClient.invalidateQueries({ queryKey: ["debts"] });
+        queryClient.invalidateQueries({ queryKey: ["payments"] });
         queryClient.invalidateQueries({ queryKey: ["customers"] });
+        queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
         toast.success(t("notification.debt.delete.success"), {
           action: {
             label: t("vars.undo"),
@@ -90,7 +92,9 @@ export default function DebtTable(props: Props) {
                 await API.Restore(id);
                 queryClient.invalidateQueries({ queryKey: ["totals"] });
                 queryClient.invalidateQueries({ queryKey: ["debts"] });
+                queryClient.invalidateQueries({ queryKey: ["payments"] });
                 queryClient.invalidateQueries({ queryKey: ["customers"] });
+                queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
                 toast.success(t("notification.debt.restore.success"));
               } catch (_error) {
                 toast.error(t("notification.debt.restore.error"));

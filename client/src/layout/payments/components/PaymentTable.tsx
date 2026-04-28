@@ -79,8 +79,10 @@ export default function PaymentTable(props: Props) {
       try {
         await API.Delete(id);
         queryClient.invalidateQueries({ queryKey: ["totals"] });
+        queryClient.invalidateQueries({ queryKey: ["debts"] });
         queryClient.invalidateQueries({ queryKey: ["payments"] });
         queryClient.invalidateQueries({ queryKey: ["customers"] });
+        queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
         toast.success(t("notification.payment.delete.success"), {
           action: {
             label: t("vars.undo"),
@@ -88,8 +90,10 @@ export default function PaymentTable(props: Props) {
               try {
                 await API.Restore(id);
                 queryClient.invalidateQueries({ queryKey: ["totals"] });
+                queryClient.invalidateQueries({ queryKey: ["debts"] });
                 queryClient.invalidateQueries({ queryKey: ["payments"] });
                 queryClient.invalidateQueries({ queryKey: ["customers"] });
+                queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
                 toast.success(t("notification.payment.restore.success"));
               } catch (_error) {
                 toast.error(t("notification.payment.restore.error"));
