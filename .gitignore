@@ -41,3 +41,4 @@ server/coverage/
 CodeReviewReport.md
 docs/
 dumps/
+.worktrees/
