@@ -32,7 +32,7 @@ router.get("/", asyncHandler(async (req: Request, res: Response) => {
 }));
 
 router.get("/:configKey", asyncHandler(async (req: Request, res: Response) => {
-	const configKey = req.params.configKey;
+	const configKey = req.params.configKey as string;
 	Logger.debug("[ConfigController] Get config", { configKey });
 
 	const configValue = await ConfigService.GetConfig(configKey);

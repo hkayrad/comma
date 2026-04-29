@@ -14,6 +14,9 @@
         "lint": "eslint .",
         "preview": "vite preview"
     },
+    "optionalDependencies": {
+      "@rollup/rollup-linux-x64-gnu": "^4.60.2"
+    },
     "dependencies": {
         "@base-ui-components/react": "^1.0.0-rc.0",
         "@base-ui/react": "^1.0.0",

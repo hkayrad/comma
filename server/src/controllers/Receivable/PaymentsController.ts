@@ -38,7 +38,7 @@ router.get("/payments", validate(paginationSchema, "query"), asyncHandler(async 
 }));
 
 router.put("/payments/:id", validate(paymentSchema), asyncHandler(async (req: Request, res: Response) => {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const payment = req.body;
 	const companyId = req.user.companyId;
 	Logger.info("[ReceivablePaymentsController] Update payment request", { paymentId: id, companyId });
@@ -48,7 +48,7 @@ router.put("/payments/:id", validate(paymentSchema), asyncHandler(async (req: Re
 }));
 
 router.delete("/payments/:id", asyncHandler(async (req: Request, res: Response) => {
-	const paymentId = req.params.id;
+	const paymentId = req.params.id as string;
 	const { id: userId, companyId } = req.user;
 	Logger.info("[ReceivablePaymentsController] Delete payment request", { paymentId, companyId });
 
@@ -57,7 +57,7 @@ router.delete("/payments/:id", asyncHandler(async (req: Request, res: Response) 
 }));
 
 router.post("/payments/:id/restore", asyncHandler(async (req: Request, res: Response) => {
-	const paymentId = req.params.id;
+	const paymentId = req.params.id as string;
 	const { id: userId, companyId } = req.user;
 	Logger.info("[ReceivablePaymentsController] Restore payment request", { paymentId, companyId });
 

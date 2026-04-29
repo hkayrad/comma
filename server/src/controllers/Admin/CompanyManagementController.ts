@@ -26,25 +26,25 @@ router.get("/", validate(paginationSchema, "query"), asyncHandler(async (req: Re
 
 router.get("/:id", asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[CompanyManagementController] Get company by id");
-	const data = await CompanyManagementService.GetById(req.params.id);
+	const data = await CompanyManagementService.GetById(req.params.id as string);
 	res.json({ success: true, data });
 }));
 
 router.put("/:id", validate(companySchema), asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[CompanyManagementController] Update company");
-	const data = await CompanyManagementService.Update(req.params.id, req.body);
+	const data = await CompanyManagementService.Update(req.params.id as string, req.body);
 	res.json({ success: true, data, message: "Company updated successfully" });
 }));
 
 router.delete("/:id", asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[CompanyManagementController] Delete company");
-	await CompanyManagementService.Delete(req.params.id);
+	await CompanyManagementService.Delete(req.params.id as string);
 	res.json({ success: true, message: "Company deleted successfully" });
 }));
 
 router.post("/:id/restore", asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[CompanyManagementController] Restore company");
-	await CompanyManagementService.Restore(req.params.id);
+	await CompanyManagementService.Restore(req.params.id as string);
 	res.json({ success: true, message: "Restored successfully" });
 }));
 
