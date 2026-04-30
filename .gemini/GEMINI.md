@@ -1,0 +1,2 @@
+- Use context7 MCP server if you need documentation about external tools, or if you want to ask questions about how to use them.
+- Remove temporary scripts after finishing the task

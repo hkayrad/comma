@@ -1,7 +1,5 @@
 # Rules
 
-- Remove temporary scripts after finishing the task
-
 # Project Context
 
 ## Project Overview
