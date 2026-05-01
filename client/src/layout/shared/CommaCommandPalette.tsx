@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
   CommandDialog,
   CommandInput,
@@ -40,15 +41,28 @@ export function CommaCommandPalette() {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      // Check if user is typing in an input or textarea
+      const isInput = ["INPUT", "TEXTAREA"].includes(
+        document.activeElement?.tagName || "",
+      );
+
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
+      }
+
+      if (!isInput && !open) {
+        if (e.key === "r") {
+          e.preventDefault();
+          queryClient.invalidateQueries();
+          toast.success(t("table.header.refresh.success", "Data refreshed!"));
+        }
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [open, queryClient, t]);
 
   const runCommand = (command: () => void) => {
     setOpen(false);
