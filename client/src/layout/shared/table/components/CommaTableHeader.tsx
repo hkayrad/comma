@@ -133,13 +133,13 @@ export default function CommaTableHeader(props: Props) {
     table.resetColumnFilters();
     table.setPageIndex(0);
     setSelectedFilters(new Set());
-    toast.success("Filtreler temizlendi!");
-  }, [table]);
+    toast.success(t("table.header.filters.clear.success"));
+  }, [table, t]);
 
   const onSortReset = useCallback(() => {
     table.resetSorting();
-    toast.success("Sıralama sıfırlandı!");
-  }, [table]);
+    toast.success(t("table.header.sorting.success"));
+  }, [table, t]);
 
   const onExportCSV = useCallback(() => {
     const visibleColumns = table
@@ -254,6 +254,7 @@ export default function CommaTableHeader(props: Props) {
   }, [table, t, translationPrefix]);
 
   const onRefresh = useCallback(() => {
+    if (isRefreshing) return;
     setIsRefreshing(true);
     queryClient.invalidateQueries();
     toast.promise(
@@ -264,12 +265,12 @@ export default function CommaTableHeader(props: Props) {
         }, 500);
       }),
       {
-        loading: "Tablo yenileniyor...",
-        success: "Tablo başarıyla yenilendi!",
-        error: "Tablo yenileme başarısız oldu.",
+        loading: t("table.header.refresh.loading"),
+        success: t("table.header.refresh.success"),
+        error: t("table.header.refresh.error"),
       },
     );
-  }, [queryClient]);
+  }, [queryClient, t]);
 
   const handleFilterToggle = useCallback(
     (tag: { column: string; value: string }) => {

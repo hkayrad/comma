@@ -72,7 +72,6 @@ export const CommaImage = ({
           src={hasError ? fallbackSrc : src}
           alt={alt}
           loading={loading}
-          // @ts-expect-error - fetchPriority is supported in React 19 but types may vary
           fetchPriority={fetchPriority}
           onLoad={(e) => {
             setIsLoaded(true);

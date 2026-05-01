@@ -33,11 +33,31 @@ import PaymentDialog from "@/layout/payments/components/PaymentDialog";
  */
 export function CommaCommandPalette() {
   const [open, setOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const queryClient = useQueryClient();
   const { openDebtDialog, openPaymentDialog } = useEntityDialogs();
+
+  const handleRefresh = React.useCallback(() => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    toast.promise(
+      new Promise<void>((resolve) => {
+        queryClient.invalidateQueries();
+        setTimeout(() => {
+          setIsRefreshing(false);
+          resolve();
+        }, 500);
+      }),
+      {
+        loading: t("table.header.refresh.loading"),
+        success: t("table.header.refresh.success"),
+        error: t("table.header.refresh.error"),
+      },
+    );
+  }, [isRefreshing, queryClient, t]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -54,15 +74,14 @@ export function CommaCommandPalette() {
       if (!isInput && !open) {
         if (e.key === "r") {
           e.preventDefault();
-          queryClient.invalidateQueries();
-          toast.success(t("table.header.refresh.success", "Data refreshed!"));
+          handleRefresh();
         }
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [open, queryClient, t]);
+  }, [open, handleRefresh]);
 
   const runCommand = (command: () => void) => {
     setOpen(false);
@@ -120,10 +139,11 @@ export function CommaCommandPalette() {
             {theme === "dark" ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
             <span>{t("login.changeTheme")}</span>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => {
-            queryClient.invalidateQueries();
-          })}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <CommandItem
+            disabled={isRefreshing}
+            onSelect={() => runCommand(handleRefresh)}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
             <span>{t("table.header.refresh")}</span>
           </CommandItem>
         </CommandGroup>

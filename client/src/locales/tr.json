@@ -740,10 +740,13 @@
       "search.hover": "İsim ile Müşteri Ara",
       "showHideCols": "Sütunları Göster/Gizle",
       "showHideCols.hover": "İstenilen sütunları gizle veya göster",
-      "sorting": {
-        "clear": "Sıralamayı Sıfırla",
-        "clear.hover": "Tüm sıralamaları kaldır"
-      }
+      "sorting.clear": "Sıralamayı Sıfırla",
+      "sorting.clear.hover": "Tüm sıralamaları kaldır",
+      "sorting.success": "Sıralama sıfırlandı!",
+      "filters.clear.success": "Filtreler temizlendi!",
+      "refresh.loading": "Tablo yenileniyor...",
+      "refresh.success": "Tablo başarıyla yenilendi!",
+      "refresh.error": "Tablo yenileme başarısız oldu."
     }
   },
   "user": {

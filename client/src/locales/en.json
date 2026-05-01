@@ -731,10 +731,13 @@
       "search.hover": "Search by Customer Name",
       "showHideCols": "Show/Hide Columns",
       "showHideCols.hover": "Show or hide desired columns",
-      "sorting": {
-        "clear": "Reset Sorting",
-        "clear.hover": "Reset the sorting"
-      }
+      "sorting.clear": "Reset Sorting",
+      "sorting.clear.hover": "Reset the sorting",
+      "sorting.success": "Sorting reset!",
+      "filters.clear.success": "Filters cleared!",
+      "refresh.loading": "Refreshing table...",
+      "refresh.success": "Table refreshed successfully!",
+      "refresh.error": "Table refresh failed."
     }
   },
   "user": {

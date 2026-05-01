@@ -54,7 +54,9 @@ function CommandDialog({
                 className={cn("rounded-xl! overflow-hidden p-0", className)}
                 showCloseButton={showCloseButton}
             >
-                {children}
+                <Command className="[&_[data-slot=command-input-wrapper]_svg]:size-5 [&_[data-slot=command-input-wrapper]]:border-b-0! [&_[data-slot=command-input-wrapper]]:px-3! [&_[data-slot=command-input-wrapper]]:py-2! [&_[data-slot=command-input]]:h-10 [&_[data-slot=command-item]]:px-3 [&_[data-slot=command-item]]:py-2 [&_[data-slot=command-item]_svg]:size-4">
+                    {children}
+                </Command>
             </DialogContent>
         </Dialog>
     );
