@@ -51,6 +51,7 @@ type Props = {
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
+  readOnly?: boolean;
 };
 
 export default function DebtTable(props: Props) {
@@ -66,6 +67,7 @@ export default function DebtTable(props: Props) {
     onColumnFiltersChange,
     columnVisibility,
     onColumnVisibilityChange,
+    readOnly,
   } = props;
 
   const queryClient = useQueryClient();
@@ -181,7 +183,7 @@ export default function DebtTable(props: Props) {
   );
 
   const DebtTableColumns: ColumnDef<DebtDto>[] = useMemo(
-    () => [
+    () => ([
       {
         id: "#",
         header: ({ column }) => column.id,
@@ -573,8 +575,8 @@ export default function DebtTable(props: Props) {
           </div>
         ),
       },
-    ],
-    [onEdit, confirmDelete, type, t, onAddPayment],
+    ] as ColumnDef<DebtDto>[]).filter(c => !readOnly || c.id !== "actions"),
+    [onEdit, confirmDelete, type, t, onAddPayment, readOnly],
   );
 
   const tags = useMemo(
@@ -616,7 +618,8 @@ export default function DebtTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
-      contextMenuItems={(c) => (
+      readOnly={readOnly}
+      contextMenuItems={!readOnly ? (c) => (
         <>
           <ContextMenuItem onClick={() => onAddPayment(c)}>
             <Wallet className="mr-2 h-4 w-4" />
@@ -639,7 +642,7 @@ export default function DebtTable(props: Props) {
             {t("debt.table.column.actions.delete")}
           </ContextMenuItem>
         </>
-      )}
+      ) : undefined}
     />
   );
 }

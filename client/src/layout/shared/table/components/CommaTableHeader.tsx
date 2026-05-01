@@ -65,10 +65,11 @@ type Props = {
     color: string;
   }[];
   addButton?: ReactNode;
+  readOnly?: boolean;
 };
 
 export default function CommaTableHeader(props: Props) {
-  const { table, searchColumn, tags, addButton } = props;
+  const { table, searchColumn, tags, addButton, readOnly } = props;
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
@@ -650,7 +651,7 @@ export default function CommaTableHeader(props: Props) {
           />
           <TooltipContent>{t("table.header.refresh.hover")}</TooltipContent>
         </Tooltip>
-        {addButton || <AddButton />}
+        {!readOnly && (addButton || <AddButton />)}
       </div>
     </div>
   );

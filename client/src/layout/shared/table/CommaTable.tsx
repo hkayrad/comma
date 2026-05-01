@@ -50,6 +50,7 @@ type Props = {
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   addButton?: ReactNode;
   contextMenuItems?: (row: any) => ReactNode;
+  readOnly?: boolean;
 };
 
 export default function CommaTable(props: Props) {
@@ -69,6 +70,7 @@ export default function CommaTable(props: Props) {
     onColumnVisibilityChange,
     addButton,
     contextMenuItems,
+    readOnly,
   } = props;
 
   const useContextMenuForActions = useDashboardSettings(
@@ -133,6 +135,7 @@ export default function CommaTable(props: Props) {
           searchColumn={searchColumn}
           tags={tags}
           addButton={addButton}
+          readOnly={readOnly}
         />
       </div>
       <div className="rounded-md border overflow-clip" data-table-export>
@@ -202,7 +205,7 @@ export default function CommaTable(props: Props) {
                     </TableCell>
                   ));
 
-                  if (useContextMenuForActions && contextMenuItems) {
+                  if (useContextMenuForActions && contextMenuItems && !readOnly) {
                     const rowClasses = "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted font-light h-[45px]";
 
                     return (
