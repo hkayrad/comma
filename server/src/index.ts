@@ -22,6 +22,7 @@ import UserManagementController from "@/controllers/Admin/UserManagementControll
 import UserSettingsController from "@/controllers/UserSettingsController";
 import TwoFactorController from "@/controllers/TwoFactorController";
 import StatsController from "@/controllers/StatsController";
+import PortalController from "@/controllers/PortalController";
 import { Logger } from "@/lib/utils/logger";
 import { sequelize } from "@/lib/db/sequelize";
 import { errorHandler } from "@/lib/utils/middleware/errorHandler";
@@ -126,6 +127,7 @@ app.use("/admin/users", UserManagementController);
 app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);
 app.use("/stats", StatsController);
+app.use("/portal", PortalController);
 
 // Global error handler — must be registered AFTER all routes
 app.use(errorHandler);

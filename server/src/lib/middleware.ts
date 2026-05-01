@@ -62,3 +62,32 @@ export function configMiddleware(req: Request, res: Response, next: NextFunction
 	Logger.debug("[ConfigMiddleware] Checking auth");
 	authMiddleware(req, res, next);
 }
+
+export function portalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
+	Logger.debug("[PortalAuthMiddleware] Request received", {
+		method: req.method,
+		path: req.path,
+	});
+
+	try {
+		const portalToken = req.cookies.portal_token;
+
+		if (!portalToken) {
+			Logger.warn("[PortalAuthMiddleware] Portal token missing");
+			return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
+		}
+
+		jwt.verify(portalToken, process.env.JWT_SECRET as jwt.Secret, (err: any, decoded: any) => {
+			if (err || decoded.role !== UserRole.PORTAL_CUSTOMER) {
+				Logger.warn("[PortalAuthMiddleware] Invalid token or role", { err });
+				return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
+			}
+
+			req.user = decoded;
+			next();
+		});
+	} catch (error) {
+		Logger.error("[PortalAuthMiddleware] Error verifying token", { error });
+		return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
+	}
+}
