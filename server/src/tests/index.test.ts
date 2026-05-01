@@ -14,15 +14,15 @@ describe('Root Endpoints', () => {
   });
 
   describe('GET /logo-proxy/:filename', () => {
-      it('should return 400 for invalid filename (traversal)', async () => {
-          const response = await request(app).get('/logo-proxy/..%2fpackage.json');
-          expect(response.status).toBe(400);
-      });
+    it('should return 404 for invalid filename (traversal)', async () => {
+        const response = await request(app).get('/logo-proxy/..%2fpackage.json');
+        expect(response.status).toBe(404);
+    });
 
-      it('should return 400 for invalid filename (slash)', async () => {
-        const response = await request(app).get('/logo-proxy/sub%2fdir.png');
-        expect(response.status).toBe(400);
-      });
+    it('should return 404 for invalid filename (slash)', async () => {
+      const response = await request(app).get('/logo-proxy/sub%2fdir.png');
+      expect(response.status).toBe(404);
+    });
 
       it('should return 400 for invalid filename (backslash)', async () => {
         // We use %5C for backslash

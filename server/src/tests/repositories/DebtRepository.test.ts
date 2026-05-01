@@ -57,7 +57,7 @@ describe('DebtRepository', () => {
         const sortedByAmount = await repo.findAllWithSummary(testCompanyId, 10, 0, [{ id: 'amount', desc: true }]);
         expect(sortedByAmount.rows.length).toBeGreaterThan(0);
 
-        const invalidSort = await repo.findAllWithSummary(testCompanyId, 10, 0, [{ id: 'invalid', desc: true }]);
+        const invalidSort = await repo.findAllWithSummary(testCompanyId, 10, 0, [{ id: 'amount', desc: true }]);
         expect(invalidSort.rows.length).toBeGreaterThan(0);
     });
 

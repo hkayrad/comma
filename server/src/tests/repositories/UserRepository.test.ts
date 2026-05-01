@@ -20,7 +20,7 @@ describe('UserRepository', () => {
 
   afterAll(async () => {
     await RefreshTokens.destroy({ where: {}, force: true });
-    await Users.destroy({ where: { username: TEST_USERNAME }, force: true });
+    await Users.destroy({ where: { company_id: testCompanyId }, force: true });
     await Companies.destroy({ where: { id: testCompanyId }, force: true });
   });
 
