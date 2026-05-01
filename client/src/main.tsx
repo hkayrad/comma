@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
 import "./i18n";
-import { RequireAuth, RequireNoAuth } from "./layout/auth/AuthCheck";
+import { RequireAuth, RequireNoAuth, PortalAuthGuard } from "./layout/auth/AuthCheck";
 import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
 import { lazy, Suspense } from "react";
@@ -25,6 +25,9 @@ const CustomerStatement = lazy(
 const Dev = lazy(() => import("./layout/Dev"));
 const NotFound = lazy(() => import("./layout/NotFound"));
 
+const PortalLogin = lazy(() => import("./layout/portal/PortalLogin"));
+const PortalDashboard = lazy(() => import("./layout/portal/PortalDashboard"));
+
 const PageLoader = ({ className }: { className?: string }) => (
   <div
     className={cn(
@@ -41,6 +44,28 @@ const router = createBrowserRouter([
     Component: Root,
     ErrorBoundary: RootErrorBoundary,
     children: [
+      {
+        path: "p/:companyId",
+        element: (
+          <Suspense fallback={<PageLoader className="h-screen! w-screen!" />}>
+            <PortalLogin />
+          </Suspense>
+        ),
+      },
+      {
+        path: "portal",
+        Component: PortalAuthGuard,
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<PageLoader className="h-screen! w-screen!" />}>
+                <PortalDashboard />
+              </Suspense>
+            ),
+          },
+        ],
+      },
       {
         path: "login",
         Component: RequireNoAuth,
