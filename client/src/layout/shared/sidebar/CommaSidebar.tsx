@@ -71,6 +71,7 @@ import { useTranslation } from "react-i18next";
 import UserSettingsDialog from "../dialog/UserSettingsDialog";
 import PageSettingsDialog from "../dialog/PageSettingsDialog";
 import UpcomingDueDates from "@/layout/dashboard/components/UpcomingDueDates";
+import { CommaImage } from "@/components/shared/CommaImage";
 import {
   Popover,
   PopoverContent,
@@ -78,7 +79,7 @@ import {
 } from "@/components/ui/popover";
 import { useUpcomingDueDates } from "@/hooks/use-upcoming-due-dates";
 
-export default function HksSidebar() {
+export default function CommaSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
@@ -221,11 +222,9 @@ export default function HksSidebar() {
         >
           <AnimatePresence mode="wait">
             {state === "collapsed" ? (
-              <motion.img
+              <motion.div
                 key="icon"
-                src={logoSrc.small}
-                alt="Comma Logo"
-                className="h-full w-auto mx-auto object-contain"
+                className="h-full w-auto mx-auto"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -248,13 +247,19 @@ export default function HksSidebar() {
                   duration: 0.25,
                   ease: [0.4, 0, 0.2, 1],
                 }}
-              />
+              >
+                <CommaImage
+                  src={logoSrc.small}
+                  alt="Comma Logo"
+                  containerClassName="h-full w-auto"
+                  className="object-contain"
+                  loading="eager"
+                />
+              </motion.div>
             ) : (
-              <motion.img
+              <motion.div
                 key="logo"
-                src={logoSrc.large}
-                alt="Comma Logo"
-                className="h-full w-auto mx-auto object-contain"
+                className="h-full w-auto mx-auto"
                 initial={{
                   opacity: 0,
                   x: 0,
@@ -277,7 +282,15 @@ export default function HksSidebar() {
                   duration: 0.25,
                   ease: [0.4, 0, 0.2, 1],
                 }}
-              />
+              >
+                <CommaImage
+                  src={logoSrc.large}
+                  alt="Comma Logo"
+                  containerClassName="h-full w-auto"
+                  className="object-contain"
+                  loading="eager"
+                />
+              </motion.div>
             )}
           </AnimatePresence>
         </NavLink>

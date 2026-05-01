@@ -25,7 +25,7 @@ import type {
   ColumnFiltersState,
   VisibilityState,
 } from "@tanstack/react-table";
-import HksTable from "@/layout/shared/table/HksTable";
+import CommaTable from "@/layout/shared/table/CommaTable";
 import { useDialog } from "@/contexts/dialog";
 import { useEntityDialogs } from "@/hooks/use-entity-dialogs";
 import CustomerDialog from "@/layout/shared/dialog/CustomerDialog";
@@ -657,7 +657,7 @@ export default function CustomerTable(props: Props) {
   );
 
   return (
-    <HksTable
+    <CommaTable
       data={data}
       columns={CustomerTableColumns}
       searchColumn="name"

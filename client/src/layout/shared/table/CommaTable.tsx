@@ -26,7 +26,7 @@ import {
   type PaginationState,
   type OnChangeFn,
 } from "@tanstack/react-table";
-import HksTableHeader from "./components/HksTableHeader";
+import CommaTableHeader from "./components/CommaTableHeader";
 
 type Props = {
   data: any[];
@@ -52,7 +52,7 @@ type Props = {
   contextMenuItems?: (row: any) => ReactNode;
 };
 
-export default function HksTable(props: Props) {
+export default function CommaTable(props: Props) {
   const {
     data,
     columns,
@@ -128,7 +128,7 @@ export default function HksTable(props: Props) {
   return (
     <>
       <div className="sticky -top-4 z-20 pb-2 bg-background">
-        <HksTableHeader
+        <CommaTableHeader
           table={table}
           searchColumn={searchColumn}
           tags={tags}

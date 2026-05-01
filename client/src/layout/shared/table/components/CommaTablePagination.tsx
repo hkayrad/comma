@@ -13,7 +13,7 @@ type Props = {
   table: Table<any>;
 };
 
-export default function HksTablePagination(props: Props) {
+export default function CommaTablePagination(props: Props) {
   const { table } = props;
   const { t } = useTranslation();
 

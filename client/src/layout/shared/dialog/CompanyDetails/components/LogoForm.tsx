@@ -14,6 +14,7 @@ import { Trash2, UploadIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { CommaImage } from "@/components/shared/CommaImage";
 
 export default function LogoForm() {
   const { theme } = useTheme();
@@ -170,7 +171,7 @@ export default function LogoForm() {
             </DropzoneEmptyState>
             <DropzoneContent>
               {(smallLogoPreview || logos.smallLogo) && (
-                <img
+                <CommaImage
                   src={
                     smallLogoPreview
                       ? smallLogoPreview
@@ -179,7 +180,8 @@ export default function LogoForm() {
                         : ""
                   }
                   alt="Small Logo"
-                  className={`h-32 aspect-square object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
+                  containerClassName="h-32 aspect-square"
+                  className={`object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
                 />
               )}
             </DropzoneContent>
@@ -230,7 +232,7 @@ export default function LogoForm() {
             </DropzoneEmptyState>
             <DropzoneContent>
               {(largeLogoPreview || logos.largeLogo) && (
-                <img
+                <CommaImage
                   src={
                     largeLogoPreview
                       ? largeLogoPreview
@@ -239,7 +241,8 @@ export default function LogoForm() {
                         : ""
                   }
                   alt="Large Logo"
-                  className={`max-w-96 h-32 object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
+                  containerClassName="max-w-96 h-32"
+                  className={`object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
                 />
               )}
             </DropzoneContent>

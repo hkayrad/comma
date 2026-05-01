@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { sendRefreshEvent } from "@/lib/utils";
 // import addButton from "@/layout/shared/addButton";
 import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
-import HksSidebar from "@/layout/shared/sidebar/HksSidebar";
+import CommaSidebar from "@/layout/shared/sidebar/CommaSidebar";
 import Header from "@/layout/shared/header/Header";
 import {
   SidebarInset,
@@ -24,7 +24,7 @@ export default function App() {
       {/*<NonSystemAdminOnly>
       </NonSystemAdminOnly>*/}
       <SidebarProvider>
-        <HksSidebar />
+        <CommaSidebar />
         <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
           <MaintenanceBanner />
           <SystemAdminOnly>

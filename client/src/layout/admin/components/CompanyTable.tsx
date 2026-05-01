@@ -21,7 +21,7 @@ import type {
   ColumnFiltersState,
   VisibilityState,
 } from "@tanstack/react-table";
-import HksTable from "@/layout/shared/table/HksTable";
+import CommaTable from "@/layout/shared/table/CommaTable";
 import CompanyDialog from "./CompanyDialog";
 import { useDialog } from "@/contexts/dialog";
 import SortableColumnHeader from "@/layout/shared/table/components/SortableColumnHeader";
@@ -340,7 +340,7 @@ export default function CompanyTable(props: Props) {
   );
 
   return (
-    <HksTable
+    <CommaTable
       data={data}
       columns={CompanyTableColumns}
       searchColumn="name"

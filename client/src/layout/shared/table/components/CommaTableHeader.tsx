@@ -42,7 +42,7 @@ import {
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
-import HksTablePagination from "./HksTablePagination";
+import CommaTablePagination from "./CommaTablePagination";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
@@ -67,7 +67,7 @@ type Props = {
   addButton?: ReactNode;
 };
 
-export default function HksTableHeader(props: Props) {
+export default function CommaTableHeader(props: Props) {
   const { table, searchColumn, tags, addButton } = props;
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -592,7 +592,7 @@ export default function HksTableHeader(props: Props) {
         </Tooltip>
       </ButtonGroup>
       <div className="flex gap-2 ml-auto ">
-        <HksTablePagination table={table} />
+        <CommaTablePagination table={table} />
         <Menu>
           <Tooltip disableHoverablePopup>
             <TooltipTrigger

@@ -5,7 +5,7 @@
         "url": "https://hkayrad.tr"
     },
     "private": true,
-    "version": "2.14.1",
+    "version": "2.15.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -15,7 +15,7 @@
         "preview": "vite preview"
     },
     "optionalDependencies": {
-      "@rollup/rollup-linux-x64-gnu": "^4.60.2"
+        "@rollup/rollup-linux-x64-gnu": "^4.60.2"
     },
     "dependencies": {
         "@base-ui-components/react": "^1.0.0-rc.0",

@@ -24,7 +24,7 @@ This document outlines the coding standards and architectural patterns for the C
 
 ### 4. Tables
 - **Tanstack Table:** Use `@tanstack/react-table` for all data grids.
-- **Server-side Logic:** Implement server-side pagination, sorting, and filtering using the `HksTable` wrapper.
+- **Server-side Logic:** Implement server-side pagination, sorting, and filtering using the `CommaTable` wrapper.
 
 ### 5. TypeScript & Imports
 - **Typing:** Favor `interface` or `type` for all data structures and props.

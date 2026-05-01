@@ -1,7 +1,7 @@
 {
   "name": "@comma/server",
   "private": true,
-  "version": "2.14.1",
+  "version": "2.15.0",
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
     "build": "tsc --build && tsc-alias",

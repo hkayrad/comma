@@ -23,7 +23,7 @@ import type {
   ColumnFiltersState,
   VisibilityState,
 } from "@tanstack/react-table";
-import HksTable from "@/layout/shared/table/HksTable";
+import CommaTable from "@/layout/shared/table/CommaTable";
 import { Badge } from "@/components/ui/badge";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
@@ -510,7 +510,7 @@ export default function PaymentTable(props: Props) {
   );
 
   return (
-    <HksTable
+    <CommaTable
       data={data}
       columns={PaymentTableColumns}
       searchColumn="customer_name"

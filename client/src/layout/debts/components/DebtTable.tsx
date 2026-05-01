@@ -23,7 +23,7 @@ import type {
   ColumnFiltersState,
   VisibilityState,
 } from "@tanstack/react-table";
-import HksTable from "@/layout/shared/table/HksTable";
+import CommaTable from "@/layout/shared/table/CommaTable";
 import DebtDialog from "@/layout/debts/components/DebtDialog";
 import PaymentDialog from "@/layout/payments/components/PaymentDialog";
 import { useDialog } from "@/contexts/dialog";
@@ -600,7 +600,7 @@ export default function DebtTable(props: Props) {
   );
 
   return (
-    <HksTable
+    <CommaTable
       data={data}
       columns={DebtTableColumns}
       tags={tags}
