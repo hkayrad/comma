@@ -34,7 +34,8 @@ export default function LogoForm() {
     smallLogo: null,
     largeLogo: null,
   });
-  const [cacheBuster, setCacheBuster] = useState<number>(Date.now());
+  const [cacheBuster, setCacheBuster] = useState<number>(() => Date.now());
+
 
   const fetchLogos = useCallback(async () => {
     try {

@@ -112,13 +112,13 @@ export function StatementRowActions({
               await api.Restore(item.id!);
               onRefresh();
               toast.success(t(`notification.${type}.restore.success`));
-            } catch (_error) {
+            } catch {
               toast.error(t(`notification.${type}.restore.error`));
             }
           },
         },
       });
-    } catch (_error) {
+    } catch {
       toast.error(t(`notification.${type}.delete.error`));
     }
   }, [type, item.id, DEBT_API, PAYMENT_API, onRefresh, t]);

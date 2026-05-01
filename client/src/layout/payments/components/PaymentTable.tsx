@@ -95,15 +95,18 @@ export default function PaymentTable(props: Props) {
                 queryClient.invalidateQueries({ queryKey: ["customers"] });
                 queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
                 toast.success(t("notification.payment.restore.success"));
-              } catch (_error) {
-                toast.error(t("notification.payment.restore.error"));
+              } catch {
+                toast.error(t("notification.payment.delete.error"));
               }
+
             },
           },
         });
-      } catch (_error) {
+      } catch {
         toast.error(t("notification.payment.delete.error"));
       }
+
+
     },
     [type, t, queryClient],
   );

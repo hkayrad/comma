@@ -26,16 +26,15 @@ export default function MaintenanceDialog() {
   );
   const { t } = useTranslation();
 
-  const DEFAULT_START_TIME = new Date(Date.now() + 60000)
-    .toTimeString()
-    .slice(0, 5);
-  const DEFAULT_MAINTENANCE_DURATION = 300000; // 5 minute
-  const DEFAULT_END_TIME = new Date(Date.now() + DEFAULT_MAINTENANCE_DURATION)
-    .toTimeString()
-    .slice(0, 5);
-
-  const [startTime, setStartTime] = useState<string>(DEFAULT_START_TIME);
-  const [endTime, setEndTime] = useState<string>(DEFAULT_END_TIME);
+  const [startTime, setStartTime] = useState<string>(() => {
+    return new Date(Date.now() + 60000).toTimeString().slice(0, 5);
+  });
+  const [endTime, setEndTime] = useState<string>(() => {
+    const DEFAULT_MAINTENANCE_DURATION = 300000; // 5 minute
+    return new Date(Date.now() + DEFAULT_MAINTENANCE_DURATION)
+      .toTimeString()
+      .slice(0, 5);
+  });
 
   const handleStartTimeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

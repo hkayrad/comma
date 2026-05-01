@@ -113,7 +113,7 @@ export class TwoFactorApi {
   /**
    * Use recovery code to bypass 2FA
    */
-  static async useRecoveryCode(
+  static async verifyRecoveryCode(
     code: string,
     tempToken: string,
   ): Promise<TwoFactorRecoveryResponse> {

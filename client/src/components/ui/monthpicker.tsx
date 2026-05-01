@@ -86,7 +86,7 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
         return rows;
     }, [i18n.language]);
 
-    if (minDate && maxDate && minDate > maxDate) minDate = maxDate;
+    const effectiveMinDate = (minDate && maxDate && minDate > maxDate) ? maxDate : minDate;
 
     const disabledDatesMapped = disabledDates?.map((d) => {
         return { year: d.getFullYear(), month: d.getMonth() };
@@ -136,7 +136,7 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
                                                 }}
                                                 disabled={
                                                     (maxDate ? menuYear > maxDate?.getFullYear() || (menuYear == maxDate?.getFullYear() && m.number > maxDate.getMonth()) : false) ||
-                                                    (minDate ? menuYear < minDate?.getFullYear() || (menuYear == minDate?.getFullYear() && m.number < minDate.getMonth()) : false) ||
+                                                    (effectiveMinDate ? menuYear < effectiveMinDate?.getFullYear() || (menuYear == effectiveMinDate?.getFullYear() && m.number < effectiveMinDate.getMonth()) : false) ||
                                                     (disabledDatesMapped ? disabledDatesMapped?.some((d) => d.year == menuYear && d.month == m.number) : false)
                                                 }
                                                 className={cn(

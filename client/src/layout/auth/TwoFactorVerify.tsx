@@ -70,7 +70,7 @@ export default function TwoFactorVerify({
         setError(null);
 
         try {
-            const response = await TwoFactorApi.useRecoveryCode(recoveryCode, tempToken);
+            const response = await TwoFactorApi.verifyRecoveryCode(recoveryCode, tempToken);
 
             if (response.success && response.username && response.role !== undefined) {
                 onSuccess({ username: response.username, role: response.role });

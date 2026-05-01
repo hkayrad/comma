@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 interface CommaImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   avif?: string;
@@ -35,11 +35,17 @@ export const CommaImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  // Reset state if src changes
-  useEffect(() => {
+  const [prevSrc, setPrevSrc] = useState(src);
+  const [prevAvif, setPrevAvif] = useState(avif);
+  const [prevWebp, setPrevWebp] = useState(webp);
+
+  if (src !== prevSrc || avif !== prevAvif || webp !== prevWebp) {
     setIsLoaded(false);
     setHasError(false);
-  }, [src, avif, webp]);
+    setPrevSrc(src);
+    setPrevAvif(avif);
+    setPrevWebp(webp);
+  }
 
   const containerStyle: React.CSSProperties = {};
   if (aspectRatio) {

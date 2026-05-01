@@ -78,15 +78,16 @@ export default function UserTable(props: Props) {
                 await AdminUserApi.Restore(id);
                 sendRefreshEvent();
                 toast.success(t("notification.customer.restore.success"));
-              } catch (_error) {
+              } catch {
                 toast.error(t("notification.customer.restore.error"));
               }
             },
           },
         });
-      } catch (_error) {
+      } catch {
         toast.error(t("notification.customer.delete.error"));
       }
+
     },
     [t],
   );

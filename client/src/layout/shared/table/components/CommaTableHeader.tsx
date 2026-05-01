@@ -84,12 +84,15 @@ export default function CommaTableHeader(props: Props) {
   );
 
   // Sync local search value with table filter value (useful for resets)
-  const tableSearchValue = table
+  const tableSearchValue = (table
     .getColumn(searchColumn)
-    ?.getFilterValue() as string;
-  useEffect(() => {
-    setSearchValue(tableSearchValue ?? "");
-  }, [tableSearchValue]);
+    ?.getFilterValue() as string) ?? "";
+
+  const [prevTableSearchValue, setPrevTableSearchValue] = useState(tableSearchValue);
+  if (tableSearchValue !== prevTableSearchValue) {
+    setSearchValue(tableSearchValue);
+    setPrevTableSearchValue(tableSearchValue);
+  }
 
   // Debounce search input
   useEffect(() => {
@@ -270,7 +273,7 @@ export default function CommaTableHeader(props: Props) {
         error: t("table.header.refresh.error"),
       },
     );
-  }, [queryClient, t]);
+  }, [queryClient, t, isRefreshing]);
 
   const handleFilterToggle = useCallback(
     (tag: { column: string; value: string }) => {

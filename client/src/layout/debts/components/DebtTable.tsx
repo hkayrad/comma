@@ -96,15 +96,17 @@ export default function DebtTable(props: Props) {
                 queryClient.invalidateQueries({ queryKey: ["customers"] });
                 queryClient.invalidateQueries({ queryKey: ["upcoming-due-dates"] });
                 toast.success(t("notification.debt.restore.success"));
-              } catch (_error) {
-                toast.error(t("notification.debt.restore.error"));
+              } catch {
+                toast.error(t("notification.debt.delete.error"));
               }
+
             },
           },
         });
-      } catch (_error) {
+      } catch {
         toast.error(t("notification.debt.delete.error"));
       }
+
     },
     [type, t, queryClient],
   );

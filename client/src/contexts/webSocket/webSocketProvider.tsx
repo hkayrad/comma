@@ -62,12 +62,6 @@ export const WebSocketProvider = ({
     ws.current.onclose = () => {
       setIsConnected(false);
       Logger.debug("WebSocket disconnected");
-      if (shouldReconnect.current) {
-        reconnectTimeout.current = setTimeout(() => {
-          Logger.debug("Reconnecting WebSocket...");
-          connect();
-        }, 3000);
-      }
     };
 
     ws.current.onerror = () => {
@@ -239,6 +233,16 @@ export const WebSocketProvider = ({
     sendEndMaintenanceNotification,
     sendGetActiveUsersRequest,
   ]);
+
+  useEffect(() => {
+    if (!isConnected && shouldReconnect.current) {
+      const timer = setTimeout(() => {
+        Logger.debug("Reconnecting WebSocket...");
+        connect();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConnected, connect]);
 
   useEffect(() => {
     shouldReconnect.current = true;
