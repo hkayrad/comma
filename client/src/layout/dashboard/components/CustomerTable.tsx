@@ -1,6 +1,6 @@
 import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { Button } from "@/components/ui/button";
-import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet } from "lucide-react";
+import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -530,6 +530,28 @@ export default function CustomerTable(props: Props) {
               />
               <TooltipContent>
                 {t("dashboard.table.column.actions.show_details")}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const portalUrl = `${window.location.origin}/p/${row.original.company_id}?vkn=${row.original.tax_number}`;
+                      copyToClipboard(portalUrl, t);
+                      toast.success(t("notification.portal.link_copied"));
+                    }}
+                  >
+                    <Share2 />
+                  </Button>
+                )}
+              />
+              <TooltipContent>
+                {t("dashboard.table.column.actions.share_portal")}
               </TooltipContent>
             </Tooltip>
             <Tooltip disableHoverablePopup>
