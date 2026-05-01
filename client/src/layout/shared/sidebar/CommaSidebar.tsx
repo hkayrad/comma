@@ -116,7 +116,7 @@ export default function CommaSidebar() {
     smallLogo: "",
     largeLogo: "",
   });
-  const [cacheBuster] = useState<number>(() => Date.now());
+  const [cacheBuster, setCacheBuster] = useState<number>(() => Date.now());
   const logoSrc = useMemo(
     () => ({
       small: logos.smallLogo

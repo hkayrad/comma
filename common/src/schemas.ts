@@ -5,3 +5,4 @@ export * from "./payments/schemas";
 export * from "./companies/schemas";
 export * from "./config/schemas";
 export * from "./shared/schemas";
+export * from "./portal/schemas";

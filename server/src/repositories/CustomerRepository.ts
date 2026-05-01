@@ -31,6 +31,11 @@ export class CustomerRepository {
 		return await Model.findOne({ where: { id, company_id: companyId }, transaction });
 	}
 
+	async findByTaxNumber(taxNumber: string, companyId: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		return await Model.findOne({ where: { tax_number: taxNumber, company_id: companyId }, transaction });
+	}
+
 	async update(id: UUID, companyId: UUID, updateData: Partial<CustomerDto>, transaction?: Transaction) {
 		const Model = this.getModel();
 		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });

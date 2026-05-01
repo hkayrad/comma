@@ -10,12 +10,12 @@ This document outlines potential improvements, new features, and technical enhan
 
 ### 2. Advanced Analytics & Reporting
 *   **Custom Report Builder**: Allow users to select columns, filters, and grouping for custom financial statements.
-*   **Cash Flow Forecasting**: Use historical data to predict future cash flow trends.
+*   **Cash Flow Forecasting**: Proactive 30/60/90 day projections based on upcoming due dates and historical payment patterns to predict future liquidity.
 *   **DSO (Days Sales Outstanding) Tracking**: Calculate and visualize how long it takes to collect payments.
 
 ### 3. Workflow & Automation
 *   **Automated Payment Reminders**: Send emails or system notifications to customers with overdue debts.
-*   **Recurring Debts/Payments**: Support for fixed-interval financial transactions (e.g., monthly rent or subscriptions).
+*   **Recurring Transactions**: Support for "Recurring Profiles" to automate fixed-interval financial entries (e.g., monthly rent, software subscriptions, or retainer fees).
 *   **Bulk Import/Export**: Robust CSV/Excel import tools for customers, debts, and payments.
 
 ### 4. User Experience (UX)
@@ -30,7 +30,7 @@ This document outlines potential improvements, new features, and technical enhan
 *   **Optimized Image Loading**: Use modern formats (WebP/AVIF) and responsive sizes for all assets.
 
 ### 2. Security
-*   **Audit Logs**: Detailed tracking of who changed what and when (Customer creation, payment edits, etc.).
+*   **Immutable Audit Logs**: Comprehensive system-wide tracking of every insert, update, and delete (Who, What, When, and Before/After values) for high-level accountability and dispute resolution.
 *   **IP Whitelisting**: Optional security setting to restrict access to specific IP ranges.
 
 ### 3. Developer Experience (DX)
@@ -38,5 +38,8 @@ This document outlines potential improvements, new features, and technical enhan
 *   **API Versioning**: Move to `/api/v1/...` structure to support future breaking changes.
 
 ## 📈 Future Possibilities
+*   **AI-Powered Invoice OCR**: Automatic data extraction (Customer, Amount, VAT, Date) from uploaded PDF or image invoices.
+*   **Customer Self-Service Portal**: Secure, read-only links for customers to view their outstanding balance and payment history.
+*   **Budget vs. Actuals**: Set monthly expense/income targets and track real-time performance against them.
 *   **Mobile App**: Dedicated React Native or Flutter app for on-the-go management.
 *   **Integration with Accounting Software**: Sync data with tools like Logo, Mikro, or Xero.

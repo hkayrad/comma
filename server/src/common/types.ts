@@ -5,3 +5,4 @@ export * from "./payments/types";
 export * from "./companies/types";
 export * from "./config/types";
 export * from "./shared/types";
+export * from "./portal/types";

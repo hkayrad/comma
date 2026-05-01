@@ -46,7 +46,10 @@
     },
     "table": {
       "column": {
-        "actions": "İşlemler",
+        "actions": {
+          "label": "İşlemler",
+          "share_portal": "Portal Bağlantısını Paylaş"
+        },
         "address": "Adres",
         "email": "E-posta",
         "index": "#",
@@ -100,7 +103,10 @@
     "title": "Borçlar",
     "table": {
       "column": {
-        "actions": "İşlemler",
+        "actions": {
+          "label": "İşlemler",
+          "share_portal": "Portal Bağlantısını Paylaş"
+        },
         "actions.delete": "Borcu sil",
         "actions.delete.confirm": "Borcu sil",
         "actions.delete.description": "Bu işlem borç kaydını silecektir. Onaylıyor musunuz?",
@@ -641,7 +647,10 @@
     "title": "Ödemeler",
     "table": {
       "column": {
-        "actions": "İşlemler",
+        "actions": {
+          "label": "İşlemler",
+          "share_portal": "Portal Bağlantısını Paylaş"
+        },
         "actions.delete": "Ödemeyi sil",
         "actions.delete.confirm": "Ödemeyi Sil",
         "actions.delete.description": "Bu işlem ödeme kaydını silecektir. Onaylıyor musunuz?",
