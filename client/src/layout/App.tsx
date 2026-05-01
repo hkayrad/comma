@@ -5,6 +5,7 @@ import { sendRefreshEvent } from "@/lib/utils";
 import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
 import CommaSidebar from "@/layout/shared/sidebar/CommaSidebar";
 import Header from "@/layout/shared/header/Header";
+import { CommaCommandPalette } from "@/layout/shared/CommaCommandPalette";
 import {
   SidebarInset,
   SidebarProvider,
@@ -27,6 +28,7 @@ export default function App() {
         <CommaSidebar />
         <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
           <MaintenanceBanner />
+          <CommaCommandPalette />
           <SystemAdminOnly>
             <Admin />
           </SystemAdminOnly>
