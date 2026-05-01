@@ -899,6 +899,15 @@
       "disable": "2FA'yı Devre Dışı Bırak"
     }
   },
+  "commandPalette": {
+    "placeholder": "Bir komut yazın veya arama yapın...",
+    "noResults": "Sonuç bulunamadı.",
+    "group": {
+      "navigation": "Navigasyon",
+      "actions": "Eylemler",
+      "settings": "Ayarlar"
+    }
+  },
   "api_errors": {
     "validation": "Doğrulama hatası",
     "not_found": "Kaynak bulunamadı",

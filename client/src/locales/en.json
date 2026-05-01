@@ -890,6 +890,15 @@
       "disable": "Disable 2FA"
     }
   },
+  "commandPalette": {
+    "placeholder": "Type a command or search...",
+    "noResults": "No results found.",
+    "group": {
+      "navigation": "Navigation",
+      "actions": "Actions",
+      "settings": "Settings"
+    }
+  },
   "api_errors": {
     "validation": "Validation failed",
     "not_found": "Resource not found",
