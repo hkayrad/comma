@@ -46,10 +46,7 @@
     },
     "table": {
       "column": {
-        "actions": {
-          "label": "İşlemler",
-          "share_portal": "Portal Bağlantısını Paylaş"
-        },
+        "actions": "İşlemler",
         "address": "Adres",
         "email": "E-posta",
         "index": "#",
@@ -61,6 +58,7 @@
         "actions.edit_details": "Bilgileri Düzenle",
         "actions.show_details": "Bilgileri Göster",
         "actions.show_statement": "Borç Dökümü",
+        "actions.share_portal": "Portal Bağlantısını Paylaş",
         "debt_status": "Borç Durumu",
         "is_company": "Tür",
         "mersis_no": "Mersis No",
@@ -103,15 +101,13 @@
     "title": "Borçlar",
     "table": {
       "column": {
-        "actions": {
-          "label": "İşlemler",
-          "share_portal": "Portal Bağlantısını Paylaş"
-        },
+        "actions": "İşlemler",
         "actions.delete": "Borcu sil",
         "actions.delete.confirm": "Borcu sil",
         "actions.delete.description": "Bu işlem borç kaydını silecektir. Onaylıyor musunuz?",
         "actions.delete.title": "Emin misiniz?",
         "actions.edit": "Borç bilgilerini düzenle",
+        "actions.share_portal": "Portal Bağlantısını Paylaş",
         "amount": "Tutar",
         "currency": "Para Birimi",
         "customer_name": "Müşteri",
@@ -173,16 +169,6 @@
       "add": "Borç Ekle",
       "add_more": "Daha Fazla Ekle",
       "save_as_draft": "Taslak Olarak Kaydet",
-      "remove": "Kaydı Sil",
-      "edit": {
-        "description": "Borç bilgilerini düzenleyin",
-        "title": "Borç Düzenle"
-      },
-      "update": "Borcu Güncelle"
-    },
-    "info": {
-      "add": "Borç Ekle",
-      "add_more": "Daha Fazla Ekle",
       "remove": "Kaydı Sil",
       "edit": {
         "description": "Borç bilgilerini düzenleyin",
@@ -647,15 +633,13 @@
     "title": "Ödemeler",
     "table": {
       "column": {
-        "actions": {
-          "label": "İşlemler",
-          "share_portal": "Portal Bağlantısını Paylaş"
-        },
+        "actions": "İşlemler",
         "actions.delete": "Ödemeyi sil",
         "actions.delete.confirm": "Ödemeyi Sil",
         "actions.delete.description": "Bu işlem ödeme kaydını silecektir. Onaylıyor musunuz?",
         "actions.delete.title": "Emin misiniz?",
         "actions.edit": "Ödeme bilgilerini düzenle",
+        "actions.share_portal": "Portal Bağlantısını Paylaş",
         "amount": "Miktar",
         "amount_in_try": "Ödenen Miktar",
         "currency": "Para Birimi",

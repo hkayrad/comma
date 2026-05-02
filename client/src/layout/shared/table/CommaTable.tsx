@@ -51,6 +51,7 @@ type Props = {
   addButton?: ReactNode;
   contextMenuItems?: (row: any) => ReactNode;
   readOnly?: boolean;
+  isPortal?: boolean;
 };
 
 export default function CommaTable(props: Props) {
@@ -71,6 +72,7 @@ export default function CommaTable(props: Props) {
     addButton,
     contextMenuItems,
     readOnly,
+    isPortal,
   } = props;
 
   const useContextMenuForActions = useDashboardSettings(
@@ -136,6 +138,7 @@ export default function CommaTable(props: Props) {
           tags={tags}
           addButton={addButton}
           readOnly={readOnly}
+          isPortal={isPortal}
         />
       </div>
       <div className="rounded-md border overflow-clip" data-table-export>
@@ -149,6 +152,7 @@ export default function CommaTable(props: Props) {
                       <TableHead
                         key={header.id}
                         className={`
+                          ${isPortal ? "py-4 px-4" : ""}
                           ${header.id === "name" && "w-36"}
                           ${header.id === "desciption " && "w-36"}
                           ${header.id === "tax_office" && "w-36"}
@@ -183,7 +187,7 @@ export default function CommaTable(props: Props) {
                     <TableCell
                       key={cell.id}
                       className={`
-                        py-1 px-1 select-none
+                        ${isPortal ? "py-8 px-6" : "py-1 px-1"} select-none
                         ${cell.column.id === "#" && "px-2"}
                         ${cell.column.id === "is_company" && "w-16 text-center"}
                         ${cell.column.id === "name" && "w-36 overflow-hidden"}
@@ -232,7 +236,7 @@ export default function CommaTable(props: Props) {
                     <TableRow
                       key={row.id}
                       data-state={isSelected && "selected"}
-                      className="font-light"
+                      className={`font-light ${isPortal ? "h-20" : ""}`}
                     >
                       {rowContent}
                     </TableRow>

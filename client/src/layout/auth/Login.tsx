@@ -168,7 +168,7 @@ export default function Login() {
             alt="Comma Logo"
             fetchPriority="high"
             loading="eager"
-            containerClassName="w-64 lg:w-96"
+            containerClassName="w-64 lg:w-96 bg-transparent"
             className="saturate-0 brightness-0 invert object-contain"
           />
         </div>

@@ -66,10 +66,11 @@ type Props = {
   }[];
   addButton?: ReactNode;
   readOnly?: boolean;
+  isPortal?: boolean;
 };
 
 export default function CommaTableHeader(props: Props) {
-  const { table, searchColumn, tags, addButton, readOnly } = props;
+  const { table, searchColumn, tags, addButton, readOnly, isPortal } = props;
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
@@ -374,42 +375,44 @@ export default function CommaTableHeader(props: Props) {
   return (
     <div className="flex items-center gap-2">
       <ButtonGroup>
-        <Tooltip>
-          <TooltipTrigger
-            render={(props) => (
-              <InputGroup {...props} className="bg-background min-w-48">
-                <InputGroupAddon>
-                  <UserRound
-                    className={
-                      searchInputRef.current?.value === ""
-                        ? "text-muted-foreground"
-                        : "text-primary"
-                    }
+        {!isPortal && (
+          <Tooltip>
+            <TooltipTrigger
+              render={(props) => (
+                <InputGroup {...props} className="bg-background min-w-48">
+                  <InputGroupAddon>
+                    <UserRound
+                      className={
+                        searchInputRef.current?.value === ""
+                          ? "text-muted-foreground"
+                          : "text-primary"
+                      }
+                    />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    ref={searchInputRef}
+                    placeholder={t("table.header.search")}
+                    value={searchValue}
+                    onChange={(event) => setSearchValue(event.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        searchInputRef.current?.blur();
+                      }
+                    }}
+                    className="select-none"
                   />
-                </InputGroupAddon>
-                <InputGroupInput
-                  ref={searchInputRef}
-                  placeholder={t("table.header.search")}
-                  value={searchValue}
-                  onChange={(event) => setSearchValue(event.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") {
-                      searchInputRef.current?.blur();
-                    }
-                  }}
-                  className="select-none"
-                />
-                <InputGroupAddon align="inline-end" className="gap-1">
-                  <KbdGroup>
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>/</Kbd>
-                  </KbdGroup>
-                </InputGroupAddon>
-              </InputGroup>
-            )}
-          ></TooltipTrigger>
-          <TooltipContent>{t("table.header.search.hover")}</TooltipContent>
-        </Tooltip>
+                  <InputGroupAddon align="inline-end" className="gap-1">
+                    <KbdGroup>
+                      <Kbd>Ctrl</Kbd>
+                      <Kbd>/</Kbd>
+                    </KbdGroup>
+                  </InputGroupAddon>
+                </InputGroup>
+              )}
+            ></TooltipTrigger>
+            <TooltipContent>{t("table.header.search.hover")}</TooltipContent>
+          </Tooltip>
+        )}
         {tags && (
           <Menu>
             <Tooltip disableHoverablePopup>

@@ -541,9 +541,8 @@ export default function CustomerTable(props: Props) {
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      const portalUrl = `${window.location.origin}/p/${row.original.company_id}?vkn=${row.original.tax_number}`;
+                      const portalUrl = `${window.location.origin}/p/${row.original.company_id}`;
                       copyToClipboard(portalUrl, t);
-                      toast.success(t("notification.portal.link_copied"));
                     }}
                   >
                     <Share2 />

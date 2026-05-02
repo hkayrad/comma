@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router";
+import { CommaImage } from "@/components/shared/CommaImage";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("tr-TR", {
@@ -34,7 +35,7 @@ export default function PortalDashboard() {
         ]);
         setOverview(overviewResponse.data);
         setStatement(statementResponse.data);
-      } catch (error) {
+      } catch {
         toast.error("Veriler alınırken bir hata oluştu. Oturumunuz süresi dolmuş olabilir.");
       } finally {
         setLoading(false);
@@ -67,14 +68,24 @@ export default function PortalDashboard() {
   const { customer } = overview;
   const debts = statement.debts || [];
   const payments = statement.payments || [];
-  
   const remainingDebt = customer?.balance || 0;
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background p-6 sm:p-12">
+      <div className="max-w-screen mx-auto space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Müşteri Portalı</h1>
+          <div className="flex items-center gap-4">
+            <CommaImage
+              src={
+                customer?.small_logo_path
+                  ? `${import.meta.env.VITE_API_URL}/uploads/logos/${customer.small_logo_path}`
+                  : "/logo.webp"
+              }
+              alt="Company Logo"
+              className="w-12 h-12 object-contain"
+            />
+            <h1 className="text-3xl font-bold tracking-tight">Müşteri Portalı</h1>
+          </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Çıkış Yap
@@ -101,11 +112,11 @@ export default function PortalDashboard() {
             <TabsTrigger value="debts">Borçlar</TabsTrigger>
             <TabsTrigger value="payments">Ödemeler</TabsTrigger>
           </TabsList>
-          <TabsContent value="debts" className="bg-card border rounded-lg overflow-hidden">
-            <DebtTable data={debts} type="receivable" readOnly={true} />
+          <TabsContent value="debts" className="bg-card overflow-hidden">
+            <DebtTable data={debts} type="receivable" readOnly={true} isPortal={true} />
           </TabsContent>
-          <TabsContent value="payments" className="bg-card border rounded-lg overflow-hidden">
-            <PaymentTable data={payments} type="receivable" readOnly={true} />
+          <TabsContent value="payments" className="bg-card overflow-hidden">
+            <PaymentTable data={payments} type="receivable" readOnly={true} isPortal={true} />
           </TabsContent>
         </Tabs>
       </div>

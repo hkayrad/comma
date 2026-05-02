@@ -32,4 +32,14 @@ export class PortalApi {
       throw error;
     }
   }
+
+  static async getCompanyInfo(companyId: string) {
+    try {
+      const response = await instance.get(`/portal/company/${companyId}`);
+      return response.data;
+    } catch (error) {
+      Logger.error("Error fetching company info:", error);
+      throw error;
+    }
+  }
 }

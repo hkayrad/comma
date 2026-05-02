@@ -52,6 +52,7 @@ type Props = {
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   readOnly?: boolean;
+  isPortal?: boolean;
 };
 
 export default function DebtTable(props: Props) {
@@ -68,6 +69,7 @@ export default function DebtTable(props: Props) {
     columnVisibility,
     onColumnVisibilityChange,
     readOnly,
+    isPortal,
   } = props;
 
   const queryClient = useQueryClient();
@@ -575,9 +577,21 @@ export default function DebtTable(props: Props) {
           </div>
         ),
       },
-    ] as ColumnDef<DebtDto>[]).filter(c => !readOnly || c.id !== "actions"),
-    [onEdit, confirmDelete, type, t, onAddPayment, readOnly],
-  );
+    ] as ColumnDef<DebtDto>[]).filter((c) => {
+      if (readOnly && c.id === "actions") return false;
+      if (
+        isPortal &&
+        (c.id === "customer_name" ||
+          (c as any).accessorKey === "customer_name" ||
+          c.id === "description" ||
+          (c as any).accessorKey === "description")
+      )
+        return false;
+      return true;
+    }),
+    [onEdit, confirmDelete, type, t, onAddPayment, readOnly, isPortal],
+    );
+
 
   const tags = useMemo(
     () => [

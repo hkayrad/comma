@@ -7,6 +7,7 @@ import { portalLoginSchema } from "@comma/common/schemas";
 import { UserRole } from "@comma/common/enums";
 import ReceivableCustomersService from "@/services/Receivable/CustomersService";
 import { CustomerRepository } from "@/repositories/CustomerRepository";
+import { CompanyService } from "@/services/CompanyService";
 import { portalAuthMiddleware } from "@/lib/middleware";
 
 const router = express.Router();
@@ -40,6 +41,21 @@ router.post("/login", validate(portalLoginSchema), asyncHandler(async (req: Requ
 	});
 
 	res.json({ success: true, message: "Portal login successful" });
+}));
+
+router.get("/company/:id", asyncHandler(async (req: Request, res: Response) => {
+	const { id } = req.params;
+	Logger.info("[PortalController] Public company info request", { id });
+
+	const company = await CompanyService.GetCompanyById(id);
+	res.json({
+		success: true,
+		data: {
+			name: company.name,
+			small_logo_path: company.small_logo_path,
+			large_logo_path: company.large_logo_path,
+		},
+	});
 }));
 
 router.get("/overview", portalAuthMiddleware, asyncHandler(async (req: Request, res: Response) => {

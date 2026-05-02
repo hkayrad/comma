@@ -3,7 +3,8 @@ import type { DebtDto } from "../debts/types";
 import type { PaymentDto } from "../payments/types";
 
 export type CustomerDto = {
-	id?: UUID;
+  id?: UUID;
+	company_id?: UUID;
 	name: string;
 	phone?: string | null;
 	is_company: boolean;

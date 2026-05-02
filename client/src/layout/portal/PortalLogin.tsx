@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,15 @@ export default function PortalLogin() {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<any>(null);
+
+  useEffect(() => {
+    if (companyId) {
+      PortalApi.getCompanyInfo(companyId)
+        .then((res) => setCompanyInfo(res.data))
+        .catch((err) => console.error("Could not fetch company info", err));
+    }
+  }, [companyId]);
 
   const formSchema = portalLoginSchema.pick({ tax_number: true });
 
@@ -52,7 +61,7 @@ export default function PortalLogin() {
         await PortalApi.login({ companyId, tax_number: values.tax_number });
         toast.success("Başarıyla giriş yapıldı");
         navigate("/portal");
-      } catch (error) {
+      } catch {
         toast.error("Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.");
       } finally {
         setLoading(false);
@@ -70,11 +79,17 @@ export default function PortalLogin() {
       <div className="w-full max-w-md p-8 space-y-8 bg-card border rounded-xl shadow-lg">
         <div className="flex flex-col items-center space-y-4">
           <CommaImage
-            src="/logo.webp"
-            alt="Company Logo"
-            className="w-32 h-32 object-contain"
+            src={
+              companyInfo?.large_logo_path
+                ? `${import.meta.env.VITE_API_URL}/uploads/logos/${companyInfo.large_logo_path}`
+                : "/logo.webp"
+            }
+            alt={companyInfo?.name || "Company Logo"}
+            className="w-48 h-32 object-contain"
           />
-          <h1 className="text-2xl font-bold text-center">Müşteri Portalı</h1>
+          <h1 className="text-2xl font-bold text-center">
+            {companyInfo?.name || "Müşteri Portalı"}
+          </h1>
           <p className="text-sm text-muted-foreground text-center">
             Hesap ekstrenizi görüntülemek için giriş yapın
           </p>
