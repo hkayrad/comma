@@ -68,7 +68,7 @@ export default function PortalDashboard() {
   const { customer } = overview;
   const debts = statement.debts || [];
   const payments = statement.payments || [];
-  const remainingDebt = customer?.balance || 0;
+  const remainingDebt = parseFloat(customer?.remaining_debt) || 0;
 
   return (
     <div className="min-h-screen bg-background p-6 sm:p-12">
