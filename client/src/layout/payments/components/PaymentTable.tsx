@@ -544,6 +544,7 @@ export default function PaymentTable(props: Props) {
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
       readOnly={readOnly}
+      isPortal={isPortal}
       contextMenuItems={!readOnly ? (c) => (
         <>
           <ContextMenuItem onClick={() => onEdit(c.id!)}>

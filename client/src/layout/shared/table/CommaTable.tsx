@@ -27,6 +27,7 @@ import {
   type OnChangeFn,
 } from "@tanstack/react-table";
 import CommaTableHeader from "./components/CommaTableHeader";
+import { cn } from "@/lib/utils";
 
 type Props = {
   data: any[];
@@ -143,7 +144,7 @@ export default function CommaTable(props: Props) {
       </div>
       <div className="rounded-md border overflow-clip" data-table-export>
         <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
-          <table className="w-full caption-bottom text-sm">
+          <table className="w-full caption-bottom text-sm border-collapse">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:bg-background!">
@@ -151,20 +152,19 @@ export default function CommaTable(props: Props) {
                     return (
                       <TableHead
                         key={header.id}
-                        className={`
-                          ${isPortal ? "py-4 px-4" : ""}
-                          ${header.id === "name" && "w-36"}
-                          ${header.id === "desciption " && "w-36"}
-                          ${header.id === "tax_office" && "w-36"}
-                          ${header.id === "actions" && "w-1"}
-                          ${header.id === "debt_status" && "w-32"}
-                          ${header.id === "invoice_no" && "w-36"}
-                          ${header.id === "is_company" && "w-16"}
-                          ${header.id === "currency" && "w-16"}
-                          ${header.id === "payment_method" && "w-16"}
-                          ${header.id === "payment_date" && "w-16"}
-                          ${header.id === "due_date" && "w-16"}
-                        `}
+                        className={cn(
+                          isPortal ? "py-2! px-6" : "",
+                          header.id === "name" && "w-36",
+                          header.id === "tax_office" && "w-36",
+                          header.id === "actions" && "w-1",
+                          header.id === "debt_status" && "w-32",
+                          header.id === "invoice_no" && "w-36",
+                          header.id === "is_company" && "w-16",
+                          header.id === "currency" && "w-16",
+                          header.id === "payment_method" && "w-16",
+                          header.id === "payment_date" && "w-16",
+                          header.id === "due_date" && "w-16"
+                        )}
                       >
                         {header.isPlaceholder
                           ? null
@@ -186,21 +186,21 @@ export default function CommaTable(props: Props) {
                   const rowContent = row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={`
-                        ${isPortal ? "py-8 px-6" : "py-1 px-1"} select-none
-                        ${cell.column.id === "#" && "px-2"}
-                        ${cell.column.id === "is_company" && "w-16 text-center"}
-                        ${cell.column.id === "name" && "w-36 overflow-hidden"}
-                        ${cell.column.id === "desciption" && "w-36 overflow-hidden"}
-                        ${cell.column.id === "tax_office" && "w-36 overflow-hidden"}
-                        ${cell.column.id === "invoice_no" && "w-36 overflow-hidden"}
-                        ${cell.column.id === "debt_status" && "w-fit text-center"}
-                        ${cell.column.id === "actions" && "w-fit"}
-                        ${cell.column.id === "currency" && "w-fit text-center"}
-                        ${cell.column.id === "payment_method" && "w-fit text-center"}
-                        ${cell.column.id === "payment_date" && "w-fit text-center"}
-                        ${cell.column.id === "due_date" && "w-fit text-center"}
-                      `}
+                      className={cn(
+                        "select-none",
+                        isPortal ? "py-3! px-8!" : "py-1 px-1",
+                        cell.column.id === "#" && "px-2",
+                        cell.column.id === "is_company" && "w-16 text-center",
+                        cell.column.id === "name" && "w-36 overflow-hidden",
+                        cell.column.id === "tax_office" && "w-36 overflow-hidden",
+                        cell.column.id === "invoice_no" && "w-36 overflow-hidden",
+                        cell.column.id === "debt_status" && "w-fit text-center",
+                        cell.column.id === "actions" && "w-fit",
+                        cell.column.id === "currency" && "w-fit text-center",
+                        cell.column.id === "payment_method" && "w-fit text-center",
+                        cell.column.id === "payment_date" && "w-fit text-center",
+                        cell.column.id === "due_date" && "w-fit text-center",
+                      )}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -210,15 +210,16 @@ export default function CommaTable(props: Props) {
                   ));
 
                   if (useContextMenuForActions && contextMenuItems && !readOnly) {
-                    const rowClasses = "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted font-light h-[45px]";
-
                     return (
                       <ContextMenu key={row.id}>
                         <ContextMenuTrigger
                           render={(props) => (
                             <tr
                               {...props}
-                              className={rowClasses}
+                              className={cn(
+                                "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted font-light",
+                                isPortal ? "h-2!" : "h-11.25"
+                              )}
                               data-state={isSelected && "selected"}
                             >
                               {rowContent}
@@ -236,7 +237,10 @@ export default function CommaTable(props: Props) {
                     <TableRow
                       key={row.id}
                       data-state={isSelected && "selected"}
-                      className={`font-light ${isPortal ? "h-20" : ""}`}
+                      className={cn(
+                        "font-light border-b",
+                        isPortal && "h-8!"
+                      )}
                     >
                       {rowContent}
                     </TableRow>

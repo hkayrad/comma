@@ -633,6 +633,7 @@ export default function DebtTable(props: Props) {
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
       readOnly={readOnly}
+      isPortal={isPortal}
       contextMenuItems={!readOnly ? (c) => (
         <>
           <ContextMenuItem onClick={() => onAddPayment(c)}>
