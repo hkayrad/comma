@@ -1,0 +1,170 @@
+import { CustomerRepository } from "@/repositories/CustomerRepository";
+import type { CustomerDto, UUID, SortItem, FilterItem } from "@comma/common/types";
+import { Logger } from "@/lib/utils/logger";
+import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
+import { sequelize } from "@/lib/db/sequelize";
+
+export class BaseCustomerService {
+  private repo: CustomerRepository;
+  private domainLabel: string;
+
+  constructor(domain: "receivable" | "payable") {
+    this.repo = new CustomerRepository(domain);
+    this.domainLabel = domain === "receivable" ? "ReceivableCustomers" : "PayableCustomers";
+  }
+
+  async Create(customer: CustomerDto, userId: UUID, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Creating customer`, { companyId, customerName: customer.name, userId });
+
+    const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
+
+    if (!name || is_company === undefined || is_company === null) {
+      throw new ValidationError("Name and customer type are required");
+    }
+
+    const newCustomer = await this.repo.create({
+      name,
+      phone: phone || null,
+      is_company,
+      tax_number: tax_number || null,
+      tax_office: tax_office || null,
+      mersis_no: mersis_no || null,
+      email: email || null,
+      address: address || null,
+      company_id: companyId,
+      created_by: userId,
+    });
+
+    Logger.info(`[${this.domainLabel}] Customer created successfully`, { customerId: newCustomer.id, companyId });
+    return newCustomer.id;
+  }
+
+  async CreateBatch(customers: CustomerDto[], userId: UUID, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Creating customers batch`, { companyId, count: customers.length, userId });
+
+    const batchData = customers.map((customer) => ({
+      name: customer.name,
+      phone: customer.phone || null,
+      is_company: customer.is_company,
+      tax_number: customer.tax_number || null,
+      tax_office: customer.tax_office || null,
+      mersis_no: customer.mersis_no || null,
+      email: customer.email || null,
+      address: customer.address || null,
+      company_id: companyId,
+      created_by: userId,
+    }));
+
+    return await sequelize.transaction(async (t) => {
+      const result = await this.repo.createBatch(batchData, t);
+      Logger.info(`[${this.domainLabel}] Customers batch created successfully`, { companyId, count: result.length });
+      return result;
+    });
+  }
+
+  async GetAll(companyId: UUID, page: number, limit: number, sorting: SortItem[] = [], filters: FilterItem[] = []) {
+    Logger.debug(`[${this.domainLabel}] Fetching all customers`, { companyId, page, limit, sorting, filters });
+    const offset = page * limit;
+    const repoResult = await this.repo.findAllWithSummary(companyId, limit, offset, sorting, filters);
+
+    Logger.debug(`[${this.domainLabel}] Customers fetched successfully`, { companyId, count: repoResult.rows.length, totalCount: repoResult.count });
+
+    return { rows: repoResult.rows, count: repoResult.count };
+  }
+
+  async GetStatement(customerId: UUID, companyId: UUID, startDate?: string, endDate?: string) {
+    Logger.debug(`[${this.domainLabel}] Fetching customer statement`, { customerId, companyId, startDate, endDate });
+
+    if (!customerId) {
+      throw new ValidationError("Customer ID is required");
+    }
+
+    const response = await this.repo.getStatement(customerId, companyId, startDate, endDate);
+
+    if (!response) {
+      throw new NotFoundError("Customer not found");
+    }
+
+    Logger.debug(`[${this.domainLabel}] Customer statement fetched successfully`, {
+      customerId, companyId, debtsCount: response.debts.length, paymentsCount: response.payments.length,
+    });
+
+    return response;
+  }
+
+  async GetIdAndName(companyId: UUID) {
+    Logger.debug(`[${this.domainLabel}] Fetching customer IDs and names`, { companyId });
+
+    const result = await this.repo.findAllIdAndName(companyId);
+
+    Logger.debug(`[${this.domainLabel}] Customer IDs and names fetched successfully`, { companyId, count: result.length });
+
+    return result;
+  }
+
+  async Update(id: UUID, customer: CustomerDto, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Updating customer`, { customerId: id, companyId });
+
+    if (!id) {
+      throw new ValidationError("Customer ID is required");
+    }
+
+    const { name, phone, is_company, tax_number, tax_office, mersis_no, email, address } = customer;
+
+    if (!name || is_company === undefined || is_company === null) {
+      throw new ValidationError("Name and customer type are required");
+    }
+
+    const [affectedRows] = await this.repo.update(id, companyId, {
+      name,
+      phone: phone || null,
+      is_company,
+      tax_number: tax_number || null,
+      tax_office: tax_office || null,
+      mersis_no: mersis_no || null,
+      email: email || null,
+      address: address || null,
+    });
+
+    if (affectedRows === 0) {
+      const exists = await this.repo.findById(id, companyId);
+      if (!exists) {
+        throw new NotFoundError("Customer not found");
+      }
+    }
+
+    Logger.info(`[${this.domainLabel}] Customer updated successfully`, { customerId: id, companyId });
+  }
+
+  async Delete(id: UUID, userId: UUID, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Deleting customer`, { customerId: id, companyId });
+
+    if (!id) {
+      throw new ValidationError("Customer ID is required");
+    }
+
+    const deletedCount = await this.repo.delete(id, companyId, userId);
+
+    if (deletedCount === 0) {
+      throw new NotFoundError("Customer not found");
+    }
+
+    Logger.info(`[${this.domainLabel}] Customer deleted successfully`, { customerId: id, companyId });
+  }
+
+  async Restore(id: UUID, userId: UUID, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Restoring customer`, { customerId: id, companyId });
+
+    if (!id) {
+      throw new ValidationError("Customer ID is required");
+    }
+
+    const restoredCount = await this.repo.restore(id, companyId);
+
+    if (restoredCount === 0) {
+      throw new NotFoundError("Customer not found");
+    }
+
+    Logger.info(`[${this.domainLabel}] Customer restored successfully`, { customerId: id, companyId });
+  }
+}
