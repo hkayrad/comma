@@ -1,306 +1,46 @@
 import instance from "../instance";
-import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement, UUID } from "@comma/common";
+import type { ApiResponse, CustomerDto, CustomerIdName, CustomerStatement } from "@comma/common";
 import { Logger } from "../utils/logger";
-import type { SortingState, ColumnFiltersState } from "@tanstack/react-table";
+import { FinancialBaseApi } from "./financialBase";
 
-export class ReceivableCustomerApi {
-	static readonly BASE_URL = "/receivables/customers";
+class BaseCustomerApi extends FinancialBaseApi<CustomerDto> {
+  constructor(domain: "receivables" | "payables") {
+    super(domain, "customer");
+  }
 
-	static async CreateBatch(data: CustomerDto[]): Promise<void> {
-		await instance.post(`${this.BASE_URL}/batch`, data);
-	}
+  async GetIdAndName(): Promise<CustomerIdName[]> {
+    try {
+      const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>(`${this.baseUrl}/id-name`);
+      if (response.success) return response.data || [];
+      return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
+    } catch (error) {
+      Logger.error("Error fetching customer id-name:", error);
+      return Promise.reject("Müşteriler getirilirken hata oluştu");
+    }
+  }
 
-	static async Create(data: CustomerDto): Promise<UUID | null> {
-		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/receivables/customers", data);
+  async GetStatement(
+    id: string,
+    filters?: { startDate?: string; endDate?: string },
+  ): Promise<CustomerStatement | null> {
+    try {
+      const { startDate, endDate } = filters || {};
+      const queryParams = new URLSearchParams();
+      if (startDate) queryParams.append("startDate", startDate);
+      if (endDate) queryParams.append("endDate", endDate);
 
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
+      const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
+        `${this.baseUrl}/${id}/statement?${queryParams.toString()}`,
+      );
 
-			Logger.error("Error creating customer:", response.message);
-			return Promise.reject(response.message || "Müşteri eklenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error creating customer:", error);
-			return Promise.reject("Müşteri eklenirken hata oluştu");
-		}
-	}
-
-	static async GetAll(
-		page: number = 0,
-		pageSize: number = 20,
-		sorting?: SortingState,
-		filters?: ColumnFiltersState,
-	): Promise<{ rows: CustomerDto[]; count: number } | null> {
-		try {
-			const params = new URLSearchParams();
-			params.append("page", page.toString());
-			params.append("limit", pageSize.toString());
-			if (sorting) params.append("sorting", JSON.stringify(sorting));
-			if (filters) params.append("filters", JSON.stringify(filters));
-
-			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(
-				`/receivables/customers?${params.toString()}`,
-			);
-
-			if (response.success) {
-				return Promise.resolve(response.data || { rows: [], count: 0 });
-			}
-
-			Logger.error("Error fetching customers:", response.message);
-			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customers:", error);
-			return Promise.reject("Müşteriler getirilirken hata oluştu");
-		}
-	}
-
-	static async GetIdAndName(): Promise<CustomerIdName[]> {
-		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/receivables/customers/id-name");
-
-			if (response.success) {
-				return Promise.resolve(response.data || []);
-			}
-
-			Logger.error("Error fetching customers:", response.message);
-			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customers:", error);
-			return Promise.reject("Müşteriler getirilirken hata oluştu");
-		}
-	}
-
-	static async GetStatement(
-		id: string,
-		filters?: { startDate?: string; endDate?: string },
-	): Promise<CustomerStatement | null> {
-		try {
-			const { startDate, endDate } = filters || {};
-			const queryParams = new URLSearchParams();
-			if (startDate) queryParams.append("startDate", startDate);
-			if (endDate) queryParams.append("endDate", endDate);
-
-			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/receivables/customers/${id}/statement?${queryParams.toString()}`,
-			);
-
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
-
-			Logger.error("Error fetching customer statement:", response.message);
-			return Promise.reject(response.message || "Müşteri borç dökümü getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customer statement:", error);
-			return Promise.reject("Müşteri borç dökümü getirilirken hata oluştu");
-		}
-	}
-
-	static async Update(id: string, data: CustomerDto): Promise<string | null> {
-		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/receivables/customers/${id}`, data);
-
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
-
-			Logger.error("Error updating customer:", response.message);
-			return Promise.reject(response.message || "Müşteri güncellenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error updating customer:", error);
-			return Promise.reject("Müşteri güncellenirken hata oluştu");
-		}
-	}
-
-	static async Delete(id: string): Promise<void> {
-		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/receivables/customers/${id}`);
-
-			if (response.success) {
-				return Promise.resolve();
-			}
-
-			Logger.error("Error deleting customer:", response.message);
-			return Promise.reject(response.message || "Müşteri silinirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error deleting customer:", error);
-			return Promise.reject("Müşteri silinirken hata oluştu");
-		}
-	}
-
-	static async Restore(id: string): Promise<void> {
-		try {
-			const { data: response } = await instance.post<ApiResponse<null>>(`/receivables/customers/${id}/restore`);
-
-			if (response.success) {
-				return Promise.resolve();
-			}
-
-			Logger.error("Error restoring customer:", response.message);
-			return Promise.reject(response.message || "Müşteri geri yüklenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error restoring customer:", error);
-			return Promise.reject("Müşteri geri yüklenirken hata oluştu");
-		}
-	}
+      if (response.success) return response.data;
+      return Promise.reject(response.message || "Müşteri borç dökümü getirilirken hata oluştu");
+    } catch (error) {
+      Logger.error("Error fetching customer statement:", error);
+      return Promise.reject("Müşteri borç dökümü getirilirken hata oluştu");
+    }
+  }
 }
 
-export class PayableCustomerApi {
-	static readonly BASE_URL = "/payables/customers";
-
-	static async CreateBatch(data: CustomerDto[]): Promise<void> {
-		await instance.post(`${this.BASE_URL}/batch`, data);
-	}
-
-	static async Create(data: CustomerDto): Promise<UUID | null> {
-		try {
-			const { data: response } = await instance.post<ApiResponse<UUID>>("/payables/customers", data);
-
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
-
-			Logger.error("Error creating customer:", response.message);
-			return Promise.reject(response.message || "Müşteri eklenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error creating customer:", error);
-			return Promise.reject("Müşteri eklenirken hata oluştu");
-		}
-	}
-
-	static async GetAll(
-		page: number = 0,
-		pageSize: number = 20,
-		sorting?: SortingState,
-		filters?: ColumnFiltersState,
-	): Promise<{ rows: CustomerDto[]; count: number } | null> {
-		try {
-			const params = new URLSearchParams();
-			params.append("page", page.toString());
-			params.append("limit", pageSize.toString());
-			if (sorting) params.append("sorting", JSON.stringify(sorting));
-			if (filters) params.append("filters", JSON.stringify(filters));
-
-			const { data: response } = await instance.get<ApiResponse<{ rows: CustomerDto[]; count: number }>>(
-				`/payables/customers?${params.toString()}`,
-			);
-
-			if (response.success) {
-				return Promise.resolve(response.data || { rows: [], count: 0 });
-			}
-
-			Logger.error("Error fetching customers:", response.message);
-			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customers:", error);
-			return Promise.reject("Müşteriler getirilirken hata oluştu");
-		}
-	}
-
-	static async GetAll2(): Promise<CustomerDto[]> {
-		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerDto[]>>("/payables/customers");
-
-			if (response.success) {
-				return Promise.resolve(response.data || []);
-			}
-
-			Logger.error("Error fetching customers:", response.message);
-			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customers:", error);
-			return Promise.reject("Müşteriler getirilirken hata oluştu");
-		}
-	}
-
-	static async GetIdAndName(): Promise<CustomerIdName[]> {
-		try {
-			const { data: response } = await instance.get<ApiResponse<CustomerIdName[]>>("/payables/customers/id-name");
-
-			if (response.success) {
-				return Promise.resolve(response.data || []);
-			}
-
-			Logger.error("Error fetching customers:", response.message);
-			return Promise.reject(response.message || "Müşteriler getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customers:", error);
-			return Promise.reject("Müşteriler getirilirken hata oluştu");
-		}
-	}
-
-	static async GetStatement(
-		id: string,
-		filters?: { startDate?: string; endDate?: string },
-	): Promise<CustomerStatement | null> {
-		try {
-			const { startDate, endDate } = filters || {};
-			const queryParams = new URLSearchParams();
-			if (startDate) queryParams.append("startDate", startDate);
-			if (endDate) queryParams.append("endDate", endDate);
-
-			const { data: response } = await instance.get<ApiResponse<CustomerStatement>>(
-				`/payables/customers/${id}/statement?${queryParams.toString()}`,
-			);
-
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
-
-			Logger.error("Error fetching customer statement:", response.message);
-			return Promise.reject(response.message || "Müşteri borç dökümü getirilirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error fetching customer statement:", error);
-			return Promise.reject("Müşteri borç dökümü getirilirken hata oluştu");
-		}
-	}
-
-	static async Update(id: string, data: CustomerDto): Promise<string | null> {
-		try {
-			const { data: response } = await instance.put<ApiResponse<UUID>>(`/payables/customers/${id}`, data);
-
-			if (response.success) {
-				return Promise.resolve(response.data);
-			}
-
-			Logger.error("Error updating customer:", response.message);
-			return Promise.reject(response.message || "Müşteri güncellenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error updating customer:", error);
-			return Promise.reject("Müşteri güncellenirken hata oluştu");
-		}
-	}
-
-	static async Delete(id: string): Promise<void> {
-		try {
-			const { data: response } = await instance.delete<ApiResponse<null>>(`/payables/customers/${id}`);
-
-			if (response.success) {
-				return Promise.resolve();
-			}
-
-			Logger.error("Error deleting customer:", response.message);
-			return Promise.reject(response.message || "Müşteri silinirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error deleting customer:", error);
-			return Promise.reject("Müşteri silinirken hata oluştu");
-		}
-	}
-
-	static async Restore(id: string): Promise<void> {
-		try {
-			const { data: response } = await instance.post<ApiResponse<null>>(`/payables/customers/${id}/restore`);
-
-			if (response.success) {
-				return Promise.resolve();
-			}
-
-			Logger.error("Error restoring customer:", response.message);
-			return Promise.reject(response.message || "Müşteri geri yüklenirken hata oluştu");
-		} catch (error) {
-			Logger.error("Error restoring customer:", error);
-			return Promise.reject("Müşteri geri yüklenirken hata oluştu");
-		}
-	}
-}
+export const ReceivableCustomerApi = new BaseCustomerApi("receivables");
+export const PayableCustomerApi = new BaseCustomerApi("payables");
