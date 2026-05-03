@@ -44,7 +44,7 @@ router.post("/login", validate(portalLoginSchema), asyncHandler(async (req: Requ
 }));
 
 router.get("/company/:id", asyncHandler(async (req: Request, res: Response) => {
-	const { id } = req.params;
+	const { id } = req.params as { id: string };
 	Logger.info("[PortalController] Public company info request", { id });
 
 	const company = await CompanyService.GetCompanyById(id);

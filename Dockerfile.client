@@ -4,11 +4,12 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Copy root package files
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Copy workspace package files
 COPY common/package.json ./common/
 COPY client/package.json ./client/
+COPY server/package.json ./server/
 
 # Install dependencies
 RUN npm install
@@ -16,6 +17,9 @@ RUN npm install
 # Copy source code
 COPY common ./common
 COPY client ./client
+
+# Build common first (needed for types/schemas)
+RUN npm run build --workspace=common
 
 # Build arguments for Vite
 ARG VITE_API_URL=/api

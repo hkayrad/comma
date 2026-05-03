@@ -9,6 +9,9 @@ import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 
 // Ensure uploads directory exists
 const uploadDir = path.resolve(process.cwd(), "uploads", "logos");
+if (!fs.existsSync(uploadDir)) {
+	fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 export class CompanyService {
 	static async GetCompanyById(companyId: UUID) {

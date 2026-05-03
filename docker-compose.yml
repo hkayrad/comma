@@ -35,6 +35,8 @@ services:
       NODE_ENV: production
     depends_on:
       - db
+    volumes:
+      - ./server/uploads:/app/uploads
     ports:
       - "3001:3001"
 

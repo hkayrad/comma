@@ -13,7 +13,7 @@ export default function FormattedCurrency(props: Props) {
   const { row, column, currency = "TRY", negative = false } = props;
   const { t } = useTranslation();
   const rawValue = row.getValue(column.id);
-  const value = parseFloat(rawValue) || 0;
+  const value = parseFloat(rawValue as any) || 0;
   const formatted = value.toLocaleString("tr-TR", {
     style: "currency",
     currency: currency,
