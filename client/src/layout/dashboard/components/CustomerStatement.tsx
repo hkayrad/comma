@@ -1,13 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router";
-import { PayableCustomerApi, ReceivableCustomerApi } from "@/lib/api/customer";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router";
 import type {
-  CustomerStatement as CustomerStatementType,
   DebtDto,
   PaymentDto,
-  CompanyDto,
 } from "@comma/common";
-import { CompanyApi } from "@/lib/api/company";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -24,78 +20,155 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { DateRange, Locale } from "react-day-picker";
+import type { Locale } from "react-day-picker";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { exportCustomerStatementPDF } from "@/lib/pdf-new";
 import { Logger } from "@/lib/utils/logger";
-import { useBreadcrumb } from "@/contexts/breadcrumb/useBreadcrumb";
 import { useTranslation } from "react-i18next";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
 import { StatementRowActions } from "./StatementRowActions";
+import { useCustomerStatement } from "@/hooks/useCustomerStatement";
+import CommaTable from "@/layout/shared/table/CommaTable";
+import type { ColumnDef } from "@tanstack/react-table";
 
 export default function CustomerStatement() {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
-  const type: "payable" | "receivable" =
-    location.pathname.split("/")[1] === "alacaklar" ? "receivable" : "payable";
-  const { customerId } = useParams();
   const navigate = useNavigate();
-  const setLabel = useBreadcrumb((s) => s.setLabel);
-
-  const useContextMenuForActions = useDashboardSettings(
-    (s) => s.useContextMenuForActions,
-  );
+  
+  const {
+    type,
+    loading,
+    data,
+    company,
+    exporting,
+    setExporting,
+    date,
+    setDate,
+    resetDate,
+    refresh,
+  } = useCustomerStatement();
 
   const langMap: Record<string, Locale> = {
     tr: tr,
     en: enUS,
   };
 
-  const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
+  const debtColumns = useMemo<ColumnDef<DebtDto>[]>(() => [
+    {
+      accessorKey: "issue_date",
+      header: t("debt.table.column.issue_date"),
+      cell: ({ row }) => formatDate(row.original.issue_date),
+    },
+    {
+      accessorKey: "invoice_no",
+      header: t("debt.table.column.invoice_no"),
+      cell: ({ row }) => row.original.invoice_no || "-",
+    },
+    {
+      accessorKey: "amount",
+      header: t("debt.table.column.amount"),
+      cell: ({ row }) => formatCurrency(row.original.amount, row.original.currency),
+    },
+    {
+      accessorKey: "vat",
+      header: t("debt.table.column.vat"),
+      cell: ({ row }) => formatCurrency(row.original.vat, row.original.currency),
+    },
+    {
+      accessorKey: "total",
+      header: t("debt.table.column.total"),
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {formatCurrency(row.original.total, row.original.currency)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "currency",
+      header: t("debt.table.column.currency"),
+    },
+    {
+      accessorKey: "exchange_rate",
+      header: t("debt.table.column.exchange_rate"),
+      cell: ({ row }) => row.original.exchange_rate === 1 ? "-" : formatCurrency(row.original.exchange_rate),
+    },
+    {
+      accessorKey: "total_in_try",
+      header: t("debt.table.column.total_in_try"),
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {formatCurrency(row.original.total_in_try)}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: () => <div className="text-right">{t("debt.table.column.actions")}</div>,
+      cell: ({ row }) => (
+        <div className="text-right">
+          <StatementRowActions
+            item={row.original}
+            type="debt"
+            overviewType={type}
+            company={company}
+            onRefresh={refresh}
+          />
+        </div>
+      ),
+    }
+  ], [t, type, company, refresh]);
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<CustomerStatementType | null>(null);
-  const [exporting, setExporting] = useState(false);
-  const [date, setDate] = useState<DateRange | undefined>(undefined);
-
-  const [company, setCompany] = useState<CompanyDto | null>(null);
-
-  useEffect(() => {
-    CompanyApi.GetCompanyById()
-      .then((response) => setCompany(response.data))
-      .catch(Logger.error);
-  }, []);
-
-  const refresh = useCallback(() => {
-    if (!customerId) return;
-
-    const filters = {
-      startDate: date?.from ? format(date.from, "yyyy-MM-dd") : undefined,
-      endDate: date?.to ? format(date.to, "yyyy-MM-dd") : undefined,
-    };
-
-    API.GetStatement(customerId, filters)
-      .then((res) => {
-        setData(res);
-        if (res?.customer?.name) {
-          setLabel(customerId, res.customer.name);
-        }
-      })
-      .catch(() =>
-        toast.error(t("dashboard.customerStatement.error.fetchStatement")),
-      )
-      .finally(() => setLoading(false));
-  }, [customerId, API, date, setLabel, t]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const paymentColumns = useMemo<ColumnDef<PaymentDto>[]>(() => [
+    {
+      accessorKey: "payment_date",
+      header: t("payment.table.column.payment_date"),
+      cell: ({ row }) => formatDate(row.original.payment_date),
+    },
+    {
+      accessorKey: "invoice_no",
+      header: t("payment.table.column.invoice_no"),
+      cell: ({ row }) => row.original.invoice_no || "-",
+    },
+    {
+      accessorKey: "amount",
+      header: t("payment.table.column.amount"),
+      cell: ({ row }) => formatCurrency(row.original.amount, row.original.currency),
+    },
+    {
+      accessorKey: "currency",
+      header: t("payment.table.column.currency"),
+    },
+    {
+      accessorKey: "exchange_rate",
+      header: t("payment.table.column.exchange_rate"),
+      cell: ({ row }) => row.original.exchange_rate === 1 ? "-" : formatCurrency(row.original.exchange_rate),
+    },
+    {
+      accessorKey: "amount_in_try",
+      header: t("payment.table.column.amount_in_try"),
+      cell: ({ row }) => formatCurrency(row.original.amount_in_try),
+    },
+    {
+      accessorKey: "payment_method",
+      header: t("payment.table.column.payment_method"),
+      cell: ({ row }) => t(`vars.${row.original.payment_method}`),
+    },
+    {
+      id: "actions",
+      header: () => <div className="text-right">{t("payment.table.column.actions")}</div>,
+      cell: ({ row }) => (
+        <div className="text-right">
+          <StatementRowActions
+            item={row.original}
+            type="payment"
+            overviewType={type}
+            company={company}
+            onRefresh={refresh}
+          />
+        </div>
+      ),
+    }
+  ], [t, type, company, refresh]);
 
   const getRemainingColor = (amount: number) => {
     if (amount > 0) return "text-red-600";
@@ -123,7 +196,7 @@ export default function CustomerStatement() {
     } finally {
       setExporting(false);
     }
-  }, [data, company, date, t]);
+  }, [data, company, date, t, setExporting]);
 
   if (loading) {
     return (
@@ -194,7 +267,7 @@ export default function CustomerStatement() {
       <div className="px-12 flex items-center gap-3">
         <h1 className="text-2xl font-semibold">{customer.name}</h1>
         <div className="flex ml-auto gap-2">
-          <Button variant="outline" onClick={() => setDate(undefined)}>
+          <Button variant="outline" onClick={resetDate}>
             {t("dashboard.customerStatement.resetDate")}
           </Button>
           <Popover>
@@ -299,266 +372,44 @@ export default function CustomerStatement() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 px-12">
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>{t("dashboard.customerStatement.debts")}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="max-h-100 overflow-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted sticky top-0">
-                  <tr className="text-left">
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.issue_date")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.invoice_no")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.amount")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.vat")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.total")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.currency")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.exchange_rate")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("debt.table.column.total_in_try")}
-                    </th>
-                    {!useContextMenuForActions && (
-                      <th className="py-2 px-3 font-medium text-right">
-                        {t("debt.table.column.actions")}
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {debts.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={useContextMenuForActions ? 8 : 9}
-                        className="py-4 px-3 text-center text-muted-foreground"
-                      >
-                        {t("dashboard.customerStatement.noDebts")}
-                      </td>
-                    </tr>
-                  )}
-                  {debts.map((d: DebtDto) => {
-                    const rowContent = (
-                      <>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatDate(d.issue_date)}
-                        </td>
-                        <td className="py-1.5 px-3">{d.invoice_no || "-"}</td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatCurrency(d.amount, d.currency)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatCurrency(d.vat, d.currency)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap font-medium">
-                          {formatCurrency(d.total, d.currency)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {d.currency}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap font-medium">
-                          {d.exchange_rate === 1
-                            ? "-"
-                            : formatCurrency(d.exchange_rate)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap font-medium">
-                          {formatCurrency(d.total_in_try)}
-                        </td>
-                        {!useContextMenuForActions && (
-                          <td className="py-1.5 px-3 text-right">
-                            <StatementRowActions
-                              item={d}
-                              type="debt"
-                              overviewType={type}
-                              company={company}
-                              onRefresh={refresh}
-                            />
-                          </td>
-                        )}
-                      </>
-                    );
-
-                    if (useContextMenuForActions) {
-                      return (
-                        <ContextMenu key={d.id}>
-                          <ContextMenuTrigger
-                            render={(props) => (
-                              <tr
-                                {...props}
-                                className="border-b last:border-0 hover:bg-muted/50 group cursor-default"
-                              >
-                                {rowContent}
-                              </tr>
-                            )}
-                          />
-                          <ContextMenuContent className="w-48">
-                            <StatementRowActions
-                              item={d}
-                              type="debt"
-                              overviewType={type}
-                              company={company}
-                              onRefresh={refresh}
-                              isContextMenu
-                            />
-                          </ContextMenuContent>
-                        </ContextMenu>
-                      );
-                    }
-
-                    return (
-                      <tr
-                        key={d.id}
-                        className="border-b last:border-0 hover:bg-muted/50 group"
-                      >
-                        {rowContent}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle>{t("dashboard.customerStatement.payments")}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="max-h-100 overflow-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted sticky top-0">
-                  <tr className="text-left">
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.payment_date")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.invoice_no")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.amount")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.currency")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.exchange_rate")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.amount_in_try")}
-                    </th>
-                    <th className="py-2 px-3 font-medium">
-                      {t("payment.table.column.payment_method")}
-                    </th>
-                    {!useContextMenuForActions && (
-                      <th className="py-2 px-3 font-medium text-right">
-                        {t("payment.table.column.actions")}
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={useContextMenuForActions ? 7 : 8}
-                        className="py-4 px-3 text-center text-muted-foreground"
-                      >
-                        {t("dashboard.customerStatement.noPayments")}
-                      </td>
-                    </tr>
-                  )}
-                  {payments.map((p: PaymentDto) => {
-                    const rowContent = (
-                      <>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatDate(p.payment_date)}
-                        </td>
-                        <td className="py-1.5 px-3">{p.invoice_no || "-"}</td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatCurrency(p.amount, p.currency)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {p.currency}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {p.exchange_rate === 1
-                            ? "-"
-                            : formatCurrency(p.exchange_rate)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {formatCurrency(p.amount_in_try)}
-                        </td>
-                        <td className="py-1.5 px-3 whitespace-nowrap">
-                          {t(`vars.${p.payment_method}`)}
-                        </td>
-                        {!useContextMenuForActions && (
-                          <td className="py-1.5 px-3 text-right">
-                            <StatementRowActions
-                              item={p}
-                              type="payment"
-                              overviewType={type}
-                              company={company}
-                              onRefresh={refresh}
-                            />
-                          </td>
-                        )}
-                      </>
-                    );
-
-                    if (useContextMenuForActions) {
-                      return (
-                        <ContextMenu key={p.id}>
-                          <ContextMenuTrigger
-                            render={(props) => (
-                              <tr
-                                {...props}
-                                className="border-b last:border-0 hover:bg-muted/50 group cursor-default"
-                              >
-                                {rowContent}
-                              </tr>
-                            )}
-                          />
-                          <ContextMenuContent className="w-48">
-                            <StatementRowActions
-                              item={p}
-                              type="payment"
-                              overviewType={type}
-                              company={company}
-                              onRefresh={refresh}
-                              isContextMenu
-                            />
-                          </ContextMenuContent>
-                        </ContextMenu>
-                      );
-                    }
-
-                    return (
-                      <tr
-                        key={p.id}
-                        className="border-b last:border-0 hover:bg-muted/50 group"
-                      >
-                        {rowContent}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">{t("dashboard.customerStatement.debts")}</h2>
+          <CommaTable
+            data={debts}
+            columns={debtColumns}
+            searchColumn="invoice_no"
+            readOnly
+            contextMenuItems={(item) => (
+              <StatementRowActions
+                item={item}
+                type="debt"
+                overviewType={type}
+                company={company}
+                onRefresh={refresh}
+                isContextMenu
+              />
+            )}
+          />
+        </div>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">{t("dashboard.customerStatement.payments")}</h2>
+          <CommaTable
+            data={payments}
+            columns={paymentColumns}
+            searchColumn="invoice_no"
+            readOnly
+            contextMenuItems={(item) => (
+              <StatementRowActions
+                item={item}
+                type="payment"
+                overviewType={type}
+                company={company}
+                onRefresh={refresh}
+                isContextMenu
+              />
+            )}
+          />
+        </div>
       </div>
     </div>
   );
