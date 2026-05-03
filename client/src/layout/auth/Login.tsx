@@ -31,7 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useUser } from "@/contexts/user";
+import { useUser } from "@/stores/useUserStore";
 import { Logger } from "@/lib/utils/logger";
 import {
   Menu,

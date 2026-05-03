@@ -10,7 +10,7 @@ import { Logger } from "@/lib/utils/logger";
 import { AuthApi } from "@/lib/api/auth";
 import { TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useConfig } from "@/contexts/config";
+import { useConfig } from "@/stores/useConfigStore";
 import { useTranslation } from "react-i18next";
 import { useWebSocket } from "./useWebSocket";
 

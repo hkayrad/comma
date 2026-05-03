@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/input-group";
 import { useDialog } from "@/contexts/dialog";
 import { UserApi } from "@/lib/api/user";
-import { useUser } from "@/contexts/user";
+import { useUser } from "@/stores/useUserStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, KeyRound, User } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";

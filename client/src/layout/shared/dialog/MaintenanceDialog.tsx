@@ -6,7 +6,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
-import { useConfig } from "@/contexts/config";
+import { useConfig } from "@/stores/useConfigStore";
 import { useWebSocket } from "@/contexts/webSocket";
 import { ConfigApi } from "@/lib/api/config";
 import { Logger } from "@/lib/utils/logger";

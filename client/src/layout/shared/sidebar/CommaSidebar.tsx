@@ -9,7 +9,7 @@ import { useTheme } from "@/components/theme-provider";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthApi } from "@/lib/api/auth";
 import { toast } from "sonner";
-import { useUser } from "@/contexts/user";
+import { useUser } from "@/stores/useUserStore";
 import { useRole } from "@/hooks/useRole";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useWebSocket } from "@/contexts/webSocket";

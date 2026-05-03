@@ -17,7 +17,7 @@ import { useWebSocket } from "@/contexts/webSocket";
 import { UsersRound, Construction } from "lucide-react";
 import { useDialog } from "@/contexts/dialog";
 import { useCallback } from "react";
-import { useConfig } from "@/contexts/config";
+import { useConfig } from "@/stores/useConfigStore";
 import MaintenanceDialog from "@/layout/shared/dialog/MaintenanceDialog";
 import { useTranslation } from "react-i18next";
 

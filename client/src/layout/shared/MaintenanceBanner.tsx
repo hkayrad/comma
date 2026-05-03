@@ -1,4 +1,4 @@
-import { useConfig } from "@/contexts/config";
+import { useConfig } from "@/stores/useConfigStore";
 import { TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

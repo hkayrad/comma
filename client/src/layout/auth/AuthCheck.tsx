@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router";
-import { useUser } from "@/contexts/user";
+import { useUser } from "@/stores/useUserStore";
 import { useQuery } from "@tanstack/react-query";
 import { PortalApi } from "@/lib/api/portal";
 

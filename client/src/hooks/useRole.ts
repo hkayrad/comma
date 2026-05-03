@@ -1,4 +1,4 @@
-import { useUser } from "@/contexts/user/useUser";
+import { useUser } from "@/stores/useUserStore";
 import { useMemo } from "react";
 
 /**
