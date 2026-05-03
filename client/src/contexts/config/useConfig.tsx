@@ -18,26 +18,23 @@ export const useConfig = create<ConfigState>((set, get) => ({
     try {
       const response = await ConfigApi.GetConfigs();
 
-      if (!response.success) {
-        Logger.error("Failed to fetch configs:", response.message);
+      if (!response || !response.success) {
+        Logger.error("Failed to fetch configs:", response?.message || "Unknown error");
         return;
       }
 
-      if (response.configs.length === 0) {
-        Logger.warn("No configs found");
-        return;
-      }
+      const configsData = response.configs || {};
+      Logger.debug("Fetched configs:", configsData);
 
-      Logger.debug("Fetched configs:", response.configs);
-
-      const configsData = response.configs;
       set({ configs: configsData });
 
       Object.entries(configsData).forEach(([key, value]) => {
-        sessionStorage.setItem(key, value as string);
+        if (typeof value === "string") {
+          sessionStorage.setItem(key, value);
+        }
       });
     } catch (error) {
-      Logger.error("Failed to fetch configs:", error);
+      Logger.error("Failed to fetch configs catch:", error instanceof Error ? error.message : error);
     } finally {
       set({ isLoading: false });
     }

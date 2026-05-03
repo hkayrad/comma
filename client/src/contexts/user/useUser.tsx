@@ -52,10 +52,19 @@ export const useUser = create<UserStore>((set) => ({
       }
 
       // Normal login - set user
-      const user = data;
-      set({ user });
+      if (data && typeof data === "object" && "username" in data) {
+        const user = data;
+        set({ user });
+        return {
+          user,
+          requires2FA: false,
+          tempToken: null,
+        };
+      }
+      
+      Logger.warn("Invalid login response format", response);
       return {
-        user,
+        user: null,
         requires2FA: false,
         tempToken: null,
       };
@@ -72,12 +81,16 @@ export const useUser = create<UserStore>((set) => ({
 
       Logger.info("Refresh response", response);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data && typeof response.data === "object" && "username" in response.data) {
         const user = response.data;
         set({ user });
+      } else {
+        Logger.warn("Invalid refresh response format", response);
+        set({ user: null });
       }
     } catch (error) {
       Logger.error("Failed to refresh user", error);
+      set({ user: null });
     } finally {
       set({ isLoading: false });
     }

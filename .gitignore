@@ -33,8 +33,6 @@ server/uploads/logos/
 client/.tolgeerc.json
 
 build/**
-build.bat
-build.ps1
 server/.env.test
 server/coverage/
 

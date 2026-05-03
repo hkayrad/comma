@@ -443,7 +443,7 @@ export default function CommaSidebar() {
                                     ${RoleColors[(role ?? 0) as RoleColorType]}
                                   `}
                                 >
-                                  {user?.username.charAt(0).toUpperCase()}
+                                  {user?.username?.charAt(0).toUpperCase() || "?"}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="grid flex-1 text-left text-sm leading-tight">
