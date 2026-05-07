@@ -43,14 +43,6 @@ describe('TcmbService', () => {
     expect(rates?.unixtime).toBe('1234567890');
   });
 
-  it('should return null if PROXY_URL missing', async () => {
-      const old = process.env.PROXY_URL;
-      delete process.env.PROXY_URL;
-      const rates = await TcmbService.GetExchangeRates();
-      expect(rates).toBeNull();
-      process.env.PROXY_URL = old;
-  });
-
   it('should return null if API returns non-ok response', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,

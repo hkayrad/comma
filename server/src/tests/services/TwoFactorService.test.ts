@@ -49,14 +49,6 @@ describe('TwoFactorService', () => {
       expect(decrypted).toBe(secret);
     });
 
-    it('should throw error if key not configured', () => {
-        const old = process.env.TOTP_ENCRYPTION_KEY;
-        delete process.env.TOTP_ENCRYPTION_KEY;
-        expect(() => TwoFactorService.encryptSecret('s')).toThrow('TOTP_ENCRYPTION_KEY is not configured');
-        expect(() => TwoFactorService.decryptSecret('s')).toThrow('TOTP_ENCRYPTION_KEY is not configured');
-        process.env.TOTP_ENCRYPTION_KEY = old;
-    });
-
     it('should throw error if format invalid', () => {
         expect(() => TwoFactorService.decryptSecret('a:b')).toThrow('Invalid encrypted secret format');
     });

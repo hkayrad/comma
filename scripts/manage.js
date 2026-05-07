@@ -26,16 +26,28 @@ async function run(command, cwd) {
 }
 
 function spawnDev(name, command, cwd, color) {
-    const [cmd, ...args] = command.split(" ");
-    const proc = spawn(cmd, args, { cwd, shell: true });
+    const proc = spawn(command, { cwd, shell: true });
+    const prefix = `\x1b[${color}m[${name}]\x1b[0m `;
+    let atStartOfLine = true;
 
-    proc.stdout.on("data", (data) => {
-        process.stdout.write(`\x1b[${color}m[${name}]\x1b[0m ${data}`);
-    });
+    const handleData = (data, stream) => {
+        const str = data.toString();
+        let output = "";
+        for (let i = 0; i < str.length; i++) {
+            if (atStartOfLine) {
+                output += prefix;
+                atStartOfLine = false;
+            }
+            output += str[i];
+            if (str[i] === "\n") {
+                atStartOfLine = true;
+            }
+        }
+        stream.write(output);
+    };
 
-    proc.stderr.on("data", (data) => {
-        process.stderr.write(`\x1b[${color}m[${name}]\x1b[0m ${data}`);
-    });
+    proc.stdout.on("data", (data) => handleData(data, process.stdout));
+    proc.stderr.on("data", (data) => handleData(data, process.stderr));
 
     return proc;
 }

@@ -5,6 +5,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 import jwt from 'jsonwebtoken';
 import { Logger } from '@/lib/utils/logger';
 import { UserRole } from '@comma/common/enums';
+import { env } from '@/lib/utils/env';
 
 vi.mock('ws', async () => {
     class MockWebSocketServer {
@@ -29,9 +30,6 @@ describe('NotificationWebSocket', () => {
             on: vi.fn(),
         } as unknown as Server;
 		notificationWS = new NotificationWebSocket(mockServer);
-        process.env.JWT_SECRET = 'test_secret';
-        process.env.JWT_ISSUER = 'test_issuer';
-        process.env.JWT_AUDIENCE = 'test_audience';
 	});
 
 	it('should initialize WebSocketServer', () => {
@@ -51,10 +49,10 @@ describe('NotificationWebSocket', () => {
         });
 
         it('should authenticate client if token valid', () => {
-            const ws: any = { };
-            const token = jwt.sign({ id: '1', role: 1 }, process.env.JWT_SECRET as string, {
-                issuer: process.env.JWT_ISSUER,
-                audience: process.env.JWT_AUDIENCE
+            const ws: any = { close: vi.fn() };
+            const token = jwt.sign({ id: '1', role: 1 }, env.JWT_SECRET as string, {
+                issuer: env.JWT_ISSUER,
+                audience: env.JWT_AUDIENCE
             });
             const req: any = { headers: { cookie: `access_token=${token}` } };
             

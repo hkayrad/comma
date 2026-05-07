@@ -35,7 +35,7 @@
 ## Building and Running
 
 ### Prerequisites
-*   Node.js (v14+)
+*   Node.js (v18.20+)
 *   MariaDB (Running and configured)
 
 ### Quick Start (Development)

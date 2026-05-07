@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Logger } from '@/lib/utils/logger';
 import fs from 'fs';
 
+vi.mock('@/lib/utils/env', () => ({
+  env: { NODE_ENV: 'development' }
+}));
+
 describe('Logger', () => {
   beforeEach(() => {
     vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -35,11 +39,8 @@ describe('Logger', () => {
   });
 
   it('debug should call console.debug in development', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
     Logger.debug('test debug');
     expect(console.debug).toHaveBeenCalled();
-    process.env.NODE_ENV = originalEnv;
   });
 
   it('table should call console.table', () => {
