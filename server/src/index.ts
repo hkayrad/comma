@@ -126,8 +126,10 @@ app.use("/2fa", TwoFactorController);
 app.use("/stats", StatsController);
 app.use("/portal", PortalController);
 
-const openApiSpec = generateOpenApiSpec();
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+if (!env.isProduction) {
+	const openApiSpec = generateOpenApiSpec();
+	app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+}
 
 // Global error handler — must be registered AFTER all routes
 app.use(errorHandler);
