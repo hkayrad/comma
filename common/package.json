@@ -8,6 +8,7 @@
     "build": "tsc --build"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
