@@ -1,5 +1,6 @@
 import type { ExchangeRates } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
+import { env } from "@/lib/utils/env";
 
 function formatDate(date: Date): string {
 	const day = String(date.getDate()).padStart(2, "0");
@@ -36,13 +37,8 @@ export class TcmbService {
 
 			Logger.debug(`TCMB date range: ${tcmbStartDate} to ${tcmbEndDate}`);
 
-			const proxyUrl = process.env.PROXY_URL;
-			const apiKey = process.env.PROXY_API_KEY || "";
-
-			if (!proxyUrl) {
-				Logger.error("[TCMB Service] PROXY_URL is not defined in environment variables");
-				return null;
-			}
+			const proxyUrl = env.PROXY_URL;
+			const apiKey = env.PROXY_API_KEY;
 
 			const response = await fetch(
 				`${proxyUrl}/tcmb?series=${series.join("-")}&startDate=${tcmbStartDate}&endDate=${tcmbEndDate}&type=json&frequency=2`,

@@ -163,10 +163,12 @@ export class CustomerRepository {
 		const query = `
 			SELECT
 		    c.*,
+		    comp.small_logo_path,
 		    COALESCE(d.total_debt, 0) AS total_debt,
 		    COALESCE(p.total_payments, 0) AS total_payments,
 		    COALESCE(d.total_debt, 0) - COALESCE(p.total_payments, 0) AS remaining_debt
 			FROM ${this.domain}_customers c
+			INNER JOIN companies comp ON c.company_id = comp.id
             ${joins}
 			${whereClause}
 			${orderClause}
@@ -191,10 +193,12 @@ export class CustomerRepository {
 		const customerQuery = `
 			SELECT
 		    c.*,
+		    comp.small_logo_path,
 		    COALESCE(ds.total_debt, 0) AS total_debt,
 		    COALESCE(ps.total_payments, 0) AS total_payments,
 		    COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
 			FROM ${this.domain}_customers c
+			INNER JOIN companies comp ON c.company_id = comp.id
 			LEFT JOIN vw_${this.domain}_debt_summary ds
 		    ON c.id = ds.customer_id
 		    AND c.company_id = ds.company_id

@@ -13,6 +13,7 @@ export type CustomerDto = {
 	mersis_no?: string | null;
 	email?: string | null;
 	address?: string | null;
+	small_logo_path?: string | null;
 	total_debt?: number;
 	total_payments?: number;
 	remaining_debt?: number;

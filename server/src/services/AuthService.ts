@@ -1,5 +1,5 @@
 import { Logger } from "@/lib/utils/logger";
-import dotenv from "dotenv";
+import { env } from "@/lib/utils/env";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -7,11 +7,9 @@ import { UserRepository } from "@/repositories/UserRepository";
 import { sequelize } from "@/lib/db/sequelize";
 import { Transaction } from "sequelize";
 
-dotenv.config();
-
 export class AuthService {
 	private static readonly accessTokenExpiresIn = `15m`;
-	private static readonly refreshTokenExpiresIn = `${process.env.JWT_EXPIRES_IN || 7}d`;
+	private static readonly refreshTokenExpiresIn = `${env.JWT_EXPIRES_IN}d`;
 	private static readonly MIN_DELAY_MS = 500; // Minimum delay for timing attack prevention
 	private static readonly MAX_DELAY_MS = 1500; // Maximum delay for timing attack prevention
 
@@ -68,7 +66,7 @@ export class AuthService {
 				// Generate a temporary token for 2FA verification
 				const tempToken = jwt.sign(
 					{ id: user.id, purpose: "2fa_verification" },
-					process.env.JWT_SECRET as jwt.Secret,
+					env.JWT_SECRET as jwt.Secret,
 					{ expiresIn: "5m" }
 				);
 
@@ -97,9 +95,9 @@ export class AuthService {
 				role: user.role,
 			};
 
-			const accessToken = jwt.sign(accessTokenPayload, process.env.JWT_SECRET as jwt.Secret, {
-				issuer: process.env.JWT_ISSUER,
-				audience: process.env.JWT_AUDIENCE,
+			const accessToken = jwt.sign(accessTokenPayload, env.JWT_SECRET as jwt.Secret, {
+				issuer: env.JWT_ISSUER,
+				audience: env.JWT_AUDIENCE,
 				expiresIn: this.accessTokenExpiresIn as any,
 			});
 
@@ -181,9 +179,9 @@ export class AuthService {
 				role: user.role,
 			};
 
-			const accessToken = jwt.sign(accessTokenPayload, process.env.JWT_SECRET as jwt.Secret, {
-				issuer: process.env.JWT_ISSUER,
-				audience: process.env.JWT_AUDIENCE,
+			const accessToken = jwt.sign(accessTokenPayload, env.JWT_SECRET as jwt.Secret, {
+				issuer: env.JWT_ISSUER,
+				audience: env.JWT_AUDIENCE,
 				expiresIn: this.accessTokenExpiresIn as any,
 			});
 
@@ -302,9 +300,9 @@ export class AuthService {
 					username: dbUser.username,
 					role: dbUser.role,
 				};
-				const accessToken = jwt.sign(accessTokenPayload, process.env.JWT_SECRET as jwt.Secret, {
-					issuer: process.env.JWT_ISSUER,
-					audience: process.env.JWT_AUDIENCE,
+				const accessToken = jwt.sign(accessTokenPayload, env.JWT_SECRET as jwt.Secret, {
+					issuer: env.JWT_ISSUER,
+					audience: env.JWT_AUDIENCE,
 					expiresIn: this.accessTokenExpiresIn as any,
 				});
 

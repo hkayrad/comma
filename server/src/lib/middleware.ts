@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import dotenv from "dotenv";
+import { env } from "@/lib/utils/env";
 import { Logger } from "@/lib/utils/logger";
 import jwt from "jsonwebtoken";
 import { UserRole } from "@comma/common/enums";
-
-dotenv.config();
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
 	Logger.debug("[AuthMiddleware] Request received", {
@@ -20,7 +18,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 			return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 		}
 
-		jwt.verify(accessToken, process.env.JWT_SECRET as jwt.Secret, (err: any, user: any) => {
+		jwt.verify(accessToken, env.JWT_SECRET as jwt.Secret, (err: any, user: any) => {
 			if (err) return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 
 			req.user = user;
@@ -77,7 +75,7 @@ export function portalAuthMiddleware(req: Request, res: Response, next: NextFunc
 			return res.status(401).json({ success: false, data: null, message: "Unauthorized" });
 		}
 
-		jwt.verify(portalToken, process.env.JWT_SECRET as jwt.Secret, (err: any, decoded: any) => {
+		jwt.verify(portalToken, env.JWT_SECRET as jwt.Secret, (err: any, decoded: any) => {
 			if (err || decoded.role !== UserRole.PORTAL_CUSTOMER) {
 				Logger.warn("[PortalAuthMiddleware] Invalid token or role", { err });
 				return res.status(401).json({ success: false, data: null, message: "Unauthorized" });

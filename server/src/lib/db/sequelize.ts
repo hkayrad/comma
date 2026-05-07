@@ -1,14 +1,12 @@
 import { Sequelize } from "sequelize";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { env } from "@/lib/utils/env";
 
 const sequelize = new Sequelize({
 	dialect: "mariadb",
-	host: process.env.DB_URL,
-	username: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
+	host: env.DB_URL,
+	username: env.DB_USER,
+	password: env.DB_PASSWORD,
+	database: env.DB_NAME,
 	dialectOptions: {
 		connectTimeout: 30000,
 	},

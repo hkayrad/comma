@@ -1,5 +1,5 @@
 import { Logger } from "@/lib/utils/logger";
-import dotenv from "dotenv";
+import { env } from "@/lib/utils/env";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import * as OTPAuth from "otpauth";
@@ -7,10 +7,8 @@ import QRCode from "qrcode";
 import { UserRepository } from "@/repositories/UserRepository";
 import { Op } from "sequelize";
 
-dotenv.config();
-
-const ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY;
-const APP_NAME = process.env.APP_NAME || "Comma";
+const ENCRYPTION_KEY = env.TOTP_ENCRYPTION_KEY;
+const APP_NAME = env.APP_NAME;
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 const MIN_DELAY_MS = 500; // Minimum delay for timing attack prevention
@@ -74,7 +72,7 @@ export class TwoFactorService {
    * Encrypt a TOTP secret using AES-256-GCM
    */
   static encryptSecret(secret: string): string {
-    const encryptionKey = process.env.TOTP_ENCRYPTION_KEY;
+    const encryptionKey = env.TOTP_ENCRYPTION_KEY;
     if (!encryptionKey) {
       throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }
@@ -96,7 +94,7 @@ export class TwoFactorService {
    * Decrypt a TOTP secret
    */
   static decryptSecret(encryptedSecret: string): string {
-    const encryptionKey = process.env.TOTP_ENCRYPTION_KEY;
+    const encryptionKey = env.TOTP_ENCRYPTION_KEY;
     if (!encryptionKey) {
       throw new Error("TOTP_ENCRYPTION_KEY is not configured");
     }

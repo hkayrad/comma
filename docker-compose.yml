@@ -3,10 +3,10 @@ services:
     image: mariadb:10.11
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: root_password
-      MARIADB_DATABASE: comma
-      MARIADB_USER: comma_user
-      MARIADB_PASSWORD: comma_password
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-comma}
+      MARIADB_USER: ${MARIADB_USER:-comma_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
     volumes:
       - ./migration.sql:/docker-entrypoint-initdb.d/migration.sql
       - db_data:/var/lib/mysql
@@ -18,21 +18,21 @@ services:
       context: .
       dockerfile: Dockerfile.server
     environment:
-      CLIENT_URL: http://localhost:4000
-      DB_NAME: comma
-      DB_USER: comma_user
-      DB_PASSWORD: comma_password
-      DB_PORT: 3306
-      DB_URL: db
-      JWT_AUDIENCE: comma-users
-      JWT_EXPIRES_IN: 7
-      JWT_ISSUER: comma
-      JWT_SECRET: super_secret_key_change_me
-      PROXY_API_KEY: lezoWjkSU70HHrwNxRW9zSMW69tvtdJAIycw09i00oQrJaPVfNA4hjACDKeQSV2JMIwWuB0UVfWw1OhOjufQQ7QXJu3PPt2A5PtC97RZy1N0RZt4wQBVoNRMfxHbsKge
-      PROXY_URL: https://proxy.hkayrad.me
-      SERVER_PORT: 3001
-      TOTP_ENCRYPTION_KEY: a9f16c032a8f8635ddb812ac54fd250279b1f9a16df02fb2d2a16825aeda28e9
-      NODE_ENV: production
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:4000}
+      DB_NAME: ${DB_NAME:-comma}
+      DB_USER: ${DB_USER:-comma_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_URL: ${DB_URL:-db}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-comma-users}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7}
+      JWT_ISSUER: ${JWT_ISSUER:-comma}
+      JWT_SECRET: ${JWT_SECRET}
+      PROXY_API_KEY: ${PROXY_API_KEY}
+      PROXY_URL: ${PROXY_URL:-https://proxy.hkayrad.me}
+      SERVER_PORT: ${SERVER_PORT:-3001}
+      TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY}
+      NODE_ENV: ${NODE_ENV:-production}
     depends_on:
       - db
     volumes:
@@ -45,9 +45,9 @@ services:
       context: .
       dockerfile: Dockerfile.client
       args:
-        VITE_API_URL: http://localhost:3001
-        VITE_WEBSOCKET_URL: ws://localhost:3001/notification
-        VITE_ENV: production
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        VITE_WEBSOCKET_URL: ${VITE_WEBSOCKET_URL:-ws://localhost:3001/notification}
+        VITE_ENV: ${VITE_ENV:-production}
     ports:
       - "4000:80"
     depends_on:

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { env } from "@/lib/utils/env";
 
 export class Logger {
 	private static logDir = path.join(process.cwd(), "./", "logs");
@@ -70,7 +71,7 @@ export class Logger {
 	}
 
 	static debug(message: any, ...optionalParams: any[]) {
-		if (process.env.NODE_ENV === "development") {
+		if (env.NODE_ENV === "development") {
 			const timestamp = Logger.getFormattedDate();
 			console.debug(`${timestamp} [DEBUG] `, message, ...optionalParams);
 

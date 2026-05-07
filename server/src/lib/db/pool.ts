@@ -1,13 +1,11 @@
 import mariadb from "mariadb";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { env } from "@/lib/utils/env";
 
 export const pool = mariadb.createPool({
-	host: process.env.DB_URL,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD,
-	database: process.env.DB_NAME,
+	host: env.DB_URL,
+	user: env.DB_USER,
+	password: env.DB_PASSWORD,
+	database: env.DB_NAME,
 	connectionLimit: 5,
 	connectTimeout: 10000,
 });

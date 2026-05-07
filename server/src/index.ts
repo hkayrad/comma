@@ -23,6 +23,7 @@ import UserSettingsController from "@/controllers/UserSettingsController";
 import TwoFactorController from "@/controllers/TwoFactorController";
 import StatsController from "@/controllers/StatsController";
 import PortalController from "@/controllers/PortalController";
+import { env } from "@/lib/utils/env";
 import { Logger } from "@/lib/utils/logger";
 import { sequelize } from "@/lib/db/sequelize";
 import { errorHandler } from "@/lib/utils/middleware/errorHandler";
@@ -43,8 +44,6 @@ declare global {
 	}
 }
 
-dotenv.config();
-
 const app = express();
 const server = http.createServer(app);
 
@@ -55,11 +54,7 @@ new NotificationWebSocket(server);
 
 app.use(
 	cors({
-		origin:
-			process.env.CLIENT_URL ||
-			(() => {
-				throw new Error("CLIENT_URL not defined");
-			})(),
+		origin: env.CLIENT_URL,
 		credentials: true,
 	}),
 );
@@ -80,7 +75,7 @@ app.use(
 	"/uploads",
 	express.static("uploads", {
 		setHeaders: (res) => {
-			res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL || "*");
+			res.setHeader("Access-Control-Allow-Origin", env.CLIENT_URL);
 			res.setHeader("Access-Control-Allow-Credentials", "true");
 		},
 	}),
@@ -134,12 +129,8 @@ app.use(errorHandler);
 
 export { app };
 
-if (process.env.NODE_ENV !== "test") {
-	const listenPort =
-		process.env.SERVER_PORT ||
-		(() => {
-			throw new Error("SERVER_PORT not defined");
-		})();
+if (env.NODE_ENV !== "test") {
+	const listenPort = env.SERVER_PORT;
 
 	server.listen(listenPort, async () => {
 		Logger.info(`Server has been started`);
@@ -152,11 +143,10 @@ if (process.env.NODE_ENV !== "test") {
 		}
 
 		Logger.table({
-			"Node Environment": process.env.NODE_ENV,
+			"Node Environment": env.NODE_ENV,
 			"Server Port": listenPort,
 			"Database Status": "Connected",
 			"JWT Status": "Initialized",
 		});
 	});
 }
-

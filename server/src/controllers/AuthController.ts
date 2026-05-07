@@ -1,14 +1,12 @@
 import express from "express";
 import { AuthService } from "@/services/AuthService";
 import { Logger } from "@/lib/utils/logger";
-import dotenv from "dotenv";
+import { env } from "@/lib/utils/env";
 import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { UnauthorizedError, ValidationError } from "@/lib/errors/AppError";
 import { validate } from "@/lib/utils/middleware/validate";
 import { loginSchema } from "@comma/common/schemas";
-
-dotenv.config();
 
 const router = express.Router();
 
@@ -39,15 +37,15 @@ router.post("/login", authRateLimiter, validate(loginSchema), asyncHandler(async
 	// Normal login - set cookies
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
+		secure: env.isProduction,
 		sameSite: "strict",
 		maxAge: 15 * 60 * 1000, // 15 minutes
 	});
 	res.cookie("refresh_token", refreshToken, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
+		secure: env.isProduction,
 		sameSite: "strict",
-		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
+		maxAge: parseInt(env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000, // 7 days
 		path: "/",
 	});
 	res.json({ username: user?.username, role: user?.role });
@@ -74,16 +72,16 @@ router.post("/refresh", authRateLimiter, asyncHandler(async (req, res) => {
 
 	res.cookie("access_token", accessToken, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
+		secure: env.isProduction,
 		sameSite: "strict",
 		maxAge: 15 * 60 * 1000, // 15 minutes
 	});
 
 	res.cookie("refresh_token", refreshToken, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
+		secure: env.isProduction,
 		sameSite: "strict",
-		maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000, // 7 days
+		maxAge: parseInt(env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000, // 7 days
 		path: "/",
 	});
 

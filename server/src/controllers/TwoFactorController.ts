@@ -1,14 +1,12 @@
 import express from "express";
 import { TwoFactorService } from "@/services/TwoFactorService";
 import { Logger } from "@/lib/utils/logger";
+import { env } from "@/lib/utils/env";
 import { authMiddleware } from "@/lib/middleware";
 import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { UnauthorizedError, ValidationError } from "@/lib/errors/AppError";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const router = express.Router();
 
@@ -25,7 +23,7 @@ const verify2FATempToken = (
   }
 
   try {
-    const decoded = jwt.verify(tempToken, process.env.JWT_SECRET as string) as {
+    const decoded = jwt.verify(tempToken, env.JWT_SECRET) as {
       id: string;
       purpose: string;
     };
@@ -69,7 +67,7 @@ router.post("/setup", authMiddleware, asyncHandler(async (req, res) => {
 
   const setupToken = jwt.sign(
     { userId, secret, purpose: "2fa_setup" },
-    process.env.JWT_SECRET as string,
+    env.JWT_SECRET,
     { expiresIn: "10m" },
   );
 
@@ -90,7 +88,7 @@ router.post("/verify-setup", authMiddleware, asyncHandler(async (req, res) => {
   // Verify and decode the setup token
   let decoded: { userId: string; secret: string; purpose: string };
   try {
-    decoded = jwt.verify(setupToken, process.env.JWT_SECRET as string) as typeof decoded;
+    decoded = jwt.verify(setupToken, env.JWT_SECRET) as typeof decoded;
   } catch {
     throw new ValidationError("Setup session expired. Please start again.");
   }
@@ -147,15 +145,15 @@ router.post("/verify", authRateLimiter, verify2FATempToken, asyncHandler(async (
 
   res.cookie("access_token", loginResult.accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.isProduction,
     sameSite: "strict",
     maxAge: 15 * 60 * 1000,
   });
   res.cookie("refresh_token", loginResult.refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.isProduction,
     sameSite: "strict",
-    maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
+    maxAge: parseInt(env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000,
     path: "/",
   });
 
@@ -196,15 +194,15 @@ router.post("/recovery", authRateLimiter, verify2FATempToken, asyncHandler(async
 
   res.cookie("access_token", loginResult.accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.isProduction,
     sameSite: "strict",
     maxAge: 15 * 60 * 1000,
   });
   res.cookie("refresh_token", loginResult.refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.isProduction,
     sameSite: "strict",
-    maxAge: parseInt(process.env.JWT_EXPIRES_IN || "7") * 24 * 60 * 60 * 1000,
+    maxAge: parseInt(env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000,
     path: "/",
   });
 

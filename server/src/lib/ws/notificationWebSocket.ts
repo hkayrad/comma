@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { DecodedJwtToken } from "@comma/common/types";
 import { Logger } from "@/lib/utils/logger";
 import { UserRole } from "@comma/common/enums";
+import { env } from "@/lib/utils/env";
 
 interface AuthenticatedWebSocket extends WebSocket {
 	isAlive: boolean;
@@ -69,9 +70,9 @@ export default class NotificationWebSocket {
 
 		// Verify JWT token
 		try {
-			const decoded = jwt.verify(token, process.env.JWT_SECRET as string, {
-				issuer: process.env.JWT_ISSUER,
-				audience: process.env.JWT_AUDIENCE,
+			const decoded = jwt.verify(token, env.JWT_SECRET as string, {
+				issuer: env.JWT_ISSUER,
+				audience: env.JWT_AUDIENCE,
 			}) as DecodedJwtToken;
 
 			ws.isAlive = true;

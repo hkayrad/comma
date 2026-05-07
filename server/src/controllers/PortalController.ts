@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { Logger } from "@/lib/utils/logger";
+import { env } from "@/lib/utils/env";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
 import { portalLoginSchema } from "@comma/common/schemas";
@@ -29,13 +30,13 @@ router.post("/login", validate(portalLoginSchema), asyncHandler(async (req: Requ
 		username: customer.name,
 	};
 
-	const token = jwt.sign(tokenPayload, process.env.JWT_SECRET as jwt.Secret, {
+	const token = jwt.sign(tokenPayload, env.JWT_SECRET as jwt.Secret, {
 		expiresIn: "1h",
 	});
 
 	res.cookie("portal_token", token, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
+		secure: env.isProduction,
 		sameSite: "strict",
 		maxAge: 60 * 60 * 1000,
 	});
