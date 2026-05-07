@@ -6,23 +6,23 @@ const paginationParams = [
   {
     name: 'page',
     in: 'query' as const,
-    schema: { type: 'integer', default: 0 },
+    schema: { type: 'integer' as const, default: 0 },
   },
   {
     name: 'limit',
     in: 'query' as const,
-    schema: { type: 'integer', default: 20 },
+    schema: { type: 'integer' as const, default: 20 },
   },
   {
     name: 'sorting',
     in: 'query' as const,
-    schema: { type: 'string' },
+    schema: { type: 'string' as const },
     description: 'JSON string for sorting',
   },
   {
     name: 'filters',
     in: 'query' as const,
-    schema: { type: 'string' },
+    schema: { type: 'string' as const },
     description: 'JSON string for filters',
   },
 ];
