@@ -1,5 +1,8 @@
 import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 import { registry } from './registry';
+import './routes/auth';
+import './routes/config';
+import './routes/tcmb';
 
 export function generateOpenApiSpec() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
