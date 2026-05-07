@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PayableDebtsService from '@/services/Payable/DebtsService';
 import { DebtRepository } from '@/repositories/DebtRepository';
 import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
+import { sequelize } from '@/lib/db/sequelize';
 
 describe('PayableDebtsService', () => {
   beforeEach(() => {
@@ -10,19 +11,40 @@ describe('PayableDebtsService', () => {
 
   const validCompanyId = 'f47ac10b-58cc-4372-a567-0e02b2c3d470';
   const validUserId = 'f47ac10b-58cc-4372-a567-0e02b2c3d471';
+  const validDebtDto = {
+    customer_id: '1', amount: 100, vat: 20, currency: 'TRY', exchange_rate: 1, issue_date: new Date()
+  };
 
   describe('Create', () => {
     it('should throw ValidationError if required fields missing', async () => {
       await expect(PayableDebtsService.Create({} as any, validUserId, validCompanyId))
         .rejects.toThrow(ValidationError);
+        
+      const requiredFields = ['customer_id', 'amount', 'issue_date', 'vat', 'currency', 'exchange_rate'];
+      for (const field of requiredFields) {
+        const invalidDto = { ...validDebtDto, [field]: undefined };
+        await expect(PayableDebtsService.Create(invalidDto as any, validUserId, validCompanyId))
+          .rejects.toThrow(ValidationError);
+      }
     });
 
     it('should create debt and return id', async () => {
       vi.spyOn(DebtRepository.prototype, 'create').mockResolvedValue({ id: 'new-id' } as any);
-      const result = await PayableDebtsService.Create({
-        customer_id: '1', amount: 100, vat: 20, currency: 'TRY', exchange_rate: 1, issue_date: new Date()
-      } as any, validUserId, validCompanyId);
+      const result = await PayableDebtsService.Create(validDebtDto as any, validUserId, validCompanyId);
       expect(result).toBe('new-id');
+    });
+  });
+
+  describe('CreateBatch', () => {
+    it('should create a batch of debts', async () => {
+      vi.spyOn(sequelize, 'transaction').mockImplementation(async (cb) => await cb({} as any));
+      vi.spyOn(DebtRepository.prototype, 'createBatch').mockResolvedValue([{ id: 'new-id-1' }, { id: 'new-id-2' }] as any);
+      
+      const debts = [validDebtDto, { ...validDebtDto, amount: 200 }];
+      const result = await PayableDebtsService.CreateBatch(debts as any, validUserId, validCompanyId);
+      
+      expect(result).toHaveLength(2);
+      expect(DebtRepository.prototype.createBatch).toHaveBeenCalled();
     });
   });
 
@@ -51,44 +73,46 @@ describe('PayableDebtsService', () => {
   });
 
   describe("Update", () => {
+    it('should throw ValidationError if id is missing', async () => {
+      await expect(PayableDebtsService.Update('' as any, validDebtDto as any, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError if required fields missing', async () => {
+      const requiredFields = ['customer_id', 'amount', 'issue_date', 'vat', 'currency', 'exchange_rate'];
+      for (const field of requiredFields) {
+        const invalidDto = { ...validDebtDto, [field]: undefined };
+        await expect(PayableDebtsService.Update('1', invalidDto as any, validCompanyId))
+          .rejects.toThrow(ValidationError);
+      }
+    });
+
     it("should update debt", async () => {
       vi.spyOn(DebtRepository.prototype, "update").mockResolvedValue([1, []]);
-      await PayableDebtsService.Update(
-        "1",
-        {
-          customer_id: "1",
-          amount: 100,
-          vat: 20,
-          currency: "TRY",
-          exchange_rate: 1,
-          issue_date: new Date(),
-        } as any,
-        validCompanyId,
-      );
+      await PayableDebtsService.Update("1", validDebtDto as any, validCompanyId);
       expect(DebtRepository.prototype.update).toHaveBeenCalled();
+    });
+    
+    it("should not throw error if affectedRows is 0 but debt exists", async () => {
+      vi.spyOn(DebtRepository.prototype, "update").mockResolvedValue([0, []]);
+      vi.spyOn(DebtRepository.prototype, "findById").mockResolvedValue({ id: '1' } as any);
+      await expect(PayableDebtsService.Update("1", validDebtDto as any, validCompanyId)).resolves.not.toThrow();
     });
 
     it("should throw NotFoundError if affectedRows is 0 and debt not found", async () => {
       vi.spyOn(DebtRepository.prototype, "update").mockResolvedValue([0, []]);
       vi.spyOn(DebtRepository.prototype, "findById").mockResolvedValue(null as any);
-      await expect(
-        PayableDebtsService.Update(
-          "1",
-          {
-            customer_id: "1",
-            amount: 100,
-            vat: 20,
-            currency: "TRY",
-            exchange_rate: 1,
-            issue_date: new Date(),
-          } as any,
-          validCompanyId,
-        ),
-      ).rejects.toThrow(NotFoundError);
+      await expect(PayableDebtsService.Update("1", validDebtDto as any, validCompanyId))
+        .rejects.toThrow(NotFoundError);
     });
   });
 
   describe('Delete', () => {
+    it('should throw ValidationError if id is missing', async () => {
+        await expect(PayableDebtsService.Delete('' as any, validUserId, validCompanyId))
+            .rejects.toThrow(ValidationError);
+    });
+
     it('should delete debt', async () => {
         vi.spyOn(DebtRepository.prototype, 'delete').mockResolvedValue(1);
         await PayableDebtsService.Delete('1', validUserId, validCompanyId);
@@ -103,6 +127,11 @@ describe('PayableDebtsService', () => {
   });
 
   describe('Restore', () => {
+    it('should throw ValidationError if id is missing', async () => {
+        await expect(PayableDebtsService.Restore('' as any, validUserId, validCompanyId))
+            .rejects.toThrow(ValidationError);
+    });
+
     it('should restore debt', async () => {
         vi.spyOn(DebtRepository.prototype, 'restore').mockResolvedValue([1]);
         await PayableDebtsService.Restore('1', validUserId, validCompanyId);

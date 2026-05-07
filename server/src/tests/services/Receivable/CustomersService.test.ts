@@ -14,7 +14,12 @@ describe('ReceivableCustomersService', () => {
 
   describe('Create', () => {
     it('should throw ValidationError if name missing', async () => {
-      await expect(ReceivableCustomersService.Create({} as any, validUserId, validCompanyId))
+      await expect(ReceivableCustomersService.Create({ is_company: true } as any, validUserId, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError if is_company missing', async () => {
+      await expect(ReceivableCustomersService.Create({ name: 'Test' } as any, validUserId, validCompanyId))
         .rejects.toThrow(ValidationError);
     });
 
@@ -22,6 +27,23 @@ describe('ReceivableCustomersService', () => {
       vi.spyOn(CustomerRepository.prototype, 'create').mockResolvedValue({ id: 'new-id' } as any);
       const result = await ReceivableCustomersService.Create({ name: 'Test', is_company: true } as any, validUserId, validCompanyId);
       expect(result).toBe('new-id');
+    });
+  });
+
+  describe('CreateBatch', () => {
+    it('should create customers in batch', async () => {
+      const mockResult = [{ id: 'id1' }, { id: 'id2' }];
+      vi.spyOn(CustomerRepository.prototype, 'createBatch').mockResolvedValue(mockResult as any);
+      
+      const customers = [
+        { name: 'Customer 1', is_company: true },
+        { name: 'Customer 2', is_company: false }
+      ];
+      
+      const result = await ReceivableCustomersService.CreateBatch(customers as any, validUserId, validCompanyId);
+      
+      expect(CustomerRepository.prototype.createBatch).toHaveBeenCalled();
+      expect(result).toEqual(mockResult);
     });
   });
 
@@ -35,6 +57,11 @@ describe('ReceivableCustomersService', () => {
   });
 
   describe('GetStatement', () => {
+    it('should throw ValidationError if customerId is missing', async () => {
+      await expect(ReceivableCustomersService.GetStatement('', validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
     it('should throw NotFoundError if statement not found', async () => {
       vi.spyOn(CustomerRepository.prototype, 'getStatement').mockResolvedValue(null);
       await expect(ReceivableCustomersService.GetStatement('1', validCompanyId))
@@ -49,7 +76,25 @@ describe('ReceivableCustomersService', () => {
     });
   });
 
+  describe('GetIdAndName', () => {
+    it('should return results', async () => {
+        vi.spyOn(CustomerRepository.prototype, 'findAllIdAndName').mockResolvedValue([]);
+        const result = await ReceivableCustomersService.GetIdAndName(validCompanyId);
+        expect(result).toEqual([]);
+    });
+  });
+
   describe('Update', () => {
+    it('should throw ValidationError if id is missing', async () => {
+      await expect(ReceivableCustomersService.Update('', { name: 'New', is_company: true } as any, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
+    it('should throw ValidationError if name or is_company is missing', async () => {
+      await expect(ReceivableCustomersService.Update('1', { name: '' } as any, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
     it('should update customer', async () => {
         vi.spyOn(CustomerRepository.prototype, 'update').mockResolvedValue([1]);
         await ReceivableCustomersService.Update('1', { name: 'New', is_company: true } as any, validCompanyId);
@@ -62,9 +107,21 @@ describe('ReceivableCustomersService', () => {
         await expect(ReceivableCustomersService.Update('1', { name: 'New', is_company: true } as any, validCompanyId))
             .rejects.toThrow(NotFoundError);
     });
+
+    it('should not throw error if affectedRows is 0 and customer found', async () => {
+        vi.spyOn(CustomerRepository.prototype, 'update').mockResolvedValue([0]);
+        vi.spyOn(CustomerRepository.prototype, 'findById').mockResolvedValue({ id: '1' } as any);
+        await ReceivableCustomersService.Update('1', { name: 'New', is_company: true } as any, validCompanyId);
+        expect(CustomerRepository.prototype.findById).toHaveBeenCalled();
+    });
   });
 
   describe('Delete', () => {
+    it('should throw ValidationError if id is missing', async () => {
+      await expect(ReceivableCustomersService.Delete('', validUserId, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
     it('should delete customer', async () => {
         vi.spyOn(CustomerRepository.prototype, 'delete').mockResolvedValue(1);
         await ReceivableCustomersService.Delete('1', validUserId, validCompanyId);
@@ -79,6 +136,11 @@ describe('ReceivableCustomersService', () => {
   });
 
   describe('Restore', () => {
+    it('should throw ValidationError if id is missing', async () => {
+      await expect(ReceivableCustomersService.Restore('', validUserId, validCompanyId))
+        .rejects.toThrow(ValidationError);
+    });
+
     it('should restore customer', async () => {
         vi.spyOn(CustomerRepository.prototype, 'restore').mockResolvedValue(1);
         await ReceivableCustomersService.Restore('1', validUserId, validCompanyId);
