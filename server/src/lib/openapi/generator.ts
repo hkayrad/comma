@@ -3,6 +3,8 @@ import { registry } from './registry';
 import './routes/auth';
 import './routes/config';
 import './routes/tcmb';
+import './routes/companies';
+import './routes/admin';
 
 export function generateOpenApiSpec() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
