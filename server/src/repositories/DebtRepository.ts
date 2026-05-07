@@ -90,6 +90,8 @@ export class DebtRepository {
 
                 if (id === "customer_name") {
                     customerWhere.name = { [Op.like]: `%${value}%` };
+                } else if (id === "customer_id") {
+                    where.customer_id = value;
                 } else if (id === "invoice_no" || id === "description") {
                     where[id] = { [Op.like]: `%${value}%` };
                 } else if (id === "currency") {

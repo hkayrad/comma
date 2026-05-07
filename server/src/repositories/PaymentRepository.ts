@@ -57,6 +57,7 @@ export class PaymentRepository {
 			exchange_rate: "p.exchange_rate", payment_method: "p.payment_method",
 			payment_date: "p.payment_date", invoice_no: "p.invoice_no",
 			description: "p.description", amount_in_try: "p.amount_in_try", due_date: "p.due_date",
+			customer_id: "p.customer_id",
 		};
 
 		let whereClause = "WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL";
@@ -71,8 +72,13 @@ export class PaymentRepository {
 					whereClause += ` AND ${dbCol} IN (?)`;
 					replacements.push(value as string[]);
 				} else if (typeof value === "string" && value.trim() !== "") {
-					whereClause += ` AND ${dbCol} LIKE ?`;
-					replacements.push(`%${value}%`);
+					if (id === "customer_id") {
+						whereClause += ` AND ${dbCol} = ?`;
+						replacements.push(value);
+					} else {
+						whereClause += ` AND ${dbCol} LIKE ?`;
+						replacements.push(`%${value}%`);
+					}
 				}
 			});
 		}

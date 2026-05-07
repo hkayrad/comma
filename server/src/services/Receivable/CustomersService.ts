@@ -16,6 +16,10 @@ export default class ReceivableCustomersService {
     return service.GetAll(companyId, page, limit, sorting, filters);
   }
 
+  static async GetSummary(customerId: UUID, companyId: UUID) {
+    return service.GetSummary(customerId, companyId);
+  }
+
   static async GetStatement(customerId: UUID, companyId: UUID, startDate?: string, endDate?: string) {
     return service.GetStatement(customerId, companyId, startDate, endDate);
   }

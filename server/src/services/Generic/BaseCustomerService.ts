@@ -72,6 +72,17 @@ export class BaseCustomerService {
     return { rows: repoResult.rows, count: repoResult.count };
   }
 
+  async GetSummary(customerId: UUID, companyId: UUID) {
+    Logger.debug(`[${this.domainLabel}] Fetching customer summary`, { customerId, companyId });
+
+    if (!customerId) throw new ValidationError("Customer ID is required");
+
+    const response = await this.repo.getSummary(customerId, companyId);
+    if (!response) throw new NotFoundError("Customer not found");
+
+    return response;
+  }
+
   async GetStatement(customerId: UUID, companyId: UUID, startDate?: string, endDate?: string) {
     Logger.debug(`[${this.domainLabel}] Fetching customer statement`, { customerId, companyId, startDate, endDate });
 

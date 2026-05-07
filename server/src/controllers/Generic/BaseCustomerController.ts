@@ -40,6 +40,14 @@ export function createCustomerController(service: any, label: string) {
     res.json({ success: true, data });
   }));
 
+  router.get("/customers/:id/summary", asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const companyId = req.user.companyId;
+    Logger.debug(`[${label}Controller] Get customer summary request`, { customerId: id, companyId });
+    const data = await service.GetSummary(id, companyId);
+    res.json({ success: true, data });
+  }));
+
   router.get("/customers/:id/statement",
     asyncHandler(async (req: Request<{ id: string }, {}, {}, { startDate?: string; endDate?: string }>, res: Response) => {
       const { id } = req.params;

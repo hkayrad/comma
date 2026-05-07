@@ -183,6 +183,35 @@ export class CustomerRepository {
         return { rows: result, count: totalCount };
     }
 
+	async getSummary(customerId: UUID, companyId: UUID): Promise<CustomerDto | null> {
+		const query = `
+			SELECT
+		    c.*,
+		    comp.small_logo_path,
+		    COALESCE(ds.total_debt, 0) AS total_debt,
+		    COALESCE(ps.total_payments, 0) AS total_payments,
+		    COALESCE(ds.total_debt, 0) - COALESCE(ps.total_payments, 0) AS remaining_debt
+			FROM ${this.domain}_customers c
+			INNER JOIN companies comp ON c.company_id = comp.id
+			LEFT JOIN vw_${this.domain}_debt_summary ds
+		    ON c.id = ds.customer_id
+		    AND c.company_id = ds.company_id
+			LEFT JOIN vw_${this.domain}_payment_summary ps
+		    ON c.id = ps.customer_id
+		    AND c.company_id = ps.company_id
+			WHERE c.id = ?
+			  AND c.company_id = ?
+			  AND c.deleted_at IS NULL;
+		`;
+
+		const result = (await sequelize.query(query, {
+			replacements: [customerId, companyId],
+			type: QueryTypes.SELECT,
+		})) as CustomerDto[];
+
+		return result.length > 0 ? result[0] : null;
+	}
+
 	async getStatement(
 		customerId: UUID,
 		companyId: UUID,
