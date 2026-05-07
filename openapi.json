@@ -162,6 +162,5626 @@
           }
         }
       }
+    },
+    "/configs": {
+      "get": {
+        "summary": "Get all configurations",
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of configs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "configs": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "configs"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No configs found"
+          }
+        }
+      },
+      "post": {
+        "summary": "Set configuration",
+        "description": "Requires Admin role",
+        "tags": [
+          "Config"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "configKey": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "configValue": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "configKey",
+                  "configValue"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Config set successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/configs/{configKey}": {
+      "get": {
+        "summary": "Get configuration by key",
+        "tags": [
+          "Config"
+        ],
+        "parameters": [
+          {
+            "name": "configKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of config",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "configKey": {
+                      "type": "string"
+                    },
+                    "configValue": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "configKey",
+                    "configValue"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Config not found"
+          }
+        }
+      }
+    },
+    "/configs/start-maintenance": {
+      "post": {
+        "summary": "Start maintenance mode",
+        "description": "Requires Admin role",
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Maintenance mode started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/configs/end-maintenance": {
+      "post": {
+        "summary": "End maintenance mode",
+        "description": "Requires Admin role",
+        "tags": [
+          "Config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Maintenance mode ended successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/tcmb": {
+      "get": {
+        "summary": "Fetch TCMB exchange rates",
+        "tags": [
+          "TCMB"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of exchange rates",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching TCMB data"
+          }
+        }
+      }
+    },
+    "/companies": {
+      "put": {
+        "summary": "Update company details",
+        "tags": [
+          "Companies"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/id": {
+      "get": {
+        "summary": "Get company details by ID (from session)",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of company details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "is_company": {
+                          "type": "boolean"
+                        },
+                        "address": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "phone": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "email": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "email"
+                        },
+                        "tax_number": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "tax_office": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "mersis_no": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "small_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "large_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "is_company"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/logo/small": {
+      "post": {
+        "summary": "Upload small logo",
+        "tags": [
+          "Companies"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete small logo",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Logo deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/logo/large": {
+      "post": {
+        "summary": "Upload large logo",
+        "tags": [
+          "Companies"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete large logo",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Logo deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/companies/logos": {
+      "get": {
+        "summary": "Get company logos",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of logos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "small_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "large_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "small_logo_path",
+                        "large_logo_path"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies": {
+      "post": {
+        "summary": "Create a new company",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all companies",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of companies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{id}": {
+      "get": {
+        "summary": "Get company by ID",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update company",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete company",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/companies/{id}/restore": {
+      "post": {
+        "summary": "Restore company",
+        "tags": [
+          "Admin - Companies"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users": {
+      "post": {
+        "summary": "Create a new user",
+        "tags": [
+          "Admin - Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "company_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 100
+                  },
+                  "role": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 99,
+                    "default": 0
+                  }
+                },
+                "required": [
+                  "company_id",
+                  "username",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/company/{companyId}": {
+      "get": {
+        "summary": "Get all users for a company",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{id}": {
+      "get": {
+        "summary": "Get user by ID",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{id}/restore": {
+      "post": {
+        "summary": "Restore user",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{id}/reset-password": {
+      "post": {
+        "summary": "Reset user password",
+        "tags": [
+          "Admin - Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers": {
+      "post": {
+        "summary": "Create a new receivable customer",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all receivable customers",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers/batch": {
+      "post": {
+        "summary": "Create multiple receivable customers",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "phone": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 20
+                    },
+                    "is_company": {
+                      "type": "boolean"
+                    },
+                    "tax_number": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 11
+                    },
+                    "tax_office": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 255
+                    },
+                    "mersis_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 16
+                    },
+                    "email": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "nullable": true,
+                          "maxLength": 255,
+                          "format": "email"
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            ""
+                          ]
+                        },
+                        {
+                          "nullable": true
+                        }
+                      ]
+                    },
+                    "address": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "is_company"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customers created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers/{id}/statement": {
+      "get": {
+        "summary": "Get customer statement",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of statement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers/id-name": {
+      "get": {
+        "summary": "Get customer IDs and names",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of customer IDs and names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers/{id}": {
+      "put": {
+        "summary": "Update receivable customer",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete receivable customer",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/customers/{id}/restore": {
+      "post": {
+        "summary": "Restore receivable customer",
+        "tags": [
+          "Receivables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts": {
+      "post": {
+        "summary": "Create a new receivable debt",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "vat": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "withholding": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "discount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "issue_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "vat",
+                  "currency",
+                  "exchange_rate",
+                  "issue_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debt created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all receivable debts",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of debts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts/batch": {
+      "post": {
+        "summary": "Create multiple receivable debts",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "customer_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "invoice_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 100
+                    },
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "vat": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "withholding": {
+                      "type": "number",
+                      "minimum": 0,
+                      "default": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "enum": [
+                        "TRY",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "exchange_rate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "discount": {
+                      "type": "number",
+                      "minimum": 0,
+                      "default": 0
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    },
+                    "issue_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    },
+                    "due_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "customer_id",
+                    "amount",
+                    "vat",
+                    "currency",
+                    "exchange_rate",
+                    "issue_date"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Debts created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts/totals": {
+      "get": {
+        "summary": "Get receivable debt totals",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of debt totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts/{id}": {
+      "put": {
+        "summary": "Update receivable debt",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "vat": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "withholding": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "discount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "issue_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "vat",
+                  "currency",
+                  "exchange_rate",
+                  "issue_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debt updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete receivable debt",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts/{id}/restore": {
+      "post": {
+        "summary": "Restore receivable debt",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/debts/upcoming-due-dates": {
+      "get": {
+        "summary": "Get upcoming due dates for receivable debts",
+        "tags": [
+          "Receivables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of upcoming due dates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/payments": {
+      "post": {
+        "summary": "Create a new receivable payment",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "check",
+                      "card"
+                    ]
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "payment_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "currency",
+                  "exchange_rate",
+                  "payment_method",
+                  "payment_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all receivable payments",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of payments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/payments/batch": {
+      "post": {
+        "summary": "Create multiple receivable payments",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "customer_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "currency": {
+                      "type": "string",
+                      "enum": [
+                        "TRY",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "exchange_rate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "payment_method": {
+                      "type": "string",
+                      "enum": [
+                        "cash",
+                        "bank_transfer",
+                        "check",
+                        "card"
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    },
+                    "invoice_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 100
+                    },
+                    "payment_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    },
+                    "due_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "customer_id",
+                    "amount",
+                    "currency",
+                    "exchange_rate",
+                    "payment_method",
+                    "payment_date"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payments created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/payments/{id}": {
+      "put": {
+        "summary": "Update receivable payment",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "check",
+                      "card"
+                    ]
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "payment_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "currency",
+                  "exchange_rate",
+                  "payment_method",
+                  "payment_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete receivable payment",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/payments/{id}/restore": {
+      "post": {
+        "summary": "Restore receivable payment",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receivables/payments/upcoming-checks": {
+      "get": {
+        "summary": "Get upcoming checks for receivable payments",
+        "tags": [
+          "Receivables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of upcoming checks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers": {
+      "post": {
+        "summary": "Create a new payable customer",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all payable customers",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers/batch": {
+      "post": {
+        "summary": "Create multiple payable customers",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255
+                    },
+                    "phone": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 20
+                    },
+                    "is_company": {
+                      "type": "boolean"
+                    },
+                    "tax_number": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 11
+                    },
+                    "tax_office": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 255
+                    },
+                    "mersis_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 16
+                    },
+                    "email": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "nullable": true,
+                          "maxLength": 255,
+                          "format": "email"
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            ""
+                          ]
+                        },
+                        {
+                          "nullable": true
+                        }
+                      ]
+                    },
+                    "address": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "is_company"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customers created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers/{id}/statement": {
+      "get": {
+        "summary": "Get customer statement",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of statement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers/id-name": {
+      "get": {
+        "summary": "Get customer IDs and names",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of customer IDs and names",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers/{id}": {
+      "put": {
+        "summary": "Update payable customer",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 20
+                  },
+                  "is_company": {
+                    "type": "boolean"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 11
+                  },
+                  "tax_office": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 255
+                  },
+                  "mersis_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 16
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 255,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "name",
+                  "is_company"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete payable customer",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/customers/{id}/restore": {
+      "post": {
+        "summary": "Restore payable customer",
+        "tags": [
+          "Payables - Customers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts": {
+      "post": {
+        "summary": "Create a new payable debt",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "vat": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "withholding": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "discount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "issue_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "vat",
+                  "currency",
+                  "exchange_rate",
+                  "issue_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debt created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all payable debts",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of debts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts/batch": {
+      "post": {
+        "summary": "Create multiple payable debts",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "customer_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "invoice_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 100
+                    },
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "vat": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "withholding": {
+                      "type": "number",
+                      "minimum": 0,
+                      "default": 0
+                    },
+                    "currency": {
+                      "type": "string",
+                      "enum": [
+                        "TRY",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "exchange_rate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "discount": {
+                      "type": "number",
+                      "minimum": 0,
+                      "default": 0
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    },
+                    "issue_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    },
+                    "due_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "customer_id",
+                    "amount",
+                    "vat",
+                    "currency",
+                    "exchange_rate",
+                    "issue_date"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Debts created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts/totals": {
+      "get": {
+        "summary": "Get payable debt totals",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of debt totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts/{id}": {
+      "put": {
+        "summary": "Update payable debt",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "vat": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "withholding": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "discount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "issue_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "vat",
+                  "currency",
+                  "exchange_rate",
+                  "issue_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debt updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete payable debt",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts/{id}/restore": {
+      "post": {
+        "summary": "Restore payable debt",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Debt restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/debts/upcoming-due-dates": {
+      "get": {
+        "summary": "Get upcoming due dates for payable debts",
+        "tags": [
+          "Payables - Debts"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of upcoming due dates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/payments": {
+      "post": {
+        "summary": "Create a new payable payment",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "check",
+                      "card"
+                    ]
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "payment_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "currency",
+                  "exchange_rate",
+                  "payment_method",
+                  "payment_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all payable payments",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for sorting"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON string for filters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of payments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/payments/batch": {
+      "post": {
+        "summary": "Create multiple payable payments",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "customer_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "currency": {
+                      "type": "string",
+                      "enum": [
+                        "TRY",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "exchange_rate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "payment_method": {
+                      "type": "string",
+                      "enum": [
+                        "cash",
+                        "bank_transfer",
+                        "check",
+                        "card"
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500
+                    },
+                    "invoice_no": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 100
+                    },
+                    "payment_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    },
+                    "due_date": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "customer_id",
+                    "amount",
+                    "currency",
+                    "exchange_rate",
+                    "payment_method",
+                    "payment_date"
+                  ]
+                },
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payments created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/payments/{id}": {
+      "put": {
+        "summary": "Update payable payment",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "TRY",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "exchange_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "check",
+                      "card"
+                    ]
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 100
+                  },
+                  "payment_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "customer_id",
+                  "amount",
+                  "currency",
+                  "exchange_rate",
+                  "payment_method",
+                  "payment_date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete payable payment",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/payments/{id}/restore": {
+      "post": {
+        "summary": "Restore payable payment",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment restored successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payables/payments/upcoming-checks": {
+      "get": {
+        "summary": "Get upcoming checks for payable payments",
+        "tags": [
+          "Payables - Payments"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of upcoming checks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/username": {
+      "put": {
+        "summary": "Update username",
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newUsername": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 50
+                  },
+                  "currentPassword": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "newUsername",
+                  "currentPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Username updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/password": {
+      "put": {
+        "summary": "Update password",
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "currentPassword": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 100
+                  }
+                },
+                "required": [
+                  "currentPassword",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/status": {
+      "get": {
+        "summary": "Check 2FA status",
+        "tags": [
+          "2FA"
+        ],
+        "responses": {
+          "200": {
+            "description": "2FA status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/setup": {
+      "post": {
+        "summary": "Initiate 2FA setup",
+        "tags": [
+          "2FA"
+        ],
+        "responses": {
+          "200": {
+            "description": "2FA setup data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "qrCode": {
+                      "type": "string"
+                    },
+                    "secret": {
+                      "type": "string"
+                    },
+                    "setupToken": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "qrCode",
+                    "secret",
+                    "setupToken"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/verify-setup": {
+      "post": {
+        "summary": "Verify 2FA setup",
+        "tags": [
+          "2FA"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "setupToken": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "setupToken",
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "2FA setup completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "recoveryCodes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "recoveryCodes",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/verify": {
+      "post": {
+        "summary": "Verify 2FA code during login",
+        "tags": [
+          "2FA"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "tempToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "2FA verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "username",
+                    "role"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/recovery": {
+      "post": {
+        "summary": "Use 2FA recovery code",
+        "tags": [
+          "2FA"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "tempToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "2FA recovery code used",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "remainingCodes": {
+                      "type": "number"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "remainingCodes",
+                    "username",
+                    "role"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/2fa/disable": {
+      "post": {
+        "summary": "Disable 2FA",
+        "tags": [
+          "2FA"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "2FA disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/monthly": {
+      "get": {
+        "summary": "Get monthly statistics",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "startDate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "months",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Monthly statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal/login": {
+      "post": {
+        "summary": "Customer portal login",
+        "tags": [
+          "Portal"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "companyId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 11,
+                    "pattern": "^[0-9]+$"
+                  }
+                },
+                "required": [
+                  "companyId",
+                  "tax_number"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Portal login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal/company/{id}": {
+      "get": {
+        "summary": "Get public company info for portal",
+        "tags": [
+          "Portal"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public company info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "small_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "large_logo_path": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "small_logo_path",
+                        "large_logo_path"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal/overview": {
+      "get": {
+        "summary": "Get portal overview",
+        "tags": [
+          "Portal"
+        ],
+        "responses": {
+          "200": {
+            "description": "Portal overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "customer": {
+                          "nullable": true
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal/statement": {
+      "get": {
+        "summary": "Get portal statement",
+        "tags": [
+          "Portal"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "startDate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "endDate",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portal statement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
