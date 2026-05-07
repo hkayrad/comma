@@ -30,5 +30,5 @@ if (spec.paths) {
   });
 }
 
-fs.writeFileSync(path.join(rootDir, 'API.md'), markdown);
+fs.writeFileSync(path.join(rootDir, 'API-AUTOGEN.md'), markdown);
 console.log('Docs generated successfully.');
