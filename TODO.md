@@ -8,10 +8,12 @@ This file tracks technical debt, maintenance tasks, and planned feature expansio
 - [x] **Startup Validation:** Implement environment variable validation (e.g., using `envalid`) in `server/src/index.ts`.
 
 ## Quality & Testing
+- [ ] **Backend Coverage:** Increase test coverage for `Receivable` and `Payable` services in `server/src/tests`.
+- [x] **OpenAPI Integration:** Automate API documentation generation to keep `API.md` in sync with Express routes.
+
+## UI Testing
 - [ ] **Frontend Testing Suite:** Setup Vitest + React Testing Library in `client/`.
 - [ ] **Core UI Tests:** Add tests for financial components and calculation utilities in the frontend.
-- [ ] **Backend Coverage:** Increase test coverage for `Receivable` and `Payable` services in `server/src/tests`.
-- [ ] **OpenAPI Integration:** Automate API documentation generation to keep `API.md` in sync with Express routes.
 
 ## DevOps & CI/CD
 - [ ] **CI Pipeline:** Create GitHub Actions to automate linting, type-checking, and testing on PRs.
