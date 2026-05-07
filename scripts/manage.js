@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -7,8 +8,7 @@ const buildDir = path.join(root, "build");
 
 async function run(command, cwd) {
     return new Promise((resolve, reject) => {
-        const [cmd, ...args] = command.split(" ");
-        const proc = spawn(cmd, args, {
+        const proc = spawn(command, {
             cwd,
             stdio: "inherit",
             shell: true
@@ -18,7 +18,42 @@ async function run(command, cwd) {
             if (code === 0) resolve();
             else reject(new Error(`Command failed: ${command} in ${cwd}`));
         });
+
+        proc.on("error", (err) => {
+            reject(err);
+        });
     });
+}
+
+function spawnDev(name, command, cwd, color) {
+    const [cmd, ...args] = command.split(" ");
+    const proc = spawn(cmd, args, { cwd, shell: true });
+
+    proc.stdout.on("data", (data) => {
+        process.stdout.write(`\x1b[${color}m[${name}]\x1b[0m ${data}`);
+    });
+
+    proc.stderr.on("data", (data) => {
+        process.stderr.write(`\x1b[${color}m[${name}]\x1b[0m ${data}`);
+    });
+
+    return proc;
+}
+
+async function dev() {
+    console.log("Starting development servers...");
+    const clientProc = spawnDev("Client", "npm run dev", path.join(root, "client"), "32"); // Green
+    const serverProc = spawnDev("Server", "npm run dev", path.join(root, "server"), "34"); // Blue
+
+    const cleanup = () => {
+        console.log("\nStopping servers...");
+        clientProc.kill();
+        serverProc.kill();
+        process.exit();
+    };
+
+    process.on("SIGINT", cleanup);
+    process.on("SIGTERM", cleanup);
 }
 
 async function build() {
@@ -59,6 +94,11 @@ if (command === "build") {
         console.error(err);
         process.exit(1);
     });
-} else if (!command) {
+} else if (command === "dev") {
+    dev().catch(err => {
+        console.error(err);
+        process.exit(1);
+    });
+} else {
     console.log("Usage: node scripts/manage.js <build|dev>");
 }
