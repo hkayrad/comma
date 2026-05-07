@@ -40,5 +40,4 @@ CodeReviewReport.md
 docs/
 dumps/
 .worktrees/
-
-.worktrees/
+**/*.tsbuildinfo
