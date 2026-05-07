@@ -10,6 +10,6 @@ export function generateOpenApiSpec() {
       title: 'Comma API',
       description: 'Financial Transaction Management API',
     },
-    servers: [{ url: '/api' }],
+    servers: [{ url: '/' }],
   });
 }

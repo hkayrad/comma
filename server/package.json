@@ -12,6 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@comma/common": "*",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
