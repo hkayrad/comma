@@ -6,6 +6,7 @@ import './routes/tcmb';
 import './routes/companies';
 import './routes/admin';
 import './routes/receivables';
+import './routes/payables';
 
 export function generateOpenApiSpec() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
