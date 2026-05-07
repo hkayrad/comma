@@ -23,7 +23,7 @@ This file tracks technical debt, maintenance tasks, and planned feature expansio
 ## Performance & DX
 - [ ] **Image Optimization:** Implement automated image resizing/optimization for logos using `sharp`.
 - [ ] **Global Loading States:** Add a centralized loading indicator for API-heavy interactions.
-- [ ] **Cross-Platform Scripts:** Consolidate `build.sh` and `build.ps1` into a unified Node-based task runner.
+- [x] **Cross-Platform Scripts:** Consolidate `build.sh` and `build.ps1` into a unified Node-based task runner.
 
 ## Feature Expansions
 - [ ] **Server-side Data Tables:** Implement server-side filtering, sorting, and pagination for large datasets.
