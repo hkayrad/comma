@@ -76,13 +76,15 @@ export default function PortalDashboard() {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <CommaImage
-              src={
-                customer?.small_logo_path
-                  ? `${import.meta.env.VITE_API_URL}/uploads/logos/${customer.small_logo_path}`
-                  : "/logo.webp"
-              }
+              // src={
+              //   customer?.small_logo_path
+              //     ? `${import.meta.env.VITE_API_URL}/uploads/logos/${customer.small_logo_path}`
+              //     : "/logo.webp"
+              // }
+              // TODO: Fix the logo url
+              src={"/logo.webp"}
               alt="Company Logo"
-              className="w-12 h-12 object-contain"
+              className="h-12 object-contain"
             />
             <h1 className="text-3xl font-bold tracking-tight">Müşteri Portalı</h1>
           </div>

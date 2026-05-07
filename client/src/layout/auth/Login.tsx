@@ -9,6 +9,7 @@ import {
   Eye,
   EyeOff,
   Globe,
+  InfoIcon,
   KeyRound,
   LogIn,
   Moon,
@@ -52,6 +53,8 @@ import TwoFactorVerify from "./TwoFactorVerify";
 import { CommaImage } from "@/components/shared/CommaImage";
 
 import { loginSchema } from "@common";
+import { useDialog } from "@/contexts/dialog";
+import InfoDialog from "../shared/sidebar/components/InfoDialog";
 
 export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -65,6 +68,7 @@ export default function Login() {
   const login = useUser((s) => s.login);
   const setUser = useUser((s) => s.setUser);
   const { t, i18n } = useTranslation();
+  const openDialog = useDialog((s) => s.openDialog);
 
   const formSchema = loginSchema.extend({
     username: z
@@ -143,6 +147,16 @@ export default function Login() {
     setPendingUsername("");
   }, []);
 
+  const handleInfo = useCallback(async () => {
+    openDialog({
+      title: t("dialog.info.title"),
+      description: t("dialog.info.description"),
+      size: "xl",
+      content: <InfoDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog, t]);
+
   //WARN DEBUG LOGIN
   const sysAdminLogin = useCallback(async () => {
     form.setValue("username", "admin");
@@ -180,6 +194,22 @@ export default function Login() {
                 nativeButton
                 size="icon"
                 className="absolute bottom-4 right-4"
+                onClick={handleInfo}
+              >
+                <InfoIcon />
+              </Button>
+            )}
+          />
+          <TooltipContent side="left">{t("sidebar.footer.info.label")}</TooltipContent>
+        </Tooltip>
+        <Tooltip disableHoverablePopup>
+          <TooltipTrigger
+            render={(props) => (
+              <Button
+                {...props}
+                nativeButton
+                size="icon"
+                className="absolute bottom-16 right-4"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               >
                 {theme === "dark" ? (
@@ -198,7 +228,7 @@ export default function Login() {
               render={(props) => (
                 <MenuTrigger
                   {...props}
-                  className="absolute bottom-16 right-4"
+                  className="absolute bottom-28 right-4"
                   render={(props) => (
                     <Button {...props} size="icon">
                       <Globe />
