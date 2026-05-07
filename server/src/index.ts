@@ -23,6 +23,8 @@ import UserSettingsController from "@/controllers/UserSettingsController";
 import TwoFactorController from "@/controllers/TwoFactorController";
 import StatsController from "@/controllers/StatsController";
 import PortalController from "@/controllers/PortalController";
+import swaggerUi from "swagger-ui-express";
+import { generateOpenApiSpec } from "@/lib/openapi/generator";
 import { env } from "@/lib/utils/env";
 import { Logger } from "@/lib/utils/logger";
 import { sequelize } from "@/lib/db/sequelize";
@@ -123,6 +125,9 @@ app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);
 app.use("/stats", StatsController);
 app.use("/portal", PortalController);
+
+const openApiSpec = generateOpenApiSpec();
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 // Global error handler — must be registered AFTER all routes
 app.use(errorHandler);
