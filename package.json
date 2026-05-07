@@ -8,7 +8,8 @@
     "server"
   ],
   "scripts": {
-    "dev": "echo 'Run npm run dev in client/ and server/ separately'",
+    "dev": "node scripts/manage.js dev",
+    "build:prod": "node scripts/manage.js build",
     "build": "npm run build --workspace=common && npm run build --workspace=client && npm run build --workspace=server",
     "build:common": "npm run build --workspace=common",
     "build:client": "npm run build --workspace=client",
