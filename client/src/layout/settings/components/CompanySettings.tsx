@@ -1,4 +1,3 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LogoForm from "./LogoForm";
 import InformationForm from "./InformationForm";
 import { useTranslation } from "react-i18next";

@@ -25,7 +25,6 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CancelButton from "../../shared/CancelButton";
 import TwoFactorSetup from "../../shared/dialog/TwoFactorSetup";
 
@@ -36,7 +35,6 @@ export default function UserSettings() {
   const dialogContext = useDialog();
   const user = useUser((s) => s.user);
   const setUser = useUser((s) => s.setUser);
-  const [activeTab, setActiveTab] = useState("username");
 
   const closeDialog = useCallback(() => {
     if (dialogContext?.closeDialog) {
