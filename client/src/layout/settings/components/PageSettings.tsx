@@ -21,42 +21,46 @@ export default function PageSettings() {
   );
 
     return (
-        <div className="flex flex-col gap-6 mt-4">
-            <div className="flex flex-col gap-2">
-                <h3 className="text-sm font-medium text-muted-foreground">{t("sidebar.pageSettings.generalTab", { defaultValue: "Ana Sayfa" })}</h3>
-                <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
-                    <Label htmlFor="overview-cards" className="flex-1 text-sm cursor-pointer select-none">
-                        {t("sidebar.pageSettings.overviewCards")}
-                    </Label>
-                    <Switch
-                        id="overview-cards"
-                        checked={showOverviewCards}
-                        onCheckedChange={setShowOverviewCards}
-                    />
-                </div>
-                <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
-                    <Label htmlFor="statistics-chart" className="flex-1 text-sm cursor-pointer select-none">
-                        {t("sidebar.pageSettings.statisticsChart")}
-                    </Label>
-                    <Switch
-                        id="statistics-chart"
-                        checked={showStatisticsChart}
-                        onCheckedChange={setShowStatisticsChart}
-                    />
+        <div className="flex flex-col gap-12 mt-4">
+            <div className="space-y-6">
+                <h3 className="text-xl font-semibold border-b pb-2">{t("sidebar.pageSettings.generalTab", { defaultValue: "General" })}</h3>
+                <div className="space-y-2 max-w-2xl">
+                    <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                        <Label htmlFor="overview-cards" className="flex-1 text-sm cursor-pointer select-none">
+                            {t("sidebar.pageSettings.overviewCards")}
+                        </Label>
+                        <Switch
+                            id="overview-cards"
+                            checked={showOverviewCards}
+                            onCheckedChange={setShowOverviewCards}
+                        />
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                        <Label htmlFor="statistics-chart" className="flex-1 text-sm cursor-pointer select-none">
+                            {t("sidebar.pageSettings.statisticsChart")}
+                        </Label>
+                        <Switch
+                            id="statistics-chart"
+                            checked={showStatisticsChart}
+                            onCheckedChange={setShowStatisticsChart}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-                <h3 className="text-sm font-medium text-muted-foreground">{t("sidebar.pageSettings.tablesTab", { defaultValue: "Tablolar" })}</h3>
-                <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
-                    <Label htmlFor="context-menu-actions" className="flex-1 text-sm cursor-pointer select-none">
-                        {t("sidebar.pageSettings.contextMenuActions", { defaultValue: "Tablo aksiyonlarını sağ tık menüsünde göster" })}
-                    </Label>
-                    <Switch
-                        id="context-menu-actions"
-                        checked={useContextMenuForActions}
-                        onCheckedChange={setUseContextMenuForActions}
-                    />
+            <div className="space-y-6">
+                <h3 className="text-xl font-semibold border-b pb-2">{t("sidebar.pageSettings.tablesTab", { defaultValue: "Tables" })}</h3>
+                <div className="space-y-2 max-w-2xl">
+                    <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                        <Label htmlFor="context-menu-actions" className="flex-1 text-sm cursor-pointer select-none">
+                            {t("sidebar.pageSettings.contextMenuActions", { defaultValue: "Show table actions in right-click menu" })}
+                        </Label>
+                        <Switch
+                            id="context-menu-actions"
+                            checked={useContextMenuForActions}
+                            onCheckedChange={setUseContextMenuForActions}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
