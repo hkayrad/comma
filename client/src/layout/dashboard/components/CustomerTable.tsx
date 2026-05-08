@@ -729,6 +729,15 @@ export default function CustomerTable(props: Props) {
             <Pencil className="mr-2 h-4 w-4" />
             {t("dashboard.table.column.actions.edit_details")}
           </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              const portalUrl = `${window.location.origin}/p/${c.company_id}`;
+              copyToClipboard(portalUrl, t);
+            }}
+          >
+            <Share2 className="mr-2 h-4 w-4" />
+            {t("dashboard.table.column.actions.share_portal")}
+          </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
             className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
