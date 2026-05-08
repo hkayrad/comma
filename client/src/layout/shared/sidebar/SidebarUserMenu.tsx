@@ -27,8 +27,8 @@ import {
   EllipsisVertical,
   LogOut,
   Moon,
-  Settings,
   Sun,
+  Info,
 } from "lucide-react";
 import {
   SidebarGroup,
@@ -46,7 +46,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
-import InfoDialog from "../dialog/components/InfoDialog";
+import InfoDialog from "./components/InfoDialog";
 
 export default function SidebarUserMenu() {
   const navigate = useNavigate();

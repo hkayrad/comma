@@ -35,12 +35,15 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
 export default function InformationForm() {
   const [companyDetails, setCompanyDetails] = useState<CompanyDto | null>(null);
 
+  const location = useLocation();
+  const isSettingsPage = location.pathname.includes("/ayarlar");
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
 
@@ -409,7 +412,7 @@ export default function InformationForm() {
           )}
         />
         <div className="flex justify-end gap-2 col-span-2">
-          <CancelButton onClick={onCancel} />
+          {!isSettingsPage && <CancelButton onClick={onCancel} />}
           <Button type="submit">{t("vars.save")}</Button>
         </div>
       </form>

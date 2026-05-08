@@ -23,72 +23,120 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto py-10 px-4 md:px-10 lg:px-24 h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
-      <div className="flex flex-col gap-8 max-w-5xl mx-auto">
+    <div className="container mx-auto py-10 px-4 md:px-10 lg:px-16 h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+      <div className="flex flex-col gap-8 max-w-7xl mx-auto">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("sidebar.footer.account.settings")}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("sidebar.footer.account.settings")}
+          </h1>
           <p className="text-muted-foreground">
-            {t("settings.description", { defaultValue: "Hesap, şirket ve uygulama ayarlarınızı buradan yönetebilirsiniz." })}
+            {t("settings.description", {
+              defaultValue:
+                "Hesap, şirket ve uygulama ayarlarınızı buradan yönetebilirsiniz.",
+            })}
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[600px] mb-8">
-            <TabsTrigger value="hesap" className="flex items-center gap-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={onTabChange}
+          orientation="vertical"
+          className="flex flex-col md:flex-row gap-10"
+        >
+          <TabsList className="flex flex-col w-full md:w-64 h-fit bg-transparent p-0 gap-1 items-stretch">
+            <TabsTrigger
+              value="hesap"
+              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
+            >
               <User className="h-4 w-4" />
-              <span>{t("settings.tabs.account", { defaultValue: "Hesap" })}</span>
+              <span className="font-medium">
+                {t("settings.tabs.account", { defaultValue: "Hesap" })}
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="sirket" className="flex items-center gap-2">
+            <TabsTrigger
+              value="sirket"
+              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
+            >
               <Building2 className="h-4 w-4" />
-              <span>{t("settings.tabs.company", { defaultValue: "Şirket" })}</span>
+              <span className="font-medium">
+                {t("settings.tabs.company", { defaultValue: "Şirket" })}
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="gorunum" className="flex items-center gap-2">
+            <TabsTrigger
+              value="gorunum"
+              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
+            >
               <Palette className="h-4 w-4" />
-              <span>{t("settings.tabs.appearance", { defaultValue: "Görünüm" })}</span>
+              <span className="font-medium">
+                {t("settings.tabs.appearance", { defaultValue: "Görünüm" })}
+              </span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="hesap">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("settings.tabs.account", { defaultValue: "Hesap Ayarları" })}</CardTitle>
-                <CardDescription>
-                  {t("settings.account.description", { defaultValue: "Kullanıcı adı, şifre ve iki faktörlü doğrulama ayarlarınızı güncelleyin." })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <UserSettings />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <div className="flex-1">
+            <TabsContent value="hesap">
+              <Card className="border-none shadow-none bg-transparent">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle>
+                    {t("settings.tabs.account", {
+                      defaultValue: "Hesap Ayarları",
+                    })}
+                  </CardTitle>
+                  <CardDescription>
+                    {t("settings.account.description", {
+                      defaultValue:
+                        "Kullanıcı adı, şifre ve iki faktörlü doğrulama ayarlarınızı güncelleyin.",
+                    })}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-0">
+                  <UserSettings />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="sirket">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("settings.tabs.company", { defaultValue: "Şirket Ayarları" })}</CardTitle>
-                <CardDescription>
-                  {t("settings.company.description", { defaultValue: "Şirket bilgilerini ve logolarını buradan düzenleyebilirsiniz." })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CompanySettings />
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent value="sirket">
+              <Card className="border-none shadow-none bg-transparent">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle>
+                    {t("settings.tabs.company", {
+                      defaultValue: "Şirket Ayarları",
+                    })}
+                  </CardTitle>
+                  <CardDescription>
+                    {t("settings.company.description", {
+                      defaultValue:
+                        "Şirket bilgilerini ve logolarını buradan düzenleyebilirsiniz.",
+                    })}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-0">
+                  <CompanySettings />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <TabsContent value="gorunum">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("settings.tabs.appearance", { defaultValue: "Görünüm Ayarları" })}</CardTitle>
-                <CardDescription>
-                  {t("settings.appearance.description", { defaultValue: "Uygulama arayüzü ve tablo görüntüleme tercihlerini kişiselleştirin." })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PageSettings />
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent value="gorunum">
+              <Card className="border-none shadow-none bg-transparent">
+                <CardHeader className="px-0 pt-0">
+                  <CardTitle>
+                    {t("settings.tabs.appearance", {
+                      defaultValue: "Görünüm Ayarları",
+                    })}
+                  </CardTitle>
+                  <CardDescription>
+                    {t("settings.appearance.description", {
+                      defaultValue:
+                        "Uygulama arayüzü ve tablo görüntüleme tercihlerini kişiselleştirin.",
+                    })}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-0">
+                  <PageSettings />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>

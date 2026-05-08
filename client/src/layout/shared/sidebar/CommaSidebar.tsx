@@ -1,5 +1,4 @@
 import {
-  CompanyAdminOnly,
   NonSystemAdminOnly,
   SystemAdminOnly,
 } from "@/layout/auth/RoleGuard";
@@ -7,9 +6,7 @@ import NonSystemAdminSidebarContent from "./NonSystemAdminSidebar";
 import SystemAdminSidebarContent from "./SystemAdminSidebar";
 import { useCallback } from "react";
 import {
-  Info,
   Settings,
-  Wrench,
   Bell,
 } from "lucide-react";
 import {
@@ -27,8 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useDialog } from "@/contexts/dialog";
-import InfoDialog from "./components/InfoDialog";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import UpcomingDueDates from "@/layout/dashboard/components/UpcomingDueDates";

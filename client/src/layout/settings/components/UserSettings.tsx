@@ -22,6 +22,7 @@ import { Eye, EyeOff, KeyRound, User as UserIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,6 +31,8 @@ import TwoFactorSetup from "../../shared/dialog/TwoFactorSetup";
 
 export default function UserSettings() {
   const { t } = useTranslation();
+  const location = useLocation();
+  const isSettingsPage = location.pathname.includes("/ayarlar");
   const dialogContext = useDialog();
   const user = useUser((s) => s.user);
   const setUser = useUser((s) => s.setUser);
@@ -259,7 +262,7 @@ export default function UserSettings() {
               )}
             />
             <div className="flex justify-end gap-2">
-              {dialogContext?.closeDialog && <CancelButton onClick={onCancel} />}
+              {!isSettingsPage && <CancelButton onClick={onCancel} />}
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>
@@ -400,7 +403,7 @@ export default function UserSettings() {
               )}
             />
             <div className="flex justify-end gap-2">
-              {dialogContext?.closeDialog && <CancelButton onClick={onCancel} />}
+              {!isSettingsPage && <CancelButton onClick={onCancel} />}
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>
