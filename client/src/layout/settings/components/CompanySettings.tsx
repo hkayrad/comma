@@ -6,23 +6,24 @@ import { useTranslation } from "react-i18next";
 export default function CompanySettings() {
   const { t } = useTranslation();
   return (
-    <Tabs defaultValue="info" className="w-full">
-      <TabsList>
-        <TabsTrigger value="info">
+    <div className="flex flex-col gap-16">
+      <section className="space-y-6">
+        <h3 className="text-xl font-semibold border-b pb-2">
           {t("dialog.accountDetails.accountInformation")}
-        </TabsTrigger>
-        <TabsTrigger value="logos">
+        </h3>
+        <div className="py-4">
+          <InformationForm />
+        </div>
+      </section>
+
+      <section className="space-y-6">
+        <h3 className="text-xl font-semibold border-b pb-2">
           {t("dialog.accountDetails.logos")}
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="info" className="mt-4">
-        <InformationForm />
-      </TabsContent>
-
-      <TabsContent value="logos" className="mt-4">
-        <LogoForm />
-      </TabsContent>
-    </Tabs>
+        </h3>
+        <div className="py-4">
+          <LogoForm />
+        </div>
+      </section>
+    </div>
   );
 }

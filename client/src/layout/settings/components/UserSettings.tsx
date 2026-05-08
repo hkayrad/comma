@@ -170,24 +170,16 @@ export default function UserSettings() {
   );
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList>
-        <TabsTrigger value="username">
+    <div className="flex flex-col gap-16">
+      {/* Username Section */}
+      <section className="space-y-6">
+        <h3 className="text-xl font-semibold border-b pb-2">
           {t("settings.tabs.username")}
-        </TabsTrigger>
-        <TabsTrigger value="password">
-          {t("settings.tabs.password")}
-        </TabsTrigger>
-        <TabsTrigger value="2fa">
-          {t("twoFactor.settings.title")}
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="username" className="mt-4">
+        </h3>
         <Form {...usernameForm}>
           <form
             onSubmit={usernameForm.handleSubmit(onSubmitUsername)}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-6 max-w-2xl"
           >
             <FormField
               control={usernameForm.control}
@@ -267,13 +259,17 @@ export default function UserSettings() {
             </div>
           </form>
         </Form>
-      </TabsContent>
+      </section>
 
-      <TabsContent value="password" className="mt-4">
+      {/* Password Section */}
+      <section className="space-y-6">
+        <h3 className="text-xl font-semibold border-b pb-2">
+          {t("settings.tabs.password")}
+        </h3>
         <Form {...passwordForm}>
           <form
             onSubmit={passwordForm.handleSubmit(onSubmitPassword)}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-6 max-w-2xl"
           >
             <FormField
               control={passwordForm.control}
@@ -408,11 +404,17 @@ export default function UserSettings() {
             </div>
           </form>
         </Form>
-      </TabsContent>
+      </section>
 
-      <TabsContent value="2fa" className="mt-4">
-        <TwoFactorSetup onComplete={closeDialog} />
-      </TabsContent>
-    </Tabs>
+      {/* 2FA Section */}
+      <section className="space-y-6">
+        <h3 className="text-xl font-semibold border-b pb-2">
+          {t("twoFactor.settings.title")}
+        </h3>
+        <div className="py-2">
+          <TwoFactorSetup onComplete={closeDialog} />
+        </div>
+      </section>
+    </div>
   );
 }
