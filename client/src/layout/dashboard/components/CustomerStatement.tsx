@@ -380,6 +380,7 @@ export default function CustomerStatement() {
             searchColumn="invoice_no"
             readOnly
             translationPrefix="debt"
+            hideHeader
             contextMenuItems={(item) => (
               <StatementRowActions
                 item={item}
@@ -400,6 +401,7 @@ export default function CustomerStatement() {
             searchColumn="invoice_no"
             readOnly
             translationPrefix="payment"
+            hideHeader
             contextMenuItems={(item) => (
               <StatementRowActions
                 item={item}

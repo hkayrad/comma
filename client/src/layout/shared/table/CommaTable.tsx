@@ -54,6 +54,7 @@ type Props = {
   readOnly?: boolean;
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
+  hideHeader?: boolean;
 };
 
 export default function CommaTable(props: Props) {
@@ -76,6 +77,7 @@ export default function CommaTable(props: Props) {
     readOnly,
     isPortal,
     translationPrefix,
+    hideHeader,
   } = props;
 
   const useContextMenuForActions = useDashboardSettings(
@@ -134,17 +136,19 @@ export default function CommaTable(props: Props) {
 
   return (
     <>
-      <div className="sticky -top-4 z-20 pb-2 bg-background">
-        <CommaTableHeader
-          table={table}
-          searchColumn={searchColumn}
-          tags={tags}
-          addButton={addButton}
-          readOnly={readOnly}
-          isPortal={isPortal}
-          translationPrefix={translationPrefix}
-        />
-      </div>
+      {!hideHeader && (
+        <div className="sticky -top-4 z-20 pb-2 bg-background">
+          <CommaTableHeader
+            table={table}
+            searchColumn={searchColumn}
+            tags={tags}
+            addButton={addButton}
+            readOnly={readOnly}
+            isPortal={isPortal}
+            translationPrefix={translationPrefix}
+          />
+        </div>
+      )}
       <div className="rounded-md border overflow-clip" data-table-export>
         <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
           <table className="w-full caption-bottom text-sm border-collapse">
