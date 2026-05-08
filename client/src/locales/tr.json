@@ -751,9 +751,22 @@
     }
   },
   "settings": {
+    "description": "Hesap, şirket ve uygulama ayarlarınızı buradan yönetebilirsiniz.",
     "tabs": {
+      "account": "Hesap",
+      "company": "Şirket",
+      "appearance": "Görünüm",
       "username": "Kullanıcı Adı Değiştir",
       "password": "Şifre Değiştir"
+    },
+    "account": {
+      "description": "Kullanıcı adı, şifre ve iki faktörlü doğrulama ayarlarınızı güncelleyin."
+    },
+    "company": {
+      "description": "Şirket bilgilerini ve logolarını buradan düzenleyebilirsiniz."
+    },
+    "appearance": {
+      "description": "Uygulama arayüzü ve tablo görüntüleme tercihlerini kişiselleştirin."
     },
     "form": {
       "username": {

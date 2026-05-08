@@ -751,9 +751,22 @@
     }
   },
   "settings": {
+    "description": "Manage your account, company, and application settings from here.",
     "tabs": {
+      "account": "Account",
+      "company": "Company",
+      "appearance": "Appearance",
       "username": "Change Username",
       "password": "Change Password"
+    },
+    "account": {
+      "description": "Update your username, password, and two-factor authentication settings."
+    },
+    "company": {
+      "description": "You can edit company information and logos here."
+    },
+    "appearance": {
+      "description": "Personalize the application interface and table display preferences."
     },
     "form": {
       "username": {

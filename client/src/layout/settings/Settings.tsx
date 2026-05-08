@@ -1,12 +1,27 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 import UserSettings from "./components/UserSettings";
 import CompanySettings from "./components/CompanySettings";
 import PageSettings from "./components/PageSettings";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { User, Building2, Palette } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { useMemo } from "react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/animate-ui/components/radix/sidebar";
 
 export default function Settings() {
   const { t } = useTranslation();
@@ -23,122 +38,130 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto py-10 px-4 md:px-10 lg:px-16 h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
-      <div className="flex flex-col gap-8 max-w-7xl mx-auto">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t("sidebar.footer.account.settings")}
-          </h1>
-          <p className="text-muted-foreground">
-            {t("settings.description", {
-              defaultValue:
-                "Hesap, şirket ve uygulama ayarlarınızı buradan yönetebilirsiniz.",
-            })}
-          </p>
+    <div className="h-full flex flex-col bg-background">
+      <SidebarProvider defaultOpen={true} className="flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0 w-full overflow-hidden">
+          <Sidebar
+            collapsible="none"
+            className="hidden md:flex w-72 border-r bg-muted/30 h-full"
+            animateOnHover={false}
+          >
+            <SidebarContent className="py-6 px-3">
+              <SidebarGroup className="p-0">
+                <SidebarGroupContent>
+                  <div className="px-4 mb-6">
+                    <h1 className="text-2xl font-bold tracking-tight">
+                      {t("sidebar.footer.account.settings")}
+                    </h1>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t("settings.description")}
+                    </p>
+                  </div>
+                  <SidebarMenu className="gap-1">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeTab === "hesap"}
+                        onClick={() => onTabChange("hesap")}
+                        className="py-6 px-4 text-base"
+                      >
+                        <User className="size-5" />
+                        <span className="font-medium">
+                          {t("settings.tabs.account")}
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeTab === "sirket"}
+                        onClick={() => onTabChange("sirket")}
+                        className="py-6 px-4 text-base"
+                      >
+                        <Building2 className="size-5" />
+                        <span className="font-medium">
+                          {t("settings.tabs.company")}
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        isActive={activeTab === "gorunum"}
+                        onClick={() => onTabChange("gorunum")}
+                        className="py-6 px-4 text-base"
+                      >
+                        <Palette className="size-5" />
+                        <span className="font-medium">
+                          {t("settings.tabs.appearance")}
+                        </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+
+          <main className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 p-8 lg:p-12 lg:px-24">
+            <div className="max-w-4xl mx-auto space-y-12">
+              <div className="md:hidden mb-8">
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {t("sidebar.footer.account.settings")}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  {t("settings.description")}
+                </p>
+              </div>
+
+              {activeTab === "hesap" && (
+                <Card className="border-none shadow-none bg-transparent">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="text-3xl font-bold">
+                      {t("settings.tabs.account")}
+                    </CardTitle>
+                    <CardDescription className="text-lg">
+                      {t("settings.account.description")}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-0 py-8">
+                    <UserSettings />
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeTab === "sirket" && (
+                <Card className="border-none shadow-none bg-transparent">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="text-3xl font-bold">
+                      {t("settings.tabs.company")}
+                    </CardTitle>
+                    <CardDescription className="text-lg">
+                      {t("settings.company.description")}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-0 py-8">
+                    <CompanySettings />
+                  </CardContent>
+                </Card>
+              )}
+
+              {activeTab === "gorunum" && (
+                <Card className="border-none shadow-none bg-transparent">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="text-3xl font-bold">
+                      {t("settings.tabs.appearance")}
+                    </CardTitle>
+                    <CardDescription className="text-lg">
+                      {t("settings.appearance.description")}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-0 py-8">
+                    <PageSettings />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </main>
         </div>
-
-        <Tabs
-          value={activeTab}
-          onValueChange={onTabChange}
-          orientation="vertical"
-          className="flex flex-col md:flex-row gap-10"
-        >
-          <TabsList className="flex flex-col w-full md:w-64 h-fit bg-transparent p-0 gap-1 items-stretch">
-            <TabsTrigger
-              value="hesap"
-              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
-            >
-              <User className="h-4 w-4" />
-              <span className="font-medium">
-                {t("settings.tabs.account", { defaultValue: "Hesap" })}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="sirket"
-              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
-            >
-              <Building2 className="h-4 w-4" />
-              <span className="font-medium">
-                {t("settings.tabs.company", { defaultValue: "Şirket" })}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="gorunum"
-              className="flex items-center gap-3 px-4 py-3 justify-start rounded-lg transition-colors hover:bg-muted data-active:bg-muted data-active:text-foreground text-muted-foreground"
-            >
-              <Palette className="h-4 w-4" />
-              <span className="font-medium">
-                {t("settings.tabs.appearance", { defaultValue: "Görünüm" })}
-              </span>
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="flex-1">
-            <TabsContent value="hesap">
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle>
-                    {t("settings.tabs.account", {
-                      defaultValue: "Hesap Ayarları",
-                    })}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("settings.account.description", {
-                      defaultValue:
-                        "Kullanıcı adı, şifre ve iki faktörlü doğrulama ayarlarınızı güncelleyin.",
-                    })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-0">
-                  <UserSettings />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="sirket">
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle>
-                    {t("settings.tabs.company", {
-                      defaultValue: "Şirket Ayarları",
-                    })}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("settings.company.description", {
-                      defaultValue:
-                        "Şirket bilgilerini ve logolarını buradan düzenleyebilirsiniz.",
-                    })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-0">
-                  <CompanySettings />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="gorunum">
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="px-0 pt-0">
-                  <CardTitle>
-                    {t("settings.tabs.appearance", {
-                      defaultValue: "Görünüm Ayarları",
-                    })}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("settings.appearance.description", {
-                      defaultValue:
-                        "Uygulama arayüzü ve tablo görüntüleme tercihlerini kişiselleştirin.",
-                    })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-0">
-                  <PageSettings />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
+      </SidebarProvider>
     </div>
   );
 }
