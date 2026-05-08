@@ -21,7 +21,7 @@ This file tracks technical debt, maintenance tasks, and planned feature expansio
 - [ ] **Container Health:** Add `healthcheck` to `docker-compose.yml` for MariaDB and Server.
 
 ## Performance & DX
-- [ ] **Image Optimization:** Implement automated image resizing/optimization for logos using `sharp`.
+- [x] **Image Optimization:** Implement automated image resizing/optimization for logos using `sharp`.
 - [ ] **Global Loading States:** Add a centralized loading indicator for API-heavy interactions.
 - [x] **Cross-Platform Scripts:** Consolidate `build.sh` and `build.ps1` into a unified Node-based task runner.
 

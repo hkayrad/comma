@@ -91,15 +91,16 @@ export class CompanyService {
 		Logger.debug("[CompanyService] Processing and moving file to uploads directory", { fileName, filePath });
 
 		// Process with Sharp
-		const transformer = sharp(logo.tempFilePath);
-
-		if (logoSize === "small") {
-			transformer.resize(200);
-		} else if (logoSize === "large") {
-			transformer.resize(500);
-		}
-
-		await transformer.webp({ quality: 80 }).toFile(filePath);
+		await sharp(logo.tempFilePath)
+			.resize({
+				width: logoSize === "small" ? 200 : 1000,
+				height: logoSize === "small" ? 200 : 1000,
+				fit: "inside",
+				withoutEnlargement: true,
+			})
+			.rotate() // Auto-rotate based on EXIF
+			.webp({ quality: 80, effort: 6 })
+			.toFile(filePath);
 
 		await CompanyRepository.update(companyId, { [`${logoSize}_logo_path`]: fileName });
 
