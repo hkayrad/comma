@@ -249,7 +249,6 @@ export class DebtRepository {
                 due_date: {
                     [Op.and]: [
                         { [Op.ne]: null },
-                        { [Op.gte]: literal('CURDATE()') },
                         { [Op.lte]: literal(`DATE_ADD(CURDATE(), INTERVAL ${daysThreshold} DAY)`) }
                     ]
                 },
