@@ -172,6 +172,11 @@ export default function Login() {
     form.setValue("password", "Test1234");
   }, [form]);
 
+  const demoLogin = useCallback(() => {
+    form.setValue("username", "demo");
+    form.setValue("password", "demo123");
+  }, [form]);
+
   return (
     <>
       <MaintenanceBanner />
@@ -253,6 +258,24 @@ export default function Login() {
             ))}
           </MenuPanel>
         </Menu>
+        <Tooltip disableHoverablePopup>
+          <TooltipTrigger
+            render={(props) => (
+              <Button
+                {...props}
+                nativeButton
+                size="icon"
+                className="absolute bottom-40 right-4"
+                onClick={demoLogin}
+              >
+                <User />
+              </Button>
+            )}
+          />
+          <TooltipContent side="left">
+            {t("login.demoCredentials")}
+          </TooltipContent>
+        </Tooltip>
         <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
           {requires2FA && tempToken ? (
             <TwoFactorVerify

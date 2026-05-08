@@ -466,7 +466,8 @@
       "username.maxCharError": "Username can be a maximum of 20 characters."
     },
     "title": "Login",
-    "description": "Please enter your credentials to access the system."
+    "description": "Please enter your credentials to access the system.",
+    "demoCredentials": "Demo Credentials"
   },
   "notification": {
     "draft": {

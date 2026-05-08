@@ -461,7 +461,8 @@
       "username.maxCharError": "Kullanıcı adı en fazla 20 karakter olabilir."
     },
     "title": "Giriş Yap",
-    "description": "Lütfen kullanıcı adı ve şifrenizi girerek sisteme giriş yapın."
+    "description": "Lütfen kullanıcı adı ve şifrenizi girerek sisteme giriş yapın.",
+    "demoCredentials": "Demo Kimlik Bilgileri"
   },
   "notification": {
     "draft": {
