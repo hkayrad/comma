@@ -2,13 +2,6 @@ import { useTranslation } from "react-i18next";
 import UserSettings from "./components/UserSettings";
 import CompanySettings from "./components/CompanySettings";
 import PageSettings from "./components/PageSettings";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { User, Building2, Palette } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { useMemo } from "react";
@@ -112,51 +105,51 @@ export default function Settings() {
               </div>
 
               {activeTab === "hesap" && (
-                <Card className="border-none shadow-none bg-transparent">
-                  <CardHeader className="px-0 pt-0">
-                    <CardTitle className="text-3xl font-bold">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight">
                       {t("settings.tabs.account")}
-                    </CardTitle>
-                    <CardDescription className="text-lg">
+                    </h2>
+                    <p className="text-lg text-muted-foreground mt-1">
                       {t("settings.account.description")}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="px-0 py-8">
+                    </p>
+                  </div>
+                  <div className="py-4">
                     <UserSettings />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {activeTab === "sirket" && (
-                <Card className="border-none shadow-none bg-transparent">
-                  <CardHeader className="px-0 pt-0">
-                    <CardTitle className="text-3xl font-bold">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight">
                       {t("settings.tabs.company")}
-                    </CardTitle>
-                    <CardDescription className="text-lg">
+                    </h2>
+                    <p className="text-lg text-muted-foreground mt-1">
                       {t("settings.company.description")}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="px-0 py-8">
+                    </p>
+                  </div>
+                  <div className="py-4">
                     <CompanySettings />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
 
               {activeTab === "gorunum" && (
-                <Card className="border-none shadow-none bg-transparent">
-                  <CardHeader className="px-0 pt-0">
-                    <CardTitle className="text-3xl font-bold">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight">
                       {t("settings.tabs.appearance")}
-                    </CardTitle>
-                    <CardDescription className="text-lg">
+                    </h2>
+                    <p className="text-lg text-muted-foreground mt-1">
                       {t("settings.appearance.description")}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="px-0 py-8">
+                    </p>
+                  </div>
+                  <div className="py-4">
                     <PageSettings />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
             </div>
           </main>
