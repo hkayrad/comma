@@ -627,7 +627,7 @@
   },
   "overviewCards": {
     "paid": "Paid {{state}}",
-    "remaning": "Remaining {{state}}",
+    "remaining": "Remaining {{state}}",
     "total": "Total {{state}}"
   },
   "payment": {

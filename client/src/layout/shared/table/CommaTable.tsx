@@ -53,6 +53,7 @@ type Props = {
   contextMenuItems?: (row: any) => ReactNode;
   readOnly?: boolean;
   isPortal?: boolean;
+  translationPrefix?: "dashboard" | "debt" | "payment";
 };
 
 export default function CommaTable(props: Props) {
@@ -74,6 +75,7 @@ export default function CommaTable(props: Props) {
     contextMenuItems,
     readOnly,
     isPortal,
+    translationPrefix,
   } = props;
 
   const useContextMenuForActions = useDashboardSettings(
@@ -140,6 +142,7 @@ export default function CommaTable(props: Props) {
           addButton={addButton}
           readOnly={readOnly}
           isPortal={isPortal}
+          translationPrefix={translationPrefix}
         />
       </div>
       <div className="rounded-md border overflow-clip" data-table-export>

@@ -160,7 +160,7 @@ export default function CustomerDetails(props: Props) {
                   </div>
                   <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                     <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">
-                      {t("overviewCards.remaning", {
+                      {t("overviewCards.remaining", {
                         state:
                           type === "receivable"
                             ? t("vars.receivable")

@@ -627,7 +627,7 @@
   },
   "overviewCards": {
     "paid": "Ödenmiş {{state}}",
-    "remaning": "Kalan {{state}}",
+    "remaining": "Kalan {{state}}",
     "total": "Toplam {{state}}"
   },
   "payment": {

@@ -138,7 +138,7 @@ export default function OverviewCards(props: Props) {
       <Card className="grow w-48 shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
-            {t("overviewCards.remaning", {
+            {t("overviewCards.remaining", {
               state:
                 type === "receivable"
                   ? t("vars.receivable")

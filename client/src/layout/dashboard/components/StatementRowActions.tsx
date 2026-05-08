@@ -170,12 +170,20 @@ export function StatementRowActions({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon" className="h-8 w-8 p-0" nativeButton>
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            nativeButton
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 p-0"
+          >
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        )}
+      />
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleDownload}>
           <FileDown className="mr-2 h-4 w-4" />

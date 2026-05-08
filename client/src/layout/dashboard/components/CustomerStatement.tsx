@@ -234,7 +234,7 @@ export default function CustomerStatement() {
   const { customer, debts, payments } = data;
 
   return (
-    <div className="space-y-6 p-4 overflow-y-auto">
+    <div className="space-y-6 p-4 h-[calc(100vh-3.5rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -358,7 +358,7 @@ export default function CustomerStatement() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              {t("overviewCards.remaning", { state: "" }).trim()}
+              {t("overviewCards.remaining", { state: "" }).trim()}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
@@ -379,6 +379,7 @@ export default function CustomerStatement() {
             columns={debtColumns}
             searchColumn="invoice_no"
             readOnly
+            translationPrefix="debt"
             contextMenuItems={(item) => (
               <StatementRowActions
                 item={item}
@@ -398,6 +399,7 @@ export default function CustomerStatement() {
             columns={paymentColumns}
             searchColumn="invoice_no"
             readOnly
+            translationPrefix="payment"
             contextMenuItems={(item) => (
               <StatementRowActions
                 item={item}

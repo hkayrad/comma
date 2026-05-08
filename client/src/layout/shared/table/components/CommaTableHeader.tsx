@@ -67,10 +67,19 @@ type Props = {
   addButton?: ReactNode;
   readOnly?: boolean;
   isPortal?: boolean;
+  translationPrefix?: "dashboard" | "debt" | "payment";
 };
 
 export default function CommaTableHeader(props: Props) {
-  const { table, searchColumn, tags, addButton, readOnly, isPortal } = props;
+  const {
+    table,
+    searchColumn,
+    tags,
+    addButton,
+    readOnly,
+    isPortal,
+    translationPrefix: propTranslationPrefix,
+  } = props;
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const location = useLocation();
@@ -106,6 +115,8 @@ export default function CommaTableHeader(props: Props) {
   }, [searchValue, searchColumn, table]);
 
   const translationPrefix = useMemo(() => {
+    if (propTranslationPrefix) return propTranslationPrefix;
+
     const path = location.pathname;
     if (path.includes("odemeler")) {
       return "payment";
@@ -114,7 +125,7 @@ export default function CommaTableHeader(props: Props) {
       return "debt";
     }
     return "dashboard";
-  }, [location.pathname]);
+  }, [location.pathname, propTranslationPrefix]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
