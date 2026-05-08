@@ -59,7 +59,7 @@ export default function InfoDialog() {
         </ItemContent>
         <ItemActions>
           <NavLink
-            to="https://evds2.tcmb.gov.tr"
+            to="https://evds3.tcmb.gov.tr"
             target="_blank"
             className="text-xs text-muted-foreground flex items-center gap-1"
           >

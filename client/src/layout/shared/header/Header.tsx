@@ -35,6 +35,7 @@ export default function Header() {
     alacaklar: t("header.breadcrumb.finance.receivables"),
     borclar: t("header.breadcrumbs.finance.payables"),
     odemeler: t("header.breadcrumbs.finance.payments"),
+    ayarlar: t("sidebar.footer.account.settings"),
     dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
     borc_dokumu: t("header.breadcrumbs.finance.customerStatement"),
   };

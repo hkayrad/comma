@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
 import { useTranslation } from "react-i18next";
 
-export default function PageSettingsDialog() {
+export default function PageSettings() {
     const { t } = useTranslation();
   const showOverviewCards = useDashboardSettings((s) => s.showOverviewCards);
   const showStatisticsChart = useDashboardSettings((s) => s.showStatisticsChart);

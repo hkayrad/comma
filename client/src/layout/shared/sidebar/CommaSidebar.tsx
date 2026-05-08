@@ -7,7 +7,6 @@ import NonSystemAdminSidebarContent from "./NonSystemAdminSidebar";
 import SystemAdminSidebarContent from "./SystemAdminSidebar";
 import { useCallback } from "react";
 import {
-  Building2,
   Info,
   Settings,
   Wrench,
@@ -28,11 +27,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import CompanyDetailsDialog from "../dialog/CompanyDetails/CompanyDetailsDialog";
 import { useDialog } from "@/contexts/dialog";
 import InfoDialog from "./components/InfoDialog";
 import { useTranslation } from "react-i18next";
-import PageSettingsDialog from "../dialog/PageSettingsDialog";
+import { useNavigate } from "react-router";
 import UpcomingDueDates from "@/layout/dashboard/components/UpcomingDueDates";
 import {
   Popover,
@@ -40,52 +38,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useUpcomingDueDates } from "@/hooks/use-upcoming-due-dates";
-import {
-  Menu,
-  MenuPanel,
-  MenuItem,
-  MenuTrigger,
-} from "@/components/animate-ui/components/base/menu";
 import SidebarHeader from "./SidebarHeader";
 import SidebarUserMenu from "./SidebarUserMenu";
 
 export default function CommaSidebar() {
+  const navigate = useNavigate();
   const { state } = useSidebar();
-  const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
   const { data: upcomingDueDates = [] } = useUpcomingDueDates();
 
   const upcomingPaymentsCount = upcomingDueDates.length;
 
-  const handleCompanyDetails = useCallback(async () => {
-    openDialog({
-      title: t("dialog.accountDetails.title"),
-      description: t("dialog.accountDetails.description"),
-      size: "3xl",
-      content: <CompanyDetailsDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog, t]);
-
-  const handleInfo = useCallback(async () => {
-    openDialog({
-      title: t("dialog.info.title"),
-      description: t("dialog.info.description"),
-      size: "xl",
-      content: <InfoDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog, t]);
-
-  const handlePageSettings = useCallback(() => {
-    openDialog({
-      title: t("sidebar.pageSettings.label"),
-      description: t("sidebar.pageSettings.description"),
-      size: "md",
-      content: <PageSettingsDialog />,
-      showCloseButton: true,
-    });
-  }, [openDialog, t]);
+  const handleSettings = useCallback(() => {
+    navigate("/ayarlar");
+  }, [navigate]);
 
   return (
     <Sidebar className="no-print" variant="inset" collapsible="icon">
@@ -102,84 +68,26 @@ export default function CommaSidebar() {
       {/* END SIDEBAR CONTENT */}
 
       <SidebarFooter>
-        {/* Page Settings */}
+        {/* Unified Settings */}
         <SidebarMenu>
           <SidebarMenuItem>
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
-                  <SidebarMenuButton {...props} onClick={handlePageSettings}>
+                  <SidebarMenuButton {...props} onClick={handleSettings}>
                     <Settings />
                     <span className="select-none">
-                      {t("sidebar.pageSettings.label")}
+                      {t("sidebar.footer.account.settings")}
                     </span>
                   </SidebarMenuButton>
                 )}
               />
               <TooltipContent side="right" hidden={state !== "collapsed"}>
-                {t("sidebar.pageSettings.label")}
+                {t("sidebar.footer.account.settings")}
               </TooltipContent>
             </Tooltip>
           </SidebarMenuItem>
         </SidebarMenu>
-        <CompanyAdminOnly>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Menu>
-                <Tooltip disableHoverablePopup>
-                  <TooltipTrigger
-                    render={(props) => (
-                      <MenuTrigger
-                        {...props}
-                        render={(props) => (
-                          <SidebarMenuButton {...props}>
-                            <Wrench />
-                            <span className="select-none">
-                              {t("sidebar.footer.companyManagement.label")}
-                            </span>
-                          </SidebarMenuButton>
-                        )}
-                      />
-                    )}
-                  />
-                  <TooltipContent side="right" hidden={state !== "collapsed"}>
-                    {t("sidebar.footer.companyManagement.label")}
-                  </TooltipContent>
-                </Tooltip>
-                <MenuPanel side="right" align="end" sideOffset={4}>
-                  <MenuItem
-                    onClick={handleCompanyDetails}
-                    className="justify-start!"
-                  >
-                    <Building2 className="text-inherit bg-inherit select-none" />
-                    <span>
-                      {t(
-                        "sidebar.footer.companyManagement.accountDetails.label",
-                      )}
-                    </span>
-                  </MenuItem>
-                </MenuPanel>
-              </Menu>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </CompanyAdminOnly>
-        <Tooltip disableHoverablePopup>
-          <TooltipTrigger
-            render={(props) => (
-              <SidebarMenu {...props}>
-                <SidebarMenuButton onClick={handleInfo}>
-                  <Info />
-                  <span className="select-none">
-                    {t("sidebar.footer.info.label")}
-                  </span>
-                </SidebarMenuButton>
-              </SidebarMenu>
-            )}
-          ></TooltipTrigger>
-          <TooltipContent side="right" hidden={state !== "collapsed"}>
-            {t("sidebar.footer.info.label")}
-          </TooltipContent>
-        </Tooltip>
 
         {/* Notifications button for upcoming due dates */}
         <Popover>

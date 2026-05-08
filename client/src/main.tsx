@@ -19,6 +19,7 @@ const App = lazy(() => import("./layout/App"));
 const Dashboard = lazy(() => import("./layout/dashboard/Dashboard"));
 const Debts = lazy(() => import("./layout/debts/Debts"));
 const Payments = lazy(() => import("./layout/payments/Payments"));
+const Settings = lazy(() => import("./layout/settings/Settings"));
 const CustomerStatement = lazy(
   () => import("./layout/dashboard/components/CustomerStatement"),
 );
@@ -172,6 +173,14 @@ const router = createBrowserRouter([
                           <Dev />
                         </Suspense>
                       ) : null,
+                  },
+                  {
+                    path: "ayarlar",
+                    element: (
+                      <Suspense fallback={<PageLoader />}>
+                        <Settings />
+                      </Suspense>
+                    ),
                   },
                 ],
               },

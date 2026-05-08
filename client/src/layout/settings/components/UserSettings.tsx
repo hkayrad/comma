@@ -18,22 +18,28 @@ import { useDialog } from "@/contexts/dialog";
 import { UserApi } from "@/lib/api/user";
 import { useUser } from "@/stores/useUserStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, KeyRound, User } from "lucide-react";
+import { Eye, EyeOff, KeyRound, User as UserIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CancelButton from "../CancelButton";
-import TwoFactorSetup from "./TwoFactorSetup";
+import CancelButton from "../../shared/CancelButton";
+import TwoFactorSetup from "../../shared/dialog/TwoFactorSetup";
 
-export default function UserSettingsDialog() {
+export default function UserSettings() {
   const { t } = useTranslation();
-  const closeDialog = useDialog((s) => s.closeDialog);
+  const dialogContext = useDialog();
   const user = useUser((s) => s.user);
   const setUser = useUser((s) => s.setUser);
   const [activeTab, setActiveTab] = useState("username");
+
+  const closeDialog = useCallback(() => {
+    if (dialogContext?.closeDialog) {
+      dialogContext.closeDialog();
+    }
+  }, [dialogContext]);
 
   // Password visibility states
   const [showCurrentPasswordUsername, setShowCurrentPasswordUsername] =
@@ -192,7 +198,7 @@ export default function UserSettingsDialog() {
                   <FormControl>
                     <InputGroup>
                       <InputGroupAddon align="inline-start">
-                        <User className="text-muted-foreground" />
+                        <UserIcon className="text-muted-foreground" />
                       </InputGroupAddon>
                       <InputGroupInput
                         placeholder={t("settings.form.username.placeholder")}
@@ -253,7 +259,7 @@ export default function UserSettingsDialog() {
               )}
             />
             <div className="flex justify-end gap-2">
-              <CancelButton onClick={onCancel} />
+              {dialogContext?.closeDialog && <CancelButton onClick={onCancel} />}
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>
@@ -394,7 +400,7 @@ export default function UserSettingsDialog() {
               )}
             />
             <div className="flex justify-end gap-2">
-              <CancelButton onClick={onCancel} />
+              {dialogContext?.closeDialog && <CancelButton onClick={onCancel} />}
               <Button type="submit">{t("vars.save")}</Button>
             </div>
           </form>

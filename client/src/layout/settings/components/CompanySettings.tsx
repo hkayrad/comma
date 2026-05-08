@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LogoForm from "./components/LogoForm";
-import InformationForm from "./components/InformationForm";
+import LogoForm from "./LogoForm";
+import InformationForm from "./InformationForm";
 import { useTranslation } from "react-i18next";
 
-export default function CompanyDetailsDialog() {
+export default function CompanySettings() {
   const { t } = useTranslation();
   return (
     <Tabs defaultValue="info" className="w-full">

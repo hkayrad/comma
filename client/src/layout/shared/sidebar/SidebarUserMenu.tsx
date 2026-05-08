@@ -46,7 +46,7 @@ import {
 import { useDialog } from "@/contexts/dialog";
 import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
-import UserSettingsDialog from "../dialog/UserSettingsDialog";
+import InfoDialog from "../dialog/components/InfoDialog";
 
 export default function SidebarUserMenu() {
   const navigate = useNavigate();
@@ -73,12 +73,12 @@ export default function SidebarUserMenu() {
     });
   }, [navigate, reloadConnection, clearUser, t]);
 
-  const handleSettings = useCallback(() => {
+  const handleInfo = useCallback(async () => {
     openDialog({
-      title: t("dialog.settings.title"),
-      description: t("dialog.settings.description"),
-      size: "lg",
-      content: <UserSettingsDialog />,
+      title: t("dialog.info.title"),
+      description: t("dialog.info.description"),
+      size: "xl",
+      content: <InfoDialog />,
       showCloseButton: true,
     });
   }, [openDialog, t]);
@@ -160,9 +160,9 @@ export default function SidebarUserMenu() {
 
                 <MenuSeparator />
 
-                <MenuItem onClick={handleSettings}>
-                  <Settings className="text-inherit bg-inherit select-none" />
-                  <span>{t("sidebar.footer.account.settings")}</span>
+                <MenuItem onClick={handleInfo}>
+                  <Info className="text-inherit bg-inherit select-none" />
+                  <span>{t("sidebar.footer.info.label")}</span>
                 </MenuItem>
 
                 <MenuItem
