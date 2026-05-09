@@ -2,13 +2,16 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
 import "./i18n";
-import { RequireAuth, RequireNoAuth, PortalAuthGuard } from "./layout/auth/AuthCheck";
+import {
+  RequireAuth,
+  RequireNoAuth,
+  PortalAuthGuard,
+} from "./layout/auth/AuthCheck";
 import Root from "./root";
 import { NonSystemAdminOnly } from "./layout/auth/RoleGuard";
 import { lazy, Suspense } from "react";
-import { Spinner } from "./components/ui/spinner";
-import { cn } from "./lib/utils";
 import { RootErrorBoundary } from "./components/shared/RootErrorBoundary";
+import { PageLoader } from "./components/shared/PageLoader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -28,17 +31,6 @@ const NotFound = lazy(() => import("./layout/NotFound"));
 
 const PortalLogin = lazy(() => import("./layout/portal/PortalLogin"));
 const PortalDashboard = lazy(() => import("./layout/portal/PortalDashboard"));
-
-const PageLoader = ({ className }: { className?: string }) => (
-  <div
-    className={cn(
-      "flex h-full w-full items-center justify-center p-4",
-      className,
-    )}
-  >
-    <Spinner className="size-8" />
-  </div>
-);
 
 const router = createBrowserRouter([
   {
@@ -60,7 +52,9 @@ const router = createBrowserRouter([
           {
             index: true,
             element: (
-              <Suspense fallback={<PageLoader className="h-screen! w-screen!" />}>
+              <Suspense
+                fallback={<PageLoader className="h-screen! w-screen!" />}
+              >
                 <PortalDashboard />
               </Suspense>
             ),
@@ -203,6 +197,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-    <ReactQueryDevtools initialIsOpen={false} />
+    <ReactQueryDevtools buttonPosition="top-right" initialIsOpen={false} />
   </QueryClientProvider>,
 );
