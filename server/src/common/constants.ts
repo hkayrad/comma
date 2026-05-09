@@ -1,6 +1,0 @@
-export const ADMIN_ROLE_ID = 99;
-export const STAFF_ROLE_ID = 1;
-export const USER_ROLE_ID = 0;
-export const PORTAL_CUSTOMER_ROLE_ID = 2;
-export const ADMIN_COMPANY_ID = "00000000-0000-0000-0000-000000000000";
-export const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000000";
