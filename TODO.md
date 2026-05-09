@@ -22,7 +22,7 @@ This file tracks technical debt, maintenance tasks, and planned feature expansio
 
 ## Performance & DX
 - [x] **Image Optimization:** Implement automated image resizing/optimization for logos using `sharp`.
-- [ ] **Global Loading States:** Add a centralized loading indicator for API-heavy interactions.
+- [x] **Global Loading States:** Add a centralized loading indicator for API-heavy interactions.
 - [x] **Cross-Platform Scripts:** Consolidate `build.sh` and `build.ps1` into a unified Node-based task runner.
 
 ## Feature Expansions

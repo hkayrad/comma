@@ -666,6 +666,7 @@
           "light": "Light Mode"
         }
       },
+      "syncing": "Syncing...",
       "companyManagement": {
         "accountDetails": {
           "label": "Company Details"

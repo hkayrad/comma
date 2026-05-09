@@ -2,6 +2,7 @@ import { Outlet, useNavigation } from "react-router";
 import { DialogProvider } from "@/contexts/dialog";
 import { WebSocketProvider } from "@/contexts/webSocket";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
 import { Toaster } from "@/components/ui/sonner";
 import { StrictMode } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -26,6 +27,7 @@ export default function Root() {
     <StrictMode>
       <WebSocketProvider url={import.meta.env.VITE_WEBSOCKET_URL}>
         <ThemeProvider defaultTheme="light" storageKey="comma-theme">
+          <GlobalLoadingIndicator />
           <DialogProvider>
             <Toaster
               richColors

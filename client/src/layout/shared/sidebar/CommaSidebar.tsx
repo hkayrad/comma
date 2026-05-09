@@ -35,6 +35,7 @@ import {
 import { useUpcomingDueDates } from "@/hooks/use-upcoming-due-dates";
 import SidebarHeader from "./SidebarHeader";
 import SidebarUserMenu from "./SidebarUserMenu";
+import { SyncStatus } from "./SyncStatus";
 
 export default function CommaSidebar() {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ export default function CommaSidebar() {
       {/* END SIDEBAR CONTENT */}
 
       <SidebarFooter>
+        <SyncStatus />
         {/* Unified Settings */}
         <SidebarMenu>
           <SidebarMenuItem>
