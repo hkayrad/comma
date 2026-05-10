@@ -1,7 +1,12 @@
 import { cleanEnv, str, port, num, url } from "envalid";
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+if (process.env.NODE_ENV === "test") {
+	dotenv.config({ path: path.resolve(process.cwd(), ".env.test"), override: true });
+} else {
+	dotenv.config({ override: true });
+}
 
 export const env = cleanEnv(process.env, {
 	NODE_ENV: str({ choices: ["development", "test", "production"], default: "development" }),

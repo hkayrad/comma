@@ -8,6 +8,7 @@ import sharp from 'sharp';
 vi.mock('sharp', () => {
   const sharpMock = {
     resize: vi.fn().mockReturnThis(),
+    rotate: vi.fn().mockReturnThis(),
     webp: vi.fn().mockReturnThis(),
     toFile: vi.fn().mockResolvedValue({}),
   };
