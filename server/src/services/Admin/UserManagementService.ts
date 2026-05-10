@@ -4,7 +4,7 @@ import { UserRepository } from "@/repositories/UserRepository";
 import { NotFoundError, ValidationError } from "@/lib/errors/AppError";
 import bcrypt from "bcrypt";
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 14;
 
 export class UserManagementService {
 	static async Create(user: CreateUserDto, createdBy: UUID) {
