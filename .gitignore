@@ -34,11 +34,12 @@ client/.tolgeerc.json
 
 build/**
 server/.env.test
-server/coverage/
+server/coverage/**
 
 CodeReviewReport.md
 docs/
 dumps/
 .worktrees/
 **/*.tsbuildinfo
-.gemini
+.gemini/
+GEMINI.md
