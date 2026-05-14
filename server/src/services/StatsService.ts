@@ -29,7 +29,7 @@ class StatsService {
         } else {
             end = new Date();
             start = new Date();
-            start.setMonth(start.getMonth() - monthCount);
+            start.setMonth(start.getMonth() - monthCount + 1);
         }
 
         const [receivables, payables] = await Promise.all([
