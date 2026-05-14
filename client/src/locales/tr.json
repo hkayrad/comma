@@ -760,6 +760,7 @@
       "username": "Kullanıcı Adı Değiştir",
       "password": "Şifre Değiştir"
     },
+    "demoRestricted": "Demo hesap bilgileri değiştirilemez.",
     "account": {
       "description": "Kullanıcı adı, şifre ve iki faktörlü doğrulama ayarlarınızı güncelleyin."
     },

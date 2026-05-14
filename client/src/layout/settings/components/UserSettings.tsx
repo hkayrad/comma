@@ -167,250 +167,259 @@ export default function UserSettings() {
     [passwordForm, closeDialog, t],
   );
 
+  const isDemo = user?.username === "demo";
+
   return (
     <div className="flex flex-col gap-16">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        {/* Username Section */}
-        <section className="space-y-6">
-          <h3 className="text-xl font-semibold border-b pb-2">
-            {t("settings.tabs.username")}
-          </h3>
-          <Form {...usernameForm}>
-            <form
-              onSubmit={usernameForm.handleSubmit(onSubmitUsername)}
-              className="flex flex-col gap-6"
-            >
-              <FormField
-                control={usernameForm.control}
-                name="newUsername"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex gap-1">
-                      {t("settings.form.username.label")}{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <UserIcon className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          placeholder={t("settings.form.username.placeholder")}
-                          {...field}
-                        />
-                      </InputGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t("settings.form.username.description")}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={usernameForm.control}
-                name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex gap-1">
-                      {t("settings.form.currentPassword.label")}{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <KeyRound className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          type={
-                            showCurrentPasswordUsername ? "text" : "password"
-                          }
-                          placeholder={t(
-                            "settings.form.currentPassword.placeholder",
-                          )}
-                          {...field}
-                        />
-                        <InputGroupButton
-                          size="icon-xs"
-                          onClick={() =>
-                            setShowCurrentPasswordUsername(
-                              !showCurrentPasswordUsername,
-                            )
-                          }
-                          className="text-muted-foreground hover:text-foreground transition-colors mr-1"
-                        >
-                          {showCurrentPasswordUsername ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </InputGroupButton>
-                      </InputGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t("settings.form.currentPassword.description")}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end gap-2">
-                {!isSettingsPage && <CancelButton onClick={onCancel} />}
-                <Button type="submit">{t("vars.save")}</Button>
-              </div>
-            </form>
-          </Form>
-        </section>
+      {isDemo ? (
+        <div className="bg-muted/50 border rounded-lg p-6 flex items-center gap-4 text-muted-foreground">
+          <KeyRound className="size-6 shrink-0" />
+          <p className="text-sm font-medium">{t("settings.demoRestricted")}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          {/* Username Section */}
+          <section className="space-y-6">
+            <h3 className="text-xl font-semibold border-b pb-2">
+              {t("settings.tabs.username")}
+            </h3>
+            <Form {...usernameForm}>
+              <form
+                onSubmit={usernameForm.handleSubmit(onSubmitUsername)}
+                className="flex flex-col gap-6"
+              >
+                <FormField
+                  control={usernameForm.control}
+                  name="newUsername"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-1">
+                        {t("settings.form.username.label")}{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupAddon align="inline-start">
+                            <UserIcon className="text-muted-foreground" />
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            placeholder={t("settings.form.username.placeholder")}
+                            {...field}
+                          />
+                        </InputGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t("settings.form.username.description")}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={usernameForm.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-1">
+                        {t("settings.form.currentPassword.label")}{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupAddon align="inline-start">
+                            <KeyRound className="text-muted-foreground" />
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            type={
+                              showCurrentPasswordUsername ? "text" : "password"
+                            }
+                            placeholder={t(
+                              "settings.form.currentPassword.placeholder",
+                            )}
+                            {...field}
+                          />
+                          <InputGroupButton
+                            size="icon-xs"
+                            onClick={() =>
+                              setShowCurrentPasswordUsername(
+                                !showCurrentPasswordUsername,
+                              )
+                            }
+                            className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                          >
+                            {showCurrentPasswordUsername ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </InputGroupButton>
+                        </InputGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t("settings.form.currentPassword.description")}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  {!isSettingsPage && <CancelButton onClick={onCancel} />}
+                  <Button type="submit">{t("vars.save")}</Button>
+                </div>
+              </form>
+            </Form>
+          </section>
 
-        {/* Password Section */}
-        <section className="space-y-6">
-          <h3 className="text-xl font-semibold border-b pb-2">
-            {t("settings.tabs.password")}
-          </h3>
-          <Form {...passwordForm}>
-            <form
-              onSubmit={passwordForm.handleSubmit(onSubmitPassword)}
-              className="flex flex-col gap-6"
-            >
-              <FormField
-                control={passwordForm.control}
-                name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex gap-1">
-                      {t("settings.form.currentPassword.label")}{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <KeyRound className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          type={
-                            showCurrentPasswordPassword ? "text" : "password"
-                          }
-                          placeholder={t(
-                            "settings.form.currentPassword.placeholder",
-                          )}
-                          {...field}
-                        />
-                        <InputGroupButton
-                          size="icon-xs"
-                          onClick={() =>
-                            setShowCurrentPasswordPassword(
-                              !showCurrentPasswordPassword,
-                            )
-                          }
-                          className="text-muted-foreground hover:text-foreground transition-colors mr-1"
-                        >
-                          {showCurrentPasswordPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </InputGroupButton>
-                      </InputGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t("settings.form.currentPassword.description")}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={passwordForm.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex gap-1">
-                      {t("settings.form.newPassword.label")}{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <KeyRound className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          type={showNewPassword ? "text" : "password"}
-                          placeholder={t(
-                            "settings.form.newPassword.placeholder",
-                          )}
-                          {...field}
-                        />
-                        <InputGroupButton
-                          size="icon-xs"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="text-muted-foreground hover:text-foreground transition-colors mr-1"
-                        >
-                          {showNewPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </InputGroupButton>
-                      </InputGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t("settings.form.newPassword.description")}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={passwordForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex gap-1">
-                      {t("settings.form.confirmPassword.label")}{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <InputGroup>
-                        <InputGroupAddon align="inline-start">
-                          <KeyRound className="text-muted-foreground" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder={t(
-                            "settings.form.confirmPassword.placeholder",
-                          )}
-                          {...field}
-                        />
-                        <InputGroupButton
-                          size="icon-xs"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="text-muted-foreground hover:text-foreground transition-colors mr-1"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" />
-                          ) : (
-                            <Eye className="h-4 w-4" />
-                          )}
-                        </InputGroupButton>
-                      </InputGroup>
-                    </FormControl>
-                    <FormDescription>
-                      {t("settings.form.confirmPassword.description")}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex justify-end gap-2">
-                {!isSettingsPage && <CancelButton onClick={onCancel} />}
-                <Button type="submit">{t("vars.save")}</Button>
-              </div>
-            </form>
-          </Form>
-        </section>
-      </div>
+          {/* Password Section */}
+          <section className="space-y-6">
+            <h3 className="text-xl font-semibold border-b pb-2">
+              {t("settings.tabs.password")}
+            </h3>
+            <Form {...passwordForm}>
+              <form
+                onSubmit={passwordForm.handleSubmit(onSubmitPassword)}
+                className="flex flex-col gap-6"
+              >
+                <FormField
+                  control={passwordForm.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-1">
+                        {t("settings.form.currentPassword.label")}{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupAddon align="inline-start">
+                            <KeyRound className="text-muted-foreground" />
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            type={
+                              showCurrentPasswordPassword ? "text" : "password"
+                            }
+                            placeholder={t(
+                              "settings.form.currentPassword.placeholder",
+                            )}
+                            {...field}
+                          />
+                          <InputGroupButton
+                            size="icon-xs"
+                            onClick={() =>
+                              setShowCurrentPasswordPassword(
+                                !showCurrentPasswordPassword,
+                              )
+                            }
+                            className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                          >
+                            {showCurrentPasswordPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </InputGroupButton>
+                        </InputGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t("settings.form.currentPassword.description")}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={passwordForm.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-1">
+                        {t("settings.form.newPassword.label")}{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupAddon align="inline-start">
+                            <KeyRound className="text-muted-foreground" />
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            type={showNewPassword ? "text" : "password"}
+                            placeholder={t(
+                              "settings.form.newPassword.placeholder",
+                            )}
+                            {...field}
+                          />
+                          <InputGroupButton
+                            size="icon-xs"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                          >
+                            {showNewPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </InputGroupButton>
+                        </InputGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t("settings.form.newPassword.description")}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={passwordForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex gap-1">
+                        {t("settings.form.confirmPassword.label")}{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupAddon align="inline-start">
+                            <KeyRound className="text-muted-foreground" />
+                          </InputGroupAddon>
+                          <InputGroupInput
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder={t(
+                              "settings.form.confirmPassword.placeholder",
+                            )}
+                            {...field}
+                          />
+                          <InputGroupButton
+                            size="icon-xs"
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            className="text-muted-foreground hover:text-foreground transition-colors mr-1"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </InputGroupButton>
+                        </InputGroup>
+                      </FormControl>
+                      <FormDescription>
+                        {t("settings.form.confirmPassword.description")}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  {!isSettingsPage && <CancelButton onClick={onCancel} />}
+                  <Button type="submit">{t("vars.save")}</Button>
+                </div>
+              </form>
+            </Form>
+          </section>
+        </div>
+      )}
 
       {/* 2FA Section */}
       <section className="space-y-6">

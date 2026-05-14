@@ -50,6 +50,11 @@ export class UserManagementService {
 
 	static async Update(id: UUID, userData: Partial<UserDto & { password?: string }>, updatedBy: UUID) {
 		Logger.info("[UserManagement] Update", { id });
+
+		const user = await UserRepository.findById(id);
+		if (!user) throw new NotFoundError("User not found");
+		if (user.username === "demo") throw new ValidationError("Demo account cannot be modified");
+
 		const { username, role, password } = userData;
 		const updateData: Record<string, unknown> = {};
 
@@ -75,6 +80,11 @@ export class UserManagementService {
 
 	static async Delete(id: UUID, deletedBy: UUID) {
 		Logger.info("[UserManagement] Delete", { id });
+
+		const user = await UserRepository.findById(id);
+		if (!user) throw new NotFoundError("User not found");
+		if (user.username === "demo") throw new ValidationError("Demo account cannot be deleted");
+
 		const deletedCount = await UserRepository.delete(id, deletedBy);
 		if (deletedCount === 0) throw new NotFoundError("User not found");
 		Logger.info("[UserManagement] Deleted user successfully", { id });
@@ -89,6 +99,11 @@ export class UserManagementService {
 
 	static async ResetPassword(id: UUID, newPassword: string) {
 		Logger.info("[UserManagement] ResetPassword", { id });
+
+		const user = await UserRepository.findById(id);
+		if (!user) throw new NotFoundError("User not found");
+		if (user.username === "demo") throw new ValidationError("Demo account password cannot be reset");
+
 		const passHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
 		const [affectedRows] = await UserRepository.update(id, { pass_hash: passHash });
 		if (affectedRows === 0) {

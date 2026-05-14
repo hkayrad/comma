@@ -15,6 +15,10 @@ export class UserSettingsService {
         const user = await UserRepository.findById(userId);
         if (!user) throw new NotFoundError("User not found");
 
+        if (user.username === "demo") {
+            throw new ValidationError("Demo account username cannot be changed");
+        }
+
         const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
         if (!passwordMatch) throw new UnauthorizedError("Current password is incorrect");
 
@@ -35,6 +39,10 @@ export class UserSettingsService {
 
         const user = await UserRepository.findById(userId);
         if (!user) throw new NotFoundError("User not found");
+
+        if (user.username === "demo") {
+            throw new ValidationError("Demo account password cannot be changed");
+        }
 
         const passwordMatch = await bcrypt.compare(currentPassword, user.pass_hash);
         if (!passwordMatch) throw new UnauthorizedError("Current password is incorrect");

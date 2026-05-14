@@ -46,6 +46,8 @@ declare global {
 	}
 }
 
+const START_TIME = Date.now();
+
 const app = express();
 const server = http.createServer(app);
 
@@ -84,7 +86,11 @@ app.use(
 );
 
 app.get("/health", (req, res) => {
-	res.status(200).json({ status: "ok" });
+	res.status(200).json({
+		status: "healthy",
+		time: new Date(Date.now()).toISOString(),
+		uptime: `${Date.now() - START_TIME} ms`
+	});
 });
 
 app.get("/logo-proxy/:filename", (req, res) => {

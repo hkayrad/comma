@@ -760,6 +760,7 @@
       "username": "Change Username",
       "password": "Change Password"
     },
+    "demoRestricted": "Demo account credentials cannot be changed.",
     "account": {
       "description": "Update your username, password, and two-factor authentication settings."
     },
