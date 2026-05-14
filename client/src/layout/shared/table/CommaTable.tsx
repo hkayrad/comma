@@ -26,8 +26,23 @@ import {
   type PaginationState,
   type OnChangeFn,
 } from "@tanstack/react-table";
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuPanel,
+  MenuTrigger,
+} from "@/components/animate-ui/components/base/menu";
+import { Rows3 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import CommaTableHeader from "./components/CommaTableHeader";
+import CommaTablePagination from "./components/CommaTablePagination";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   data: any[];
@@ -79,6 +94,9 @@ export default function CommaTable(props: Props) {
     translationPrefix,
     hideHeader,
   } = props;
+
+  const { t } = useTranslation();
+  const rowCounts = [5, 10, 20, 50, 100];
 
   const useContextMenuForActions = useDashboardSettings(
     (s) => s.useContextMenuForActions,
@@ -267,6 +285,52 @@ export default function CommaTable(props: Props) {
           </table>
         </div>
       </div>
+      {hideHeader && table.getPageCount() > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-2">
+          <Menu>
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <MenuTrigger
+                    {...props}
+                    render={(props) => (
+                      <Button
+                        {...props}
+                        nativeButton
+                        variant="outline"
+                        size="sm"
+                        className="select-none h-9"
+                      >
+                        <Rows3 className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">
+                          {t("table.header.rowCount")}
+                        </span>
+                      </Button>
+                    )}
+                  />
+                )}
+              ></TooltipTrigger>
+              <TooltipContent>
+                {t("table.header.rowCount.hover")}
+              </TooltipContent>
+            </Tooltip>
+            <MenuPanel align="end">
+              {rowCounts.map((rowCount) => (
+                <MenuCheckboxItem
+                  key={`row-count-${rowCount}`}
+                  checked={table.getState().pagination.pageSize === rowCount}
+                  onCheckedChange={() => table.setPageSize(rowCount)}
+                >
+                  {t("table.header.rowCount.row", {
+                    rowCount: rowCount,
+                  })}
+                </MenuCheckboxItem>
+              ))}
+            </MenuPanel>
+          </Menu>
+          <CommaTablePagination table={table} />
+        </div>
+      )}
     </>
   );
 }

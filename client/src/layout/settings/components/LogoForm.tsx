@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import { toast } from "sonner";
 import { CommaImage } from "@/components/shared/CommaImage";
+import { useRole } from "@/hooks/useRole";
 
 export default function LogoForm() {
   const { theme } = useTheme();
@@ -23,6 +24,8 @@ export default function LogoForm() {
   const isSettingsPage = location.pathname.includes("/ayarlar");
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
+  const { hasMinimumRole } = useRole();
+  const canEdit = hasMinimumRole(1);
 
   const [smallLogo, setSmallLogo] = useState<File | null>(null);
   const [largeLogo, setLargeLogo] = useState<File | null>(null);
@@ -135,7 +138,7 @@ export default function LogoForm() {
             <h2 className="">
               {t("dialog.accountDetails.logos.small").toString()}
             </h2>
-            {(smallLogoPreview || logos.smallLogo) && (
+            {canEdit && (smallLogoPreview || logos.smallLogo) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -155,6 +158,7 @@ export default function LogoForm() {
             onDrop={(files) => handleDrop(files, "small")}
             onError={Logger.error}
             multiple={false}
+            disabled={!canEdit}
             className={`${smallLogo && "aspect-square"} w-auto p-6!`}
           >
             <DropzoneEmptyState>
@@ -196,7 +200,7 @@ export default function LogoForm() {
             <h2 className="">
               {t("dialog.accountDetails.logos.large").toString()}
             </h2>
-            {(largeLogoPreview || logos.largeLogo) && (
+            {canEdit && (largeLogoPreview || logos.largeLogo) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -216,6 +220,7 @@ export default function LogoForm() {
             onDrop={(files) => handleDrop(files, "large")}
             onError={Logger.error}
             multiple={false}
+            disabled={!canEdit}
             className="w-auto p-6!"
           >
             <DropzoneEmptyState>
@@ -255,9 +260,11 @@ export default function LogoForm() {
       </div>
       <div className="flex justify-end gap-2 col-span-2">
         {!isSettingsPage && <CancelButton onClick={onCancel} />}
-        <Button onClick={handleUpload}>
-          {t("dialog.accountDetails.logos.form.upload.confirm")}
-        </Button>
+        {canEdit && (
+          <Button onClick={handleUpload}>
+            {t("dialog.accountDetails.logos.form.upload.confirm")}
+          </Button>
+        )}
       </div>
     </div>
   );

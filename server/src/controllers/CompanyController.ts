@@ -5,7 +5,7 @@ import { Logger } from "@/lib/utils/logger";
 import { UploadedFile } from "express-fileupload";
 import { CompanyDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
-import { ValidationError } from "@/lib/errors/AppError";
+import { ValidationError, UnauthorizedError } from "@/lib/errors/AppError";
 
 const router = express.Router();
 
@@ -13,6 +13,12 @@ router.use(authMiddleware);
 
 router.put("/", asyncHandler(async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const userRole = req.user.role;
+
+	if (userRole < 1) {
+		throw new UnauthorizedError("You do not have permission to update company details");
+	}
+
 	const details: CompanyDto = req.body;
 
 	Logger.info("[CompanyController] Update company details request", { companyId });
@@ -35,6 +41,12 @@ router.get("/id", asyncHandler(async (req: Request, res: Response) => {
 
 router.post("/logo/small", asyncHandler(async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const userRole = req.user.role;
+
+	if (userRole < 1) {
+		throw new UnauthorizedError("You do not have permission to upload logos");
+	}
+
 	Logger.info("[CompanyController] Upload small logo request", { companyId });
 
 	if (!req.files?.logo) {
@@ -47,6 +59,12 @@ router.post("/logo/small", asyncHandler(async (req: Request, res: Response) => {
 
 router.post("/logo/large", asyncHandler(async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const userRole = req.user.role;
+
+	if (userRole < 1) {
+		throw new UnauthorizedError("You do not have permission to upload logos");
+	}
+
 	Logger.info("[CompanyController] Upload large logo request", { companyId });
 
 	if (!req.files?.logo) {
@@ -59,6 +77,12 @@ router.post("/logo/large", asyncHandler(async (req: Request, res: Response) => {
 
 router.delete("/logo/small", asyncHandler(async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const userRole = req.user.role;
+
+	if (userRole < 1) {
+		throw new UnauthorizedError("You do not have permission to delete logos");
+	}
+
 	Logger.info("[CompanyController] Delete small logo request", { companyId });
 
 	await CompanyService.DeleteLogo("small", companyId);
@@ -67,6 +91,12 @@ router.delete("/logo/small", asyncHandler(async (req: Request, res: Response) =>
 
 router.delete("/logo/large", asyncHandler(async (req: Request, res: Response) => {
 	const companyId = req.user.companyId;
+	const userRole = req.user.role;
+
+	if (userRole < 1) {
+		throw new UnauthorizedError("You do not have permission to delete logos");
+	}
+
 	Logger.info("[CompanyController] Delete large logo request", { companyId });
 
 	await CompanyService.DeleteLogo("large", companyId);

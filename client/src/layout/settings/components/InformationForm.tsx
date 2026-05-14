@@ -38,6 +38,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
+import { useRole } from "@/hooks/useRole";
 
 export default function InformationForm() {
   const [companyDetails, setCompanyDetails] = useState<CompanyDto | null>(null);
@@ -46,6 +47,8 @@ export default function InformationForm() {
   const isSettingsPage = location.pathname.includes("/ayarlar");
   const closeDialog = useDialog((s) => s.closeDialog);
   const { t } = useTranslation();
+  const { hasMinimumRole } = useRole();
+  const canEdit = hasMinimumRole(1);
 
   const CompanyFormSchema = z.object({
     name: z
@@ -192,6 +195,7 @@ export default function InformationForm() {
                   <InputGroupInput
                     type="text"
                     placeholder="ABC. Ltd. Şti."
+                    disabled={!canEdit}
                     {...field}
                   />
                   <InputGroupAddon>
@@ -218,6 +222,7 @@ export default function InformationForm() {
                 <RadioGroup
                   className="flex gap-8"
                   value={String(field.value)}
+                  disabled={!canEdit}
                   onValueChange={(value) => field.onChange(value === "true")}
                 >
                   <div className="flex gap-2 items-center">
@@ -259,6 +264,7 @@ export default function InformationForm() {
                     <InputGroupInput
                       type="text"
                       placeholder="Eskişehir"
+                      disabled={!canEdit}
                       {...field}
                     />
                     <InputGroupAddon>
@@ -291,6 +297,7 @@ export default function InformationForm() {
                     placeholder={
                       form.watch("is_company") ? "1234567890" : "12345678901"
                     }
+                    disabled={!canEdit}
                     {...field}
                   />
                   <InputGroupAddon>
@@ -321,6 +328,7 @@ export default function InformationForm() {
                     <InputGroupInput
                       type="number"
                       placeholder="1234567890123456"
+                      disabled={!canEdit}
                       {...field}
                     />
                     <InputGroupAddon>
@@ -347,6 +355,7 @@ export default function InformationForm() {
                   <InputGroupInput
                     type="text"
                     placeholder="+90 555 555 55 55"
+                    disabled={!canEdit}
                     {...field}
                   />
                   <InputGroupAddon>
@@ -372,6 +381,7 @@ export default function InformationForm() {
                   <InputGroupInput
                     type="text"
                     placeholder="ornek@sirket.com"
+                    disabled={!canEdit}
                     {...field}
                   />
                   <InputGroupAddon>
@@ -397,6 +407,7 @@ export default function InformationForm() {
                   <InputGroupInput
                     type="text"
                     placeholder="Örnek Mah. No:1 D:5"
+                    disabled={!canEdit}
                     {...field}
                   />
                   <InputGroupAddon>
@@ -413,7 +424,7 @@ export default function InformationForm() {
         />
         <div className="flex justify-end gap-2 col-span-2">
           {!isSettingsPage && <CancelButton onClick={onCancel} />}
-          <Button type="submit">{t("vars.save")}</Button>
+          {canEdit && <Button type="submit">{t("vars.save")}</Button>}
         </div>
       </form>
     </Form>
