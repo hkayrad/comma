@@ -188,7 +188,7 @@ export default function LogoForm() {
                         : ""
                   }
                   alt="Small Logo"
-                  containerClassName="h-32 aspect-square"
+                  containerClassName="h-32 aspect-square bg-transparent"
                   className={`object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
                 />
               )}
@@ -250,7 +250,7 @@ export default function LogoForm() {
                         : ""
                   }
                   alt="Large Logo"
-                  containerClassName="max-w-96 h-32"
+                  containerClassName="max-w-96 h-32 bg-transparent"
                   className={`object-contain ${theme === "dark" ? "invert brightness-0" : ""}`}
                 />
               )}

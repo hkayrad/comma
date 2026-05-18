@@ -11,7 +11,7 @@ export default function CommaSidebarHeader() {
   const location = useLocation();
   const { theme } = useTheme();
   const { state } = useSidebar();
-  
+
   const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
   const [logos, setLogos] = useState<{
     smallLogo: string;
@@ -113,7 +113,7 @@ export default function CommaSidebarHeader() {
               <CommaImage
                 src={logoSrc.small}
                 alt="Comma Logo"
-                containerClassName="h-full w-auto"
+                containerClassName="h-full w-auto bg-transparent"
                 className="object-contain"
                 loading="eager"
               />
@@ -148,7 +148,7 @@ export default function CommaSidebarHeader() {
               <CommaImage
                 src={logoSrc.large}
                 alt="Comma Logo"
-                containerClassName="h-full w-auto"
+                containerClassName="h-full w-auto bg-transparent"
                 className="object-contain"
                 loading="eager"
               />

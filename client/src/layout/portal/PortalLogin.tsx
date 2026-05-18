@@ -85,7 +85,7 @@ export default function PortalLogin() {
                 : "/logo.webp"
             }
             alt={companyInfo?.name || "Company Logo"}
-            className="w-48 h-32 object-contain"
+            className="w-48 h-32 object-contain bg-transparent"
           />
           <h1 className="text-2xl font-bold text-center">
             {companyInfo?.name || "Müşteri Portalı"}
