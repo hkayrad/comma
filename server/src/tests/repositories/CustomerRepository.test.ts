@@ -73,11 +73,33 @@ describe('CustomerRepository', () => {
         expect(debtStatus.count).toBeGreaterThan(0);
     });
 
-    it('getStatement should support date filters', async () => {
+    it('getStatement should support date filters and calculate totals correctly', async () => {
         const cust = await repo.create({ company_id: testCompanyId, name: 'Statement Cust', is_company: true, created_by: testUserId });
+        
+        // Create a test debt with withholding and discount
+        const debtRepo = new (await import('@/repositories/DebtRepository')).DebtRepository('receivable');
+        await debtRepo.create({
+            company_id: testCompanyId,
+            customer_id: cust.id,
+            invoice_no: 'INV-STMT',
+            amount: 100,
+            vat: 20,
+            discount: 10,
+            withholding: 5,
+            currency: 'USD',
+            exchange_rate: 2.0,
+            issue_date: new Date(),
+            created_by: testUserId
+        });
+
         const statement = await repo.getStatement(cust.id, testCompanyId, '2020-01-01', '2030-01-01');
         expect(statement).not.toBeNull();
         expect(statement?.customer.name.trim()).toBe('Statement Cust');
+        
+        const stmtDebt = statement?.debts.find(d => d.invoice_no === 'INV-STMT');
+        expect(stmtDebt).toBeDefined();
+        expect(Number(stmtDebt?.total)).toBe(105);
+        expect(Number(stmtDebt?.total_in_try)).toBe(210);
     });
 
     it('findAllIdAndName should return results', async () => {
