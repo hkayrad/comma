@@ -31,7 +31,7 @@ let isRestarting = false;
 let isExiting = false;
 
 function spawnDev(name, command, cwd, color) {
-    const proc = spawn(command, { cwd, shell: true });
+    const proc = spawn(command, { cwd, shell: true, detached: true });
     const prefix = `\x1b[${color}m[${name}]\x1b[0m `;
     let atStartOfLine = true;
 
@@ -67,9 +67,23 @@ function killProc(proc) {
         proc.once("exit", () => {
             resolve();
         });
-        proc.kill("SIGTERM");
+        
+        try {
+            if (process.platform === "win32") {
+                proc.kill("SIGTERM");
+            } else {
+                process.kill(-proc.pid, "SIGTERM");
+            }
+        } catch (e) {}
+
         const timeout = setTimeout(() => {
-            proc.kill("SIGKILL");
+            try {
+                if (process.platform === "win32") {
+                    proc.kill("SIGKILL");
+                } else {
+                    process.kill(-proc.pid, "SIGKILL");
+                }
+            } catch (e) {}
             resolve();
         }, 2000);
         proc.once("exit", () => clearTimeout(timeout));
