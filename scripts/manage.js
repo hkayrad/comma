@@ -31,7 +31,7 @@ let isRestarting = false;
 let isExiting = false;
 
 function spawnDev(name, command, cwd, color) {
-    const proc = spawn(command, { cwd, shell: true, detached: true });
+    const proc = spawn(command, { cwd, shell: true, detached: process.platform !== "win32" });
     const prefix = `\x1b[${color}m[${name}]\x1b[0m `;
     let atStartOfLine = true;
 
@@ -53,6 +53,9 @@ function spawnDev(name, command, cwd, color) {
 
     proc.stdout.on("data", (data) => handleData(data, process.stdout));
     proc.stderr.on("data", (data) => handleData(data, process.stderr));
+    proc.on("error", (err) => {
+        console.error(`\n[${name}] process error:`, err);
+    });
 
     return proc;
 }
@@ -64,42 +67,52 @@ function killProc(proc) {
             resolve();
             return;
         }
-        proc.once("exit", () => {
+
+        let timeout;
+        const cleanUpAndResolve = () => {
+            clearTimeout(timeout);
+            proc.off("exit", cleanUpAndResolve);
             resolve();
-        });
+        };
+
+        proc.once("exit", cleanUpAndResolve);
         
         try {
             if (process.platform === "win32") {
-                proc.kill("SIGTERM");
+                const { execSync } = require("child_process");
+                execSync(`taskkill /pid ${proc.pid} /t /f`, { stdio: "ignore" });
             } else {
                 process.kill(-proc.pid, "SIGTERM");
             }
         } catch (e) {}
 
-        const timeout = setTimeout(() => {
+        timeout = setTimeout(() => {
             try {
                 if (process.platform === "win32") {
-                    proc.kill("SIGKILL");
+                    const { execSync } = require("child_process");
+                    execSync(`taskkill /pid ${proc.pid} /t /f`, { stdio: "ignore" });
                 } else {
                     process.kill(-proc.pid, "SIGKILL");
                 }
             } catch (e) {}
-            resolve();
+            cleanUpAndResolve();
         }, 2000);
-        proc.once("exit", () => clearTimeout(timeout));
     });
 }
 
 function startServers() {
     console.log("Starting development servers...");
-    clientProc = spawnDev("Client", "npm run dev", path.join(root, "client"), "32"); // Green
-    serverProc = spawnDev("Server", "npm run dev", path.join(root, "server"), "34"); // Blue
+    const client = spawnDev("Client", "npm run dev", path.join(root, "client"), "32"); // Green
+    const server = spawnDev("Server", "npm run dev", path.join(root, "server"), "34"); // Blue
 
-    clientProc.on("exit", () => {
-        clientProc = null;
+    clientProc = client;
+    serverProc = server;
+
+    client.on("exit", () => {
+        if (clientProc === client) clientProc = null;
     });
-    serverProc.on("exit", () => {
-        serverProc = null;
+    server.on("exit", () => {
+        if (serverProc === server) serverProc = null;
     });
 }
 
@@ -120,6 +133,7 @@ async function dev() {
     startServers();
 
     const cleanup = async () => {
+        if (isExiting) return;
         isExiting = true;
         if (process.stdin.isTTY) {
             process.stdin.setRawMode(false);
