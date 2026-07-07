@@ -43,3 +43,4 @@ dumps/
 **/*.tsbuildinfo
 .gemini/
 GEMINI.md
+.superpowers/

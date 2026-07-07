@@ -89,7 +89,11 @@ PayableDebts.init(
 			type: DataTypes.VIRTUAL(DataTypes.DECIMAL(16, 2)),
 			allowNull: true,
 			get() {
-				return this.amount + this.vat;
+				const amount = Number(this.getDataValue("amount") || 0);
+				const vat = Number(this.getDataValue("vat") || 0);
+				const discount = Number(this.getDataValue("discount") || 0);
+				const withholding = Number(this.getDataValue("withholding") || 0);
+				return amount + vat - discount - withholding;
 			},
 		},
 		total_in_try: {

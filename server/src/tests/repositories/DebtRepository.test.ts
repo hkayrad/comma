@@ -66,5 +66,62 @@ describe('DebtRepository', () => {
         await repo.getUpcomingDueDates(testCompanyId);
         await repo.getMonthlyStats(testCompanyId, new Date(), new Date());
     });
+
+    it('should correctly calculate total and total_in_try with withholding and discount', async () => {
+        const issueDate = new Date();
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 5);
+
+        const debt = await repo.create({
+            company_id: testCompanyId,
+            customer_id: testRecCustId,
+            invoice_no: 'INV-CALC',
+            amount: 100,
+            vat: 20,
+            discount: 10,
+            withholding: 5,
+            currency: 'USD',
+            exchange_rate: 2.0,
+            issue_date: issueDate,
+            due_date: dueDate,
+            created_by: testUserId
+        });
+
+        // 1. Verify Sequelize virtual fields
+        expect(Number(debt.total)).toBe(105);
+        expect(Number(debt.total_in_try)).toBe(210);
+
+        // 2. Verify findAllWithSummary totals
+        const summary = await repo.findAllWithSummary(testCompanyId, 10, 0, [], [{ id: 'invoice_no', value: 'INV-CALC' }]);
+        const row = summary.rows.find(r => r.id === debt.id);
+        expect(row).toBeDefined();
+        expect(Number(row?.total)).toBe(105);
+        expect(Number(row?.total_in_try)).toBe(210);
+
+        // 3. Verify getTotals
+        const totals = await repo.getTotals(testCompanyId, 'TRY');
+        expect(totals).not.toBeNull();
+        // Since other test cases also create debts, let's verify that totals is at least 210
+        expect(totals?.total_debts).toBeGreaterThanOrEqual(210);
+
+        // 4. Verify getUpcomingDueDates
+        const upcoming = await repo.getUpcomingDueDates(testCompanyId, 7);
+        const upcomingItem = upcoming.find(u => u.id === debt.id);
+        expect(upcomingItem).toBeDefined();
+        expect(Number(upcomingItem?.total)).toBe(105);
+
+        // 5. Verify getMonthlyStats
+        const start = new Date();
+        start.setDate(1);
+        const end = new Date();
+        end.setMonth(end.getMonth() + 1);
+        end.setDate(1);
+        const stats = await repo.getMonthlyStats(testCompanyId, start, end);
+        expect(stats.length).toBeGreaterThan(0);
+        const currentMonthStr = issueDate.toISOString().slice(0, 7);
+        const currentMonthStats = stats.find(s => s.month === currentMonthStr);
+        expect(currentMonthStats).toBeDefined();
+        expect(Number(currentMonthStats?.total)).toBeGreaterThanOrEqual(105);
+    });
   });
 });

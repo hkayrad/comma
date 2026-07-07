@@ -161,7 +161,7 @@ ALTER TABLE payable_payments ADD COLUMN due_date DATE DEFAULT NULL;
  * Grouping: customer_id, company_id
  */
 CREATE OR REPLACE VIEW vw_receivable_debt_summary AS 
-SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
+SELECT customer_id, company_id, SUM((amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate) AS total_debt 
 FROM receivable_debts 
 WHERE deleted_at IS NULL AND deleted_by IS NULL 
 GROUP BY customer_id, company_id;
@@ -187,7 +187,7 @@ GROUP BY customer_id, company_id;
  * Grouping: company_id
  */
 CREATE OR REPLACE VIEW vw_receivable_total_debt_by_company AS 
-SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
+SELECT d.company_id, COALESCE(SUM(d.amount + d.vat - COALESCE(d.discount, 0) - COALESCE(d.withholding, 0)), 0) AS total, COALESCE(SUM((d.amount + d.vat - COALESCE(d.discount, 0) - COALESCE(d.withholding, 0)) * d.exchange_rate), 0) AS total_in_try 
 FROM receivable_debts d 
 JOIN receivable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id 
 WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 
@@ -215,7 +215,7 @@ GROUP BY p.company_id;
  * Grouping: customer_id, company_id
  */
 CREATE OR REPLACE VIEW vw_payable_debt_summary AS 
-SELECT customer_id, company_id, SUM((amount + vat) * exchange_rate) AS total_debt 
+SELECT customer_id, company_id, SUM((amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate) AS total_debt 
 FROM payable_debts 
 WHERE deleted_at IS NULL AND deleted_by IS NULL 
 GROUP BY customer_id, company_id;
@@ -241,7 +241,7 @@ GROUP BY customer_id, company_id;
  * Grouping: company_id
  */
 CREATE OR REPLACE VIEW vw_payable_total_debt_by_company AS 
-SELECT d.company_id, COALESCE(SUM(d.amount + d.vat), 0) AS total, COALESCE(SUM((d.amount + d.vat) * d.exchange_rate), 0) AS total_in_try 
+SELECT d.company_id, COALESCE(SUM(d.amount + d.vat - COALESCE(d.discount, 0) - COALESCE(d.withholding, 0)), 0) AS total, COALESCE(SUM((d.amount + d.vat - COALESCE(d.discount, 0) - COALESCE(d.withholding, 0)) * d.exchange_rate), 0) AS total_in_try 
 FROM payable_debts d 
 JOIN payable_customers c ON d.customer_id = c.id AND d.company_id = c.company_id 
 WHERE d.deleted_at IS NULL AND d.deleted_by IS NULL AND c.deleted_at IS NULL AND c.deleted_by IS NULL 

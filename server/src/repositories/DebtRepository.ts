@@ -101,9 +101,9 @@ export class DebtRepository {
                 } else if (id === "issue_date" || id === "due_date") {
                     where[id] = { [Op.like]: `%${value}%` };
                 } else if (id === "total") {
-                    where[Op.and] = [literal(`(amount + vat) LIKE '%${value}%'`)];
+                    where[Op.and] = [literal(`(amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) LIKE '%${value}%'`)];
                 } else if (id === "total_in_try") {
-                    where[Op.and] = [literal(`((amount + vat) * exchange_rate) LIKE '%${value}%'`)];
+                    where[Op.and] = [literal(`((amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate) LIKE '%${value}%'`)];
                 }
             });
         }
@@ -121,11 +121,11 @@ export class DebtRepository {
             ],
             attributes: {
                 include: [
-                    [literal('(amount + vat)'), 'total'],
-                    [literal('((amount + vat) * exchange_rate)'), 'total_in_try'],
+                    [literal('(amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0))'), 'total'],
+                    [literal('((amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate)'), 'total_in_try'],
                     [
                         literal(`(
-                            SELECT COALESCE(SUM(p.amount * p.exchange_rate), 0) >= (\`${mainAlias}\`.amount + \`${mainAlias}\`.vat) * \`${mainAlias}\`.exchange_rate
+                            SELECT COALESCE(SUM(p.amount * p.exchange_rate), 0) >= (\`${mainAlias}\`.amount + \`${mainAlias}\`.vat - COALESCE(\`${mainAlias}\`.discount, 0) - COALESCE(\`${mainAlias}\`.withholding, 0)) * \`${mainAlias}\`.exchange_rate
                             FROM ${paymentTable} AS p
                             WHERE p.invoice_no = \`${mainAlias}\`.invoice_no
                               AND p.company_id = \`${mainAlias}\`.company_id
@@ -152,8 +152,8 @@ export class DebtRepository {
             order: sorting.length > 0 
                 ? sorting.map(s => {
                     if (s.id === 'customer_name') return [{ model: Customer, as: 'customer' }, 'name', s.desc ? 'DESC' : 'ASC'];
-                    if (s.id === 'total') return [literal('(amount + vat)'), s.desc ? 'DESC' : 'ASC'];
-                    if (s.id === 'total_in_try') return [literal('((amount + vat) * exchange_rate)'), s.desc ? 'DESC' : 'ASC'];
+                    if (s.id === 'total') return [literal('(amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0))'), s.desc ? 'DESC' : 'ASC'];
+                    if (s.id === 'total_in_try') return [literal('((amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate)'), s.desc ? 'DESC' : 'ASC'];
                     return [s.id, s.desc ? 'DESC' : 'ASC'];
                 })
                 : [['issue_date', 'DESC']],
@@ -184,7 +184,7 @@ export class DebtRepository {
         const [debtResult, paymentResult] = await Promise.all([
             Debt.findOne({
                 attributes: [
-                    [fn("SUM", literal("(amount + vat) * exchange_rate")), "total_in_try"]
+                    [fn("SUM", literal("(amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)) * exchange_rate")), "total_in_try"]
                 ],
                 include: [{
                     model: Customer,
@@ -231,7 +231,7 @@ export class DebtRepository {
         const rows = await Debt.findAll({
             attributes: [
                 'id',
-                [literal('(amount + vat)'), 'total'],
+                [literal('(amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0))'), 'total'],
                 'currency',
                 'due_date',
                 [literal(`DATEDIFF(due_date, CURDATE())`), 'days_remaining']
@@ -260,7 +260,7 @@ export class DebtRepository {
                           AND p.company_id = \`${mainAlias}\`.company_id
                           AND p.customer_id = \`${mainAlias}\`.customer_id
                           AND p.deleted_at IS NULL
-                    ) < (\`${mainAlias}\`.amount + \`${mainAlias}\`.vat) * \`${mainAlias}\`.exchange_rate`)
+                    ) < (\`${mainAlias}\`.amount + \`${mainAlias}\`.vat - COALESCE(\`${mainAlias}\`.discount, 0) - COALESCE(\`${mainAlias}\`.withholding, 0)) * \`${mainAlias}\`.exchange_rate`)
                 ]
             } as any,
             order: [['due_date', 'ASC']],
@@ -282,7 +282,7 @@ export class DebtRepository {
 	async getMonthlyStats(companyId: string, start: Date, end: Date) {
 		const Model = this.getModel() as any;
 		return await Model.findAll({
-			attributes: [[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"], [fn("SUM", literal("amount + vat - COALESCE(discount, 0)")), "total"]],
+			attributes: [[fn("DATE_FORMAT", col("issue_date"), "%Y-%m"), "month"], [fn("SUM", literal("amount + vat - COALESCE(discount, 0) - COALESCE(withholding, 0)")), "total"]],
 			where: { company_id: companyId, issue_date: { [Op.gte]: start, [Op.lt]: end }, deleted_at: null },
 			group: [fn("DATE_FORMAT", col("issue_date"), "%Y-%m")],
 			order: [[literal("month"), "ASC"]],
