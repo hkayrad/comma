@@ -28,6 +28,7 @@ async function run(command, cwd) {
 let clientProc = null;
 let serverProc = null;
 let isRestarting = false;
+let isExiting = false;
 
 function spawnDev(name, command, cwd, color) {
     const proc = spawn(command, { cwd, shell: true });
@@ -63,7 +64,7 @@ function killProc(proc) {
             resolve();
             return;
         }
-        proc.on("exit", () => {
+        proc.once("exit", () => {
             resolve();
         });
         proc.kill("SIGTERM");
@@ -71,7 +72,7 @@ function killProc(proc) {
             proc.kill("SIGKILL");
             resolve();
         }, 2000);
-        proc.on("exit", () => clearTimeout(timeout));
+        proc.once("exit", () => clearTimeout(timeout));
     });
 }
 
@@ -97,6 +98,7 @@ async function restartServers() {
         killProc(serverProc)
     ]);
     isRestarting = false;
+    if (isExiting) return;
     startServers();
 }
 
@@ -104,6 +106,7 @@ async function dev() {
     startServers();
 
     const cleanup = async () => {
+        isExiting = true;
         if (process.stdin.isTTY) {
             process.stdin.setRawMode(false);
             process.stdin.pause();
