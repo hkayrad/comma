@@ -171,8 +171,8 @@ export default function CustomerStatement() {
   ], [t, type, company, refresh]);
 
   const getRemainingColor = (amount: number) => {
-    if (amount > 0) return "text-red-600";
-    if (amount < 0) return "text-blue-600";
+    if (amount > 0.005) return "text-red-600";
+    if (amount < -0.005) return "text-blue-600";
     return "text-green-600";
   };
 

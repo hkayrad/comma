@@ -175,7 +175,7 @@ export default function CustomerDetails(props: Props) {
               </div>
 
               {/* Warning Messages */}
-              {(customer.remaining_debt || 0) > 0 && (
+              {(customer.remaining_debt || 0) > 0.005 && (
                 <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg flex items-center gap-2">
                   <BanknoteX className="text-amber-800 dark:text-amber-400" />
                   <p className="text-amber-800 dark:text-amber-300 text-sm font-medium">
@@ -185,7 +185,7 @@ export default function CustomerDetails(props: Props) {
                   </p>
                 </div>
               )}
-              {(customer.remaining_debt || 0) < 0 && (
+              {(customer.remaining_debt || 0) < -0.005 && (
                 <div className="mt-4 p-3 bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 rounded-lg flex items-center gap-2">
                   <BanknoteX className="text-sky-800 dark:text-sky-400" />
                   <p className="text-sky-800 dark:text-sky-300 text-sm font-medium">

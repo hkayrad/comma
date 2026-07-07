@@ -99,9 +99,9 @@ export default function PortalDashboard() {
           <CardContent>
             <div className="text-lg flex items-center gap-2">
               <strong>Kalan Borç: </strong>
-              <span className={remainingDebt > 0 ? "text-destructive font-medium" : "text-green-600 font-medium"}>
+              <span className={remainingDebt > 0.005 ? "text-destructive font-medium" : "text-green-600 font-medium"}>
                 {formatCurrency(Math.abs(remainingDebt))}
-                {remainingDebt < 0 ? " (Alacaklı)" : ""}
+                {remainingDebt < -0.005 ? " (Alacaklı)" : ""}
               </span>
             </div>
           </CardContent>

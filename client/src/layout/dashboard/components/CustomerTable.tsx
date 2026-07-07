@@ -364,7 +364,7 @@ export default function CustomerTable(props: Props) {
         header: t("dashboard.table.column.debt_status"),
         cell: ({ row }: { row: Row<CustomerDto> }) => {
           const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
-          if (remaining_debt > 0)
+          if (remaining_debt > 0.005)
             return (
               <Badge
                 className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 select-none hover:cursor-copy"
@@ -382,7 +382,7 @@ export default function CustomerTable(props: Props) {
                   : t("vars.debt_status.has_receivable")}
               </Badge>
             );
-          else if (remaining_debt < 0)
+          else if (remaining_debt < -0.005)
             return (
               <Badge
                 className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 select-none hover:cursor-copy"
@@ -424,12 +424,12 @@ export default function CustomerTable(props: Props) {
             return true;
           const remaining_debt = parseFloat(row.getValue(`remaining_debt`));
           let status = "";
-          if (remaining_debt > 0) {
+          if (remaining_debt > 0.005) {
             status =
               type === "receivable"
                 ? t("vars.debt_status.has_debt")
                 : t("vars.debt_status.has_receivable");
-          } else if (remaining_debt < 0) {
+          } else if (remaining_debt < -0.005) {
             status =
               type === "receivable"
                 ? t("vars.debt_status.has_receivable")
