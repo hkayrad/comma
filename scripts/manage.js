@@ -25,6 +25,10 @@ async function run(command, cwd) {
     });
 }
 
+let clientProc = null;
+let serverProc = null;
+let isRestarting = false;
+
 function spawnDev(name, command, cwd, color) {
     const proc = spawn(command, { cwd, shell: true });
     const prefix = `\x1b[${color}m[${name}]\x1b[0m `;
@@ -52,20 +56,82 @@ function spawnDev(name, command, cwd, color) {
     return proc;
 }
 
-async function dev() {
-    console.log("Starting development servers...");
-    const clientProc = spawnDev("Client", "npm run dev", path.join(root, "client"), "32"); // Green
-    const serverProc = spawnDev("Server", "npm run dev", path.join(root, "server"), "34"); // Blue
+function killProc(proc) {
+    if (!proc) return Promise.resolve();
+    return new Promise((resolve) => {
+        if (proc.exitCode !== null || proc.signalCode !== null) {
+            resolve();
+            return;
+        }
+        proc.on("exit", () => {
+            resolve();
+        });
+        proc.kill("SIGTERM");
+        const timeout = setTimeout(() => {
+            proc.kill("SIGKILL");
+            resolve();
+        }, 2000);
+        proc.on("exit", () => clearTimeout(timeout));
+    });
+}
 
-    const cleanup = () => {
+function startServers() {
+    console.log("Starting development servers...");
+    clientProc = spawnDev("Client", "npm run dev", path.join(root, "client"), "32"); // Green
+    serverProc = spawnDev("Server", "npm run dev", path.join(root, "server"), "34"); // Blue
+
+    clientProc.on("exit", () => {
+        clientProc = null;
+    });
+    serverProc.on("exit", () => {
+        serverProc = null;
+    });
+}
+
+async function restartServers() {
+    if (isRestarting) return;
+    isRestarting = true;
+    console.log("\nRestarting development servers...");
+    await Promise.all([
+        killProc(clientProc),
+        killProc(serverProc)
+    ]);
+    isRestarting = false;
+    startServers();
+}
+
+async function dev() {
+    startServers();
+
+    const cleanup = async () => {
+        if (process.stdin.isTTY) {
+            process.stdin.setRawMode(false);
+            process.stdin.pause();
+        }
         console.log("\nStopping servers...");
-        clientProc.kill();
-        serverProc.kill();
-        process.exit();
+        await Promise.all([
+            killProc(clientProc),
+            killProc(serverProc)
+        ]);
+        process.exit(0);
     };
 
     process.on("SIGINT", cleanup);
     process.on("SIGTERM", cleanup);
+
+    if (process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.setEncoding("utf8");
+        process.stdin.on("data", async (key) => {
+            if (key === "\u0003") {
+                await cleanup();
+            } else if (key.toLowerCase() === "r") {
+                await restartServers();
+            }
+        });
+        console.log("Press 'r' to restart the dev servers.");
+    }
 }
 
 async function build() {
