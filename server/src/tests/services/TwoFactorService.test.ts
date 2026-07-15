@@ -58,6 +58,7 @@ describe('TwoFactorService', () => {
       it('should verify a valid token', () => {
           const secret = TwoFactorService.generateSecret();
           const totp = new OTPAuth.TOTP({
+              period: 60,
               secret: OTPAuth.Secret.fromBase32(secret)
           });
           const token = totp.generate();
@@ -151,7 +152,7 @@ describe('TwoFactorService', () => {
 
       it('should return success and recovery codes', async () => {
           const secret = TwoFactorService.generateSecret();
-          const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret) });
+          const totp = new OTPAuth.TOTP({ period: 60, secret: OTPAuth.Secret.fromBase32(secret) });
           const token = totp.generate();
           vi.spyOn(UserRepository, 'update').mockResolvedValue([1]);
           const result = await TwoFactorService.completeSetup('1', secret, token);
@@ -177,7 +178,7 @@ describe('TwoFactorService', () => {
     it('should return success for valid token', async () => {
         const secret = TwoFactorService.generateSecret();
         const encryptedSecret = TwoFactorService.encryptSecret(secret);
-        const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret) });
+        const totp = new OTPAuth.TOTP({ period: 60, secret: OTPAuth.Secret.fromBase32(secret) });
         const token = totp.generate();
 
         vi.spyOn(UserRepository, 'findById').mockResolvedValue({ 
