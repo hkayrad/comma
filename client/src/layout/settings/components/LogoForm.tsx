@@ -127,7 +127,15 @@ export default function LogoForm() {
   );
 
   useEffect(() => {
-    fetchLogos();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchLogos();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [fetchLogos]);
 
   return (

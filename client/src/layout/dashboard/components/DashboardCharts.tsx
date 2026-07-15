@@ -109,7 +109,15 @@ export default function DashboardCharts() {
   }, [startDate, months]);
 
   useEffect(() => {
-    fetchData();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        fetchData();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [fetchData]);
 
   // Format month for axis (2025-01 -> Jan)

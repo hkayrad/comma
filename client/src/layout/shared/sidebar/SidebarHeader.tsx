@@ -12,7 +12,7 @@ export default function CommaSidebarHeader() {
   const { theme } = useTheme();
   const { state } = useSidebar();
 
-  const [logoFilter, setLogoFilter] = useState("brightness(100) invert(0)");
+  const logoFilter = theme === "dark" ? "brightness(0) invert(1)" : "brightness(1) invert(0)";
   const [logos, setLogos] = useState<{
     smallLogo: string;
     largeLogo: string;
@@ -45,15 +45,7 @@ export default function CommaSidebarHeader() {
   }, []);
 
   useEffect(() => {
-    if (theme === "dark") {
-      setLogoFilter("brightness(0) invert(1)");
-    } else {
-      setLogoFilter("brightness(1) invert(0)");
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    fetchLogos();
+    Promise.resolve().then(() => fetchLogos());
     window.addEventListener("logo:refresh", fetchLogos);
     return () => {
       window.removeEventListener("logo:refresh", fetchLogos);

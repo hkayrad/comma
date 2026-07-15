@@ -1,5 +1,5 @@
 import { TCMBApi } from "@/lib/api/tcmb";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ExchangeRates } from "@comma/common";
 import {
   Tooltip,
@@ -20,33 +20,33 @@ export default function ExchangeRates() {
   );
   const { t, i18n } = useTranslation();
 
-  const fetchExchangeRates = useCallback(async () => {
-    try {
-      const response = await TCMBApi.GetExchangeRates();
-
-      if (response) {
-        setExchangeRates(response);
-        sessionStorage.setItem("exchangeRates", JSON.stringify(response));
-      }
-    } catch (error) {
-      Logger.error(error);
-    }
-  }, []);
-
-  const handleRefresh = useCallback(async () => {
-    setIsLoading(true);
-    await Promise.all([fetchExchangeRates()]);
-    setIsLoading(false);
-  }, [fetchExchangeRates]);
-
   const formatDate = (date: string) => {
     const [day, month, year] = date.split("-");
     return `${month}.${day}.${year}`;
   };
 
   useEffect(() => {
-    handleRefresh();
-  }, [fetchExchangeRates, handleRefresh]);
+    let active = true;
+    const fetchRates = async () => {
+      try {
+        const response = await TCMBApi.GetExchangeRates();
+        if (response && active) {
+          setExchangeRates(response);
+          sessionStorage.setItem("exchangeRates", JSON.stringify(response));
+        }
+      } catch (error) {
+        Logger.error(error);
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchRates();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return !isLoading ? (
     <div className="flex gap-2">

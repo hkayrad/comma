@@ -60,7 +60,15 @@ export function useCustomerStatement() {
   }, [customerId, API, date, setLabel, t]);
 
   useEffect(() => {
-    refresh();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        refresh();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [refresh]);
 
   const resetDate = useCallback(() => {
