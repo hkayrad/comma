@@ -129,8 +129,8 @@ export class TwoFactorService {
       secret: OTPAuth.Secret.fromBase32(secret),
     });
 
-    // Allow ±1 time step window for clock drift
-    const delta = totp.validate({ token, window: 1 });
+    // Allow ±2 time steps window for clock drift (up to 120 seconds) to accommodate server clock discrepancy
+    const delta = totp.validate({ token, window: 2 });
     return delta !== null;
   }
 
