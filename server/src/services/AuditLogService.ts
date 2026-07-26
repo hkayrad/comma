@@ -17,7 +17,7 @@ export class AuditLogService {
 			throw new ValidationError("Missing required audit log parameters (company_id, entity_type, entity_id, action)");
 		}
 
-		const validActions = ["CREATE", "UPDATE", "DELETE", "RESTORE"];
+		const validActions = ["CREATE", "UPDATE", "DELETE", "RESTORE", "LOGIN_SUCCESS", "LOGIN_FAILED"];
 		if (!validActions.includes(params.action)) {
 			throw new ValidationError(`Invalid action: ${params.action}. Must be one of ${validActions.join(", ")}`);
 		}

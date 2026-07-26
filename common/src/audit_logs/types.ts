@@ -1,6 +1,6 @@
 import type { UUID } from "../shared/types";
 
-export type AuditLogAction = "CREATE" | "UPDATE" | "DELETE" | "RESTORE";
+export type AuditLogAction = "CREATE" | "UPDATE" | "DELETE" | "RESTORE" | "LOGIN_SUCCESS" | "LOGIN_FAILED";
 
 export interface AuditLogDto {
 	id: UUID;

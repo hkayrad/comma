@@ -21,7 +21,37 @@ export class AuthService {
 		return new Promise((resolve) => setTimeout(resolve, delay));
 	}
 
-	static async Login(username: string, password: string) {
+	private static async recordLoginAudit(params: {
+		companyId: string;
+		userId: string | null;
+		username: string;
+		action: "LOGIN_SUCCESS" | "LOGIN_FAILED";
+		reason?: string;
+		ipAddress?: string | null;
+		userAgent?: string | null;
+	}) {
+		try {
+			const { AuditLogService } = await import("@/services/AuditLogService");
+			await AuditLogService.recordAction({
+				company_id: params.companyId,
+				user_id: params.userId,
+				entity_type: "Users",
+				entity_id: params.userId || "00000000-0000-0000-0000-000000000000",
+				action: params.action,
+				old_values: null,
+				new_values: {
+					username: params.username,
+					...(params.reason ? { reason: params.reason } : {}),
+				},
+				ip_address: params.ipAddress || null,
+				user_agent: params.userAgent || null,
+			});
+		} catch (e: any) {
+			Logger.warn("[AuthService] Failed to record login audit log", { error: e.message });
+		}
+	}
+
+	static async Login(username: string, password: string, ipAddress?: string | null, userAgent?: string | null) {
 		try {
 			// Add randomized delay to prevent timing attacks and brute-force
 			await this.randomDelay();
@@ -32,6 +62,15 @@ export class AuthService {
 
 			if (!user) {
 				Logger.error("[AuthService] User not found", { username });
+				await this.recordLoginAudit({
+					companyId: "00000000-0000-0000-0000-000000000000",
+					userId: null,
+					username,
+					action: "LOGIN_FAILED",
+					reason: "User not found",
+					ipAddress,
+					userAgent,
+				});
 				return {
 					success: false,
 					requires2FA: false,
@@ -48,6 +87,15 @@ export class AuthService {
 
 			if (!passwordMatch) {
 				Logger.error("[AuthService] Invalid password", { username });
+				await this.recordLoginAudit({
+					companyId: user.company_id,
+					userId: user.id,
+					username,
+					action: "LOGIN_FAILED",
+					reason: "Invalid password",
+					ipAddress,
+					userAgent,
+				});
 				return {
 					success: false,
 					requires2FA: false,
@@ -125,6 +173,15 @@ export class AuthService {
 
 			Logger.info("[AuthService] Login successful", { username, userId: user.id, companyId: user.company_id });
 
+			await this.recordLoginAudit({
+				companyId: user.company_id,
+				userId: user.id,
+				username: user.username,
+				action: "LOGIN_SUCCESS",
+				ipAddress,
+				userAgent,
+			});
+
 			return {
 				success: true,
 				requires2FA: false,
@@ -156,7 +213,7 @@ export class AuthService {
 	/**
 	 * Complete login after 2FA verification - issues full tokens
 	 */
-	static async Complete2FALogin(userId: string) {
+	static async Complete2FALogin(userId: string, ipAddress?: string | null, userAgent?: string | null) {
 		try {
 			Logger.info("[AuthService] Completing 2FA login", { userId });
 
@@ -204,6 +261,15 @@ export class AuthService {
 			});
 
 			Logger.info("[AuthService] 2FA login completed", { userId, username: user.username });
+
+			await this.recordLoginAudit({
+				companyId: user.company_id,
+				userId: user.id,
+				username: user.username,
+				action: "LOGIN_SUCCESS",
+				ipAddress,
+				userAgent,
+			});
 
 			return {
 				success: true,

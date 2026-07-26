@@ -12,9 +12,11 @@ const router = express.Router();
 
 router.post("/login", authRateLimiter, validate(loginSchema), asyncHandler(async (req, res) => {
 	const { username, password } = req.body;
+	const ipAddress = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || null;
+	const userAgent = (req.headers["user-agent"] as string) || null;
 	Logger.info("[AuthController] Login attempt", { username });
 
-	const response = await AuthService.Login(username, password);
+	const response = await AuthService.Login(username, password, ipAddress, userAgent);
 
 	const { success, requires2FA, accessToken, refreshToken, tempToken, message, user } = response;
 
