@@ -110,7 +110,7 @@ export class PaymentRepository {
 	}
 
 	async getUpcomingChecks(companyId: string, daysThreshold: number = 7): Promise<UpcomingDueDate[]> {
-		const query = `SELECT p.id, p.amount as total, p.currency, p.due_date, DATEDIFF(p.due_date, CURDATE()) as days_remaining, c.name as customer_name FROM ${this.domain}_payments p JOIN ${this.domain}_customers c ON p.customer_id = c.id AND c.company_id = p.company_id WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND p.payment_method = 'check' AND p.due_date IS NOT NULL AND p.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY) ORDER BY p.due_date ASC LIMIT 10;`;
+		const query = `SELECT p.id, p.amount as total, p.currency, p.due_date, DATEDIFF(p.due_date, CURDATE()) as days_remaining, c.name as customer_name FROM ${this.domain}_payments p JOIN ${this.domain}_customers c ON p.customer_id = c.id AND c.company_id = p.company_id WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL AND p.payment_method = 'check' AND p.due_date IS NOT NULL AND p.due_date >= CURDATE() AND p.due_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY) ORDER BY p.due_date ASC LIMIT 10;`;
 		return (await sequelize.query(query, { replacements: [companyId, daysThreshold], type: QueryTypes.SELECT })) as UpcomingDueDate[];
 	}
 }
