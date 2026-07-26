@@ -38,7 +38,7 @@ export class DebtRepository {
 
 	async createBatch(data: any[], transaction?: Transaction) {
 		const Model = this.getModel();
-		return await (Model as any).bulkCreate(data, { transaction });
+		return await (Model as any).bulkCreate(data, { transaction, individualHooks: true });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
@@ -48,7 +48,7 @@ export class DebtRepository {
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<DebtDto>, transaction?: Transaction) {
 		const Model = this.getModel() as any;
-		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });
+		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction, individualHooks: true });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
@@ -56,6 +56,13 @@ export class DebtRepository {
 		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
+
+	async deleteBatch(ids: UUID[], companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
+		const Model = this.getModel() as any;
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+		return await Model.destroy({ where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+	}
+
 
 	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel() as any;

@@ -42,7 +42,7 @@ export class TwoFactorService {
       label: username,
       algorithm: "SHA1",
       digits: 6,
-      period: 30,
+      period: 60,
       secret: OTPAuth.Secret.fromBase32(secret),
     });
     return totp.toString();
@@ -125,12 +125,12 @@ export class TwoFactorService {
     const totp = new OTPAuth.TOTP({
       algorithm: "SHA1",
       digits: 6,
-      period: 30,
+      period: 60,
       secret: OTPAuth.Secret.fromBase32(secret),
     });
 
-    // Allow ±1 time step window for clock drift
-    const delta = totp.validate({ token, window: 1 });
+    // Allow ±2 time steps window for clock drift (up to 120 seconds) to accommodate server clock discrepancy
+    const delta = totp.validate({ token, window: 2 });
     return delta !== null;
   }
 

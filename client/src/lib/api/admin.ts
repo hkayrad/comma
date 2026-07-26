@@ -82,6 +82,16 @@ export class AdminCompanyApi {
 			throw error;
 		}
 	}
+
+	static async DeleteBatch(ids: string[]) {
+		try {
+			const response = await instance.post("/admin/companies/bulk-delete", { ids });
+			return response.data;
+		} catch (error) {
+			Logger.error("Error bulk deleting companies:", error);
+			throw error;
+		}
+	}
 }
 
 export class AdminUserApi {
@@ -171,6 +181,50 @@ export class AdminUserApi {
 			return response.data;
 		} catch (error) {
 			Logger.error(`Error resetting password for user ${id}:`, error);
+			throw error;
+		}
+	}
+
+	static async DeleteBatch(ids: string[]) {
+		try {
+			const response = await instance.post("/admin/users/bulk-delete", { ids });
+			return response.data;
+		} catch (error) {
+			Logger.error("Error bulk deleting users:", error);
+			throw error;
+		}
+	}
+}
+
+export class AuditLogApi {
+	static async GetAll(
+		page: number = 0,
+		pageSize: number = 20,
+		sorting?: SortingState,
+		filters?: ColumnFiltersState,
+	): Promise<{ rows: any[]; count: number } | null> {
+		try {
+			const params = new URLSearchParams();
+			params.append("page", (page + 1).toString());
+			params.append("limit", pageSize.toString());
+			if (sorting) params.append("sorting", JSON.stringify(sorting));
+			if (filters) params.append("filters", JSON.stringify(filters));
+
+			const { data: response } = await instance.get<{
+				success: boolean;
+				data: { data?: any[]; rows?: any[]; total?: number; count?: number };
+				message: string;
+			}>(`/admin/audit-logs?${params.toString()}`);
+
+			if (response.success && response.data) {
+				return {
+					rows: response.data.rows || response.data.data || [],
+					count: response.data.count ?? response.data.total ?? 0,
+				};
+			}
+			return null;
+		} catch (error) {
+			Logger.error("Error fetching audit logs:", error);
 			throw error;
 		}
 	}

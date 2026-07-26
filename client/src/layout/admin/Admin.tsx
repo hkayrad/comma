@@ -1,76 +1,105 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CompanyDto } from "@comma/common";
-import { AdminCompanyApi } from "@/lib/api/admin";
+import type { CompanyDto, AuditLogDto } from "@comma/common";
+import { AdminCompanyApi, AuditLogApi } from "@/lib/api/admin";
 import { Logger } from "@/lib/utils/logger";
 import { useTranslation } from "react-i18next";
 import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { useTableState } from "@/hooks/use-table-state";
 import CompanyTable from "./components/CompanyTable";
+import AuditLogTable from "./components/AuditLogTable";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Building2, History } from "lucide-react";
 import { useDialog } from "@/contexts/dialog";
 import CompanyDialog from "./components/CompanyDialog";
 import UserManagement from "./components/UserManagement";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-type AdminView = "companies" | "users";
+type AdminView = "companies" | "users" | "audit-logs";
 
 export default function Admin() {
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
-  const [rowCount, setRowCount] = useState(0);
+  const [companyRowCount, setCompanyRowCount] = useState(0);
+  const [auditLogs, setAuditLogs] = useState<AuditLogDto[]>([]);
+  const [auditLogRowCount, setAuditLogRowCount] = useState(0);
   const [currentView, setCurrentView] = useState<AdminView>("companies");
-  const [selectedCompany, setSelectedCompany] = useState<CompanyDto | null>(
-    null,
-  );
+  const [selectedCompany, setSelectedCompany] = useState<CompanyDto | null>(null);
 
   const openDialog = useDialog((s) => s.openDialog);
   const { t } = useTranslation();
 
   const {
-    pagination,
-    setPagination,
-    sorting,
-    setSorting,
-    columnFilters,
-    setColumnFilters,
-    columnVisibility,
-    setColumnVisibility,
+    pagination: companyPagination,
+    setPagination: setCompanyPagination,
+    sorting: companySorting,
+    setSorting: setCompanySorting,
+    columnFilters: companyFilters,
+    setColumnFilters: setCompanyFilters,
+    columnVisibility: companyVisibility,
+    setColumnVisibility: setCompanyVisibility,
   } = useTableState({ key: "admin-companies" });
 
-  const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (
-    updaterOrValue,
-  ) => {
-    setColumnFilters(updaterOrValue);
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  const {
+    pagination: auditPagination,
+    setPagination: setAuditPagination,
+    sorting: auditSorting,
+    setSorting: setAuditSorting,
+    columnFilters: auditFilters,
+    setColumnFilters: setAuditFilters,
+    columnVisibility: auditVisibility,
+    setColumnVisibility: setAuditVisibility,
+  } = useTableState({ key: "admin-audit-logs" });
+
+  const onCompanyFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
+    setCompanyFilters(updaterOrValue);
+    setCompanyPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  const onAuditFiltersChange: OnChangeFn<ColumnFiltersState> = (updaterOrValue) => {
+    setAuditFilters(updaterOrValue);
+    setAuditPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
 
   const fetchCompanies = useCallback(async () => {
     try {
       const response = await AdminCompanyApi.GetAll(
-        pagination.pageIndex,
-        pagination.pageSize,
-        sorting,
-        columnFilters,
+        companyPagination.pageIndex,
+        companyPagination.pageSize,
+        companySorting,
+        companyFilters,
       );
       if (response) {
         setCompanies(response.rows);
-        setRowCount(response.count);
+        setCompanyRowCount(response.count);
       }
     } catch (error) {
       Logger.error("Error fetching companies", error);
     }
-  }, [pagination, sorting, columnFilters]);
+  }, [companyPagination, companySorting, companyFilters]);
 
-  const handleRefresh = useCallback(() => {
-    fetchCompanies();
-  }, [fetchCompanies]);
+  const fetchAuditLogs = useCallback(async () => {
+    try {
+      const response = await AuditLogApi.GetAll(
+        auditPagination.pageIndex,
+        auditPagination.pageSize,
+        auditSorting,
+        auditFilters,
+      );
+      if (response) {
+        setAuditLogs(response.rows);
+        setAuditLogRowCount(response.count);
+      }
+    } catch (error) {
+      Logger.error("Error fetching audit logs", error);
+    }
+  }, [auditPagination, auditSorting, auditFilters]);
 
   useEffect(() => {
-    handleRefresh();
-    window.addEventListener("global:refresh", handleRefresh);
-    return () => {
-      window.removeEventListener("global:refresh", handleRefresh);
-    };
-  }, [handleRefresh]);
+    if (currentView === "companies") {
+      fetchCompanies();
+    } else if (currentView === "audit-logs") {
+      fetchAuditLogs();
+    }
+  }, [currentView, fetchCompanies, fetchAuditLogs]);
 
   const handleAddCompany = useCallback(() => {
     openDialog({
@@ -106,34 +135,67 @@ export default function Admin() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">
-            {t("sidebar.footer.companyManagement.label")}
+            {t("admin.title", { defaultValue: "Yönetim Paneli" })}
           </h1>
           <p className="text-muted-foreground">
-            {t("sidebar.footer.companyManagement.accountDetails.label")}
+            {t("admin.subtitle", { defaultValue: "Şirket ve denetim kaydı yönetimi" })}
           </p>
         </div>
       </div>
-      <div>
-        <CompanyTable
-          data={companies}
-          rowCount={rowCount}
-          pagination={pagination}
-          onPaginationChange={setPagination}
-          sorting={sorting}
-          onSortingChange={setSorting}
-          columnFilters={columnFilters}
-          onColumnFiltersChange={onColumnFiltersChange}
-          columnVisibility={columnVisibility}
-          onColumnVisibilityChange={setColumnVisibility}
-          onManageUsers={handleManageUsers}
-          addButton={
-            <Button onClick={handleAddCompany}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t("dashboard.addButton.actions.receivable.addCustomer")}
-            </Button>
-          }
-        />
-      </div>
+
+      <Tabs
+        value={currentView}
+        onValueChange={(val) => setCurrentView(val as AdminView)}
+        className="w-full flex-1 flex flex-col gap-4 overflow-hidden"
+      >
+        <TabsList className="w-fit">
+          <TabsTrigger value="companies" className="flex items-center gap-2">
+            <Building2 className="h-4 w-4" />
+            <span>{t("admin.tabs.companies", { defaultValue: "Şirketler" })}</span>
+          </TabsTrigger>
+          <TabsTrigger value="audit-logs" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            <span>{t("admin.tabs.auditLogs", { defaultValue: "Denetim Kayıtları (Audit Trail)" })}</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="companies" className="flex-1 overflow-hidden m-0">
+          <CompanyTable
+            data={companies}
+            rowCount={companyRowCount}
+            pagination={companyPagination}
+            onPaginationChange={setCompanyPagination}
+            sorting={companySorting}
+            onSortingChange={setCompanySorting}
+            columnFilters={companyFilters}
+            onColumnFiltersChange={onCompanyFiltersChange}
+            columnVisibility={companyVisibility}
+            onColumnVisibilityChange={setCompanyVisibility}
+            onManageUsers={handleManageUsers}
+            addButton={
+              <Button onClick={handleAddCompany}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t("dashboard.addButton.actions.receivable.addCustomer")}
+              </Button>
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="audit-logs" className="flex-1 overflow-hidden m-0">
+          <AuditLogTable
+            data={auditLogs}
+            rowCount={auditLogRowCount}
+            pagination={auditPagination}
+            onPaginationChange={setAuditPagination}
+            sorting={auditSorting}
+            onSortingChange={setAuditSorting}
+            columnFilters={auditFilters}
+            onColumnFiltersChange={onAuditFiltersChange}
+            columnVisibility={auditVisibility}
+            onColumnVisibilityChange={setAuditVisibility}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

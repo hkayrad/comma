@@ -5,7 +5,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState, type ReactNode } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -25,6 +25,7 @@ import {
   type VisibilityState,
   type PaginationState,
   type OnChangeFn,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 import {
   Menu,
@@ -32,7 +33,7 @@ import {
   MenuPanel,
   MenuTrigger,
 } from "@/components/animate-ui/components/base/menu";
-import { Rows3 } from "lucide-react";
+import { Rows3, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Tooltip,
@@ -43,6 +44,8 @@ import CommaTableHeader from "./components/CommaTableHeader";
 import CommaTablePagination from "./components/CommaTablePagination";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   data: any[];
@@ -70,12 +73,14 @@ type Props = {
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
   hideHeader?: boolean;
+  onBulkDelete?: (selectedRows: any[]) => void;
+  enableRowSelection?: boolean;
 };
 
 export default function CommaTable(props: Props) {
   const {
-    data,
-    columns,
+    data: rawData = [],
+    columns: rawColumns = [],
     searchColumn,
     tags,
     rowCount,
@@ -94,6 +99,9 @@ export default function CommaTable(props: Props) {
     translationPrefix,
     hideHeader,
   } = props;
+
+  const data = useMemo(() => (Array.isArray(rawData) ? rawData : []), [rawData]);
+  const columns = useMemo(() => (Array.isArray(rawColumns) ? rawColumns : []), [rawColumns]);
 
   const { t } = useTranslation();
   const rowCounts = [5, 10, 20, 50, 100];
@@ -115,13 +123,49 @@ export default function CommaTable(props: Props) {
       pageSize: 20,
     },
   );
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const showSelection = !readOnly && (props.enableRowSelection ?? true);
+
+  const tableColumns = useMemo(() => {
+    const validCols = Array.isArray(columns) ? columns : [];
+    if (!showSelection) return validCols;
+
+    const selectColumn: ColumnDef<any> = {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    };
+
+    return [selectColumn, ...validCols];
+  }, [columns, showSelection]);
 
   const isServerSide = !!rowCount || !!controlledPagination;
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     rowCount,
+    enableRowSelection: showSelection,
+    onRowSelectionChange: setRowSelection,
     onSortingChange:
       isServerSide && onSortingChange ? onSortingChange : setInternalSorting,
     onColumnFiltersChange:
@@ -141,6 +185,7 @@ export default function CommaTable(props: Props) {
     manualSorting: isServerSide,
     manualFiltering: isServerSide,
     state: {
+      rowSelection,
       pagination: isServerSide ? controlledPagination : internalPagination,
       sorting:
         isServerSide && controlledSorting ? controlledSorting : internalSorting,
@@ -151,6 +196,8 @@ export default function CommaTable(props: Props) {
       columnVisibility: { ...(controlledColumnVisibility ?? internalColumnVisibility), actions: !useContextMenuForActions },
     },
   });
+
+  const selectedRows = table.getSelectedRowModel()?.rows || [];
 
   return (
     <>
@@ -167,6 +214,53 @@ export default function CommaTable(props: Props) {
           />
         </div>
       )}
+      {showSelection && selectedRows.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4 rounded-xl border border-border bg-secondary/95 text-secondary-foreground p-3 px-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
+          <div className="flex items-center gap-3 text-sm">
+            <Badge variant="outline" className="font-semibold select-none bg-background">
+              {selectedRows.length} {t("table.bulk.selectedCount", { defaultValue: "öğe seçildi" })}
+            </Badge>
+            {selectedRows.reduce((acc, row) => {
+              const val = row.original?.amount_in_try ?? row.original?.amountInTry ?? row.original?.total_in_try ?? row.original?.amount ?? row.original?.total ?? 0;
+              return acc + (typeof val === "number" ? val : parseFloat(val) || 0);
+            }, 0) > 0 && (
+              <span className="font-medium text-foreground select-none flex items-center gap-1">
+                {t("table.bulk.totalAmount", { defaultValue: "Toplam:" })}{" "}
+                <span className="font-bold text-primary inline-flex items-center gap-0.5">
+                  ₺{new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                    selectedRows.reduce((acc, row) => {
+                      const val = row.original?.amount_in_try ?? row.original?.amountInTry ?? row.original?.total_in_try ?? row.original?.amount ?? row.original?.total ?? 0;
+                      return acc + (typeof val === "number" ? val : parseFloat(val) || 0);
+                    }, 0)
+                  )}
+                </span>
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {props.onBulkDelete && (
+              <Button
+                size="sm"
+                variant="destructive"
+                className="h-8 gap-1.5 select-none"
+                onClick={() => props.onBulkDelete?.(selectedRows.map((r) => r.original))}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>{t("table.bulk.delete", { defaultValue: "Seçilenleri Sil" })}</span>
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 gap-1 select-none dark:bg-black dark:text-white dark:hover:bg-black/80 dark:border-black"
+              onClick={() => setRowSelection({})}
+            >
+              <X className="h-3.5 w-3.5" />
+              <span>{t("table.bulk.clear", { defaultValue: "Seçimi Temizle" })}</span>
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="rounded-md border overflow-clip" data-table-export>
         <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
           <table className="w-full caption-bottom text-sm border-collapse">
@@ -179,6 +273,7 @@ export default function CommaTable(props: Props) {
                         key={header.id}
                         className={cn(
                           isPortal ? "py-2! px-6" : "",
+                          header.id === "select" && "w-10 px-3 text-center",
                           header.id === "name" && "w-36",
                           header.id === "tax_office" && "w-36",
                           header.id === "actions" && "w-1",
@@ -214,6 +309,7 @@ export default function CommaTable(props: Props) {
                       className={cn(
                         "select-none",
                         isPortal ? "py-3! px-8!" : "py-1 px-1",
+                        cell.column.id === "select" && "w-10 px-3 text-center",
                         cell.column.id === "#" && "px-2",
                         cell.column.id === "is_company" && "w-16 text-center",
                         cell.column.id === "name" && "w-36 overflow-hidden",
@@ -274,7 +370,7 @@ export default function CommaTable(props: Props) {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={tableColumns?.length || columns?.length || 1}
                     className="h-24 text-center select-none"
                   >
                     Veri Bulunamadı

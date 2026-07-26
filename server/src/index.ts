@@ -19,6 +19,7 @@ import TcmbController from "@/controllers/TcmbController";
 import CompanyController from "@/controllers/CompanyController";
 import CompanyManagementController from "@/controllers/Admin/CompanyManagementController";
 import UserManagementController from "@/controllers/Admin/UserManagementController";
+import AuditLogController from "@/controllers/Admin/AuditLogController";
 import UserSettingsController from "@/controllers/UserSettingsController";
 import TwoFactorController from "@/controllers/TwoFactorController";
 import StatsController from "@/controllers/StatsController";
@@ -127,6 +128,7 @@ app.use("/payables", PayablePaymentsController);
 
 app.use("/admin/companies", CompanyManagementController);
 app.use("/admin/users", UserManagementController);
+app.use("/admin", AuditLogController);
 
 app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);

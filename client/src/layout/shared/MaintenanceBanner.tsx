@@ -1,24 +1,14 @@
 import { useConfig } from "@/stores/useConfigStore";
 import { TriangleAlert } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router";
 
 export default function MaintenanceBanner() {
-  const [isBannerVisible, setIsBannerVisible] = useState(false);
-
   const location = useLocation();
   const configs = useConfig((s) => s.configs);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const maintenanceMode = configs.maintenanceMode;
-    if (maintenanceMode === "active") {
-      setIsBannerVisible(true);
-    } else {
-      setIsBannerVisible(false);
-    }
-  }, [configs]);
+  const isBannerVisible = configs.maintenanceMode === "active";
 
   return (
     isBannerVisible && (

@@ -3,6 +3,7 @@ import { sequelize } from "@/lib/db/sequelize";
 import { ReceivableCustomers } from "./ReceivableCustomers";
 import { Companies } from "./Companies";
 import { Users } from "./Users";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class ReceivablePayments extends Model<
 	InferAttributes<ReceivablePayments>,
@@ -164,3 +165,6 @@ ReceivablePayments.init(
 		],
 	},
 );
+
+registerAuditHooks(ReceivablePayments);
+

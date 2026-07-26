@@ -94,7 +94,9 @@ export function useAutoHeight<T extends HTMLElement = HTMLDivElement>(
   React.useLayoutEffect(() => {
     if (height === 0) {
       const next = measure();
-      if (next !== 0) setHeight(next);
+      if (next !== 0) {
+        requestAnimationFrame(() => setHeight(next));
+      }
     }
   }, [height, measure]);
 

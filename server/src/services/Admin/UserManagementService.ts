@@ -112,4 +112,10 @@ export class UserManagementService {
 		}
 		Logger.info("[UserManagement] Password reset successfully", { id });
 	}
+
+	static async DeleteBatch(ids: UUID[], deletedBy: UUID) {
+		Logger.info("[UserManagement] DeleteBatch called", { count: ids.length });
+		await UserRepository.deleteBatch(ids, deletedBy);
+		Logger.info("[UserManagement] Deleted users batch successfully", { count: ids.length });
+	}
 }

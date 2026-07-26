@@ -36,6 +36,11 @@ export default class PayableCustomersService {
     return service.Delete(id, userId, companyId);
   }
 
+  static async DeleteBatch(ids: UUID[], userId: UUID, companyId: UUID) {
+    return service.DeleteBatch(ids, userId, companyId);
+  }
+
+
   static async Restore(id: UUID, userId: UUID, companyId: UUID) {
     return service.Restore(id, userId, companyId);
   }

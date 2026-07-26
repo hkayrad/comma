@@ -528,6 +528,30 @@ export default function PaymentTable(props: Props) {
     [t],
   );
 
+  const handleBulkDelete = useCallback(
+    async (selectedRows: PaymentDto[]) => {
+      const ids = selectedRows.map((r) => r.id).filter(Boolean) as string[];
+      if (ids.length === 0) return;
+      const API = type === "payable" ? PayablePaymentApi : ReceivablePaymentApi;
+
+      toast(t("payment.delete.confirmBulk", { count: ids.length, defaultValue: `${ids.length} adet ödeme kaydını silmek istediğinize emin misiniz?` }), {
+        action: {
+          label: t("payment.delete.action", { defaultValue: "Sil" }),
+          onClick: async () => {
+            try {
+              await API.DeleteBatch(ids);
+              toast.success(t("payment.delete.success", { defaultValue: "Silindi" }));
+              queryClient.invalidateQueries();
+            } catch {
+              toast.error(t("payment.delete.error", { defaultValue: "Hata oluştu" }));
+            }
+          },
+        },
+      });
+    },
+    [type, queryClient, t]
+  );
+
   return (
     <CommaTable
       data={data}
@@ -543,6 +567,7 @@ export default function PaymentTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      onBulkDelete={handleBulkDelete}
       readOnly={readOnly}
       isPortal={isPortal}
       contextMenuItems={!readOnly ? (c) => (

@@ -7,6 +7,17 @@ import { NotFoundError, ValidationError } from '@/lib/errors/AppError';
 describe('UserManagementService', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    // Default mock for findById to return a standard mock user
+    vi.spyOn(UserRepository, 'findById').mockResolvedValue({
+      id: '1',
+      company_id: '1',
+      username: 'test-user',
+      role: 1,
+      created_at: new Date(),
+      created_by: 'admin-id',
+      updated_at: new Date(),
+      deleted_at: null,
+    } as any);
   });
 
   describe('Create', () => {

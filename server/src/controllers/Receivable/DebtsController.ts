@@ -5,7 +5,7 @@ import { Logger } from "@/lib/utils/logger";
 import { DebtDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { debtSchema, paginationSchema, batchDebtSchema } from "@comma/common/schemas";
+import { debtSchema, paginationSchema, batchDebtSchema, bulkDeleteSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
@@ -65,6 +65,16 @@ router.delete("/debts/:id", asyncHandler(async (req: Request<{ id: string }>, re
 	await ReceivableDebtsService.Delete(id, userId, companyId);
 	res.json({ success: true, message: "Debt deleted successfully" });
 }));
+
+router.post("/debts/bulk-delete", validate(bulkDeleteSchema), asyncHandler(async (req: Request, res: Response) => {
+	const { ids } = req.body;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[ReceivableDebtsController] Bulk delete debts request", { companyId, count: ids.length });
+
+	const deletedCount = await ReceivableDebtsService.DeleteBatch(ids, userId, companyId);
+	res.json({ success: true, data: { count: deletedCount }, message: "Debts deleted successfully" });
+}));
+
 
 router.post("/debts/:id/restore", asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
 	const { id } = req.params;

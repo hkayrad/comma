@@ -69,9 +69,9 @@ function Calendar({
   const defaultClassNames = getDefaultClassNames();
 
   // Extract onSelect and wrap it to normalize dates
-  const originalOnSelect = (props as { onSelect?: Function }).onSelect;
+  const originalOnSelect = (props as { onSelect?: (...args: any[]) => any }).onSelect;
   const restProps = { ...props };
-  delete (restProps as { onSelect?: Function }).onSelect;
+  delete (restProps as { onSelect?: (...args: any[]) => any }).onSelect;
 
   const handleSelect = React.useMemo(() => {
     if (!originalOnSelect) return undefined;

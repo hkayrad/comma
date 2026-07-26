@@ -8,3 +8,5 @@ export * from "./ReceivableCustomers";
 export * from "./ReceivableDebts";
 export * from "./ReceivablePayments";
 export * from "./Config";
+export * from "./AuditLogs";
+

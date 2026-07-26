@@ -3,6 +3,7 @@ import { sequelize } from "@/lib/db/sequelize";
 import { Companies } from "./Companies";
 import { ReceivableCustomers } from "./ReceivableCustomers";
 import { Users } from "./Users";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class ReceivableDebts extends Model<InferAttributes<ReceivableDebts>, InferCreationAttributes<ReceivableDebts>> {
 	declare id: CreationOptional<string>;
@@ -187,3 +188,6 @@ ReceivableDebts.init(
 		],
 	},
 );
+
+registerAuditHooks(ReceivableDebts);
+

@@ -66,9 +66,15 @@ export default function UserManagement({ company, onBack }: Props) {
   }, [fetchUsers]);
 
   useEffect(() => {
-    handleRefresh();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        handleRefresh();
+      }
+    });
     window.addEventListener("global:refresh", handleRefresh);
     return () => {
+      active = false;
       window.removeEventListener("global:refresh", handleRefresh);
     };
   }, [handleRefresh]);

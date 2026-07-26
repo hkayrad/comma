@@ -12,3 +12,8 @@ export const paginationSchema = z.object({
 		try { return JSON.parse(val); } catch { return []; }
 	}),
 });
+
+export const bulkDeleteSchema = z.object({
+	ids: z.array(z.string().uuid()).min(1, "At least one ID is required"),
+});
+

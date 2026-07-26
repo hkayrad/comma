@@ -5,12 +5,18 @@ import { UserManagementService } from "@/services/Admin/UserManagementService";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { ValidationError } from "@/lib/errors/AppError";
 import { validate } from "@/lib/utils/middleware/validate";
-import { createUserSchema, paginationSchema } from "@comma/common/schemas";
+import { createUserSchema, paginationSchema, bulkDeleteSchema } from "@comma/common/schemas";
 import { authRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 
 const router = express.Router();
 
 router.use(adminMiddleware);
+
+router.post("/bulk-delete", authRateLimiter, validate(bulkDeleteSchema), asyncHandler(async (req: Request, res: Response) => {
+	Logger.info("[UserManagementController] Bulk delete users");
+	await UserManagementService.DeleteBatch(req.body.ids, req.user.id);
+	res.json({ success: true, message: "Users deleted successfully" });
+}));
 
 // Create a new user
 router.post("/", authRateLimiter, validate(createUserSchema), asyncHandler(async (req: Request, res: Response) => {

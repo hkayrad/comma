@@ -135,9 +135,10 @@ router.post("/verify", authRateLimiter, verify2FATempToken, asyncHandler(async (
     });
   }
 
-  // 2FA verified - issue full tokens
+  const ipAddress = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || null;
+  const userAgent = (req.headers["user-agent"] as string) || null;
   const { AuthService } = await import("@/services/AuthService");
-  const loginResult = await AuthService.Complete2FALogin(userId);
+  const loginResult = await AuthService.Complete2FALogin(userId, ipAddress, userAgent);
 
   if (!loginResult.success) {
     throw new UnauthorizedError("Failed to complete login");
@@ -185,8 +186,10 @@ router.post("/recovery", authRateLimiter, verify2FATempToken, asyncHandler(async
   }
 
   // Recovery code verified - issue full tokens
+  const ipAddress = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || null;
+  const userAgent = (req.headers["user-agent"] as string) || null;
   const { AuthService } = await import("@/services/AuthService");
-  const loginResult = await AuthService.Complete2FALogin(userId);
+  const loginResult = await AuthService.Complete2FALogin(userId, ipAddress, userAgent);
 
   if (!loginResult.success) {
     throw new UnauthorizedError("Failed to complete login");

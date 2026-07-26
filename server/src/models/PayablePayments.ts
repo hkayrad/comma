@@ -3,6 +3,7 @@ import { sequelize } from "@/lib/db/sequelize";
 import { Companies } from "./Companies";
 import { PayableCustomers } from "./PayableCustomers";
 import { Users } from "./Users";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class PayablePayments extends Model<InferAttributes<PayablePayments>, InferCreationAttributes<PayablePayments>> {
 	declare id: CreationOptional<string>;
@@ -161,3 +162,6 @@ PayablePayments.init(
 		],
 	},
 );
+
+registerAuditHooks(PayablePayments);
+

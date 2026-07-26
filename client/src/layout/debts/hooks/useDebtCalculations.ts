@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
 export function useDebtCalculations(form: UseFormReturn<any>, index?: number) {
   const prefix = index !== undefined ? `entries.${index}.` : "";
-  const [total, setTotal] = useState(0);
 
   const handleVatButtonClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>, vatPercentage: number) => {
@@ -72,13 +71,13 @@ export function useDebtCalculations(form: UseFormReturn<any>, index?: number) {
   const watchedDiscount = form.watch(`${prefix}discount`);
   const watchedWithholding = form.watch(`${prefix}withholding`);
 
-  useEffect(() => {
+  const total = useMemo(() => {
     const valAmount = watchedAmount || 0;
     const valVat = watchedVat || 0;
     const valDiscount = watchedDiscount || 0;
     const valWithholding = watchedWithholding || 0;
     const newTotal = valAmount - valDiscount + valVat - valWithholding;
-    setTotal(Number(newTotal.toFixed(2)));
+    return Number(newTotal.toFixed(2));
   }, [watchedAmount, watchedVat, watchedDiscount, watchedWithholding]);
 
   return {
