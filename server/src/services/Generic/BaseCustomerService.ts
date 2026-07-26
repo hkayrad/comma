@@ -163,6 +163,21 @@ export class BaseCustomerService {
     Logger.info(`[${this.domainLabel}] Customer deleted successfully`, { customerId: id, companyId });
   }
 
+  async DeleteBatch(ids: UUID[], userId: UUID, companyId: UUID) {
+    Logger.info(`[${this.domainLabel}] Deleting customers batch`, { companyId, count: ids?.length, userId });
+
+    if (!ids || ids.length === 0) {
+      throw new ValidationError("At least one customer ID is required");
+    }
+
+    return await sequelize.transaction(async (t) => {
+      const deletedCount = await this.repo.deleteBatch(ids, companyId, userId, t);
+      Logger.info(`[${this.domainLabel}] Customers batch deleted successfully`, { companyId, count: deletedCount });
+      return deletedCount;
+    });
+  }
+
+
   async Restore(id: UUID, userId: UUID, companyId: UUID) {
     Logger.info(`[${this.domainLabel}] Restoring customer`, { customerId: id, companyId });
 

@@ -76,6 +76,18 @@ export class FinancialBaseApi<T, CreateDto = T, UpdateDto = CreateDto> {
     }
   }
 
+  async DeleteBatch(ids: string[]): Promise<any> {
+    try {
+      const { data: response } = await instance.post<ApiResponse<any>>(`${this.baseUrl}/bulk-delete`, { ids });
+      if (response.success) return response.data ?? true;
+      return Promise.reject(response.message || `Error bulk deleting ${this.entity}s`);
+    } catch (error) {
+      Logger.error(`Error bulk deleting ${this.entity}s:`, error);
+      return Promise.reject(`Error bulk deleting ${this.entity}s`);
+    }
+  }
+
+
   async Restore(id: string): Promise<any> {
     try {
       const { data: response } = await instance.post<ApiResponse<any>>(`${this.baseUrl}/${id}/restore`);

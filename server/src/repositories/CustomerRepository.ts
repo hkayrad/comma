@@ -1,5 +1,5 @@
 import { sequelize } from "@/lib/db/sequelize";
-import { QueryTypes, Transaction } from "sequelize";
+import { QueryTypes, Transaction, Op } from "sequelize";
 import { CustomerDto, DebtDto, PaymentDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { ReceivableCustomers, PayableCustomers } from "@/models";
 
@@ -23,7 +23,7 @@ export class CustomerRepository {
 
 	async createBatch(data: any[], transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.bulkCreate(data, { transaction });
+		return await Model.bulkCreate(data, { transaction, individualHooks: true });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
@@ -38,7 +38,7 @@ export class CustomerRepository {
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<CustomerDto>, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction });
+		return await Model.update(updateData as any, { where: { id, company_id: companyId }, transaction, individualHooks: true });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
@@ -46,6 +46,13 @@ export class CustomerRepository {
 		await Model.update({ deleted_by: deletedBy } as any, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
+
+	async deleteBatch(ids: UUID[], companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		await Model.update({ deleted_by: deletedBy } as any, { where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+		return await Model.destroy({ where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+	}
+
 
 	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel();

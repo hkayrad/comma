@@ -4,7 +4,7 @@ import { Logger } from "@/lib/utils/logger";
 import { CustomerDto } from "@comma/common/types";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { customerSchema, paginationSchema, batchCustomerSchema } from "@comma/common/schemas";
+import { customerSchema, paginationSchema, batchCustomerSchema, bulkDeleteSchema } from "@comma/common/schemas";
 
 export function createCustomerController(service: any, label: string) {
   const router = express.Router();
@@ -90,6 +90,17 @@ export function createCustomerController(service: any, label: string) {
     await service.Delete(id, userId, companyId);
     res.json({ success: true, message: "Customer deleted successfully" });
   }));
+
+  router.post("/customers/bulk-delete", validate(bulkDeleteSchema), asyncHandler(async (req: Request, res: Response) => {
+    const { ids } = req.body;
+    const { id: userId, companyId } = req.user;
+
+    Logger.info(`[${label}Controller] Bulk delete customers request`, { companyId, count: ids.length });
+
+    const deletedCount = await service.DeleteBatch(ids, userId, companyId);
+    res.json({ success: true, data: { count: deletedCount }, message: "Customers deleted successfully" });
+  }));
+
 
   router.post("/customers/:id/restore", asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params;

@@ -1,6 +1,7 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "@/lib/db/sequelize";
 import { Companies } from "./Companies";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class Users extends Model<InferAttributes<Users>, InferCreationAttributes<Users>> {
 	declare id: CreationOptional<string>;
@@ -128,3 +129,6 @@ Users.init(
 		],
 	},
 );
+
+registerAuditHooks(Users);
+

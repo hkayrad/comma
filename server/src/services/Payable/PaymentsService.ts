@@ -90,6 +90,18 @@ export default class PayablePaymentsService {
 		Logger.info("[PayablePayments] Payment deleted successfully", { paymentId, companyId });
 	}
 
+	static async DeleteBatch(ids: UUID[], userId: UUID, companyId: UUID) {
+		Logger.info("[PayablePayments] Deleting payments batch", { companyId, count: ids?.length, userId });
+		if (!ids || ids.length === 0) throw new ValidationError("At least one payment ID is required");
+
+		return await sequelize.transaction(async (t) => {
+			const deletedCount = await repo.deleteBatch(ids, companyId, userId, t);
+			Logger.info("[PayablePayments] Payments batch deleted successfully", { companyId, count: deletedCount });
+			return deletedCount;
+		});
+	}
+
+
 	static async Restore(paymentId: UUID, userId: UUID, companyId: UUID) {
 		Logger.info("[PayablePayments] Restoring payment", { paymentId, companyId, userId });
 		if (!paymentId) throw new ValidationError("Missing payment ID");

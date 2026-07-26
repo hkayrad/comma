@@ -1,7 +1,7 @@
 import { Companies } from "@/models";
 import { CompanyDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { sequelize } from "@/lib/db/sequelize";
-import { QueryTypes, Transaction } from "sequelize";
+import { QueryTypes, Transaction, Op } from "sequelize";
 
 export class CompanyRepository {
 	static async findById(id: UUID, transaction?: Transaction) {
@@ -21,7 +21,11 @@ export class CompanyRepository {
 	}
 
 	static async delete(id: UUID, transaction?: Transaction) {
-		return await Companies.destroy({ where: { id }, transaction });
+		return await Companies.destroy({ where: { id }, transaction, individualHooks: true });
+	}
+
+	static async deleteBatch(ids: UUID[], transaction?: Transaction) {
+		return await Companies.destroy({ where: { id: { [Op.in]: ids } }, transaction, individualHooks: true });
 	}
 
 	static async restore(id: UUID, transaction?: Transaction) {

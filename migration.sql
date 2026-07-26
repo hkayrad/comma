@@ -150,6 +150,29 @@ ALTER TABLE receivable_payments ADD COLUMN due_date DATE DEFAULT NULL;
 ALTER TABLE payable_payments ADD COLUMN due_date DATE DEFAULT NULL;
 
 -- ---------------------------------------------------------
+-- 3b. AUDIT LOGS TABLE
+-- ---------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID NOT NULL PRIMARY KEY,
+    company_id UUID NOT NULL,
+    user_id UUID NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id UUID NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    old_values JSON NULL,
+    new_values JSON NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_logs_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    CONSTRAINT fk_audit_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_audit_logs_company_entity ON audit_logs (company_id, entity_type, entity_id);
+CREATE INDEX idx_audit_logs_company_created_at ON audit_logs (company_id, created_at);
+
+-- ---------------------------------------------------------
 -- 4. VIEWS
 -- ---------------------------------------------------------
 

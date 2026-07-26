@@ -311,6 +311,39 @@ export default function UserTable(props: Props) {
     [t],
   );
 
+  const handleBulkDelete = useCallback(
+    async (selectedRows: UserDto[]) => {
+      const ids = selectedRows.map((r) => r.id).filter(Boolean) as string[];
+      if (ids.length === 0) return;
+
+      openDialog({
+        title: t("user.delete.title", { defaultValue: "Kullanıcıları Sil" }),
+        description: t("user.delete.confirmBulk", { count: ids.length, defaultValue: `${ids.length} adet kullanıcıyı silmek istediğinize emin misiniz?` }),
+        footer: (
+          <div className="flex gap-2 justify-end">
+            <DialogClose render={(props) => <CancelButton {...props} />} />
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                try {
+                  await AdminUserApi.DeleteBatch(ids);
+                  sendRefreshEvent();
+                  closeDialog();
+                  toast.success(t("user.delete.success", { defaultValue: "Silindi" }));
+                } catch {
+                  toast.error(t("user.delete.error", { defaultValue: "Hata oluştu" }));
+                }
+              }}
+            >
+              {t("user.delete.action", { defaultValue: "Sil" })}
+            </Button>
+          </div>
+        ),
+      });
+    },
+    [openDialog, closeDialog, t]
+  );
+
   return (
     <CommaTable
       data={data}
@@ -326,6 +359,7 @@ export default function UserTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      onBulkDelete={handleBulkDelete}
       contextMenuItems={(c) => (
         <>
           <ContextMenuItem onClick={() => onEdit(c)}>

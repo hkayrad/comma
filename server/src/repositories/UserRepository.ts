@@ -1,7 +1,7 @@
 import { Users, RefreshTokens } from "@/models";
 import type { UserDto, UUID, SortItem, FilterItem } from "@comma/common/types";
 import { sequelize } from "@/lib/db/sequelize";
-import { QueryTypes, Transaction, LOCK } from "sequelize";
+import { QueryTypes, Transaction, LOCK, Op } from "sequelize";
 
 /** Data required to create a new user */
 interface CreateUserData {
@@ -51,7 +51,12 @@ export class UserRepository {
 
 	static async delete(id: UUID, deletedBy: UUID, transaction?: Transaction) {
 		await Users.update({ deleted_by: deletedBy } as Partial<Users>, { where: { id }, transaction });
-		return await Users.destroy({ where: { id }, transaction });
+		return await Users.destroy({ where: { id }, transaction, individualHooks: true });
+	}
+
+	static async deleteBatch(ids: UUID[], deletedBy: UUID, transaction?: Transaction) {
+		await Users.update({ deleted_by: deletedBy } as Partial<Users>, { where: { id: { [Op.in]: ids } }, transaction, individualHooks: true });
+		return await Users.destroy({ where: { id: { [Op.in]: ids } }, transaction, individualHooks: true });
 	}
 
 	static async restore(id: UUID, transaction?: Transaction) {

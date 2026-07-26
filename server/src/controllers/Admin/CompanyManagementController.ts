@@ -4,11 +4,17 @@ import { Logger } from "@/lib/utils/logger";
 import { CompanyManagementService } from "@/services/Admin/CompanyManagementService";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { companySchema, paginationSchema } from "@comma/common/schemas";
+import { companySchema, paginationSchema, bulkDeleteSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
 router.use(adminMiddleware);
+
+router.post("/bulk-delete", validate(bulkDeleteSchema), asyncHandler(async (req: Request, res: Response) => {
+	Logger.info("[CompanyManagementController] Bulk delete companies");
+	await CompanyManagementService.DeleteBatch(req.body.ids);
+	res.json({ success: true, message: "Companies deleted successfully" });
+}));
 
 router.post("/", validate(companySchema), asyncHandler(async (req: Request, res: Response) => {
 	Logger.info("[CompanyManagementController] Create company");

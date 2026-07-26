@@ -2,6 +2,7 @@ import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOpt
 import { sequelize } from "@/lib/db/sequelize";
 import { Companies } from "./Companies";
 import { Users } from "./Users";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class ReceivableCustomers extends Model<
 	InferAttributes<ReceivableCustomers>,
@@ -130,3 +131,6 @@ ReceivableCustomers.init(
 		],
 	},
 );
+
+registerAuditHooks(ReceivableCustomers);
+

@@ -100,6 +100,18 @@ export default class ReceivableDebtsService {
 		Logger.info("[ReceivableDebts] Debt deleted successfully", { debtId: id, companyId });
 	}
 
+	static async DeleteBatch(ids: UUID[], userId: UUID, companyId: UUID) {
+		Logger.info("[ReceivableDebts] Deleting debts batch", { companyId, count: ids?.length, userId });
+		if (!ids || ids.length === 0) throw new ValidationError("At least one debt ID is required");
+
+		return await sequelize.transaction(async (t) => {
+			const deletedCount = await repo.deleteBatch(ids, companyId, userId, t);
+			Logger.info("[ReceivableDebts] Debts batch deleted successfully", { companyId, count: deletedCount });
+			return deletedCount;
+		});
+	}
+
+
 	static async Restore(id: UUID, userId: UUID, companyId: UUID) {
 		Logger.info("[ReceivableDebts] Restoring debt", { debtId: id, companyId, userId });
 		if (!id) throw new ValidationError("Debt ID is required");

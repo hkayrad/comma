@@ -1,6 +1,7 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model, CreationOptional } from "sequelize";
 import { sequelize } from "@/lib/db/sequelize";
 import { UUID } from "@comma/common/types";
+import { registerAuditHooks } from "@/lib/db/auditHooks";
 
 export class Companies extends Model<InferAttributes<Companies>, InferCreationAttributes<Companies>> {
 	declare id: CreationOptional<UUID>;
@@ -102,3 +103,6 @@ Companies.init(
 		paranoid: true,
 	},
 );
+
+registerAuditHooks(Companies);
+

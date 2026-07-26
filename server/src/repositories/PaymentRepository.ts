@@ -1,5 +1,5 @@
 import { sequelize } from "@/lib/db/sequelize";
-import { QueryTypes, Transaction } from "sequelize";
+import { QueryTypes, Transaction, Op } from "sequelize";
 import type { PaymentDto, UUID, SortItem, FilterItem, UpcomingDueDate } from "@comma/common/types";
 import { ReceivablePayments, PayablePayments } from "@/models";
 
@@ -23,7 +23,7 @@ export class PaymentRepository {
 
 	async createBatch(data: any[], transaction?: Transaction) {
 		const Model = this.getModel();
-		return await (Model as any).bulkCreate(data, { transaction });
+		return await (Model as any).bulkCreate(data, { transaction, individualHooks: true });
 	}
 
 	async findById(id: UUID, companyId: UUID, transaction?: Transaction) {
@@ -33,7 +33,7 @@ export class PaymentRepository {
 
 	async update(id: UUID, companyId: UUID, updateData: Partial<PaymentDto>, transaction?: Transaction) {
 		const Model = this.getModel();
-		return await Model.update(updateData as Record<string, unknown>, { where: { id, company_id: companyId }, transaction });
+		return await Model.update(updateData as Record<string, unknown>, { where: { id, company_id: companyId }, transaction, individualHooks: true });
 	}
 
 	async delete(id: UUID, companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
@@ -41,6 +41,13 @@ export class PaymentRepository {
 		await Model.update({ deleted_by: deletedBy } as Record<string, unknown>, { where: { id, company_id: companyId }, transaction });
 		return await Model.destroy({ where: { id, company_id: companyId }, transaction });
 	}
+
+	async deleteBatch(ids: UUID[], companyId: UUID, deletedBy: UUID, transaction?: Transaction) {
+		const Model = this.getModel();
+		await Model.update({ deleted_by: deletedBy } as Record<string, unknown>, { where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+		return await Model.destroy({ where: { id: { [Op.in]: ids }, company_id: companyId }, transaction, individualHooks: true });
+	}
+
 
 	async restore(id: UUID, companyId: UUID, transaction?: Transaction) {
 		const Model = this.getModel();
@@ -60,7 +67,7 @@ export class PaymentRepository {
 			customer_id: "p.customer_id",
 		};
 
-		let whereClause = "WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL";
+		let whereClause = "WHERE p.company_id = ? AND p.deleted_at IS NULL AND p.deleted_by IS NULL AND c.deleted_at IS NULL";
 		const replacements: (string | number | string[])[] = [companyId];
 
 		if (filters && filters.length > 0) {

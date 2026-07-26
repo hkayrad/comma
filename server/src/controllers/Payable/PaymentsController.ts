@@ -4,7 +4,7 @@ import { authMiddleware } from "@/lib/middleware";
 import { Logger } from "@/lib/utils/logger";
 import { asyncHandler } from "@/lib/utils/middleware/asyncHandler";
 import { validate } from "@/lib/utils/middleware/validate";
-import { paymentSchema, paginationSchema, batchPaymentSchema } from "@comma/common/schemas";
+import { paymentSchema, paginationSchema, batchPaymentSchema, bulkDeleteSchema } from "@comma/common/schemas";
 
 const router = express.Router();
 
@@ -55,6 +55,16 @@ router.delete("/payments/:id", asyncHandler(async (req: Request, res: Response) 
 	await PayablePaymentsService.Delete(id, userId, companyId);
 	res.json({ success: true, message: "Payment deleted successfully" });
 }));
+
+router.post("/payments/bulk-delete", validate(bulkDeleteSchema), asyncHandler(async (req: Request, res: Response) => {
+	const { ids } = req.body;
+	const { id: userId, companyId } = req.user;
+	Logger.info("[PayablePaymentsController] Bulk delete payments request", { companyId, count: ids.length });
+
+	const deletedCount = await PayablePaymentsService.DeleteBatch(ids, userId, companyId);
+	res.json({ success: true, data: { count: deletedCount }, message: "Payments deleted successfully" });
+}));
+
 
 router.post("/payments/:id/restore", asyncHandler(async (req: Request, res: Response) => {
 	const id = req.params.id as string;

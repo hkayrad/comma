@@ -677,6 +677,30 @@ export default function CustomerTable(props: Props) {
     [type, t],
   );
 
+  const handleBulkDelete = useCallback(
+    async (selectedRows: CustomerDto[]) => {
+      const ids = selectedRows.map((r) => r.id).filter(Boolean) as string[];
+      if (ids.length === 0) return;
+      const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
+
+      toast(t("customer.delete.confirmBulk", { count: ids.length, defaultValue: `${ids.length} adet müşteri kaydını silmek istediğinize emin misiniz?` }), {
+        action: {
+          label: t("customer.delete.action", { defaultValue: "Sil" }),
+          onClick: async () => {
+            try {
+              await API.DeleteBatch(ids);
+              toast.success(t("customer.delete.success", { defaultValue: "Silindi" }));
+              queryClient.invalidateQueries();
+            } catch {
+              toast.error(t("customer.delete.error", { defaultValue: "Hata oluştu" }));
+            }
+          },
+        },
+      });
+    },
+    [type, queryClient, t]
+  );
+
   return (
     <CommaTable
       data={data}
@@ -692,6 +716,7 @@ export default function CustomerTable(props: Props) {
       onColumnFiltersChange={onColumnFiltersChange}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
+      onBulkDelete={handleBulkDelete}
       contextMenuItems={(c) => (
         <>
           <ContextMenuItem onClick={() => onAddDebt(c.id!)}>
