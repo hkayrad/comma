@@ -546,7 +546,7 @@ export default function CustomerStatement() {
                 data={debts}
                 columns={debtColumns}
                 searchColumn="invoice_no"
-                readOnly
+                enableRowSelection
                 translationPrefix="debt"
                 hideHeader
                 contextMenuItems={(item) => (
@@ -579,7 +579,7 @@ export default function CustomerStatement() {
                 data={payments}
                 columns={paymentColumns}
                 searchColumn="invoice_no"
-                readOnly
+                enableRowSelection
                 translationPrefix="payment"
                 hideHeader
                 contextMenuItems={(item) => (
@@ -615,7 +615,7 @@ export default function CustomerStatement() {
               data={debts}
               columns={debtColumns}
               searchColumn="invoice_no"
-              readOnly
+              enableRowSelection
               translationPrefix="debt"
               hideHeader
               contextMenuItems={(item) => (
@@ -650,7 +650,7 @@ export default function CustomerStatement() {
               data={payments}
               columns={paymentColumns}
               searchColumn="invoice_no"
-              readOnly
+              enableRowSelection
               translationPrefix="payment"
               hideHeader
               contextMenuItems={(item) => (

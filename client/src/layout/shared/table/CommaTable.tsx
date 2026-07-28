@@ -125,7 +125,7 @@ export default function CommaTable(props: Props) {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const showSelection = !readOnly && (props.enableRowSelection ?? true);
+  const showSelection = props.enableRowSelection ?? !readOnly;
 
   const tableColumns = useMemo(() => {
     const validCols = Array.isArray(columns) ? columns : [];
@@ -381,7 +381,7 @@ export default function CommaTable(props: Props) {
           </table>
         </div>
       </div>
-      {hideHeader && table.getPageCount() > 1 && (
+      {hideHeader && data.length > 0 && (
         <div className="flex items-center justify-end gap-2 mt-2">
           <Menu>
             <Tooltip disableHoverablePopup>
