@@ -26,7 +26,7 @@ import { useLocation } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 import CancelButton from "../../shared/CancelButton";
-import TwoFactorSetup from "../../shared/dialog/TwoFactorSetup";
+// import TwoFactorSetup from "../../shared/dialog/TwoFactorSetup";
 
 export default function UserSettings() {
   const { t } = useTranslation();
@@ -421,7 +421,8 @@ export default function UserSettings() {
         </div>
       )}
 
-      {/* 2FA Section */}
+      {/* 2FA Section - Functionality removed (code preserved for future use) */}
+      {/*
       <section className="space-y-6">
         <h3 className="text-xl font-semibold border-b pb-2">
           {t("twoFactor.settings.title")}
@@ -430,6 +431,7 @@ export default function UserSettings() {
           <TwoFactorSetup onComplete={closeDialog} />
         </div>
       </section>
+      */}
     </div>
   );
 }

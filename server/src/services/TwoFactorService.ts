@@ -468,7 +468,9 @@ export class TwoFactorService {
    * Check if 2FA is enabled for a user
    */
   static async isEnabled(userId: string): Promise<boolean> {
-    const user = await UserRepository.findById(userId);
-    return user?.totp_enabled ?? false;
+    // 2FA functionality disabled; return false while preserving code
+    // const user = await UserRepository.findById(userId);
+    // return user?.totp_enabled ?? false;
+    return false;
   }
 }

@@ -107,8 +107,8 @@ export class AuthService {
 				};
 			}
 
-			// Check if 2FA is enabled
-			if (user.totp_enabled) {
+			// Check if 2FA is enabled (Functionality disabled, code preserved for future use)
+			if (false && user.totp_enabled) {
 				Logger.info("[AuthService] 2FA required for user", { username, userId: user.id });
 
 				// Generate a temporary token for 2FA verification
