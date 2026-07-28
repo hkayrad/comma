@@ -295,8 +295,9 @@ export default function CustomerStatement() {
   const { customer, debts, payments } = data;
 
   return (
-    <div className="w-full max-w-[1800px] mx-auto p-4 sm:p-6 space-y-6">
-      {/* Top Header Card Component */}
+    <div className="w-full h-[calc(100vh-3.5rem)] overflow-y-auto overflow-x-hidden p-4 sm:p-6 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+      <div className="w-full max-w-[1800px] mx-auto space-y-6 pb-6">
+        {/* Top Header Card Component */}
       <Card className="p-4 sm:p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -667,5 +668,6 @@ export default function CustomerStatement() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  </div>
+);
 }
