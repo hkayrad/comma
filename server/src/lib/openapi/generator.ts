@@ -8,6 +8,8 @@ import './routes/admin';
 import './routes/receivables';
 import './routes/payables';
 import './routes/misc';
+import './routes/employees';
+
 
 export function generateOpenApiSpec() {
   const generator = new OpenApiGeneratorV3(registry.definitions);

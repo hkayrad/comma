@@ -9,4 +9,10 @@ export * from "./ReceivableDebts";
 export * from "./ReceivablePayments";
 export * from "./Config";
 export * from "./AuditLogs";
+export * from "./Employees";
+export * from "./EmployeeAdvances";
+export * from "./EmployeeGarnishments";
+export * from "./EmployeeAttendances";
+export * from "./EmployeePayrolls";
+
 

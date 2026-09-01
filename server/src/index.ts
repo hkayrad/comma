@@ -24,7 +24,13 @@ import UserSettingsController from "@/controllers/UserSettingsController";
 import TwoFactorController from "@/controllers/TwoFactorController";
 import StatsController from "@/controllers/StatsController";
 import PortalController from "@/controllers/PortalController";
+import EmployeesController from "@/controllers/Employee/EmployeesController";
+import AdvancesController from "@/controllers/Employee/AdvancesController";
+import GarnishmentsController from "@/controllers/Employee/GarnishmentsController";
+import AttendanceController from "@/controllers/Employee/AttendanceController";
+import PayrollController from "@/controllers/Employee/PayrollController";
 import swaggerUi from "swagger-ui-express";
+
 import { generateOpenApiSpec } from "@/lib/openapi/generator";
 import { env } from "@/lib/utils/env";
 import { Logger } from "@/lib/utils/logger";
@@ -134,6 +140,13 @@ app.use("/settings", UserSettingsController);
 app.use("/2fa", TwoFactorController);
 app.use("/stats", StatsController);
 app.use("/portal", PortalController);
+
+app.use("/employees", EmployeesController);
+app.use("/employees", AdvancesController);
+app.use("/employees", GarnishmentsController);
+app.use("/employees", AttendanceController);
+app.use("/employees", PayrollController);
+
 
 if (!env.isProduction) {
 	const openApiSpec = generateOpenApiSpec();

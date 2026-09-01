@@ -32,6 +32,14 @@ const NotFound = lazy(() => import("./layout/NotFound"));
 const PortalLogin = lazy(() => import("./layout/portal/PortalLogin"));
 const PortalDashboard = lazy(() => import("./layout/portal/PortalDashboard"));
 
+const Employees = lazy(() => import("./layout/employees/Employees"));
+const Attendance = lazy(() => import("./layout/employees/Attendance"));
+const AdvancesAndGarnishments = lazy(
+  () => import("./layout/employees/AdvancesAndGarnishments"),
+);
+const Payroll = lazy(() => import("./layout/employees/Payroll"));
+
+
 const router = createBrowserRouter([
   {
     Component: Root,
@@ -160,7 +168,45 @@ const router = createBrowserRouter([
                     ],
                   },
                   {
+                    path: "calisanlar",
+                    children: [
+                      {
+                        index: true,
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <Employees />
+                          </Suspense>
+                        ),
+                      },
+                      {
+                        path: "pdks",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <Attendance />
+                          </Suspense>
+                        ),
+                      },
+                      {
+                        path: "avans-icra",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <AdvancesAndGarnishments />
+                          </Suspense>
+                        ),
+                      },
+                      {
+                        path: "bordro",
+                        element: (
+                          <Suspense fallback={<PageLoader />}>
+                            <Payroll />
+                          </Suspense>
+                        ),
+                      },
+                    ],
+                  },
+                  {
                     path: "dev",
+
                     element:
                       import.meta.env.VITE_NODE_ENV === "development" ? (
                         <Suspense fallback={<PageLoader />}>

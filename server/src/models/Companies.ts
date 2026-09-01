@@ -15,7 +15,10 @@ export class Companies extends Model<InferAttributes<Companies>, InferCreationAt
 	declare address: CreationOptional<string | null>;
 	declare small_logo_path: CreationOptional<string | null>;
 	declare large_logo_path: CreationOptional<string | null>;
+	declare work_start_time: CreationOptional<string | null>;
+	declare work_end_time: CreationOptional<string | null>;
 	declare created_at: CreationOptional<Date>;
+
 	declare updated_at: CreationOptional<Date>;
 	declare deleted_at: CreationOptional<Date | null>;
 }
@@ -77,7 +80,18 @@ Companies.init(
 			allowNull: true,
 			defaultValue: null,
 		},
+		work_start_time: {
+			type: DataTypes.STRING(10),
+			allowNull: true,
+			defaultValue: "08:30",
+		},
+		work_end_time: {
+			type: DataTypes.STRING(10),
+			allowNull: true,
+			defaultValue: "18:00",
+		},
 		created_at: {
+
 			type: DataTypes.DATE,
 			allowNull: false,
 			defaultValue: DataTypes.NOW,

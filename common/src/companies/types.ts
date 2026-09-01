@@ -12,6 +12,9 @@ export type CompanyDto = {
 	mersis_no?: string | null;
 	small_logo_path?: string | null;
 	large_logo_path?: string | null;
+	work_start_time?: string | null;
+	work_end_time?: string | null;
 	created_at?: Date;
 	updated_at?: Date;
 };
+

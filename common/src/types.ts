@@ -7,4 +7,6 @@ export * from "./config/types";
 export * from "./shared/types";
 export * from "./portal/types";
 export * from "./audit_logs/types";
+export * from "./employees/types";
+
 

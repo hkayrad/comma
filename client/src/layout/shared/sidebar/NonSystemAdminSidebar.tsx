@@ -38,7 +38,13 @@ import {
   Scroll,
   ScrollText,
   TestTubeDiagonal,
+  Users,
+  Clock,
+  Receipt,
+  Calculator,
+  UserCheck,
 } from "lucide-react";
+
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -98,6 +104,32 @@ export default function NonSystemAdminSidebarContent() {
     [t],
   );
 
+  const employeeItems = useMemo(
+    () => [
+      {
+        title: t("sidebar.nonSysAdmin.employees.list"),
+        url: "/calisanlar",
+        icon: Users,
+      },
+      {
+        title: t("sidebar.nonSysAdmin.employees.pdks"),
+        url: "/calisanlar/pdks",
+        icon: Clock,
+      },
+      {
+        title: t("sidebar.nonSysAdmin.employees.advancesAndGarnishments"),
+        url: "/calisanlar/avans-icra",
+        icon: Receipt,
+      },
+      {
+        title: t("sidebar.nonSysAdmin.employees.payroll"),
+        url: "/calisanlar/bordro",
+        icon: Calculator,
+      },
+    ],
+    [t],
+  );
+
   const devItems = useMemo(
     () => [
       {
@@ -117,6 +149,17 @@ export default function NonSystemAdminSidebarContent() {
           title: t("sidebar.nonSysAdmin.finance"),
           items: financialItems,
         },
+        {
+          title: t("sidebar.nonSysAdmin.employees"),
+          items: [
+            {
+              title: t("sidebar.nonSysAdmin.employees"),
+              url: "/calisanlar",
+              icon: UserCheck,
+              items: employeeItems,
+            },
+          ],
+        },
         import.meta.env.DEV
           ? {
             title: "Geliştirme",
@@ -124,8 +167,9 @@ export default function NonSystemAdminSidebarContent() {
           }
           : null,
       ].filter((item) => item !== null),
-    [financialItems, devItems, t],
+    [financialItems, employeeItems, devItems, t],
   );
+
 
   const { state } = useSidebar();
 

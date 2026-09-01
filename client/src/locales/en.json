@@ -685,8 +685,14 @@
       "finance.payableInfo.payables": "Payables",
       "finance.receivableInfo": "Receivable Information",
       "finance.receivableInfo.incomingPayments": "Incoming Payments",
-      "finance.receivableInfo.receivables": "Receivables"
+      "finance.receivableInfo.receivables": "Receivables",
+      "employees": "Employee Tracking",
+      "employees.list": "Employees (Personal & IBAN)",
+      "employees.pdks": "Attendance & Absence",
+      "employees.advancesAndGarnishments": "Advances & Garnishments",
+      "employees.payroll": "Payroll & Calculation"
     },
+
     "pageSettings": {
       "label": "Page Settings",
       "description": "Control what's visible on this page",

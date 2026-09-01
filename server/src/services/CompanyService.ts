@@ -41,6 +41,8 @@ export class CompanyService {
 			mersis_no: company.mersis_no,
 			small_logo_path: company.small_logo_path,
 			large_logo_path: company.large_logo_path,
+			work_start_time: company.work_start_time || "08:30",
+			work_end_time: company.work_end_time || "18:00",
 		};
 	}
 
@@ -62,7 +64,10 @@ export class CompanyService {
 			tax_number: details.tax_number || null,
 			tax_office: details.tax_office || null,
 			mersis_no: details.mersis_no || null,
+			work_start_time: details.work_start_time || "08:30",
+			work_end_time: details.work_end_time || "18:00",
 		});
+
 
 		if (affectedRows > 0) {
 			Logger.info("[CompanyService] Company details updated successfully", { companyId });

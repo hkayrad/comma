@@ -6,3 +6,5 @@ export * from "./companies/schemas";
 export * from "./config/schemas";
 export * from "./shared/schemas";
 export * from "./portal/schemas";
+export * from "./employees/schemas";
+

@@ -25,6 +25,7 @@ import { Logger } from "@/lib/utils/logger";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Archive,
+  Clock,
   Hash,
   IdCard,
   Landmark,
@@ -32,6 +33,7 @@ import {
   MapPinHouse,
   Phone,
 } from "lucide-react";
+
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -103,6 +105,8 @@ export default function InformationForm() {
       .max(500, t("form.company.address.validation.max", { charCount: 500 }))
       .optional()
       .or(z.literal("")),
+    work_start_time: z.string().optional().or(z.literal("")),
+    work_end_time: z.string().optional().or(z.literal("")),
   });
 
   const form = useForm<z.infer<typeof CompanyFormSchema>>({
@@ -116,6 +120,8 @@ export default function InformationForm() {
       tax_office: companyDetails?.tax_office || "",
       mersis_no: companyDetails?.mersis_no || "",
       address: companyDetails?.address || "",
+      work_start_time: companyDetails?.work_start_time || "08:30",
+      work_end_time: companyDetails?.work_end_time || "18:00",
     },
   });
 
@@ -172,9 +178,12 @@ export default function InformationForm() {
         tax_office: companyDetails.tax_office || "",
         mersis_no: companyDetails.mersis_no || "",
         address: companyDetails.address || "",
+        work_start_time: companyDetails.work_start_time || "08:30",
+        work_end_time: companyDetails.work_end_time || "18:00",
       });
     }
   }, [companyDetails, form]);
+
 
   return (
     <Form {...form}>
@@ -422,7 +431,62 @@ export default function InformationForm() {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="work_start_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Normal Mesai Başlangıç Saati (24 Saat)</FormLabel>
+              <FormControl>
+                <InputGroup>
+                  <InputGroupInput
+                    type="time"
+                    step="60"
+                    disabled={!canEdit}
+                    {...field}
+                    value={field.value || "08:30"}
+                  />
+                  <InputGroupAddon>
+                    <Clock />
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+              <FormDescription>
+                Puantaj fazla mesai hesaplamalarında varsayılan iş başlama saati.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="work_end_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Normal Mesai Bitiş Saati (24 Saat)</FormLabel>
+              <FormControl>
+                <InputGroup>
+                  <InputGroupInput
+                    type="time"
+                    step="60"
+                    disabled={!canEdit}
+                    {...field}
+                    value={field.value || "18:00"}
+                  />
+                  <InputGroupAddon>
+                    <Clock />
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+              <FormDescription>
+                Puantaj fazla mesai hesaplamalarında varsayılan iş bitiş saati.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="flex justify-end gap-2 col-span-2">
+
           {!isSettingsPage && <CancelButton onClick={onCancel} />}
           {canEdit && <Button type="submit">{t("vars.save")}</Button>}
         </div>

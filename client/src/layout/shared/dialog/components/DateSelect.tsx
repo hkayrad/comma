@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { FormControl } from "@/components/ui/form";
+
 import {
   Popover,
   PopoverContent,
@@ -45,42 +45,56 @@ export default function DateSelect(props: Props) {
     field.onChange(null);
   };
 
+  const selectedDate = useMemo(() => {
+    if (!field.value) return undefined;
+    if (field.value instanceof Date) return field.value;
+    const d = new Date(field.value);
+    return isNaN(d.getTime()) ? undefined : d;
+  }, [field.value]);
+
   return (
     <div className="flex w-full overflow-hidden gap-2">
       <Popover>
         <PopoverTrigger
           render={(props) => (
-            <FormControl {...props}>
-              <Button
-                variant="outline"
-                nativeButton
-                className={cn(
-                  "flex grow justify-between overflow-hidden text-ellipsis",
-                  allowClear && field.value ? "max-w-[calc(100%-2.75rem)]" : "w-full",
-                  !field.value && "text-muted-foreground",
-                )}
-              >
-                <span className="overflow-hidden flex items-center gap-2 min-w-0 flex-1">
-                  <CalendarIcon className="text-muted-foreground! shrink-0 h-4 w-4 opacity-50" />
-                  <span className="truncate">
-                    {field.value
-                      ? format(field.value, "PPP", {
-                        locale: localeMap[i18n.language],
-                      })
-                      : (placeholder || t("vars.date_range"))}
-                  </span>
+            <Button
+              {...props}
+              variant="outline"
+              nativeButton
+              className={cn(
+                "flex grow justify-between overflow-hidden text-ellipsis",
+                allowClear && field.value ? "max-w-[calc(100%-2.75rem)]" : "w-full",
+                !field.value && "text-muted-foreground",
+              )}
+            >
+              <span className="overflow-hidden flex items-center gap-2 min-w-0 flex-1">
+                <CalendarIcon className="text-muted-foreground! shrink-0 h-4 w-4 opacity-50" />
+                <span className="truncate">
+                  {selectedDate
+                    ? format(selectedDate, "PPP", {
+                      locale: localeMap[i18n.language],
+                    })
+                    : (placeholder || t("vars.date_range"))}
                 </span>
-              </Button>
-            </FormControl>
+              </span>
+            </Button>
           )}
         />
+
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
             lang={i18n.language}
             timeZone="Europe/Istanbul"
-            selected={field.value}
-            onSelect={field.onChange}
+            selected={selectedDate}
+            onSelect={(date) => {
+              if (date) {
+                const dateStr = format(date, "yyyy-MM-dd");
+                field.onChange(dateStr);
+              } else {
+                field.onChange(null);
+              }
+            }}
             disabled={(date) =>
               allowFuture
                 ? date < new Date("1900-01-01")
@@ -90,6 +104,7 @@ export default function DateSelect(props: Props) {
           />
         </PopoverContent>
       </Popover>
+
       {allowClear && field.value && (
         <Tooltip disableHoverablePopup>
           <TooltipTrigger

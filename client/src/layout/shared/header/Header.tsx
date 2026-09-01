@@ -38,7 +38,12 @@ export default function Header() {
     ayarlar: t("sidebar.footer.account.settings"),
     dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
     borc_dokumu: t("header.breadcrumbs.finance.customerStatement"),
+    calisanlar: "Çalışan Takibi",
+    pdks: "PDKS & Puantaj",
+    "avans-icra": "Avans & İcra",
+    bordro: "Bordro & Maaş",
   };
+
 
   const breadcrumbItems = pathSegments.map((segment, index) => {
     const path = `/${pathSegments.slice(0, index + 1).join("/")}`;

@@ -685,8 +685,14 @@
       "finance.payableInfo.payables": "Borçlar",
       "finance.receivableInfo": "Alacak Bilgileri",
       "finance.receivableInfo.incomingPayments": "Gelen Ödemeler",
-      "finance.receivableInfo.receivables": "Alacaklar"
+      "finance.receivableInfo.receivables": "Alacaklar",
+      "employees": "Çalışan Takibi",
+      "employees.list": "Çalışanlar (Özlük & IBAN)",
+      "employees.pdks": "PDKS & Devamsızlık",
+      "employees.advancesAndGarnishments": "Avans & İcra Dosyaları",
+      "employees.payroll": "Bordro & Maaş Hesaplama"
     },
+
     "pageSettings": {
       "label": "Sayfa Ayarları",
       "description": "Bu sayfada nelerin görüneceğini kontrol edin",

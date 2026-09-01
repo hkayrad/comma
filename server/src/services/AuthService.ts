@@ -107,13 +107,27 @@ export class AuthService {
 				};
 			}
 
+			if (!user) {
+				return {
+					success: false,
+					requires2FA: false,
+					accessToken: null,
+					refreshToken: null,
+					tempToken: null,
+					message: "Invalid username or password",
+					user: null,
+				};
+			}
+
+
 			// Check if 2FA is enabled (Functionality disabled, code preserved for future use)
-			if (false && user.totp_enabled) {
-				Logger.info("[AuthService] 2FA required for user", { username, userId: user.id });
+			if (false && user && (user as any).totp_enabled) {
+				const currentUser = user as any;
+				Logger.info("[AuthService] 2FA required for user", { username, userId: currentUser.id });
 
 				// Generate a temporary token for 2FA verification
 				const tempToken = jwt.sign(
-					{ id: user.id, purpose: "2fa_verification" },
+					{ id: currentUser.id, purpose: "2fa_verification" },
 					env.JWT_SECRET as jwt.Secret,
 					{ expiresIn: "5m" }
 				);
@@ -126,12 +140,14 @@ export class AuthService {
 					tempToken: tempToken,
 					message: "2FA verification required",
 					user: {
-						id: user.id,
-						username: user.username,
-						role: user.role,
+						id: currentUser.id,
+						username: currentUser.username,
+						role: currentUser.role,
 					},
 				};
 			}
+
+
 
 			// No 2FA - proceed with normal login
 			Logger.debug("[AuthService] Generating tokens", { userId: user.id, companyId: user.company_id });

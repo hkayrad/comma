@@ -9,4 +9,7 @@ export const companySchema = z.object({
 	mersis_no: z.string().max(16).nullish(),
 	email: z.email().max(255).nullish().or(z.literal("")),
 	address: z.string().max(500).nullish(),
+	work_start_time: z.string().max(10).nullish(),
+	work_end_time: z.string().max(10).nullish(),
 });
+
