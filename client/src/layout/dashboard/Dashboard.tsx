@@ -91,16 +91,16 @@ export default function Dashboard() {
         onValueChange={handleTabChange}
         className="w-full gap-4"
       >
-        <TabsList className="relative flex w-full justify-center md:fixed md:top-4 md:z-30 md:left-0 md:right-0 md:mx-auto md:w-auto select-none mb-1 md:mb-0">
+        <TabsList className="relative flex w-full justify-center md:fixed md:top-4 md:z-20 md:left-0 md:right-0 md:mx-auto md:w-fit select-none pointer-events-auto mb-1 md:mb-0">
           <TabsTrigger
             value="receivable"
-            className="data-active:text-green-600 data-active:bg-green-50 h-7.5! flex-1 md:flex-initial"
+            className="data-active:text-green-600 data-active:bg-green-50 dark:data-active:bg-green-950/40 h-7.5! flex-1 md:flex-initial"
           >
             {t("vars.receivables")}
           </TabsTrigger>
           <TabsTrigger
             value="payable"
-            className="data-active:text-red-600 data-active:bg-red-50 h-7.5! flex-1 md:flex-initial"
+            className="data-active:text-red-600 data-active:bg-red-50 dark:data-active:bg-red-950/40 h-7.5! flex-1 md:flex-initial"
           >
             {t("vars.payables")}
           </TabsTrigger>
