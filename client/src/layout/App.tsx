@@ -25,7 +25,7 @@ export default function App() {
     <div className="selection:bg-foreground selection:text-background min-h-dvh flex flex-col bg-background">
       <SidebarProvider>
         <CommaSidebar />
-        <SidebarInset className="min-h-dvh flex flex-col relative ml-0! pb-[calc(3.75rem+env(safe-area-inset-bottom))] md:pb-0">
+        <SidebarInset className="min-h-dvh flex flex-col relative ml-0! pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <MaintenanceBanner />
           <CommaCommandPalette />
           <SystemAdminOnly>

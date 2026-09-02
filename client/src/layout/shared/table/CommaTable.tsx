@@ -226,7 +226,7 @@ export default function CommaTable(props: Props) {
         </div>
       )}
       {showSelection && selectedRows.length > 0 && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:right-6 z-50 flex flex-wrap items-center justify-between sm:justify-start gap-4 rounded-xl border border-border bg-secondary/95 text-secondary-foreground p-3 px-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] md:bottom-6 right-4 left-4 md:left-auto md:right-6 z-50 flex flex-wrap items-center justify-between sm:justify-start gap-4 rounded-xl border border-border bg-secondary/95 text-secondary-foreground p-3 px-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
           <div className="flex items-center gap-3 text-sm">
             <Badge variant="outline" className="font-semibold select-none bg-background">
               {selectedRows.length} {t("table.bulk.selectedCount", { defaultValue: "öğe seçildi" })}
