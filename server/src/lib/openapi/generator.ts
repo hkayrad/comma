@@ -5,8 +5,7 @@ import './routes/config';
 import './routes/tcmb';
 import './routes/companies';
 import './routes/admin';
-import './routes/receivables';
-import './routes/payables';
+import './routes/accounting';
 import './routes/misc';
 import './routes/employees';
 
