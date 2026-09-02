@@ -106,7 +106,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-xl md:max-w-2xl w-full">
+			<DialogContent className="sm:max-w-xl md:max-w-2xl w-[calc(100dvw-2rem)] sm:w-full">
 				<DialogHeader>
 					<DialogTitle>{isEdit ? "İcra Dosyasını Düzenle" : "Yeni İcra Dosyası Girişi"}</DialogTitle>
 				</DialogHeader>

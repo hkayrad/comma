@@ -18,47 +18,42 @@ export const DialogProvider: React.FC<{ children: ReactNode }> = ({
   const getSizeClass = (size?: string) => {
     switch (size) {
       case "sm":
-        return "max-w-sm !important";
+        return "sm:max-w-sm";
       case "md":
-        return "max-w-md !important";
+        return "sm:max-w-md";
       case "lg":
-        return "max-w-lg !important";
+        return "sm:max-w-lg";
       case "xl":
-        return "max-w-xl !important";
+        return "sm:max-w-xl";
       case "2xl":
-        return "max-w-2xl !important";
+        return "sm:max-w-2xl";
       case "3xl":
-        return "max-w-3xl !important";
+        return "sm:max-w-3xl";
       case "4xl":
-        return "max-w-4xl !important";
+        return "sm:max-w-4xl";
       case "full":
-        return "max-w-[95vw] !important w-[95vw] !important";
+        return "sm:max-w-[95vw] sm:w-[95vw]";
       default:
-        return "max-w-md !important";
+        return "sm:max-w-md";
     }
   };
 
   const getWidthStyle = (size?: string) => {
-    switch (size) {
-      case "sm":
-        return { maxWidth: "24rem", width: "100%" };
-      case "md":
-        return { maxWidth: "28rem", width: "100%" };
-      case "lg":
-        return { maxWidth: "32rem", width: "100%" };
-      case "xl":
-        return { maxWidth: "36rem", width: "100%" };
-      case "2xl":
-        return { maxWidth: "42rem", width: "100%" };
-      case "3xl":
-        return { maxWidth: "48rem", width: "100%" };
-      case "4xl":
-        return { maxWidth: "56rem", width: "100%" };
-      case "full":
-        return { maxWidth: "95vw", width: "95vw" };
-      default:
-        return { maxWidth: "28rem", width: "100%" };
-    }
+    const widths: Record<string, string> = {
+      sm: "24rem",
+      md: "28rem",
+      lg: "32rem",
+      xl: "36rem",
+      "2xl": "42rem",
+      "3xl": "48rem",
+      "4xl": "56rem",
+      full: "95vw",
+    };
+    const target = widths[size || "md"] || "28rem";
+    return {
+      maxWidth: `min(${target}, calc(100dvw - 2rem))`,
+      width: `min(${target}, calc(100dvw - 2rem))`,
+    };
   };
 
   return (

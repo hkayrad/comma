@@ -51,7 +51,7 @@ export default function AdvanceDialog({ open, onOpenChange, employees, onSuccess
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-xl md:max-w-2xl w-full">
+			<DialogContent className="sm:max-w-xl md:max-w-2xl w-[calc(100dvw-2rem)] sm:w-full">
 				<DialogHeader>
 					<DialogTitle>Yeni Avans Girişi</DialogTitle>
 				</DialogHeader>

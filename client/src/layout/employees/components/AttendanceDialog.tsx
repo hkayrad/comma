@@ -109,7 +109,7 @@ export default function AttendanceDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-md">
+			<DialogContent className="sm:max-w-md w-[calc(100dvw-2rem)] sm:w-full">
 				<DialogHeader>
 					<DialogTitle>{isEditing ? "Puantaj Kaydını Düzenle" : "Yeni Puantaj Ekle"}</DialogTitle>
 				</DialogHeader>

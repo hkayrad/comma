@@ -104,7 +104,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+			<DialogContent className="sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl w-[calc(100dvw-2rem)] sm:w-full max-h-[calc(100dvh-2rem)] overflow-y-auto">
 				<DialogHeader>
 					<DialogTitle>{isEdit ? "Çalışan Bilgilerini Düzenle" : "Yeni Çalışan Ekle"}</DialogTitle>
 				</DialogHeader>
