@@ -35,6 +35,7 @@ import { generateOpenApiSpec } from "@/lib/openapi/generator";
 import { env } from "@/lib/utils/env";
 import { Logger } from "@/lib/utils/logger";
 import { sequelize } from "@/lib/db/sequelize";
+import { recreateDatabaseViews } from "@/lib/db/views";
 import { errorHandler } from "@/lib/utils/middleware/errorHandler";
 import { globalRateLimiter } from "@/lib/utils/middleware/rateLimiter";
 
@@ -166,6 +167,7 @@ if (env.NODE_ENV !== "test") {
 		try {
 			await sequelize.authenticate();
 			Logger.info("Database connection established successfully.");
+			await recreateDatabaseViews(sequelize);
 		} catch (error) {
 			Logger.error("Unable to connect to the database:", error);
 		}

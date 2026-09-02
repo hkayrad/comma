@@ -47,9 +47,8 @@ A comprehensive scan of the Comma monorepo reveals significant opportunities to 
 * **Remedy:** Delete the entire [`common/types/`](file:///home/hkayrad/Repos/comma/common/types) directory.
 
 ### 1.4. Ghost Database Views Recreated on Every Boot (48 lines)
-* **Location:** [`server/src/lib/db/views.ts`](file:///home/hkayrad/Repos/comma/server/src/lib/db/views.ts) & [`server/src/index.ts:L170`](file:///home/hkayrad/Repos/comma/server/src/index.ts#L170)
-* **The Problem:** On every startup, the server executes 4 raw SQL `CREATE OR REPLACE VIEW` statements (`vw_receivable_debt_summary`, `vw_receivable_total_debt_by_company`, `vw_payable_debt_summary`, `vw_payable_total_debt_by_company`). None of these views are ever queried anywhere in the server or client codebase.
-* **Remedy:** Remove [`server/src/lib/db/views.ts`](file:///home/hkayrad/Repos/comma/server/src/lib/db/views.ts) and the `recreateDatabaseViews(sequelize)` call in `index.ts`.
+* **Location:** [`server/src/lib/db/views.ts`](file:///home/hkayrad/Repos/comma/server/src/lib/db/views.ts) & [`server/src/index.ts`](file:///home/hkayrad/Repos/comma/server/src/index.ts)
+* **Finding & Resolution:** `CustomerRepository.ts` dynamically queries `vw_${this.domain}_debt_summary` and `vw_${this.domain}_payment_summary`. The original `views.ts` was missing the payment summary views; `views.ts` was updated to define all 4 required views (`vw_receivable_debt_summary`, `vw_receivable_payment_summary`, `vw_payable_debt_summary`, `vw_payable_payment_summary`) and runs on server startup.
 
 ### 1.5. Dead Error Normalization Utility (45 lines)
 * **Location:** [`server/src/lib/utils/errorUtils.ts`](file:///home/hkayrad/Repos/comma/server/src/lib/utils/errorUtils.ts)
@@ -222,7 +221,7 @@ graph TD
 | **1.7** Dev route & cleanup script | Removed `/dev` route, `Dev.tsx`, `cleanup_test_data.sql` | Completed | `eab4378` | -27 lines |
 | **1.6** Dead MariaDB pool | Removed unused `pool.ts` | Completed | `ec90f8b` | -11 lines |
 | **1.5** Dead `normalizeError` | Removed unused `errorUtils.ts` and its test | Completed | `c789254` | -41 lines |
-| **1.4** Dead SQL views | Removed `views.ts` and boot recreation hook | Completed | `a21d121` | -49 lines |
+| **1.4** Database SQL views | Added payment summary views & restored boot hook | Completed | `0bf53c3` | +35 lines |
 | **1.3** Obsolete `common/types/` | Deleted legacy `types.d.ts` and `index.d.ts` | Completed | `0fb23e9` | -179 lines |
 | **1.2** Unused `components/ui/` | Removed 5 duplicate / unreferenced components | Completed | `a886d75` | -1,118 lines |
 | **1.1** Unused `animate-ui` | Pruned 21 unreferenced components / animations | Completed | `27c21b2` | -3,758 lines |
