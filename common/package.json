@@ -1,6 +1,7 @@
 {
   "name": "@comma/common",
-  "version": "2.26.0",
+  "version": "2.27.0",
+
 
   "private": true,
   "main": "./dist/index.js",
