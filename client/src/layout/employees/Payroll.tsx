@@ -49,7 +49,7 @@ export default function Payroll() {
 	});
 
 	// Calculate payroll for all employees in selected period
-	const handleCalculateAll = async () => {
+	const handleCalculate = async () => {
 		try {
 			let count = 0;
 			for (const emp of employees) {
@@ -108,6 +108,10 @@ export default function Payroll() {
 		return payrolls.reduce((sum, p) => sum + Number(p.net_payable), 0);
 	}, [payrolls]);
 
+	const totalCashSalary = useMemo(() => {
+		return payrolls.reduce((sum, p) => sum + (Number(p.cash_salary) || 0), 0);
+	}, [payrolls]);
+
 	const selectedEmployeeObj = useMemo(() => {
 		if (!selectedPayroll) return null;
 		return employees.find((e) => e.id === selectedPayroll.employee_id) || null;
@@ -119,16 +123,16 @@ export default function Payroll() {
 				<div>
 					<h1 className="text-2xl font-bold tracking-tight">Bordro & Maaş Hesaplama</h1>
 					<p className="text-muted-foreground">
-						Dönem bazlı taban maaş, mesai ücreti, devamsızlık kesintisi, avans ve icra mahsupları ile net maaş hesaplayın.
+						Dönem bazlı taban maaş, mesai ücreti, devamsızlık kesintisi, avans, icra mahsupları ve elden ödemeler ile bordro yönetin.
 					</p>
 				</div>
-				<Button onClick={handleCalculateAll} className="gap-2">
+				<Button onClick={handleCalculate} className="gap-2">
 					<Calculator className="h-4 w-4" /> Dönem Bordrolarını Otomatik Hesapla
 				</Button>
 			</div>
 
 			{/* Period selector & Summary Card */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				<Card>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-xs font-medium text-muted-foreground">Hesaplama Dönemi</CardTitle>
@@ -173,11 +177,22 @@ export default function Payroll() {
 
 				<Card>
 					<CardHeader className="pb-2">
-						<CardTitle className="text-xs font-medium text-muted-foreground">Dönem Toplam Ödenecek Net Maaş</CardTitle>
+						<CardTitle className="text-xs font-medium text-muted-foreground">Dönem Net Maaş (Banka)</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold text-primary">
 							{totalNetPayable.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader className="pb-2">
+						<CardTitle className="text-xs font-medium text-amber-600 dark:text-amber-400">Dönem Toplam Elden Ödeme</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+							{totalCashSalary.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
 						</div>
 					</CardContent>
 				</Card>
@@ -204,7 +219,8 @@ export default function Payroll() {
 									<TableHead>Mesai Ücreti</TableHead>
 									<TableHead>Avans Mahsubu</TableHead>
 									<TableHead>İcra Kesintisi</TableHead>
-									<TableHead>Net Ödenecek</TableHead>
+									<TableHead>Net Ödenecek (Banka)</TableHead>
+									<TableHead className="text-amber-600 dark:text-amber-400">Elden Ödenen</TableHead>
 									<TableHead>Ödeme Durumu</TableHead>
 									<TableHead className="text-right">İşlemler</TableHead>
 								</TableRow>
@@ -235,6 +251,13 @@ export default function Payroll() {
 											<TableCell className="font-bold text-primary text-base">
 												{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
 											</TableCell>
+											<TableCell className="font-semibold text-amber-600 dark:text-amber-400">
+												{Number(p.cash_salary || 0) > 0 ? (
+													`+${Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺`
+												) : (
+													<span className="text-muted-foreground font-normal text-xs">-</span>
+												)}
+											</TableCell>
 											<TableCell>
 												<Button
 													type="button"
@@ -262,6 +285,7 @@ export default function Payroll() {
 													)}
 												</Button>
 											</TableCell>
+
 
 										<TableCell className="text-right space-x-1">
 											<Button

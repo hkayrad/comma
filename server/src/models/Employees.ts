@@ -20,6 +20,7 @@ export class Employees extends Model<InferAttributes<Employees>, InferCreationAt
 	declare iban: CreationOptional<string | null>;
 	declare bank_name: CreationOptional<string | null>;
 	declare base_salary: number;
+	declare cash_salary: CreationOptional<number>;
 	declare salary_currency: CreationOptional<string>;
 	declare created_at: CreationOptional<Date>;
 	declare created_by: CreationOptional<string>;
@@ -103,6 +104,11 @@ Employees.init(
 			defaultValue: null,
 		},
 		base_salary: {
+			type: DataTypes.DECIMAL(15, 2),
+			allowNull: false,
+			defaultValue: 0.00,
+		},
+		cash_salary: {
 			type: DataTypes.DECIMAL(15, 2),
 			allowNull: false,
 			defaultValue: 0.00,

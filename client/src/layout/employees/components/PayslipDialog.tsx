@@ -101,12 +101,25 @@ export default function PayslipDialog({ open, onOpenChange, payroll, employee }:
 									<td className="py-2 text-right font-medium text-red-500">-{Number(payroll.garnishment_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺</td>
 								</tr>
 								<tr className="bg-primary/10 font-bold text-base">
-									<td className="py-3 px-2">NET ÖDENECEK TUTAR</td>
+									<td className="py-3 px-2">RESMİ NET ÖDENECEK (Banka)</td>
 									<td className="py-3 px-2 text-right text-primary">{Number(payroll.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺</td>
 								</tr>
+								{Number(payroll.cash_salary) > 0 && (
+									<>
+										<tr className="text-amber-700 dark:text-amber-400 font-semibold bg-amber-50/50 dark:bg-amber-950/20">
+											<td className="py-2.5 px-2">Elden Ödenen Tutar (Gayriresmi) (+)</td>
+											<td className="py-2.5 px-2 text-right">+{Number(payroll.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺</td>
+										</tr>
+										<tr className="bg-emerald-500/10 font-bold text-base text-emerald-800 dark:text-emerald-300">
+											<td className="py-3 px-2">TOPLAM ELE GEÇEN TUTAR (Banka + Elden)</td>
+											<td className="py-3 px-2 text-right">{(Number(payroll.net_payable) + Number(payroll.cash_salary)).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺</td>
+										</tr>
+									</>
+								)}
 							</tbody>
 						</table>
 					</div>
+
 
 					{/* Signatures */}
 					<div className="grid grid-cols-2 gap-8 pt-8 text-center text-xs text-muted-foreground">

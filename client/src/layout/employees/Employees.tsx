@@ -137,10 +137,18 @@ export default function Employees() {
 										<Calendar className="h-3.5 w-3.5 mr-1" />
 										Giriş: {emp.hire_date ? String(emp.hire_date).split("T")[0] : "-"}
 									</div>
-									<div className="font-semibold text-primary">
-										{Number(emp.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+									<div className="text-right">
+										<div className="font-semibold text-primary text-sm">
+											{Number(emp.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ <span className="text-[11px] text-muted-foreground font-normal">(Banka)</span>
+										</div>
+										{Number(emp.cash_salary) > 0 && (
+											<div className="text-xs text-amber-600 font-medium">
+												+{Number(emp.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ <span className="text-[10px] text-muted-foreground">(Elden)</span>
+											</div>
+										)}
 									</div>
 								</div>
+
 							</CardContent>
 						</Card>
 					))}

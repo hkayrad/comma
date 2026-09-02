@@ -41,6 +41,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 			iban: "",
 			bank_name: "",
 			base_salary: 0,
+			cash_salary: 0,
 			salary_currency: "TRY",
 		},
 	});
@@ -61,6 +62,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 				iban: employee.iban || "",
 				bank_name: employee.bank_name || "",
 				base_salary: Number(employee.base_salary) || 0,
+				cash_salary: Number(employee.cash_salary) || 0,
 				salary_currency: employee.salary_currency || "TRY",
 			});
 		} else {
@@ -78,6 +80,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 				iban: "",
 				bank_name: "",
 				base_salary: 0,
+				cash_salary: 0,
 				salary_currency: "TRY",
 			});
 		}
@@ -259,15 +262,29 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 							<h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
 								Maaş & Banka Bilgileri
 							</h3>
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 								<FormField
 									control={form.control}
 									name="base_salary"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Taban / Aylık Maaş (TL) *</FormLabel>
+											<FormLabel>Resmi Taban Maaş (Banka) (TL) *</FormLabel>
 											<FormControl>
 												<Input type="number" step="0.01" placeholder="45000" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="cash_salary"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Elden Ödenen Tutar (TL)</FormLabel>
+											<FormControl>
+												<Input type="number" step="0.01" placeholder="0.00" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -303,6 +320,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 								/>
 							</div>
 						</div>
+
 
 						{/* İkamet Adresi */}
 						<FormField

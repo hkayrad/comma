@@ -14,6 +14,7 @@ export const employeeSchema = z.object({
 	iban: z.string().max(34).nullish().or(z.literal("")),
 	bank_name: z.string().max(100).nullish().or(z.literal("")),
 	base_salary: z.coerce.number().min(0, "Taban maaş negatif olamaz"),
+	cash_salary: z.coerce.number().min(0, "Elden ödenen tutar negatif olamaz").default(0),
 	salary_currency: z.string().default("TRY"),
 });
 
@@ -66,6 +67,7 @@ export const payrollSchema = z.object({
 	period_year: z.coerce.number().int().min(2000).max(2100),
 	period_month: z.coerce.number().int().min(1).max(12),
 	base_salary: z.coerce.number().min(0),
+	cash_salary: z.coerce.number().min(0).default(0),
 	working_days: z.coerce.number().min(0).default(30),
 	absent_days: z.coerce.number().min(0).default(0),
 	absence_deduction: z.coerce.number().min(0).default(0),

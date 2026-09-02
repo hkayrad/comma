@@ -168,6 +168,7 @@ router.get("/payroll/calculate-preview", asyncHandler(async (req: Request, res: 
 			period_year: yr,
 			period_month: mo,
 			base_salary: Number(employee.base_salary),
+			cash_salary: Number(employee.cash_salary) || 0,
 			working_days: workingDays,
 			absent_days: unexcusedAbsentCount,
 			absence_deduction: Math.round(absenceDeduction * 100) / 100,

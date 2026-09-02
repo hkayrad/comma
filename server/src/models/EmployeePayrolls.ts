@@ -12,6 +12,7 @@ export class EmployeePayrolls extends Model<InferAttributes<EmployeePayrolls>, I
 	declare period_year: number;
 	declare period_month: number;
 	declare base_salary: number;
+	declare cash_salary: CreationOptional<number>;
 	declare working_days: CreationOptional<number>;
 	declare absent_days: CreationOptional<number>;
 	declare absence_deduction: CreationOptional<number>;
@@ -65,6 +66,11 @@ EmployeePayrolls.init(
 		base_salary: {
 			type: DataTypes.DECIMAL(15, 2),
 			allowNull: false,
+		},
+		cash_salary: {
+			type: DataTypes.DECIMAL(15, 2),
+			allowNull: false,
+			defaultValue: 0.00,
 		},
 		working_days: {
 			type: DataTypes.INTEGER,

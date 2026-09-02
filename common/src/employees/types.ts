@@ -14,6 +14,7 @@ export interface Employee {
 	iban?: string | null;
 	bank_name?: string | null;
 	base_salary: number;
+	cash_salary?: number;
 	salary_currency: string;
 	created_at?: string;
 	updated_at?: string;
@@ -94,6 +95,7 @@ export interface EmployeePayroll {
 	period_year: number;
 	period_month: number;
 	base_salary: number;
+	cash_salary?: number;
 	working_days: number;
 	absent_days: number;
 	absence_deduction: number;
