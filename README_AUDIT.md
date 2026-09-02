@@ -212,3 +212,34 @@ graph TD
 2. **Dependency Tree:** 31 fewer npm packages to audit, install, and update.
 3. **Build & Startup Performance:** Faster container cold starts (no redundant SQL view recreations), leaner client production bundles (no unused heavy PDF/animation libraries).
 4. **Developer Cognition:** Single source of truth for accounting domain logic instead of having to synchronize duplicate bug fixes across 4 identical files.
+
+---
+
+## 6. Implementation Status (Branch: `refactor/lean-audit`)
+
+| Section / Item | Description | Status | Commit | Net Lines |
+|---|---|---|---|---|
+| **1.7** Dev route & cleanup script | Removed `/dev` route, `Dev.tsx`, `cleanup_test_data.sql` | Completed | `eab4378` | -27 lines |
+| **1.6** Dead MariaDB pool | Removed unused `pool.ts` | Completed | `ec90f8b` | -11 lines |
+| **1.5** Dead `normalizeError` | Removed unused `errorUtils.ts` and its test | Completed | `c789254` | -41 lines |
+| **1.4** Dead SQL views | Removed `views.ts` and boot recreation hook | Completed | `a21d121` | -49 lines |
+| **1.3** Obsolete `common/types/` | Deleted legacy `types.d.ts` and `index.d.ts` | Completed | `0fb23e9` | -179 lines |
+| **1.2** Unused `components/ui/` | Removed 5 duplicate / unreferenced components | Completed | `a886d75` | -1,118 lines |
+| **1.1** Unused `animate-ui` | Pruned 21 unreferenced components / animations | Completed | `27c21b2` | -3,758 lines |
+| **2.1** OpenAPI route generator | Extracted `registerAccountingRoutes` factory | Completed | `2e151e7` | -693 lines |
+| **2.2** Duplicate services | Extracted `BaseDebtService` and `BasePaymentService` | Completed | `0f4b891` | -76 lines net |
+| **2.3** Duplicate controllers | Extracted `BaseDebtController` and `BasePaymentController` | Completed | `cb5f2dd` | -174 lines net |
+| **2.4** Duplicate client views | Extracted shared `AccountingTablePage` container | Completed | `f9b7625` | -29 lines net |
+| **3.2** Environment validation | Replaced `envalid` with project-standard `zod` | Completed | `97651ef` | +8 lines |
+| **3.3** Logo sub-endpoints | Parameterized `/logo/:size` (small & large) | Completed | `8c26ce3` | -27 lines net |
+| **3.1** Pass-through repositories | Eliminated `ConfigRepository`, queried model directly | Completed | `e11d17b` | -49 lines net |
+| **4.1** Client dependencies | Pruned 26 unused packages from `client/package.json` | Completed | `d4e8e83` | -26 lines |
+| **4.2** Server dependencies | Pruned 4 unused packages from `server/package.json` | Completed | `ab25bed` | -4 lines |
+
+**Overall Result:**
+- **16 commits** on branch `refactor/lean-audit`
+- **66 files changed** (1,567 insertions, 7,598 deletions)
+- **Net code reduction:** **-6,031 lines**
+- **Dependencies removed:** **30 packages**
+- **Verification:** All builds and typechecks across `common`, `server`, and `client` pass with 0 errors.
+
