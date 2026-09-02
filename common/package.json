@@ -1,10 +1,6 @@
 {
   "name": "@comma/common",
-  "version": "2.29.2",
-
-
-
-
+  "version": "2.30.0",
   "private": true,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
