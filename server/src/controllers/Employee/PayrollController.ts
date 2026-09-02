@@ -80,11 +80,12 @@ router.get("/payroll/calculate-preview", asyncHandler(async (req: Request, res: 
 	const hourlyRate = (Number(employee.base_salary) / 225); // Standart 225 saat
 
 	attendances.forEach((att) => {
-		if (att.status === "ABSENT_UNEXCUSED") {
+		if (att.status === "ABSENT_UNEXCUSED" || att.status === "UNPAID_LEAVE") {
 			unexcusedAbsentCount += 1;
 		} else if (att.status === "HALF_DAY") {
 			unexcusedAbsentCount += 0.5;
 		}
+
 
 		if (Number(att.overtime_hours) > 0) {
 			const mult = Number(att.overtime_multiplier) || 1.5;
