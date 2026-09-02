@@ -151,7 +151,7 @@ export default function AttendanceBatchDialog({ open, onOpenChange, employees, o
 					</div>
 
 					<div className="border rounded-md overflow-hidden">
-						<Table>
+						<Table className="[&_th]:px-3 [&_th]:py-2.5 [&_td]:px-3 [&_td]:py-2">
 							<TableHeader>
 								<TableRow>
 									<TableHead className="w-1/4">Çalışan</TableHead>

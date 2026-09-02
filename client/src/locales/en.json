@@ -443,6 +443,12 @@
         "customerStatement": "Customer Statement",
         "payables": "Payables",
         "payments": "Payments"
+      },
+      "employees": {
+        "title": "Employee Tracking",
+        "pdks": "Attendance & Absence",
+        "advancesAndGarnishments": "Advances & Garnishments",
+        "payroll": "Payroll & Salary"
       }
     },
     "exchange": {

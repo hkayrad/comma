@@ -36,12 +36,11 @@ export default function Header() {
     borclar: t("header.breadcrumbs.finance.payables"),
     odemeler: t("header.breadcrumbs.finance.payments"),
     ayarlar: t("sidebar.footer.account.settings"),
-    dev: "Geliştirici - Ayrılmış geliştirme sayfası, üretim buildında görünmeyecektir",
     borc_dokumu: t("header.breadcrumbs.finance.customerStatement"),
-    calisanlar: "Çalışan Takibi",
-    pdks: "PDKS & Puantaj",
-    "avans-icra": "Avans & İcra",
-    bordro: "Bordro & Maaş",
+    calisanlar: t("header.breadcrumbs.employees.title"),
+    pdks: t("header.breadcrumbs.employees.pdks"),
+    "avans-icra": t("header.breadcrumbs.employees.advancesAndGarnishments"),
+    bordro: t("header.breadcrumbs.employees.payroll"),
   };
 
 

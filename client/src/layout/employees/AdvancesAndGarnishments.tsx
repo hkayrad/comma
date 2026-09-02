@@ -109,9 +109,9 @@ export default function AdvancesAndGarnishments() {
 							</CardContent>
 						</Card>
 					) : (
-						<Card>
+						<Card className="overflow-hidden">
 							<CardContent className="p-0">
-								<Table>
+								<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
 									<TableHeader>
 										<TableRow>
 											<TableHead>Tarih</TableHead>
@@ -176,9 +176,9 @@ export default function AdvancesAndGarnishments() {
 							</CardContent>
 						</Card>
 					) : (
-						<Card>
+						<Card className="overflow-hidden">
 							<CardContent className="p-0">
-								<Table>
+								<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
 									<TableHeader>
 										<TableRow>
 											<TableHead>Başlangıç</TableHead>
