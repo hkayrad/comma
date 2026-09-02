@@ -26,7 +26,6 @@ const Settings = lazy(() => import("./layout/settings/Settings"));
 const CustomerStatement = lazy(
   () => import("./layout/dashboard/components/CustomerStatement"),
 );
-const Dev = lazy(() => import("./layout/Dev"));
 const NotFound = lazy(() => import("./layout/NotFound"));
 
 const PortalLogin = lazy(() => import("./layout/portal/PortalLogin"));
@@ -204,16 +203,7 @@ const router = createBrowserRouter([
                       },
                     ],
                   },
-                  {
-                    path: "dev",
 
-                    element:
-                      import.meta.env.VITE_NODE_ENV === "development" ? (
-                        <Suspense fallback={<PageLoader />}>
-                          <Dev />
-                        </Suspense>
-                      ) : null,
-                  },
                   {
                     path: "ayarlar",
                     element: (
