@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next";
 
 export default function SystemAdminSidebarContent() {
   const openDialog = useDialog((s) => s.openDialog);
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const sendGetActiveUsersRequest = useWebSocket(
     (s) => s.sendGetActiveUsersRequest,
   );
@@ -32,6 +32,7 @@ export default function SystemAdminSidebarContent() {
   const configs = useConfig((s) => s.configs);
 
   const handleToggleMaintenance = useCallback(async () => {
+    setOpenMobile(false);
     openDialog({
       title:
         configs?.maintenanceMode === "active"
@@ -45,10 +46,11 @@ export default function SystemAdminSidebarContent() {
       content: <MaintenanceDialog />,
       showCloseButton: true,
     });
-  }, [configs?.maintenanceMode, openDialog, t]);
+  }, [configs?.maintenanceMode, openDialog, t, setOpenMobile]);
   const handleGetActiveUsers = useCallback(() => {
+    setOpenMobile(false);
     sendGetActiveUsersRequest();
-  }, [sendGetActiveUsersRequest]);
+  }, [sendGetActiveUsersRequest, setOpenMobile]);
 
   return (
     <SidebarContent className="gap-0">
@@ -70,7 +72,7 @@ export default function SystemAdminSidebarContent() {
                   <SidebarMenuButton
                     {...props}
                     onClick={handleToggleMaintenance}
-                    className="justify-start!"
+                    className="justify-start! h-10 md:h-8 text-sm font-medium"
                   >
                     <Construction className="text-inherit bg-inherit select-none" />
                     <span>{t("sidebar.sysAdmin.actions.maintenanceMode")}</span>
@@ -90,7 +92,7 @@ export default function SystemAdminSidebarContent() {
                   <SidebarMenuButton
                     {...props}
                     onClick={handleGetActiveUsers}
-                    className="justify-start!"
+                    className="justify-start! h-10 md:h-8 text-sm font-medium"
                   >
                     <UsersRound className="text-inherit bg-inherit select-none" />
                     <span>{t("sidebar.sysAdmin.actions.activeUsers")}</span>

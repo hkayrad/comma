@@ -6,11 +6,13 @@ import { SidebarHeader, useSidebar } from "@/components/animate-ui/components/ra
 import { CompanyApi } from "@/lib/api/company";
 import { Logger } from "@/lib/utils/logger";
 import { CommaImage } from "@/components/shared/CommaImage";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 export default function CommaSidebarHeader() {
   const location = useLocation();
   const { theme } = useTheme();
-  const { state } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
 
   const logoFilter = theme === "dark" ? "brightness(0) invert(1)" : "brightness(1) invert(0)";
   const [logos, setLogos] = useState<{
@@ -64,16 +66,20 @@ export default function CommaSidebarHeader() {
   }, []);
 
   return (
-    <SidebarHeader>
-      <NavLink
-        to="/"
-        onClick={(e) => {
-          if (location.pathname === "/") {
-            e.preventDefault();
-          }
-        }}
-        className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center w-full h-9"
-      >
+    <SidebarHeader className="p-2 border-b md:border-b-0">
+      <div className="flex items-center justify-between w-full h-9">
+        <NavLink
+          to="/"
+          onClick={(e) => {
+            if (isMobile) {
+              setOpenMobile(false);
+            }
+            if (location.pathname === "/") {
+              e.preventDefault();
+            }
+          }}
+          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center flex-1 h-9"
+        >
         <AnimatePresence mode="wait">
           {state === "collapsed" ? (
             <motion.div
@@ -147,7 +153,19 @@ export default function CommaSidebarHeader() {
             </motion.div>
           )}
         </AnimatePresence>
-      </NavLink>
+        </NavLink>
+        {isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpenMobile(false)}
+            className="size-8 shrink-0 text-muted-foreground hover:text-foreground md:hidden"
+          >
+            <X className="w-4 h-4" />
+            <span className="sr-only">Kapat</span>
+          </Button>
+        )}
+      </div>
     </SidebarHeader>
   );
 }

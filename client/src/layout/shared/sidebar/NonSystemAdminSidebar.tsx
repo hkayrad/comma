@@ -171,7 +171,7 @@ export default function NonSystemAdminSidebarContent() {
   );
 
 
-  const { state, setOpenMobile } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
 
   const renderCollapsedItem = (item: any, isActive: boolean) => (
     <SidebarMenuItem key={item.title}>
@@ -208,6 +208,7 @@ export default function NonSystemAdminSidebarContent() {
               <MenuItem
                 key={subItem.title}
                 onClick={() => {
+                  setOpenMobile(false);
                   if (subItem.url !== location.pathname) {
                     navigate(subItem.url);
                   }
@@ -237,7 +238,7 @@ export default function NonSystemAdminSidebarContent() {
                   : location.pathname.startsWith(item.url);
 
               if (item.items && item.items.length > 0) {
-                if (state === "collapsed") {
+                if (state === "collapsed" && !isMobile) {
                   return renderCollapsedItem(item, isActive);
                 }
 
@@ -253,7 +254,7 @@ export default function NonSystemAdminSidebarContent() {
                             <SidebarMenuButton
                               {...props}
                               tooltip={item.title}
-                              className="group/collapsible-trigger"
+                              className="group/collapsible-trigger h-10 md:h-8 text-sm font-medium"
                             >
                               {item.icon && <item.icon />}
                               <span className="select-none">{item.title}</span>
@@ -276,7 +277,7 @@ export default function NonSystemAdminSidebarContent() {
                                         navigate(subItem.url);
                                       }
                                     }}
-                                    className="cursor-pointer select-none"
+                                    className="cursor-pointer select-none h-9 md:h-7 text-xs sm:text-sm"
                                   >
                                     {subItem.icon && <subItem.icon />}
                                     <span>{subItem.title}</span>
@@ -306,7 +307,7 @@ export default function NonSystemAdminSidebarContent() {
                               navigate(item.url);
                             }
                           }}
-                          className="cursor-pointer"
+                          className="cursor-pointer h-10 md:h-8 text-sm font-medium"
                         >
                           {item.icon && <item.icon />}
                           <span>{item.title}</span>

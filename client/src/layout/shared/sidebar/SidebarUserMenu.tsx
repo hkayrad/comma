@@ -51,7 +51,7 @@ import InfoDialog from "./components/InfoDialog";
 export default function SidebarUserMenu() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { state, setOpenMobile } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
   const user = useUser((s) => s.user);
   const clearUser = useUser((s) => s.clearUser);
   const { role } = useRole();
@@ -134,10 +134,10 @@ export default function SidebarUserMenu() {
                 </TooltipContent>
               </Tooltip>
               <MenuPanel
-                side="right"
-                align="end"
-                sideOffset={4}
-                className="overflow-hidden"
+                side={isMobile ? "top" : "right"}
+                align={isMobile ? "start" : "end"}
+                sideOffset={8}
+                className="overflow-hidden w-56"
               >
                 <MenuGroup>
                   <MenuItem

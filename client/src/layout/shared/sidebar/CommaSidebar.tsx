@@ -39,7 +39,7 @@ import { SyncStatus } from "./SyncStatus";
 
 export default function CommaSidebar() {
   const navigate = useNavigate();
-  const { state, setOpenMobile } = useSidebar();
+  const { state, setOpenMobile, isMobile } = useSidebar();
   const { t } = useTranslation();
   const { data: upcomingDueDates = [] } = useUpcomingDueDates();
 
@@ -64,7 +64,7 @@ export default function CommaSidebar() {
       </SystemAdminOnly>
       {/* END SIDEBAR CONTENT */}
 
-      <SidebarFooter>
+      <SidebarFooter className="pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-2">
         <SyncStatus />
         {/* Unified Settings */}
         <SidebarMenu>
@@ -72,7 +72,7 @@ export default function CommaSidebar() {
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
-                  <SidebarMenuButton {...props} onClick={handleSettings}>
+                  <SidebarMenuButton {...props} onClick={handleSettings} className="h-10 md:h-8">
                     <Settings />
                     <span className="select-none">
                       {t("sidebar.footer.account.settings")}
@@ -95,7 +95,7 @@ export default function CommaSidebar() {
                 <PopoverTrigger
                   {...props}
                   render={(popoverProps) => (
-                    <SidebarMenuButton {...popoverProps}>
+                    <SidebarMenuButton {...popoverProps} className="h-10 md:h-8">
                       <div className="relative">
                         <Bell className="h-4 w-4" />
                         {upcomingPaymentsCount > 0 && (
@@ -114,7 +114,11 @@ export default function CommaSidebar() {
               {t("dashboard.upcomingDueDates.title")}
             </TooltipContent>
           </Tooltip>
-          <PopoverContent side="right" align="end" className="w-80 p-0">
+          <PopoverContent
+            side={isMobile ? "top" : "right"}
+            align={isMobile ? "center" : "end"}
+            className="w-[min(20rem,calc(100vw-2rem))] p-0"
+          >
             <UpcomingDueDates />
           </PopoverContent>
         </Popover>

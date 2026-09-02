@@ -33,7 +33,7 @@ import { getStrictContext } from "@/lib/get-strict-context";
 
 const SIDEBAR_LOCAL_STORAGE_KEY = "sidebar_state";
 const SIDEBAR_WIDTH = "15rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "min(18.5rem, 85vw)";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
