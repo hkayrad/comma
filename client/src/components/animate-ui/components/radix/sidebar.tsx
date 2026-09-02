@@ -18,13 +18,13 @@ import {
     SheetDescription,
     SheetHeader,
     SheetTitle,
-} from "@/components/animate-ui/components/radix/sheet";
+} from "@/components/ui/sheet";
 import {
     TooltipProvider,
     Tooltip,
     TooltipContent,
     TooltipTrigger,
-} from "@/components/animate-ui/components/animate/tooltip";
+} from "@/components/ui/tooltip";
 import {
     Highlight,
     HighlightItem,
@@ -145,7 +145,7 @@ function SidebarProvider({
 
     return (
         <LocalSidebarProvider value={contextValue}>
-            <TooltipProvider openDelay={0}>
+            <TooltipProvider delay={0}>
                 <div
                     data-slot="sidebar-wrapper"
                     style={
@@ -641,9 +641,11 @@ function SidebarMenuButton({
     }
 
     return (
-        <Tooltip side="right" align="center">
-            <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <Tooltip>
+            <TooltipTrigger render={button} />
             <TooltipContent
+                side="right"
+                align="center"
                 hidden={state !== "collapsed" || isMobile}
                 {...tooltip}
             />
