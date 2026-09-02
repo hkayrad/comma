@@ -95,7 +95,7 @@ function DebtEntry({
   const selectedCurrency = form.watch(`entries.${index}.currency`);
 
   return (
-    <div className="p-4 grid grid-cols-2 gap-6 border-t">
+    <div className="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 border-t">
       <CustomerSelect
         type={type}
         form={form}

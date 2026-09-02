@@ -384,7 +384,7 @@ export default function CustomerDialog(props: Props) {
 
         <div className="min-h-fit">
           {fields.map((field, index) => index === currentPageIndex && (
-            <div key={field.id} className="grid grid-cols-2 gap-6 border-t pt-4 animate-in fade-in slide-in-from-right-2 duration-200">
+            <div key={field.id} className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 border-t pt-4 animate-in fade-in slide-in-from-right-2 duration-200">
               <FormField
                 control={form.control}
                 name={`entries.${index}.name`}
@@ -492,6 +492,7 @@ export default function CustomerDialog(props: Props) {
                         <InputGroup>
                           <InputGroupInput
                             type="text"
+                            inputMode="numeric"
                             placeholder={
                               isCompany ? "1234567890" : "12345678901"
                             }
@@ -519,7 +520,8 @@ export default function CustomerDialog(props: Props) {
                         <FormControl>
                           <InputGroup>
                             <InputGroupInput
-                              type="number"
+                              type="text"
+                              inputMode="numeric"
                               placeholder="1234567890123456"
                               {...field}
                             />
@@ -543,7 +545,8 @@ export default function CustomerDialog(props: Props) {
                     <FormControl>
                       <InputGroup>
                         <InputGroupInput
-                          type="text"
+                          type="tel"
+                          inputMode="tel"
                           placeholder="+90 555 555 55 55"
                           {...field}
                         />
@@ -565,7 +568,8 @@ export default function CustomerDialog(props: Props) {
                     <FormControl>
                       <InputGroup>
                         <InputGroupInput
-                          type="text"
+                          type="email"
+                          inputMode="email"
                           placeholder="ornek@sirket.com"
                           {...field}
                         />

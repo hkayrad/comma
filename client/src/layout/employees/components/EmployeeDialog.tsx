@@ -152,7 +152,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 										<FormItem>
 											<FormLabel>TC Kimlik No</FormLabel>
 											<FormControl>
-												<Input placeholder="12345678901" maxLength={11} {...field} value={field.value || ""} />
+												<Input placeholder="12345678901" maxLength={11} inputMode="numeric" {...field} value={field.value || ""} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -202,7 +202,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 										<FormItem>
 											<FormLabel>Telefon</FormLabel>
 											<FormControl>
-												<Input placeholder="0555 555 5555" {...field} value={field.value || ""} />
+												<Input type="tel" inputMode="tel" placeholder="0555 555 5555" {...field} value={field.value || ""} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -270,7 +270,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 										<FormItem>
 											<FormLabel>Resmi Taban Maaş (Banka) (TL) *</FormLabel>
 											<FormControl>
-												<Input type="number" step="0.01" placeholder="45000" {...field} />
+												<Input type="number" step="0.01" inputMode="decimal" placeholder="45000" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -284,7 +284,7 @@ export default function EmployeeDialog({ open, onOpenChange, employee, onSuccess
 										<FormItem>
 											<FormLabel>Elden Ödenen Tutar (TL)</FormLabel>
 											<FormControl>
-												<Input type="number" step="0.01" placeholder="0.00" {...field} />
+												<Input type="number" step="0.01" inputMode="decimal" placeholder="0.00" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
