@@ -5,7 +5,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState, useMemo, type ReactNode } from "react";
+import { useState, useMemo, useEffect, type ReactNode } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import CommaMobileCardList from "./components/CommaMobileCardList";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -125,6 +127,13 @@ export default function CommaTable(props: Props) {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<"cards" | "table">(isMobile ? "cards" : "table");
+
+  useEffect(() => {
+    setViewMode(isMobile ? "cards" : "table");
+  }, [isMobile]);
+
   const showSelection = props.enableRowSelection ?? !readOnly;
 
   const tableColumns = useMemo(() => {
@@ -211,11 +220,13 @@ export default function CommaTable(props: Props) {
             readOnly={readOnly}
             isPortal={isPortal}
             translationPrefix={translationPrefix}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         </div>
       )}
       {showSelection && selectedRows.length > 0 && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-4 rounded-xl border border-border bg-secondary/95 text-secondary-foreground p-3 px-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-20 md:bottom-6 right-4 left-4 md:left-auto md:right-6 z-50 flex flex-wrap items-center justify-between sm:justify-start gap-4 rounded-xl border border-border bg-secondary/95 text-secondary-foreground p-3 px-4 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
           <div className="flex items-center gap-3 text-sm">
             <Badge variant="outline" className="font-semibold select-none bg-background">
               {selectedRows.length} {t("table.bulk.selectedCount", { defaultValue: "öğe seçildi" })}
@@ -261,8 +272,23 @@ export default function CommaTable(props: Props) {
           </div>
         </div>
       )}
-      <div className="rounded-md border overflow-clip" data-table-export>
-        <div className="overflow-auto max-h-[calc(100vh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+      {viewMode === "cards" && (
+        <div className="md:hidden pb-4">
+          <CommaMobileCardList
+            table={table}
+            isPortal={isPortal}
+            contextMenuItems={contextMenuItems}
+          />
+        </div>
+      )}
+      <div
+        className={cn(
+          "rounded-md border overflow-clip",
+          viewMode === "cards" ? "hidden md:block" : "block"
+        )}
+        data-table-export
+      >
+        <div className="overflow-auto max-h-[calc(100dvh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
           <table className="w-full caption-bottom text-sm border-collapse">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (

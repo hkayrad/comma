@@ -29,8 +29,11 @@ import {
   FileText,
   Filter,
   FilterX,
+  LayoutGrid,
+  MoreVertical,
   RefreshCw,
   Rows3,
+  TableProperties,
   UserRound,
 } from "lucide-react";
 import {
@@ -53,6 +56,7 @@ import { exportTablePDF } from "@/lib/pdf-table-export";
 import { Logger } from "@/lib/utils/logger";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 type Props = {
   table: Table<any>;
@@ -68,6 +72,8 @@ type Props = {
   readOnly?: boolean;
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
+  viewMode?: "cards" | "table";
+  onViewModeChange?: (mode: "cards" | "table") => void;
 };
 
 export default function CommaTableHeader(props: Props) {
@@ -79,6 +85,8 @@ export default function CommaTableHeader(props: Props) {
     readOnly,
     isPortal,
     translationPrefix: propTranslationPrefix,
+    viewMode,
+    onViewModeChange,
   } = props;
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -384,13 +392,175 @@ export default function CommaTableHeader(props: Props) {
     return groups;
   }, [tags]);
   return (
-    <div className="flex items-center gap-2">
-      <ButtonGroup>
-        {!isPortal && (
-          <Tooltip>
-            <TooltipTrigger
+    <>
+      {/* Mobile Toolbar (< md) */}
+      <div className="flex flex-col gap-2 md:hidden">
+        <div className="flex items-center gap-2">
+          {!isPortal && (
+            <InputGroup className="bg-background flex-1 min-w-0">
+              <InputGroupAddon>
+                <UserRound
+                  className={
+                    searchInputRef.current?.value === ""
+                      ? "text-muted-foreground"
+                      : "text-primary"
+                  }
+                />
+              </InputGroupAddon>
+              <InputGroupInput
+                ref={searchInputRef}
+                placeholder={t("table.header.search")}
+                value={searchValue}
+                onChange={(event) => setSearchValue(event.target.value)}
+                className="select-none text-sm"
+              />
+            </InputGroup>
+          )}
+
+          {tags && (
+            <Menu>
+              <MenuTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    variant="outline"
+                    size="icon"
+                    className="select-none relative shrink-0"
+                  >
+                    <Filter className="w-4 h-4" />
+                    {activeFilterCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                        {activeFilterCount}
+                      </span>
+                    )}
+                  </Button>
+                )}
+              />
+              <MenuPanel align="end" className="max-w-xs">
+                {Array.from(groupedTags.entries()).map(
+                  ([columnName, columnTags]) => (
+                    <MenuGroup key={columnName}>
+                      <MenuGroupLabel className="relative text-muted-foreground z-10">
+                        {columnName}
+                      </MenuGroupLabel>
+                      {columnTags.map((tag) => {
+                        const isSelected = selectedFilters.has(
+                          `${tag.column}:${tag.value}`,
+                        );
+                        return (
+                          <MenuCheckboxItem
+                            key={tag.value}
+                            checked={isSelected}
+                            onCheckedChange={() => handleFilterToggle(tag)}
+                          >
+                            <Badge
+                              variant="outline"
+                              style={{ backgroundColor: tag.color }}
+                              className="mr-2"
+                            />
+                            {tag.label || tag.value}
+                          </MenuCheckboxItem>
+                        );
+                      })}
+                    </MenuGroup>
+                  ),
+                )}
+                {activeFilterCount > 0 && (
+                  <>
+                    <MenuSeparator />
+                    <MenuItem onClick={onFilterReset}>
+                      <FilterX className="mr-2 h-4 w-4" />
+                      {t("table.header.filters.clear")}
+                    </MenuItem>
+                  </>
+                )}
+              </MenuPanel>
+            </Menu>
+          )}
+
+          {/* Mobile Actions Menu */}
+          <Menu>
+            <MenuTrigger
               render={(props) => (
-                <InputGroup {...props} className="bg-background min-w-48">
+                <Button
+                  {...props}
+                  nativeButton
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              )}
+            />
+            <MenuPanel align="end">
+              <MenuItem onClick={onRefresh} disabled={isRefreshing}>
+                <RefreshCw
+                  className={cn("w-4 h-4 mr-2", isRefreshing && "animate-spin")}
+                />
+                {t("table.header.refresh")}
+              </MenuItem>
+              <MenuItem onClick={onExportCSV}>
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                {t("table.header.export.csv")}
+              </MenuItem>
+              <MenuItem onClick={onExportPDF}>
+                <FileText className="w-4 h-4 mr-2" />
+                {t("table.header.export.pdf")}
+              </MenuItem>
+              <MenuSeparator />
+              <MenuItem onClick={onFilterReset}>
+                <FilterX className="w-4 h-4 mr-2" />
+                {t("table.header.filters.clear")}
+              </MenuItem>
+              <MenuItem onClick={onSortReset}>
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                {t("table.header.sorting.clear")}
+              </MenuItem>
+            </MenuPanel>
+          </Menu>
+
+          {/* View mode toggle button */}
+          {onViewModeChange && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="shrink-0"
+              onClick={() =>
+                onViewModeChange(viewMode === "cards" ? "table" : "cards")
+              }
+            >
+              {viewMode === "cards" ? (
+                <TableProperties className="w-4 h-4" />
+              ) : (
+                <LayoutGrid className="w-4 h-4" />
+              )}
+            </Button>
+          )}
+
+          {/* Add button */}
+          {!readOnly && (
+            <div className="shrink-0">
+              {addButton || <AddButton />}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Pagination */}
+        <div className="flex items-center justify-between pt-1">
+          <CommaTablePagination table={table} />
+        </div>
+      </div>
+
+      {/* Desktop Toolbar (>= md) */}
+      <div className="hidden md:flex items-center gap-2">
+        <ButtonGroup>
+          {!isPortal && (
+            <Tooltip>
+              <TooltipTrigger
+                render={(props) => (
+                  <InputGroup {...props} className="bg-background min-w-48">
                   <InputGroupAddon>
                     <UserRound
                       className={
@@ -668,5 +838,6 @@ export default function CommaTableHeader(props: Props) {
         {!readOnly && (addButton || <AddButton />)}
       </div>
     </div>
+    </>
   );
 }
