@@ -39,67 +39,40 @@ router.get("/id", asyncHandler(async (req: Request, res: Response) => {
 	res.json({ success: true, data });
 }));
 
-router.post("/logo/small", asyncHandler(async (req: Request, res: Response) => {
+router.post("/logo/:size", asyncHandler(async (req: Request<{ size: string }>, res: Response) => {
 	const companyId = req.user.companyId;
 	const userRole = req.user.role;
+	const size = req.params.size;
 
 	if (userRole < 1) {
 		throw new UnauthorizedError("You do not have permission to upload logos");
 	}
-
-	Logger.info("[CompanyController] Upload small logo request", { companyId });
-
+	if (size !== "small" && size !== "large") {
+		throw new ValidationError("Invalid logo size. Must be 'small' or 'large'");
+	}
 	if (!req.files?.logo) {
 		throw new ValidationError("Logo file is required");
 	}
 
-	const data = await CompanyService.UploadLogo("small", req.files.logo as UploadedFile, companyId);
+	Logger.info(`[CompanyController] Upload ${size} logo request`, { companyId });
+	const data = await CompanyService.UploadLogo(size, req.files.logo as UploadedFile, companyId);
 	res.json({ success: true, data, message: "Logo uploaded successfully" });
 }));
 
-router.post("/logo/large", asyncHandler(async (req: Request, res: Response) => {
+router.delete("/logo/:size", asyncHandler(async (req: Request<{ size: string }>, res: Response) => {
 	const companyId = req.user.companyId;
 	const userRole = req.user.role;
-
-	if (userRole < 1) {
-		throw new UnauthorizedError("You do not have permission to upload logos");
-	}
-
-	Logger.info("[CompanyController] Upload large logo request", { companyId });
-
-	if (!req.files?.logo) {
-		throw new ValidationError("Logo file is required");
-	}
-
-	const data = await CompanyService.UploadLogo("large", req.files.logo as UploadedFile, companyId);
-	res.json({ success: true, data, message: "Logo uploaded successfully" });
-}));
-
-router.delete("/logo/small", asyncHandler(async (req: Request, res: Response) => {
-	const companyId = req.user.companyId;
-	const userRole = req.user.role;
+	const size = req.params.size;
 
 	if (userRole < 1) {
 		throw new UnauthorizedError("You do not have permission to delete logos");
 	}
-
-	Logger.info("[CompanyController] Delete small logo request", { companyId });
-
-	await CompanyService.DeleteLogo("small", companyId);
-	res.json({ success: true, message: "Logo deleted successfully" });
-}));
-
-router.delete("/logo/large", asyncHandler(async (req: Request, res: Response) => {
-	const companyId = req.user.companyId;
-	const userRole = req.user.role;
-
-	if (userRole < 1) {
-		throw new UnauthorizedError("You do not have permission to delete logos");
+	if (size !== "small" && size !== "large") {
+		throw new ValidationError("Invalid logo size. Must be 'small' or 'large'");
 	}
 
-	Logger.info("[CompanyController] Delete large logo request", { companyId });
-
-	await CompanyService.DeleteLogo("large", companyId);
+	Logger.info(`[CompanyController] Delete ${size} logo request`, { companyId });
+	await CompanyService.DeleteLogo(size, companyId);
 	res.json({ success: true, message: "Logo deleted successfully" });
 }));
 
