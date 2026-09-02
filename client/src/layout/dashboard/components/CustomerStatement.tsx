@@ -27,7 +27,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Locale } from "react-day-picker";
 import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { exportCustomerStatementPDF } from "@/lib/pdf-new";
@@ -55,10 +54,7 @@ export default function CustomerStatement() {
     refresh,
   } = useCustomerStatement();
 
-  const langMap: Record<string, Locale> = {
-    tr: tr,
-    en: enUS,
-  };
+  const currentLocale = i18n.language?.startsWith("tr") ? tr : enUS;
 
   const debtColumns = useMemo<ColumnDef<DebtDto>[]>(() => [
     {
@@ -368,18 +364,18 @@ export default function CustomerStatement() {
                         return (
                           <>
                             {format(date.from, "dd LLL y", {
-                              locale: langMap[i18n.language] as any,
+                              locale: currentLocale,
                             })}{" "}
                             -{" "}
                             {format(date.to, "dd LLL y", {
-                              locale: langMap[i18n.language] as any,
+                              locale: currentLocale,
                             })}
                           </>
                         );
                       }
 
                       return format(date.from, "dd LLL y", {
-                        locale: langMap[i18n.language] as any,
+                        locale: currentLocale,
                       });
                     })()}
                   </Button>
@@ -392,7 +388,7 @@ export default function CustomerStatement() {
                   selected={date}
                   onSelect={setDate}
                   numberOfMonths={2}
-                  locale={langMap[i18n.language] as any}
+                  locale={currentLocale}
                 />
               </PopoverContent>
             </Popover>

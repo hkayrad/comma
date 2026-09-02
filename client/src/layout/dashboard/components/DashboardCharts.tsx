@@ -57,7 +57,7 @@ function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
   const formatMonth = (monthStr: string) => {
     const [year, month] = monthStr.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    const locale = i18n.language === "tr" ? "tr-TR" : "en-US";
+    const locale = i18n.language?.startsWith("tr") ? "tr-TR" : "en-US";
     return date.toLocaleDateString(locale, { month: "short", year: "numeric" });
   };
 
@@ -124,7 +124,7 @@ export default function DashboardCharts() {
   const formatAxisMonth = (monthStr: string) => {
     const [year, month] = monthStr.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1);
-    const locale = i18n.language === "tr" ? "tr-TR" : "en-US";
+    const locale = i18n.language?.startsWith("tr") ? "tr-TR" : "en-US";
     return date.toLocaleDateString(locale, { month: "short" });
   };
 
@@ -203,7 +203,7 @@ export default function DashboardCharts() {
                         (() => {
                           const date = new Date(startDate);
                           const locale =
-                            i18n.language === "tr" ? "tr-TR" : "en-US";
+                            i18n.language?.startsWith("tr") ? "tr-TR" : "en-US";
                           return (
                             <span className="mr-auto">
                               {date.toLocaleDateString(locale, {

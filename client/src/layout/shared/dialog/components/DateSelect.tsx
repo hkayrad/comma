@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { format, type Locale } from "date-fns";
+import { format } from "date-fns";
 import { tr, enUS } from "date-fns/locale";
 import { CalendarIcon, X } from "lucide-react";
 import { useMemo } from "react";
@@ -32,12 +32,9 @@ export default function DateSelect(props: Props) {
 
   const { i18n, t } = useTranslation();
 
-  const localeMap: Record<string, Locale> = useMemo(
-    () => ({
-      tr: tr,
-      en: enUS,
-    }),
-    [],
+  const currentLocale = useMemo(
+    () => (i18n.language?.startsWith("tr") ? tr : enUS),
+    [i18n.language],
   );
 
   const handleClear = (e: React.MouseEvent) => {
@@ -75,7 +72,7 @@ export default function DateSelect(props: Props) {
                 <span className="truncate">
                   {selectedDate
                     ? format(selectedDate, "PPP", {
-                      locale: localeMap[i18n.language],
+                      locale: currentLocale,
                     })
                     : (placeholder || t("vars.date_range"))}
                 </span>
@@ -88,6 +85,7 @@ export default function DateSelect(props: Props) {
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
+            locale={currentLocale}
             lang={i18n.language}
             timeZone="Europe/Istanbul"
             selected={selectedDate}
