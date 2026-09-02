@@ -39,15 +39,16 @@ import { SyncStatus } from "./SyncStatus";
 
 export default function CommaSidebar() {
   const navigate = useNavigate();
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const { t } = useTranslation();
   const { data: upcomingDueDates = [] } = useUpcomingDueDates();
 
   const upcomingPaymentsCount = upcomingDueDates.length;
 
   const handleSettings = useCallback(() => {
+    setOpenMobile(false);
     navigate("/ayarlar");
-  }, [navigate]);
+  }, [navigate, setOpenMobile]);
 
   return (
     <Sidebar className="no-print" variant="inset" collapsible="icon">

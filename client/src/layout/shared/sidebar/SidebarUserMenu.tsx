@@ -51,7 +51,7 @@ import InfoDialog from "./components/InfoDialog";
 export default function SidebarUserMenu() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const user = useUser((s) => s.user);
   const clearUser = useUser((s) => s.clearUser);
   const { role } = useRole();
@@ -60,6 +60,7 @@ export default function SidebarUserMenu() {
   const { t } = useTranslation();
 
   const handleLogout = useCallback(async () => {
+    setOpenMobile(false);
     const promise = AuthApi.Logout();
     toast.promise(promise, {
       loading: t("notification.auth.logout.pending"),
@@ -71,9 +72,10 @@ export default function SidebarUserMenu() {
       },
       error: t("notification.auth.logout.error"),
     });
-  }, [navigate, reloadConnection, clearUser, t]);
+  }, [navigate, reloadConnection, clearUser, t, setOpenMobile]);
 
   const handleInfo = useCallback(async () => {
+    setOpenMobile(false);
     openDialog({
       title: t("dialog.info.title"),
       description: t("dialog.info.description"),

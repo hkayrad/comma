@@ -171,7 +171,7 @@ export default function NonSystemAdminSidebarContent() {
   );
 
 
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
 
   const renderCollapsedItem = (item: any, isActive: boolean) => (
     <SidebarMenuItem key={item.title}>
@@ -271,6 +271,7 @@ export default function NonSystemAdminSidebarContent() {
                                   <SidebarMenuSubButton
                                     isActive={isSubActive}
                                     onClick={() => {
+                                      setOpenMobile(false);
                                       if (subItem.url !== location.pathname) {
                                         navigate(subItem.url);
                                       }
@@ -300,6 +301,7 @@ export default function NonSystemAdminSidebarContent() {
                           {...props}
                           isActive={isActive}
                           onClick={() => {
+                            setOpenMobile(false);
                             if (item.url !== location.pathname) {
                               navigate(item.url);
                             }

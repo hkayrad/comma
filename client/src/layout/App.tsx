@@ -6,6 +6,7 @@ import MaintenanceBanner from "@/layout/shared/MaintenanceBanner";
 import CommaSidebar from "@/layout/shared/sidebar/CommaSidebar";
 import Header from "@/layout/shared/header/Header";
 import { CommaCommandPalette } from "@/layout/shared/CommaCommandPalette";
+import MobileBottomNav from "@/layout/shared/navigation/MobileBottomNav";
 import {
   SidebarInset,
   SidebarProvider,
@@ -21,12 +22,10 @@ export default function App() {
   }, [location]);
 
   return (
-    <div className="selection:bg-foreground selection:text-background">
-      {/*<NonSystemAdminOnly>
-      </NonSystemAdminOnly>*/}
+    <div className="selection:bg-foreground selection:text-background min-h-dvh flex flex-col bg-background">
       <SidebarProvider>
         <CommaSidebar />
-        <SidebarInset className="h-[calc(100dvh-1rem)] overflow-hidden relative ml-0!">
+        <SidebarInset className="min-h-dvh flex flex-col relative ml-0! pb-[calc(3.75rem+env(safe-area-inset-bottom))] md:pb-0">
           <MaintenanceBanner />
           <CommaCommandPalette />
           <SystemAdminOnly>
@@ -34,7 +33,10 @@ export default function App() {
           </SystemAdminOnly>
           <NonSystemAdminOnly>
             <Header />
-            <Outlet />
+            <main className="flex-1 min-w-0 flex flex-col">
+              <Outlet />
+            </main>
+            <MobileBottomNav />
           </NonSystemAdminOnly>
         </SidebarInset>
       </SidebarProvider>

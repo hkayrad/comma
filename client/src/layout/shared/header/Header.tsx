@@ -75,9 +75,11 @@ export default function Header() {
     });
   }
 
+  const currentTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name;
+
   return (
-    <header className="border-b p-3 bg-background sticky top-0 z-10">
-      <div className="flex w-full items-center">
+    <header className="border-b p-2.5 md:p-3 bg-background sticky top-0 z-30">
+      <div className="flex w-full items-center gap-2">
         <Tooltip disableHoverablePopup>
           <TooltipTrigger
             render={(props) => (
@@ -87,9 +89,9 @@ export default function Header() {
                 onClick={toggleSidebar}
                 size="icon"
                 variant="ghost"
-                className="size-7"
+                className="size-8 shrink-0"
               >
-                {state === "collapsed" ? <SidebarOpen /> : <SidebarClose />}
+                {state === "collapsed" ? <SidebarOpen className="w-4 h-4" /> : <SidebarClose className="w-4 h-4" />}
               </Button>
             )}
           ></TooltipTrigger>
@@ -103,36 +105,47 @@ export default function Header() {
           </TooltipContent>
         </Tooltip>
 
-        <Separator orientation="vertical" className="w-px mr-4 ml-3 h-4!" />
+        {/* Mobile Page Title */}
+        <div className="flex md:hidden items-center min-w-0 flex-1">
+          <h1 className="text-sm font-semibold truncate text-foreground">
+            {currentTitle}
+          </h1>
+        </div>
 
-        <Breadcrumb>
-          <BreadcrumbList className="select-none">
-            {breadcrumbItems.map((item) => (
-              <React.Fragment key={item.path}>
-                <BreadcrumbItem>
-                  {item.isLast ? (
-                    <BreadcrumbPage>{item.name}</BreadcrumbPage>
-                  ) : item.name ===
-                    t("header.breadcrumbs.finance.customerStatement") ? (
-                    <BreadcrumbPage className="text-muted-foreground cursor-default">
-                      {item.name}
-                    </BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink
-                      render={(props) => (
-                        <Link {...props} to={item.path}>
-                          {item.name}
-                        </Link>
-                      )}
-                    />
-                  )}
-                </BreadcrumbItem>
-                {!item.isLast && <BreadcrumbSeparator />}
-              </React.Fragment>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
-        <div className="ml-auto mr-2">
+        {/* Desktop Breadcrumbs */}
+        <div className="hidden md:flex items-center min-w-0">
+          <Separator orientation="vertical" className="w-px mr-4 ml-2 h-4!" />
+
+          <Breadcrumb>
+            <BreadcrumbList className="select-none">
+              {breadcrumbItems.map((item) => (
+                <React.Fragment key={item.path}>
+                  <BreadcrumbItem>
+                    {item.isLast ? (
+                      <BreadcrumbPage>{item.name}</BreadcrumbPage>
+                    ) : item.name ===
+                      t("header.breadcrumbs.finance.customerStatement") ? (
+                      <BreadcrumbPage className="text-muted-foreground cursor-default">
+                        {item.name}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink
+                        render={(props) => (
+                          <Link {...props} to={item.path}>
+                            {item.name}
+                          </Link>
+                        )}
+                      />
+                    )}
+                  </BreadcrumbItem>
+                  {!item.isLast && <BreadcrumbSeparator />}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
+        <div className="ml-auto shrink-0">
           <ExchangeRates />
         </div>
       </div>
