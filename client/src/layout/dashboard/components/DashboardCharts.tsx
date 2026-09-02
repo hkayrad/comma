@@ -162,11 +162,11 @@ export default function DashboardCharts() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
         <CardTitle className="select-none">
           {t("dashboard.charts.title")}
         </CardTitle>
-        <div className="flex space-x-2 gap-2 items-center">
+        <div className="flex flex-wrap items-center gap-2">
           {(startDate || months !== 12) && (
             <Button
               variant="ghost"

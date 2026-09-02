@@ -21,7 +21,7 @@ type Props = {
 };
 
 export default function OverviewCards(props: Props) {
-  const { type, width = "full", align = "center" } = props;
+  const { type, width = "full" } = props;
   const currency = "TRY";
 
   const { t } = useTranslation();
@@ -83,9 +83,9 @@ export default function OverviewCards(props: Props) {
 
   return (
     <div
-      className={`flex items-center gap-4 ${width === "full" ? "w-full" : ""} ${align === "start" ? "justify-start" : align === "center" ? "justify-center" : align === "stretch" ? "justify-between" : "justify-end"} `}
+      className={`grid grid-cols-1 sm:grid-cols-3 gap-3 ${width === "full" ? "w-full" : ""}`}
     >
-      <Card className="grow w-48 shadow-xs">
+      <Card className="w-full shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
             {t("overviewCards.total", {
@@ -110,7 +110,7 @@ export default function OverviewCards(props: Props) {
           </CardAction>
         </CardHeader>
       </Card>
-      <Card className="grow w-48 shadow-xs">
+      <Card className="w-full shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
             {t("overviewCards.paid", {
@@ -135,7 +135,7 @@ export default function OverviewCards(props: Props) {
           </CardAction>
         </CardHeader>
       </Card>
-      <Card className="grow w-48 shadow-xs">
+      <Card className="w-full shadow-xs">
         <CardHeader>
           <CardDescription className="text-xs 2xl:text-sm 2xl:h-6 2xl:py-0.5 select-none">
             {t("overviewCards.remaining", {

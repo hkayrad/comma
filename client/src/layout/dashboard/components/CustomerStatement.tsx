@@ -291,7 +291,7 @@ export default function CustomerStatement() {
   const { customer, debts, payments } = data;
 
   return (
-    <div className="w-full h-[calc(100vh-3.5rem)] overflow-y-auto overflow-x-hidden p-4 sm:p-6 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+    <div className="w-full min-h-full flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       <div className="w-full max-w-[1800px] mx-auto space-y-6 pb-6">
         {/* Top Header Card Component */}
       <Card className="p-4 sm:p-6 shadow-xs">

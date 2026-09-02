@@ -85,31 +85,35 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="px-3 py-3 h-[calc(100vh-3.5rem)] overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+    <div className="px-3 py-3 min-h-full flex-1 flex flex-col gap-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       <Tabs
         value={tabValue}
         onValueChange={handleTabChange}
         className="w-full gap-4"
       >
-        <TabsList className="fixed top-4 z-20 left-0 right-0 mx-auto select-none">
+        <TabsList className="relative flex w-full justify-center md:fixed md:top-4 md:z-30 md:left-0 md:right-0 md:mx-auto md:w-auto select-none mb-1 md:mb-0">
           <TabsTrigger
             value="receivable"
-            className="data-active:text-green-600 data-active:bg-green-50 h-7.5!"
+            className="data-active:text-green-600 data-active:bg-green-50 h-7.5! flex-1 md:flex-initial"
           >
             {t("vars.receivables")}
           </TabsTrigger>
           <TabsTrigger
             value="payable"
-            className="data-active:text-red-600 data-active:bg-red-50 h-7.5!"
+            className="data-active:text-red-600 data-active:bg-red-50 h-7.5! flex-1 md:flex-initial"
           >
             {t("vars.payables")}
           </TabsTrigger>
         </TabsList>
         {showOverviewCards && (
-          <div className="flex items-center gap-4">
-            <OverviewCards type="receivable" align="stretch" />
-            <Separator orientation="vertical" className="h-12! w-full" />
-            <OverviewCards type="payable" align="stretch" />
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+            <div className={tabValue === "receivable" ? "block w-full md:w-1/2" : "hidden md:block md:w-1/2"}>
+              <OverviewCards type="receivable" align="stretch" />
+            </div>
+            <Separator orientation="vertical" className="hidden md:block h-12! shrink-0" />
+            <div className={tabValue === "payable" ? "block w-full md:w-1/2" : "hidden md:block md:w-1/2"}>
+              <OverviewCards type="payable" align="stretch" />
+            </div>
           </div>
         )}
         {showStatisticsChart && <DashboardCharts />}
