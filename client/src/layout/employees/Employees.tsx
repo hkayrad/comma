@@ -54,25 +54,26 @@ export default function Employees() {
 	};
 
 	return (
-		<div className="p-6 space-y-6">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div className="p-3 sm:p-6 space-y-4 sm:space-y-6 min-h-full flex-1 overflow-y-auto">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight">Çalışan Listesi & Özlük Bilgileri</h1>
-					<p className="text-muted-foreground">
+					<h1 className="text-xl sm:text-2xl font-bold tracking-tight">Çalışan Listesi & Özlük Bilgileri</h1>
+					<p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
 						Çalışanların özlük, iletişim, IBAN ve taban maaş bilgilerini yönetin.
 					</p>
 				</div>
-				<Button onClick={handleAdd} className="gap-2">
+				<Button onClick={handleAdd} className="gap-2 w-full sm:w-auto">
 					<UserPlus className="h-4 w-4" /> Yeni Çalışan Ekle
 				</Button>
 			</div>
 
-			<div className="flex items-center space-x-2 max-w-sm">
-				<Search className="h-4 w-4 text-muted-foreground" />
+			<div className="flex items-center space-x-2 w-full sm:max-w-sm">
+				<Search className="h-4 w-4 text-muted-foreground shrink-0" />
 				<Input
 					placeholder="Ad, TC No veya Unvan ile ara..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
+					className="text-sm"
 				/>
 			</div>
 
@@ -85,23 +86,23 @@ export default function Employees() {
 					</CardContent>
 				</Card>
 			) : (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 					{filteredEmployees.map((emp) => (
 						<Card key={emp.id} className="relative group hover:shadow-md transition-shadow">
 							<CardHeader className="pb-3 flex flex-row items-start justify-between space-y-0">
 								<div>
-									<CardTitle className="text-lg font-semibold">
+									<CardTitle className="text-base sm:text-lg font-semibold">
 										{emp.first_name} {emp.last_name}
 									</CardTitle>
-									<p className="text-sm text-muted-foreground font-medium">
+									<p className="text-xs sm:text-sm text-muted-foreground font-medium">
 										{emp.title || "Unvan Belirtilmedi"} {emp.department ? `(${emp.department})` : ""}
 									</p>
 								</div>
 								<div className="flex space-x-1 opacity-90">
-									<Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(emp)}>
+									<Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleEdit(emp)}>
 										<Edit className="h-4 w-4" />
 									</Button>
-									<Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600" onClick={() => handleDelete(emp)}>
+									<Button variant="ghost" size="icon" className="h-9 w-9 text-red-500 hover:text-red-600" onClick={() => handleDelete(emp)}>
 										<Trash2 className="h-4 w-4" />
 									</Button>
 								</div>

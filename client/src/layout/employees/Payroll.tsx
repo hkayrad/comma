@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AnimateSelect from "./components/AnimateSelect";
 
 import { Calculator, FileText, Trash2, CheckCircle2, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import PayslipDialog from "./components/PayslipDialog";
@@ -141,15 +140,15 @@ export default function Payroll() {
 	}, [selectedPayroll, employees]);
 
 	return (
-		<div className="p-6 space-y-6">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div className="p-3 sm:p-6 space-y-4 sm:space-y-6 min-h-full flex-1 overflow-y-auto">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight">Bordro & Maaş Hesaplama</h1>
-					<p className="text-muted-foreground">
+					<h1 className="text-xl sm:text-2xl font-bold tracking-tight">Bordro & Maaş Hesaplama</h1>
+					<p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
 						Dönem bazlı taban maaş, mesai ücreti, devamsızlık kesintisi, avans, icra mahsupları ve elden ödemeler ile bordro yönetin.
 					</p>
 				</div>
-				<Button onClick={handleCalculate} className="gap-2">
+				<Button onClick={handleCalculate} className="gap-2 w-full sm:w-auto">
 					<Calculator className="h-4 w-4" /> Dönem Bordrolarını Otomatik Hesapla
 				</Button>
 			</div>
@@ -231,103 +230,182 @@ export default function Payroll() {
 					</CardContent>
 				</Card>
 			) : (
-				<Card className="overflow-hidden">
-					<CardContent className="p-0">
-						<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
-							<TableHeader>
-								<TableRow>
-									<TableHead>Çalışan</TableHead>
-									<TableHead>Taban Maaş</TableHead>
-									<TableHead>Devamsızlık Kes.</TableHead>
-									<TableHead>Mesai Ücreti</TableHead>
-									<TableHead>Avans Mahsubu</TableHead>
-									<TableHead>İcra Kesintisi</TableHead>
-									<TableHead>Resmi Net (Banka)</TableHead>
-									<TableHead>Banka Durumu</TableHead>
-									<TableHead className="text-amber-600 dark:text-amber-400">Elden Tutar</TableHead>
-									<TableHead className="text-amber-600 dark:text-amber-400">Elden Durumu</TableHead>
-									<TableHead className="text-right">İşlemler</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{payrolls.map((p) => {
-									const isBankPaid = p.payment_status === "PAID";
-									const isCashPaid = p.cash_payment_status === "PAID";
-									const hasCash = Number(p.cash_salary || 0) > 0;
+				<>
+					{/* Mobile Payroll Cards (< md) */}
+					<div className="flex flex-col gap-3 md:hidden">
+						{payrolls.map((p) => {
+							const isBankPaid = p.payment_status === "PAID";
+							const isCashPaid = p.cash_payment_status === "PAID";
+							const hasCash = Number(p.cash_salary || 0) > 0;
 
-									return (
-										<TableRow key={p.id}>
-											<TableCell className="font-semibold">
-												{p.employee_name}
-											</TableCell>
-											<TableCell>
-												{Number(p.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-											</TableCell>
-											<TableCell className="text-red-500 font-medium">
-												-{Number(p.absence_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ ({p.absent_days}g)
-											</TableCell>
-											<TableCell className="text-emerald-600 font-medium">
-												+{Number(p.overtime_pay).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-											</TableCell>
-											<TableCell className="text-amber-600 font-medium">
-												-{Number(p.advance_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-											</TableCell>
-											<TableCell className="text-red-600 font-medium">
-												-{Number(p.garnishment_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-											</TableCell>
-											<TableCell className="font-bold text-primary text-base">
-												{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-											</TableCell>
-											<TableCell>
+							return (
+								<Card key={p.id} className="p-3.5 shadow-xs">
+									<div className="flex items-start justify-between gap-2">
+										<div>
+											<p className="font-semibold text-sm">{p.employee_name}</p>
+											<p className="text-xs text-muted-foreground mt-0.5">
+												Taban: {Number(p.base_salary).toLocaleString("tr-TR")} ₺
+											</p>
+										</div>
+										<div className="flex items-center gap-1">
+											<Button
+												variant="outline"
+												size="sm"
+												className="h-8 gap-1 text-xs px-2"
+												onClick={() => handleOpenPayslip(p)}
+											>
+												<FileText className="h-3.5 w-3.5" /> Pusula
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-red-500 hover:text-red-600"
+												onClick={() => handleDelete(p.id)}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+
+									{/* Payment Status Blocks */}
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-border mt-2">
+										<div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+											<div>
+												<span className="text-[10px] text-muted-foreground uppercase font-medium">Banka Net</span>
+												<p className="font-bold text-sm text-primary">
+													{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</p>
+											</div>
+											<Button
+												variant={isBankPaid ? "outline" : "secondary"}
+												size="sm"
+												className="h-7 text-xs gap-1"
+												onClick={() => handleToggleBankPaymentStatus(p)}
+											>
+												{isBankPaid ? (
+													<>
+														<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+														<span className="text-emerald-600 font-semibold">Ödendi</span>
+													</>
+												) : (
+													<>
+														<Clock className="h-3.5 w-3.5 text-amber-600" />
+														<span>Ödenmedi</span>
+													</>
+												)}
+											</Button>
+										</div>
+
+										{hasCash && (
+											<div className="flex items-center justify-between p-2 rounded-lg bg-amber-500/10">
+												<div>
+													<span className="text-[10px] text-amber-700 dark:text-amber-400 uppercase font-medium">Elden Net</span>
+													<p className="font-bold text-sm text-amber-600 dark:text-amber-400">
+														{Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+													</p>
+												</div>
 												<Button
-													type="button"
-													variant="outline"
+													variant={isCashPaid ? "outline" : "secondary"}
 													size="sm"
-													onClick={() => handleToggleBankPaymentStatus(p)}
-													className={cn(
-														"h-7 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-colors shadow-none border-none",
-														isBankPaid
-															? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900"
-															: "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
-													)}
-													title="Resmi banka ödeme durumunu değiştirin"
+													className="h-7 text-xs gap-1"
+													onClick={() => handleToggleCashPaymentStatus(p)}
 												>
-													{isBankPaid ? (
+													{isCashPaid ? (
 														<>
-															<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-															<span>Ödendi</span>
+															<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+															<span className="text-emerald-600 font-semibold">Ödendi</span>
 														</>
 													) : (
 														<>
-															<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+															<Clock className="h-3.5 w-3.5 text-amber-600" />
 															<span>Ödenmedi</span>
 														</>
 													)}
 												</Button>
-											</TableCell>
-											<TableCell className="font-semibold text-amber-600 dark:text-amber-400">
-												{hasCash ? (
-													`+${Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺`
-												) : (
-													<span className="text-muted-foreground font-normal text-xs">-</span>
-												)}
-											</TableCell>
-											<TableCell>
-												{hasCash ? (
+											</div>
+										)}
+									</div>
+
+									{/* Deductions & Additions breakdown */}
+									<div className="grid grid-cols-4 gap-1 pt-2 border-t border-border mt-1 text-[11px]">
+										<div>
+											<span className="text-[9px] text-muted-foreground uppercase">Devamsızlık</span>
+											<p className="text-red-500 font-medium">-{Number(p.absence_deduction).toLocaleString("tr-TR")} ₺</p>
+										</div>
+										<div>
+											<span className="text-[9px] text-muted-foreground uppercase">Mesai</span>
+											<p className="text-emerald-600 font-medium">+{Number(p.overtime_pay).toLocaleString("tr-TR")} ₺</p>
+										</div>
+										<div>
+											<span className="text-[9px] text-muted-foreground uppercase">Avans</span>
+											<p className="text-amber-600 font-medium">-{Number(p.advance_deduction).toLocaleString("tr-TR")} ₺</p>
+										</div>
+										<div>
+											<span className="text-[9px] text-muted-foreground uppercase">İcra</span>
+											<p className="text-red-600 font-medium">-{Number(p.garnishment_deduction).toLocaleString("tr-TR")} ₺</p>
+										</div>
+									</div>
+								</Card>
+							);
+						})}
+					</div>
+
+					{/* Desktop Table (>= md) */}
+					<Card className="hidden md:block overflow-hidden">
+						<CardContent className="p-0">
+							<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
+								<TableHeader>
+									<TableRow>
+										<TableHead>Çalışan</TableHead>
+										<TableHead>Taban Maaş</TableHead>
+										<TableHead>Devamsızlık Kes.</TableHead>
+										<TableHead>Mesai Ücreti</TableHead>
+										<TableHead>Avans Mahsubu</TableHead>
+										<TableHead>İcra Kesintisi</TableHead>
+										<TableHead>Resmi Net (Banka)</TableHead>
+										<TableHead>Banka Durumu</TableHead>
+										<TableHead className="text-amber-600 dark:text-amber-400">Elden Tutar</TableHead>
+										<TableHead className="text-amber-600 dark:text-amber-400">Elden Durumu</TableHead>
+										<TableHead className="text-right">İşlemler</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{payrolls.map((p) => {
+										const isBankPaid = p.payment_status === "PAID";
+										const isCashPaid = p.cash_payment_status === "PAID";
+										const hasCash = Number(p.cash_salary || 0) > 0;
+
+										return (
+											<TableRow key={p.id}>
+												<TableCell className="font-semibold">
+													{p.employee_name}
+												</TableCell>
+												<TableCell>
+													{Number(p.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</TableCell>
+												<TableCell className="text-red-500 font-medium">
+													-{Number(p.absence_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ ({p.absent_days}g)
+												</TableCell>
+												<TableCell className="text-emerald-600 font-medium">
+													+{Number(p.overtime_pay).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</TableCell>
+												<TableCell className="text-amber-600 font-medium">
+													-{Number(p.advance_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</TableCell>
+												<TableCell className="text-red-600 font-medium">
+													-{Number(p.garnishment_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</TableCell>
+												<TableCell className="font-bold text-primary text-base">
+													{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+												</TableCell>
+												<TableCell>
 													<Button
-														type="button"
-														variant="outline"
+														variant={isBankPaid ? "outline" : "secondary"}
 														size="sm"
-														onClick={() => handleToggleCashPaymentStatus(p)}
-														className={cn(
-															"h-7 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-colors shadow-none border-none",
-															isCashPaid
-																? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900"
-																: "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
-														)}
-														title="Elden ödeme durumunu değiştirin"
+														className="h-8 gap-1 text-xs"
+														onClick={() => handleToggleBankPaymentStatus(p)}
 													>
-														{isCashPaid ? (
+														{isBankPaid ? (
 															<>
 																<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
 																<span>Ödendi</span>
@@ -339,40 +417,60 @@ export default function Payroll() {
 															</>
 														)}
 													</Button>
-												) : (
-													<span className="text-muted-foreground font-normal text-xs">-</span>
-												)}
-											</TableCell>
-
-
-
-										<TableCell className="text-right space-x-1">
-											<Button
-												variant="outline"
-												size="sm"
-												className="gap-1 text-xs"
-												onClick={() => handleOpenPayslip(p)}
-											>
-												<FileText className="h-3.5 w-3.5" /> Maaş Pusulası
-											</Button>
-											<Button
-												variant="ghost"
-												size="icon"
-												className="h-8 w-8 text-red-500 hover:text-red-600"
-												onClick={() => handleDelete(p.id)}
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</TableCell>
-									</TableRow>
-									);
-								})}
-							</TableBody>
-
-						</Table>
-					</CardContent>
-				</Card>
-
+												</TableCell>
+												<TableCell className="text-amber-600 dark:text-amber-400 font-medium">
+													{hasCash ? `${Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺` : "-"}
+												</TableCell>
+												<TableCell>
+													{hasCash ? (
+														<Button
+															variant={isCashPaid ? "outline" : "secondary"}
+															size="sm"
+															className="h-8 gap-1 text-xs"
+															onClick={() => handleToggleCashPaymentStatus(p)}
+														>
+															{isCashPaid ? (
+																<>
+																	<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+																	<span>Ödendi</span>
+																</>
+															) : (
+																<>
+																	<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+																	<span>Ödenmedi</span>
+																</>
+															)}
+														</Button>
+													) : (
+														<span className="text-muted-foreground font-normal text-xs">-</span>
+													)}
+												</TableCell>
+												<TableCell className="text-right space-x-1">
+													<Button
+														variant="outline"
+														size="sm"
+														className="gap-1 text-xs"
+														onClick={() => handleOpenPayslip(p)}
+													>
+														<FileText className="h-3.5 w-3.5" /> Maaş Pusulası
+													</Button>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 text-red-500 hover:text-red-600"
+														onClick={() => handleDelete(p.id)}
+													>
+														<Trash2 className="h-4 w-4" />
+													</Button>
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</CardContent>
+					</Card>
+				</>
 			)}
 
 			<PayslipDialog

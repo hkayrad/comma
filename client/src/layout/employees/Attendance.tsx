@@ -86,23 +86,22 @@ export default function Attendance() {
 	};
 
 	return (
-		<div className="p-6 space-y-6">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div className="p-3 sm:p-6 space-y-4 sm:space-y-6 min-h-full flex-1 overflow-y-auto">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight">PDKS & Devamsızlık Takibi</h1>
-					<p className="text-muted-foreground">
+					<h1 className="text-xl sm:text-2xl font-bold tracking-tight">PDKS & Devamsızlık Takibi</h1>
+					<p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
 						Çalışanların giriş-çıkış saatleri, gelinmeyen gün sayısı ve fazla mesai durumlarını takip edin.
 					</p>
 				</div>
-				<div className="flex items-center gap-2">
-					<Button onClick={handleOpenCreate} className="gap-2">
+				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+					<Button onClick={handleOpenCreate} className="gap-2 w-full sm:w-auto">
 						<Plus className="h-4 w-4" /> Yeni Puantaj Ekle
 					</Button>
-					<Button onClick={() => setBatchDialogOpen(true)} variant="outline" className="gap-2">
+					<Button onClick={() => setBatchDialogOpen(true)} variant="outline" className="gap-2 w-full sm:w-auto">
 						<FileSpreadsheet className="h-4 w-4" /> Toplu Günlük Puantaj Gir
 					</Button>
 				</div>
-
 			</div>
 
 
@@ -181,82 +180,139 @@ export default function Attendance() {
 					</CardContent>
 				</Card>
 			) : (
-				<Card className="overflow-hidden">
-					<CardContent className="p-0">
-						<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
-							<TableHeader>
-								<TableRow>
-									<TableHead>Tarih</TableHead>
-									<TableHead>Çalışan</TableHead>
-									<TableHead>Durum</TableHead>
-									<TableHead>Giriş Saati</TableHead>
-									<TableHead>Çıkış Saati</TableHead>
-									<TableHead className="text-center">Fazla Mesai</TableHead>
-									<TableHead className="text-right">İşlem</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{attendances.map((att) => {
-									const statusInfo = STATUS_LABELS[att.status as AttendanceStatus] || { label: att.status, class: "" };
-									return (
-										<TableRow key={att.id}>
-											<TableCell className="font-medium">
+				<>
+					{/* Mobile Cards (< md) */}
+					<div className="flex flex-col gap-3 md:hidden">
+						{attendances.map((att) => {
+							const statusInfo = STATUS_LABELS[att.status as AttendanceStatus] || { label: att.status, class: "" };
+							return (
+								<Card key={att.id} className="p-3.5 shadow-xs">
+									<div className="flex items-start justify-between gap-2">
+										<div>
+											<p className="font-semibold text-sm">{att.employee_name}</p>
+											<p className="text-xs text-muted-foreground font-mono mt-0.5">
 												{String(att.date).split("T")[0]}
-											</TableCell>
-											<TableCell className="font-semibold">
-												{att.employee_name}
-											</TableCell>
-											<TableCell>
-												<span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusInfo.class}`}>
-													{statusInfo.label}
-												</span>
-											</TableCell>
-											<TableCell className="font-mono text-xs">
-												{att.check_in_time || "-"}
-											</TableCell>
-											<TableCell className="font-mono text-xs">
-												{att.check_out_time || "-"}
-											</TableCell>
-											<TableCell className="text-center">
-												{Number(att.overtime_hours) > 0 ? (
-													<span className="font-semibold text-emerald-600">
-														+{att.overtime_hours} sa ({att.overtime_multiplier}x)
+											</p>
+										</div>
+										<div className="flex items-center gap-1">
+											<span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusInfo.class}`}>
+												{statusInfo.label}
+											</span>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-black dark:text-white"
+												onClick={() => handleOpenEdit(att)}
+											>
+												<Pencil className="h-4 w-4" />
+											</Button>
+											<Button
+												variant="ghost"
+												size="icon"
+												className="h-8 w-8 text-red-500 hover:text-red-600"
+												onClick={() => handleDelete(att.id)}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+									<div className="grid grid-cols-3 gap-2 pt-2.5 mt-2 border-t border-border text-xs">
+										<div>
+											<span className="text-[10px] text-muted-foreground uppercase font-medium">Giriş</span>
+											<p className="font-mono mt-0.5">{att.check_in_time || "-"}</p>
+										</div>
+										<div>
+											<span className="text-[10px] text-muted-foreground uppercase font-medium">Çıkış</span>
+											<p className="font-mono mt-0.5">{att.check_out_time || "-"}</p>
+										</div>
+										<div>
+											<span className="text-[10px] text-muted-foreground uppercase font-medium">Fazla Mesai</span>
+											<p className="font-semibold text-emerald-600 mt-0.5">
+												{Number(att.overtime_hours) > 0 ? `+${att.overtime_hours} sa` : "-"}
+											</p>
+										</div>
+									</div>
+								</Card>
+							);
+						})}
+					</div>
+
+					{/* Desktop Table (>= md) */}
+					<Card className="hidden md:block overflow-hidden">
+						<CardContent className="p-0">
+							<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
+								<TableHeader>
+									<TableRow>
+										<TableHead>Tarih</TableHead>
+										<TableHead>Çalışan</TableHead>
+										<TableHead>Durum</TableHead>
+										<TableHead>Giriş Saati</TableHead>
+										<TableHead>Çıkış Saati</TableHead>
+										<TableHead className="text-center">Fazla Mesai</TableHead>
+										<TableHead className="text-right">İşlem</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{attendances.map((att) => {
+										const statusInfo = STATUS_LABELS[att.status as AttendanceStatus] || { label: att.status, class: "" };
+										return (
+											<TableRow key={att.id}>
+												<TableCell className="font-medium">
+													{String(att.date).split("T")[0]}
+												</TableCell>
+												<TableCell className="font-semibold">
+													{att.employee_name}
+												</TableCell>
+												<TableCell>
+													<span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusInfo.class}`}>
+														{statusInfo.label}
 													</span>
-												) : (
-													"-"
-												)}
-											</TableCell>
-											<TableCell className="text-right">
-												<div className="flex items-center justify-end gap-1">
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
-														onClick={() => handleOpenEdit(att)}
-														title="Puantajı Düzenle"
-													>
-														<Pencil className="h-4 w-4" />
-													</Button>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
-														onClick={() => handleDelete(att.id)}
-														title="Sil"
-													>
-														<Trash2 className="h-4 w-4" />
-													</Button>
-												</div>
-											</TableCell>
-
-										</TableRow>
-									);
-								})}
-							</TableBody>
-						</Table>
-					</CardContent>
-				</Card>
-
+												</TableCell>
+												<TableCell className="font-mono text-xs">
+													{att.check_in_time || "-"}
+												</TableCell>
+												<TableCell className="font-mono text-xs">
+													{att.check_out_time || "-"}
+												</TableCell>
+												<TableCell className="text-center">
+													{Number(att.overtime_hours) > 0 ? (
+														<span className="font-semibold text-emerald-600">
+															+{att.overtime_hours} sa ({att.overtime_multiplier}x)
+														</span>
+													) : (
+														"-"
+													)}
+												</TableCell>
+												<TableCell className="text-right">
+													<div className="flex items-center justify-end gap-1">
+														<Button
+															variant="ghost"
+															size="icon"
+															className="h-8 w-8 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
+															onClick={() => handleOpenEdit(att)}
+															title="Puantajı Düzenle"
+														>
+															<Pencil className="h-4 w-4" />
+														</Button>
+														<Button
+															variant="ghost"
+															size="icon"
+															className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
+															onClick={() => handleDelete(att.id)}
+															title="Sil"
+														>
+															<Trash2 className="h-4 w-4" />
+														</Button>
+													</div>
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</CardContent>
+					</Card>
+				</>
 			)}
 
 			<AttendanceDialog

@@ -64,18 +64,18 @@ export default function AdvancesAndGarnishments() {
 	};
 
 	return (
-		<div className="p-6 space-y-6">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+		<div className="p-3 sm:p-6 space-y-4 sm:space-y-6 min-h-full flex-1 overflow-y-auto">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight">Avans & İcra Takibi</h1>
-					<p className="text-muted-foreground text-sm">
+					<h1 className="text-xl sm:text-2xl font-bold tracking-tight">Avans & İcra Takibi</h1>
+					<p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
 						Çalışan avans talepleri ve icra kesintisi dosyalarını yönetin.
 					</p>
 				</div>
 			</div>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4">
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 					<TabsList className="grid grid-cols-2 w-full sm:w-80">
 						<TabsTrigger value="advances" className="gap-2">
 							<Receipt className="h-4 w-4" /> Avanslar
@@ -85,13 +85,13 @@ export default function AdvancesAndGarnishments() {
 						</TabsTrigger>
 					</TabsList>
 
-					<div>
+					<div className="w-full sm:w-auto">
 						{activeTab === "advances" ? (
-							<Button onClick={() => setAdvanceDialogOpen(true)} className="gap-2">
+							<Button onClick={() => setAdvanceDialogOpen(true)} className="gap-2 w-full sm:w-auto">
 								<Plus className="h-4 w-4" /> Yeni Avans Girişi
 							</Button>
 						) : (
-							<Button onClick={handleOpenNewGarnishment} className="gap-2">
+							<Button onClick={handleOpenNewGarnishment} className="gap-2 w-full sm:w-auto">
 								<Plus className="h-4 w-4" /> Yeni İcra Dosyası
 							</Button>
 						)}
@@ -109,59 +109,105 @@ export default function AdvancesAndGarnishments() {
 							</CardContent>
 						</Card>
 					) : (
-						<Card className="overflow-hidden">
-							<CardContent className="p-0">
-								<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
-									<TableHeader>
-										<TableRow>
-											<TableHead>Tarih</TableHead>
-											<TableHead>Çalışan</TableHead>
-											<TableHead>Tutar</TableHead>
-											<TableHead>Açıklama</TableHead>
-											<TableHead>Durum</TableHead>
-											<TableHead className="text-right">İşlem</TableHead>
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{advances.map((adv) => (
-											<TableRow key={adv.id}>
-												<TableCell className="font-medium">
+						<>
+							{/* Mobile Cards (< md) */}
+							<div className="flex flex-col gap-3 md:hidden">
+								{advances.map((adv) => (
+									<Card key={adv.id} className="p-3.5 shadow-xs">
+										<div className="flex items-start justify-between gap-2">
+											<div>
+												<p className="font-semibold text-sm">{adv.employee_name}</p>
+												<p className="text-xs text-muted-foreground font-mono mt-0.5">
 													{String(adv.request_date).split("T")[0]}
-												</TableCell>
-												<TableCell className="font-semibold">
-													{adv.employee_name}
-												</TableCell>
-												<TableCell className="font-bold text-amber-600">
-													{Number(adv.amount).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-												</TableCell>
-												<TableCell className="text-muted-foreground">
-													{adv.description || "-"}
-												</TableCell>
-												<TableCell>
-													<span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-														adv.status === "DEDUCTED"
-															? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-															: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-													}`}>
-														{adv.status === "DEDUCTED" ? "Maaştan Düşüldü" : "Aktif (Bekliyor)"}
-													</span>
-												</TableCell>
-												<TableCell className="text-right">
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 text-red-500 hover:text-red-600"
-														onClick={() => handleDeleteAdvance(adv.id)}
-													>
-														<Trash2 className="h-4 w-4" />
-													</Button>
-												</TableCell>
+												</p>
+											</div>
+											<div className="flex items-center gap-1.5">
+												<span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+													adv.status === "DEDUCTED"
+														? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+														: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+												}`}>
+													{adv.status === "DEDUCTED" ? "Maaştan Düşüldü" : "Aktif"}
+												</span>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8 text-red-500 hover:text-red-600"
+													onClick={() => handleDeleteAdvance(adv.id)}
+												>
+													<Trash2 className="h-4 w-4" />
+												</Button>
+											</div>
+										</div>
+										<div className="flex items-baseline justify-between pt-2 border-t border-border mt-2 text-xs">
+											<div className="font-bold text-base text-amber-600">
+												{Number(adv.amount).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</div>
+											{adv.description && (
+												<div className="text-muted-foreground truncate max-w-[180px] text-right">
+													{adv.description}
+												</div>
+											)}
+										</div>
+									</Card>
+								))}
+							</div>
+
+							{/* Desktop Table (>= md) */}
+							<Card className="hidden md:block overflow-hidden">
+								<CardContent className="p-0">
+									<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
+										<TableHeader>
+											<TableRow>
+												<TableHead>Tarih</TableHead>
+												<TableHead>Çalışan</TableHead>
+												<TableHead>Tutar</TableHead>
+												<TableHead>Açıklama</TableHead>
+												<TableHead>Durum</TableHead>
+												<TableHead className="text-right">İşlem</TableHead>
 											</TableRow>
-										))}
-									</TableBody>
-								</Table>
-							</CardContent>
-						</Card>
+										</TableHeader>
+										<TableBody>
+											{advances.map((adv) => (
+												<TableRow key={adv.id}>
+													<TableCell className="font-medium">
+														{String(adv.request_date).split("T")[0]}
+													</TableCell>
+													<TableCell className="font-semibold">
+														{adv.employee_name}
+													</TableCell>
+													<TableCell className="font-bold text-amber-600">
+														{Number(adv.amount).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+													</TableCell>
+													<TableCell className="text-muted-foreground">
+														{adv.description || "-"}
+													</TableCell>
+													<TableCell>
+														<span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+															adv.status === "DEDUCTED"
+																? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+																: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+														}`}>
+															{adv.status === "DEDUCTED" ? "Maaştan Düşüldü" : "Aktif (Bekliyor)"}
+														</span>
+													</TableCell>
+													<TableCell className="text-right">
+														<Button
+															variant="ghost"
+															size="icon"
+															className="h-8 w-8 text-red-500 hover:text-red-600"
+															onClick={() => handleDeleteAdvance(adv.id)}
+														>
+															<Trash2 className="h-4 w-4" />
+														</Button>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								</CardContent>
+							</Card>
+						</>
 					)}
 				</TabsContent>
 
@@ -176,89 +222,162 @@ export default function AdvancesAndGarnishments() {
 							</CardContent>
 						</Card>
 					) : (
-						<Card className="overflow-hidden">
-							<CardContent className="p-0">
-								<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
-									<TableHeader>
-										<TableRow>
-											<TableHead>Başlangıç</TableHead>
-											<TableHead>Çalışan</TableHead>
-											<TableHead>İcra Dairesi & Dosya No</TableHead>
-											<TableHead>Toplam Borç</TableHead>
-											<TableHead>Kesinti Mantığı</TableHead>
-											<TableHead>Kesilen / Kalan</TableHead>
-											<TableHead>Durum</TableHead>
-											<TableHead className="text-right">İşlem</TableHead>
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{garnishments.map((gar) => {
-											const rem = Number(gar.remaining_debt) || 0;
-											return (
-												<TableRow key={gar.id}>
-													<TableCell className="font-medium text-xs">
-														{gar.start_date ? String(gar.start_date).split("T")[0] : "-"}
-													</TableCell>
-													<TableCell className="font-semibold">
-														{gar.employee_name}
-													</TableCell>
+						<>
+							{/* Mobile Cards (< md) */}
+							<div className="flex flex-col gap-3 md:hidden">
+								{garnishments.map((gar) => {
+									const rem = Number(gar.remaining_debt) || 0;
+									return (
+										<Card key={gar.id} className="p-3.5 shadow-xs">
+											<div className="flex items-start justify-between gap-2">
+												<div>
+													<p className="font-semibold text-sm">{gar.employee_name}</p>
+													<p className="text-xs text-muted-foreground mt-0.5">
+														{gar.execution_office} · <span className="font-mono">{gar.file_no}</span>
+													</p>
+												</div>
+												<div className="flex items-center gap-1">
+													<span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+														gar.status === "COMPLETED"
+															? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
+															: gar.status === "PAUSED"
+															? "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300"
+															: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
+													}`}>
+														{gar.status === "COMPLETED"
+															? "Tamamlandı"
+															: gar.status === "PAUSED"
+															? "Durduruldu"
+															: "Devam Ediyor"}
+													</span>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 text-black dark:text-white"
+														onClick={() => handleEditGarnishment(gar)}
+													>
+														<Pencil className="h-4 w-4" />
+													</Button>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="h-8 w-8 text-red-500 hover:text-red-600"
+														onClick={() => handleDeleteGarnishment(gar.id)}
+													>
+														<Trash2 className="h-4 w-4" />
+													</Button>
+												</div>
+											</div>
+											<div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-border mt-2 text-xs">
+												<div>
+													<span className="text-[10px] text-muted-foreground uppercase font-medium">Toplam Borç</span>
+													<p className="font-bold text-red-600 mt-0.5">
+														{Number(gar.total_debt).toLocaleString("tr-TR")} ₺
+													</p>
+												</div>
+												<div>
+													<span className="text-[10px] text-muted-foreground uppercase font-medium">Ödenen</span>
+													<p className="font-medium text-emerald-600 mt-0.5">
+														{Number(gar.paid_amount).toLocaleString("tr-TR")} ₺
+													</p>
+												</div>
+												<div>
+													<span className="text-[10px] text-muted-foreground uppercase font-medium">Kalan</span>
+													<p className="font-medium text-red-500 mt-0.5">
+														{rem.toLocaleString("tr-TR")} ₺
+													</p>
+												</div>
+											</div>
+										</Card>
+									);
+								})}
+							</div>
 
-													<TableCell>
-														<div className="font-medium">{gar.execution_office}</div>
-														<div className="text-xs text-muted-foreground font-mono">{gar.file_no}</div>
-													</TableCell>
-													<TableCell className="font-bold text-red-600">
-														{Number(gar.total_debt).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-													</TableCell>
-													<TableCell>
-														{gar.deduction_type === "PERCENTAGE"
-															? `%${gar.deduction_value} Maaş Kesintisi`
-															: `${gar.deduction_value} ₺ Sabit Kesinti`}
-													</TableCell>
-													<TableCell className="text-xs">
-														<div className="text-emerald-600 font-medium">Ödenen: {Number(gar.paid_amount).toLocaleString("tr-TR")} ₺</div>
-														<div className="text-red-500 font-medium">Kalan: {rem.toLocaleString("tr-TR")} ₺</div>
-													</TableCell>
-													<TableCell>
-														<span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-															gar.status === "COMPLETED"
-																? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
-																: gar.status === "PAUSED"
-																? "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300"
-																: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
-														}`}>
-															{gar.status === "COMPLETED"
-																? "Tamamlandı"
-																: gar.status === "PAUSED"
-																? "Durduruldu"
-																: "Devam Ediyor"}
-														</span>
-													</TableCell>
-													<TableCell className="text-right space-x-1">
-														<Button
-															variant="ghost"
-															size="icon"
-															className="h-8 w-8 text-black dark:text-white hover:bg-muted"
-															onClick={() => handleEditGarnishment(gar)}
-														>
-															<Pencil className="h-4 w-4" />
-														</Button>
-														<Button
-															variant="ghost"
-															size="icon"
-															className="h-8 w-8 text-red-500 hover:text-red-600"
-															onClick={() => handleDeleteGarnishment(gar.id)}
-														>
-															<Trash2 className="h-4 w-4" />
-														</Button>
-													</TableCell>
-												</TableRow>
-											);
-										})}
-									</TableBody>
-								</Table>
-							</CardContent>
-						</Card>
+							{/* Desktop Table (>= md) */}
+							<Card className="hidden md:block overflow-hidden">
+								<CardContent className="p-0">
+									<Table className="[&_th]:px-4 [&_th]:py-3.5 [&_td]:px-4 [&_td]:py-3">
+										<TableHeader>
+											<TableRow>
+												<TableHead>Başlangıç</TableHead>
+												<TableHead>Çalışan</TableHead>
+												<TableHead>İcra Dairesi / Dosya No</TableHead>
+												<TableHead>Toplam Borç</TableHead>
+												<TableHead>Kesinti Oranı</TableHead>
+												<TableHead>Ödenen / Kalan</TableHead>
+												<TableHead>Durum</TableHead>
+												<TableHead className="text-right">İşlem</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{garnishments.map((gar) => {
+												const rem = Number(gar.remaining_debt) || 0;
+												return (
+													<TableRow key={gar.id}>
+														<TableCell className="font-medium text-xs">
+															{gar.start_date ? String(gar.start_date).split("T")[0] : "-"}
+														</TableCell>
+														<TableCell className="font-semibold">
+															{gar.employee_name}
+														</TableCell>
+
+														<TableCell>
+															<div className="font-medium">{gar.execution_office}</div>
+															<div className="text-xs text-muted-foreground font-mono">{gar.file_no}</div>
+														</TableCell>
+														<TableCell className="font-bold text-red-600">
+															{Number(gar.total_debt).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+														</TableCell>
+														<TableCell>
+															{gar.deduction_type === "PERCENTAGE"
+																? `%${gar.deduction_value} Maaş Kesintisi`
+																: `${gar.deduction_value} ₺ Sabit Kesinti`}
+														</TableCell>
+														<TableCell className="text-xs">
+															<div className="text-emerald-600 font-medium">Ödenen: {Number(gar.paid_amount).toLocaleString("tr-TR")} ₺</div>
+															<div className="text-red-500 font-medium">Kalan: {rem.toLocaleString("tr-TR")} ₺</div>
+														</TableCell>
+														<TableCell>
+															<span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+																gar.status === "COMPLETED"
+																	? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
+																	: gar.status === "PAUSED"
+																	? "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300"
+																	: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
+															}`}>
+																{gar.status === "COMPLETED"
+																	? "Tamamlandı"
+																	: gar.status === "PAUSED"
+																	? "Durduruldu"
+																	: "Devam Ediyor"}
+															</span>
+														</TableCell>
+														<TableCell className="text-right space-x-1">
+															<Button
+																variant="ghost"
+																size="icon"
+																className="h-8 w-8 text-black dark:text-white hover:bg-muted"
+																onClick={() => handleEditGarnishment(gar)}
+															>
+																<Pencil className="h-4 w-4" />
+															</Button>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="h-8 w-8 text-red-500 hover:text-red-600"
+																onClick={() => handleDeleteGarnishment(gar.id)}
+															>
+																<Trash2 className="h-4 w-4" />
+															</Button>
+														</TableCell>
+													</TableRow>
+												);
+											})}
+										</TableBody>
+									</Table>
+								</CardContent>
+							</Card>
+						</>
 					)}
 				</TabsContent>
 			</Tabs>
