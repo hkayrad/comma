@@ -1,7 +1,8 @@
 {
   "name": "comma-monorepo",
   "private": true,
-  "version": "2.25.2",
+  "version": "2.26.0",
+
   "workspaces": [
     "common",
     "client",
