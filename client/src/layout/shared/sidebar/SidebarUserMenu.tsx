@@ -29,6 +29,9 @@ import {
   Moon,
   Sun,
   Info,
+  User,
+  Building2,
+  Palette,
 } from "lucide-react";
 import {
   SidebarGroup,
@@ -85,6 +88,14 @@ export default function SidebarUserMenu() {
     });
   }, [openDialog, t]);
 
+  const handleNavSettings = useCallback(
+    (tab?: string) => {
+      setOpenMobile(false);
+      navigate(tab ? `/ayarlar?tab=${tab}` : "/ayarlar");
+    },
+    [navigate, setOpenMobile],
+  );
+
   return (
     <SidebarGroup className="p-0!">
       <SidebarGroupContent>
@@ -137,8 +148,25 @@ export default function SidebarUserMenu() {
                 side={isMobile ? "top" : "right"}
                 align={isMobile ? "start" : "end"}
                 sideOffset={8}
-                className="overflow-hidden w-56"
+                className="overflow-hidden w-60"
               >
+                <MenuGroup>
+                  <MenuItem onClick={() => handleNavSettings("hesap")}>
+                    <User className="text-inherit bg-inherit select-none" />
+                    <span>{t("settings.tabs.account")}</span>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavSettings("sirket")}>
+                    <Building2 className="text-inherit bg-inherit select-none" />
+                    <span>{t("settings.tabs.company")}</span>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavSettings("gorunum")}>
+                    <Palette className="text-inherit bg-inherit select-none" />
+                    <span>{t("settings.tabs.appearance")}</span>
+                  </MenuItem>
+                </MenuGroup>
+
+                <MenuSeparator />
+
                 <MenuGroup>
                   <MenuItem
                     onClick={() =>

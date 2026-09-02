@@ -92,28 +92,74 @@ export default function Settings() {
 
       {/* Settings Content */}
       <main className="flex-1 bg-background md:m-2 md:ml-0 md:rounded-xl md:shadow-sm overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 p-8 lg:p-12 lg:px-24">
-          <div className="max-w-5xl mx-auto space-y-12">
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 p-4 sm:p-6 lg:p-12 lg:px-24">
+          <div className="max-w-5xl mx-auto space-y-6 sm:space-y-12">
             {/* Mobile Header & Back Button */}
-            <div className="md:hidden mb-8 flex items-center gap-4">
+            <div className="md:hidden flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="p-2 -ml-2 rounded-full hover:bg-muted active:scale-95 transition-transform"
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+                <h1 className="text-xl font-bold tracking-tight">
+                  {t("sidebar.footer.account.settings")}
+                </h1>
+              </div>
+            </div>
+
+            {/* Mobile Segmented Tab Switcher */}
+            <div className="md:hidden grid grid-cols-3 p-1 bg-muted/60 rounded-xl gap-1">
               <button
-                onClick={() => navigate("/")}
-                className="p-2 -ml-2 rounded-full hover:bg-muted"
+                type="button"
+                onClick={() => onTabChange("hesap")}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-medium transition-all select-none",
+                  activeTab === "hesap"
+                    ? "bg-background text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
-                <ChevronLeft className="size-6" />
+                <User className="size-4 shrink-0" />
+                <span className="truncate">{t("settings.tabs.account")}</span>
               </button>
-              <h1 className="text-2xl font-bold tracking-tight">
-                {t("sidebar.footer.account.settings")}
-              </h1>
+              <button
+                type="button"
+                onClick={() => onTabChange("sirket")}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-medium transition-all select-none",
+                  activeTab === "sirket"
+                    ? "bg-background text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Building2 className="size-4 shrink-0" />
+                <span className="truncate">{t("settings.tabs.company")}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onTabChange("gorunum")}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg text-xs font-medium transition-all select-none",
+                  activeTab === "gorunum"
+                    ? "bg-background text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Palette className="size-4 shrink-0" />
+                <span className="truncate">{t("settings.tabs.appearance")}</span>
+              </button>
             </div>
 
             {activeTab === "hesap" && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                     {t("settings.tabs.account")}
                   </h2>
-                  <p className="text-lg text-muted-foreground mt-1">
+                  <p className="text-sm sm:text-lg text-muted-foreground mt-1">
                     {t("settings.account.description")}
                   </p>
                 </div>
@@ -122,12 +168,12 @@ export default function Settings() {
             )}
 
             {activeTab === "sirket" && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                     {t("settings.tabs.company")}
                   </h2>
-                  <p className="text-lg text-muted-foreground mt-1">
+                  <p className="text-sm sm:text-lg text-muted-foreground mt-1">
                     {t("settings.company.description")}
                   </p>
                 </div>
@@ -136,12 +182,12 @@ export default function Settings() {
             )}
 
             {activeTab === "gorunum" && (
-              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight">
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                     {t("settings.tabs.appearance")}
                   </h2>
-                  <p className="text-lg text-muted-foreground mt-1">
+                  <p className="text-sm sm:text-lg text-muted-foreground mt-1">
                     {t("settings.appearance.description")}
                   </p>
                 </div>

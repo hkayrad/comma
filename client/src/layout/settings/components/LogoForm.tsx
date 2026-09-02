@@ -140,10 +140,10 @@ export default function LogoForm() {
 
   return (
     <div>
-      <div className="flex justify-evenly">
-        <div className="mb-6 flex flex-col gap-2 w-fit">
+      <div className="flex flex-col md:flex-row md:justify-evenly gap-6 md:gap-8 w-full">
+        <div className="flex flex-col gap-2 w-full md:w-fit">
           <div className="flex items-center justify-between">
-            <h2 className="">
+            <h2 className="text-sm font-semibold">
               {t("dialog.accountDetails.logos.small").toString()}
             </h2>
             {canEdit && (smallLogoPreview || logos.smallLogo) && (
@@ -167,7 +167,7 @@ export default function LogoForm() {
             onError={Logger.error}
             multiple={false}
             disabled={!canEdit}
-            className={`${smallLogo && "aspect-square"} w-auto p-6!`}
+            className={`${smallLogo && "aspect-square"} w-full md:w-auto p-6!`}
           >
             <DropzoneEmptyState>
               <div className="flex flex-col items-center justify-center text-center p-4">
@@ -203,9 +203,9 @@ export default function LogoForm() {
             </DropzoneContent>
           </Dropzone>
         </div>
-        <div className="mb-6 flex flex-col gap-2 w-fit col-span-2">
+        <div className="flex flex-col gap-2 w-full md:w-fit">
           <div className="flex items-center justify-between">
-            <h2 className="">
+            <h2 className="text-sm font-semibold">
               {t("dialog.accountDetails.logos.large").toString()}
             </h2>
             {canEdit && (largeLogoPreview || logos.largeLogo) && (
@@ -229,7 +229,7 @@ export default function LogoForm() {
             onError={Logger.error}
             multiple={false}
             disabled={!canEdit}
-            className="w-auto p-6!"
+            className="w-full md:w-auto p-6!"
           >
             <DropzoneEmptyState>
               <div className="flex flex-col items-center justify-center text-center p-4">
@@ -266,7 +266,7 @@ export default function LogoForm() {
           </Dropzone>
         </div>
       </div>
-      <div className="flex justify-end gap-2 col-span-2">
+      <div className="flex justify-end gap-2 mt-6">
         {!isSettingsPage && <CancelButton onClick={onCancel} />}
         {canEdit && (
           <Button onClick={handleUpload}>
