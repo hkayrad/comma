@@ -23,6 +23,8 @@ export class EmployeePayrolls extends Model<InferAttributes<EmployeePayrolls>, I
 	declare net_payable: number;
 	declare payment_status: CreationOptional<string>;
 	declare payment_date: CreationOptional<Date | null>;
+	declare cash_payment_status: CreationOptional<string>;
+	declare cash_payment_date: CreationOptional<Date | null>;
 	declare created_at: CreationOptional<Date>;
 	declare created_by: CreationOptional<string>;
 	declare updated_at: CreationOptional<Date>;
@@ -117,6 +119,16 @@ EmployeePayrolls.init(
 			defaultValue: "DRAFT",
 		},
 		payment_date: {
+			type: DataTypes.DATEONLY,
+			allowNull: true,
+			defaultValue: null,
+		},
+		cash_payment_status: {
+			type: DataTypes.ENUM("DRAFT", "APPROVED", "PAID"),
+			allowNull: false,
+			defaultValue: "DRAFT",
+		},
+		cash_payment_date: {
 			type: DataTypes.DATEONLY,
 			allowNull: true,
 			defaultValue: null,

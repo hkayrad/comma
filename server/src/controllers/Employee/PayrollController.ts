@@ -177,6 +177,10 @@ router.get("/payroll/calculate-preview", asyncHandler(async (req: Request, res: 
 			advance_deduction: Math.round(advanceDeduction * 100) / 100,
 			garnishment_deduction: Math.round(garnishmentDeduction * 100) / 100,
 			net_payable: Math.round(netPayable * 100) / 100,
+			payment_status: existingPayroll?.payment_status || "DRAFT",
+			payment_date: existingPayroll?.payment_date || null,
+			cash_payment_status: existingPayroll?.cash_payment_status || "DRAFT",
+			cash_payment_date: existingPayroll?.cash_payment_date || null,
 		},
 	});
 }));

@@ -106,6 +106,8 @@ export interface EmployeePayroll {
 	net_payable: number;
 	payment_status: PayrollPaymentStatus;
 	payment_date?: string | null;
+	cash_payment_status?: PayrollPaymentStatus;
+	cash_payment_date?: string | null;
 	created_at?: string;
 	updated_at?: string;
 }

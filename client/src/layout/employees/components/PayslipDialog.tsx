@@ -34,16 +34,31 @@ export default function PayslipDialog({ open, onOpenChange, payroll, employee }:
 								Dönem: {payroll.period_month}/{payroll.period_year}
 							</p>
 						</div>
-						<div className="text-right text-xs text-muted-foreground space-y-1">
+						<div className="text-right text-xs text-muted-foreground space-y-1.5">
 							<div>Düzenlenme Tarihi: {new Date().toLocaleDateString("tr-TR")}</div>
-							<div>
-								<span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-									payroll.payment_status === "PAID"
-										? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-										: "bg-amber-100 text-amber-800 border border-amber-300"
-								}`}>
-									{payroll.payment_status === "PAID" ? "ÖDENDİ" : "ÖDENMEDİ"}
-								</span>
+							<div className="flex flex-col gap-1 items-end">
+								<div>
+									<span className="text-[11px] text-muted-foreground mr-1.5">Resmi Banka:</span>
+									<span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+										payroll.payment_status === "PAID"
+											? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+											: "bg-amber-100 text-amber-800 border border-amber-300"
+									}`}>
+										{payroll.payment_status === "PAID" ? "ÖDENDİ" : "ÖDENMEDİ"}
+									</span>
+								</div>
+								{Number(payroll.cash_salary) > 0 && (
+									<div>
+										<span className="text-[11px] text-muted-foreground mr-1.5">Elden Ödeme:</span>
+										<span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+											payroll.cash_payment_status === "PAID"
+												? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+												: "bg-amber-100 text-amber-800 border border-amber-300"
+										}`}>
+											{payroll.cash_payment_status === "PAID" ? "ÖDENDİ" : "ÖDENMEDİ"}
+										</span>
+									</div>
+								)}
 							</div>
 						</div>
 					</div>

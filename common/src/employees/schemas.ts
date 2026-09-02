@@ -78,4 +78,6 @@ export const payrollSchema = z.object({
 	net_payable: z.coerce.number(),
 	payment_status: z.enum(["DRAFT", "APPROVED", "PAID"]).default("DRAFT"),
 	payment_date: z.string().nullish().or(z.literal("")),
+	cash_payment_status: z.enum(["DRAFT", "APPROVED", "PAID"]).default("DRAFT"),
+	cash_payment_date: z.string().nullish().or(z.literal("")),
 });

@@ -14,6 +14,9 @@ ALTER TABLE `companies` ADD COLUMN IF NOT EXISTS `work_end_time` VARCHAR(10) DEF
 ALTER TABLE `employee_garnishments` ADD COLUMN IF NOT EXISTS `start_date` VARCHAR(10) DEFAULT NULL;
 ALTER TABLE `employees` ADD COLUMN IF NOT EXISTS `cash_salary` DECIMAL(15, 2) NOT NULL DEFAULT 0.00;
 ALTER TABLE `employee_payrolls` ADD COLUMN IF NOT EXISTS `cash_salary` DECIMAL(15, 2) NOT NULL DEFAULT 0.00;
+ALTER TABLE `employee_payrolls` ADD COLUMN IF NOT EXISTS `cash_payment_status` ENUM('DRAFT', 'APPROVED', 'PAID') NOT NULL DEFAULT 'DRAFT';
+ALTER TABLE `employee_payrolls` ADD COLUMN IF NOT EXISTS `cash_payment_date` DATE DEFAULT NULL;
+
 
 
 

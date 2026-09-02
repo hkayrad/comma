@@ -70,7 +70,7 @@ export default function Payroll() {
 		setPayslipDialogOpen(true);
 	};
 
-	const handleTogglePaymentStatus = async (payroll: EmployeePayroll) => {
+	const handleToggleBankPaymentStatus = async (payroll: EmployeePayroll) => {
 		const newStatus = payroll.payment_status === "PAID" ? "DRAFT" : "PAID";
 		const newDate = newStatus === "PAID" ? new Date().toISOString().split("T")[0] : null;
 
@@ -82,8 +82,8 @@ export default function Payroll() {
 			});
 			toast.success(
 				newStatus === "PAID"
-					? `${payroll.employee_name} için maaş ödemesi "ÖDENDİ" olarak işaretlendi.`
-					: `${payroll.employee_name} için maaş ödemesi "ÖDENMEDİ" olarak değiştirildi.`
+					? `${payroll.employee_name} için resmi banka ödemesi "ÖDENDİ" olarak işaretlendi.`
+					: `${payroll.employee_name} için resmi banka ödemesi "ÖDENMEDİ" olarak değiştirildi.`
 			);
 			refetch();
 		} catch (err: any) {
@@ -91,6 +91,29 @@ export default function Payroll() {
 			toast.error(errMsg);
 		}
 	};
+
+	const handleToggleCashPaymentStatus = async (payroll: EmployeePayroll) => {
+		const newStatus = payroll.cash_payment_status === "PAID" ? "DRAFT" : "PAID";
+		const newDate = newStatus === "PAID" ? new Date().toISOString().split("T")[0] : null;
+
+		try {
+			await EmployeeApi.SavePayroll({
+				...payroll,
+				cash_payment_status: newStatus,
+				cash_payment_date: newDate,
+			});
+			toast.success(
+				newStatus === "PAID"
+					? `${payroll.employee_name} için elden ödeme "ÖDENDİ" olarak işaretlendi.`
+					: `${payroll.employee_name} için elden ödeme "ÖDENMEDİ" olarak değiştirildi.`
+			);
+			refetch();
+		} catch (err: any) {
+			const errMsg = typeof err === "string" ? err : err?.message || "Elden ödeme durumu güncellenirken hata oluştu";
+			toast.error(errMsg);
+		}
+	};
+
 
 	const handleDelete = async (id: string) => {
 		try {
@@ -219,15 +242,19 @@ export default function Payroll() {
 									<TableHead>Mesai Ücreti</TableHead>
 									<TableHead>Avans Mahsubu</TableHead>
 									<TableHead>İcra Kesintisi</TableHead>
-									<TableHead>Net Ödenecek (Banka)</TableHead>
-									<TableHead className="text-amber-600 dark:text-amber-400">Elden Ödenen</TableHead>
-									<TableHead>Ödeme Durumu</TableHead>
+									<TableHead>Resmi Net (Banka)</TableHead>
+									<TableHead>Banka Durumu</TableHead>
+									<TableHead className="text-amber-600 dark:text-amber-400">Elden Tutar</TableHead>
+									<TableHead className="text-amber-600 dark:text-amber-400">Elden Durumu</TableHead>
 									<TableHead className="text-right">İşlemler</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{payrolls.map((p) => {
-									const isPaid = p.payment_status === "PAID";
+									const isBankPaid = p.payment_status === "PAID";
+									const isCashPaid = p.cash_payment_status === "PAID";
+									const hasCash = Number(p.cash_salary || 0) > 0;
+
 									return (
 										<TableRow key={p.id}>
 											<TableCell className="font-semibold">
@@ -251,28 +278,21 @@ export default function Payroll() {
 											<TableCell className="font-bold text-primary text-base">
 												{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
 											</TableCell>
-											<TableCell className="font-semibold text-amber-600 dark:text-amber-400">
-												{Number(p.cash_salary || 0) > 0 ? (
-													`+${Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺`
-												) : (
-													<span className="text-muted-foreground font-normal text-xs">-</span>
-												)}
-											</TableCell>
 											<TableCell>
 												<Button
 													type="button"
 													variant="outline"
 													size="sm"
-													onClick={() => handleTogglePaymentStatus(p)}
+													onClick={() => handleToggleBankPaymentStatus(p)}
 													className={cn(
 														"h-7 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-colors shadow-none border-none",
-														isPaid
+														isBankPaid
 															? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900"
 															: "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
 													)}
-													title="Tıklayarak ödeme durumunu değiştirin"
+													title="Resmi banka ödeme durumunu değiştirin"
 												>
-													{isPaid ? (
+													{isBankPaid ? (
 														<>
 															<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
 															<span>Ödendi</span>
@@ -285,6 +305,45 @@ export default function Payroll() {
 													)}
 												</Button>
 											</TableCell>
+											<TableCell className="font-semibold text-amber-600 dark:text-amber-400">
+												{hasCash ? (
+													`+${Number(p.cash_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺`
+												) : (
+													<span className="text-muted-foreground font-normal text-xs">-</span>
+												)}
+											</TableCell>
+											<TableCell>
+												{hasCash ? (
+													<Button
+														type="button"
+														variant="outline"
+														size="sm"
+														onClick={() => handleToggleCashPaymentStatus(p)}
+														className={cn(
+															"h-7 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-colors shadow-none border-none",
+															isCashPaid
+																? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900"
+																: "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
+														)}
+														title="Elden ödeme durumunu değiştirin"
+													>
+														{isCashPaid ? (
+															<>
+																<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+																<span>Ödendi</span>
+															</>
+														) : (
+															<>
+																<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+																<span>Ödenmedi</span>
+															</>
+														)}
+													</Button>
+												) : (
+													<span className="text-muted-foreground font-normal text-xs">-</span>
+												)}
+											</TableCell>
+
 
 
 										<TableCell className="text-right space-x-1">
