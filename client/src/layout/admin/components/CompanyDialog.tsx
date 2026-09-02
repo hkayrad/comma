@@ -243,7 +243,7 @@ export default function CompanyDialog(props: Props) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-8"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"
       >
         <FormField
           control={form.control}
@@ -462,7 +462,7 @@ export default function CompanyDialog(props: Props) {
             </FormItem>
           )}
         />
-        <div className="col-span-2 flex justify-end gap-2">
+        <div className="col-span-1 sm:col-span-2 flex justify-end gap-2">
           <CancelButton onClick={onCancel} />
           <Button type="submit">
             {company ? t("vars.save") : t("vars.save")}

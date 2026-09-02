@@ -370,7 +370,7 @@ function PaymentEntry({
         )}
       />
       {!isOnlyEntry && !isEditMode && (
-        <div className="col-span-2 flex justify-end">
+        <div className="col-span-1 sm:col-span-2 flex justify-end">
           <Button
             type="button"
             variant="ghost"

@@ -488,7 +488,7 @@ function DebtEntry({
           </FormItem>
         )}
       />
-      <div className="col-span-2 flex justify-between items-center bg-muted/30 p-2 rounded-md">
+      <div className="col-span-1 sm:col-span-2 flex justify-between items-center bg-muted/30 p-2 rounded-md">
         <div className="text-sm font-medium">
           {t("form.debt.total", {
             total: formatCurrency(total, selectedCurrency),

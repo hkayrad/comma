@@ -65,7 +65,7 @@ export default function PayslipDialog({ open, onOpenChange, payroll, employee }:
 
 
 					{/* Employee info */}
-					<div className="grid grid-cols-2 gap-4 text-sm bg-muted/40 p-3 rounded">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm bg-muted/40 p-3 rounded">
 						<div>
 							<span className="text-muted-foreground text-xs block">Çalışan Ad Soyad</span>
 							<span className="font-semibold">{payroll.employee_name || `${employee?.first_name} ${employee?.last_name}`}</span>
@@ -137,7 +137,7 @@ export default function PayslipDialog({ open, onOpenChange, payroll, employee }:
 
 
 					{/* Signatures */}
-					<div className="grid grid-cols-2 gap-8 pt-8 text-center text-xs text-muted-foreground">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 pt-6 sm:pt-8 text-center text-xs text-muted-foreground">
 						<div>
 							<div className="font-semibold text-foreground mb-8">İşveren / Yetkili İmza</div>
 							<div>______________________</div>

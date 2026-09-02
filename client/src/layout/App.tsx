@@ -25,7 +25,7 @@ export default function App() {
     <div className="selection:bg-foreground selection:text-background min-h-dvh flex flex-col bg-background">
       <SidebarProvider>
         <CommaSidebar />
-        <SidebarInset className="min-h-dvh flex flex-col relative ml-0! pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+        <SidebarInset className="min-h-dvh flex flex-col relative ml-0! max-w-full overflow-x-hidden md:h-[calc(100dvh-1rem)] md:overflow-hidden pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <MaintenanceBanner />
           <CommaCommandPalette />
           <SystemAdminOnly>
@@ -33,7 +33,7 @@ export default function App() {
           </SystemAdminOnly>
           <NonSystemAdminOnly>
             <Header />
-            <main className="flex-1 min-w-0 flex flex-col">
+            <main className="flex-1 min-w-0 max-w-full flex flex-col overflow-x-hidden">
               <Outlet />
             </main>
             <MobileBottomNav />

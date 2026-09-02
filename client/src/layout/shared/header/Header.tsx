@@ -78,7 +78,7 @@ export default function Header() {
   const currentTitle = breadcrumbItems[breadcrumbItems.length - 1]?.name;
 
   return (
-    <header className="border-b p-2.5 md:p-3 bg-background sticky top-0 z-10">
+    <header className="border-b p-2.5 md:p-3 bg-background sticky top-0 z-10 md:rounded-tl-xl md:rounded-tr-xl">
       <div className="flex w-full items-center gap-2">
         <Tooltip disableHoverablePopup>
           <TooltipTrigger

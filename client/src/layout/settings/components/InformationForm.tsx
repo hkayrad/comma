@@ -189,7 +189,7 @@ export default function InformationForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-8"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8"
       >
         <FormField
           control={form.control}
@@ -485,7 +485,7 @@ export default function InformationForm() {
             </FormItem>
           )}
         />
-        <div className="flex justify-end gap-2 col-span-2">
+        <div className="flex justify-end gap-2 col-span-1 sm:col-span-2">
 
           {!isSettingsPage && <CancelButton onClick={onCancel} />}
           {canEdit && <Button type="submit">{t("vars.save")}</Button>}

@@ -211,7 +211,7 @@ export default function CommaTable(props: Props) {
   return (
     <>
       {!hideHeader && (
-        <div className="sticky -top-4 z-20 pb-2 bg-background">
+        <div className="sticky -top-4 z-20 pb-2 bg-background w-full max-w-full min-w-0">
           <CommaTableHeader
             table={table}
             searchColumn={searchColumn}
@@ -278,17 +278,18 @@ export default function CommaTable(props: Props) {
             table={table}
             isPortal={isPortal}
             contextMenuItems={contextMenuItems}
+            translationPrefix={translationPrefix}
           />
         </div>
       )}
       <div
         className={cn(
-          "rounded-md border overflow-clip",
+          "rounded-md border overflow-clip w-full max-w-full min-w-0",
           viewMode === "cards" ? "hidden md:block" : "block"
         )}
         data-table-export
       >
-        <div className="overflow-auto max-h-[calc(100dvh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
+        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100dvh-15.25rem)] scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500 w-full max-w-full">
           <table className="w-full caption-bottom text-sm border-collapse">
             <TableHeader className="select-none z-10 bg-background sticky top-0 shadow-sm">
               {table.getHeaderGroups().map((headerGroup) => (

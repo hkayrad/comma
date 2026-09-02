@@ -113,8 +113,8 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-						<div className="grid grid-cols-2 gap-4">
-							<div className="col-span-2">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="col-span-1 sm:col-span-2">
 								<FormField
 									control={form.control}
 									name="employee_id"
@@ -174,7 +174,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 									<FormItem>
 										<FormLabel>Toplam Borç (TL) *</FormLabel>
 										<FormControl>
-											<Input type="number" step="0.01" placeholder="40000" {...field} />
+											<Input type="number" inputMode="decimal" step="0.01" placeholder="40000" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -195,8 +195,6 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 								)}
 							/>
 
-
-
 							<FormField
 								control={form.control}
 								name="deduction_type"
@@ -216,7 +214,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 								)}
 							/>
 
-							<div className="col-span-2">
+							<div className="col-span-1 sm:col-span-2">
 								<FormField
 									control={form.control}
 									name="deduction_value"
@@ -230,6 +228,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 											<FormControl>
 												<Input
 													type="number"
+													inputMode="decimal"
 													step="0.01"
 													placeholder={deductionType === "PERCENTAGE" ? "25" : "5000"}
 													{...field}
@@ -242,7 +241,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 							</div>
 
 							{isEdit && (
-								<div className="col-span-2">
+								<div className="col-span-1 sm:col-span-2">
 									<FormField
 										control={form.control}
 										name="status"
@@ -264,9 +263,7 @@ export default function GarnishmentDialog({ open, onOpenChange, employees, garni
 								</div>
 							)}
 
-
-
-							<div className="col-span-2">
+							<div className="col-span-1 sm:col-span-2">
 								<FormField
 									control={form.control}
 									name="notes"

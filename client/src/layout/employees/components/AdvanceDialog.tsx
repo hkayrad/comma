@@ -58,8 +58,8 @@ export default function AdvanceDialog({ open, onOpenChange, employees, onSuccess
 
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-						<div className="grid grid-cols-2 gap-4">
-							<div className="col-span-2">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="col-span-1 sm:col-span-2">
 								<FormField
 									control={form.control}
 									name="employee_id"
@@ -93,7 +93,7 @@ export default function AdvanceDialog({ open, onOpenChange, employees, onSuccess
 									<FormItem>
 										<FormLabel>Avans Tutarı (TL) *</FormLabel>
 										<FormControl>
-											<Input type="number" step="0.01" placeholder="5000" {...field} />
+											<Input type="number" inputMode="decimal" step="0.01" placeholder="5000" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -112,7 +112,7 @@ export default function AdvanceDialog({ open, onOpenChange, employees, onSuccess
 								)}
 							/>
 
-							<div className="col-span-2">
+							<div className="col-span-1 sm:col-span-2">
 								<FormField
 									control={form.control}
 									name="description"

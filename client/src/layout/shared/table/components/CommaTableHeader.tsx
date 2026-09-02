@@ -394,8 +394,8 @@ export default function CommaTableHeader(props: Props) {
   return (
     <>
       {/* Mobile Toolbar (< md) */}
-      <div className="flex flex-col gap-2 md:hidden">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 md:hidden w-full max-w-full min-w-0">
+        <div className="flex items-center gap-1.5 w-full min-w-0">
           {!isPortal && (
             <InputGroup className="bg-background flex-1 min-w-0">
               <InputGroupAddon>
@@ -554,7 +554,7 @@ export default function CommaTableHeader(props: Props) {
       </div>
 
       {/* Desktop Toolbar (>= md) */}
-      <div className="hidden md:flex items-center gap-2">
+      <div className="hidden md:flex flex-wrap items-center justify-between gap-2 w-full max-w-full min-w-0">
         <ButtonGroup>
           {!isPortal && (
             <Tooltip>

@@ -118,12 +118,12 @@ export default function AddButton() {
                     {...props}
                     nativeButton
                     size="default"
-                    // className="fixed bottom-4 right-4 z-50"
+                    className="gap-1.5 px-2.5 sm:px-4"
                   >
                     <Plus
                       className={`transition-transform duration-300 ease ${isMenuOpen ? `-rotate-45` : `rotate-0`}`}
                     />
-                    {t("dashboard.addButton.label")}
+                    <span className="hidden sm:inline">{t("dashboard.addButton.label")}</span>
                   </Button>
                 )}
               ></MenuTrigger>

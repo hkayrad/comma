@@ -26,7 +26,7 @@ export default function AuditLogDetailsDialog({ log }: Props) {
 
   return (
     <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto p-1">
-      <div className="grid grid-cols-2 gap-4 text-sm bg-muted/40 p-3 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm bg-muted/40 p-3 rounded-lg border border-border">
         <div>
           <span className="text-muted-foreground font-medium">{t("audit.field.action", { defaultValue: "İşlem" })}:</span>{" "}
           {getActionBadge(log.action)}
