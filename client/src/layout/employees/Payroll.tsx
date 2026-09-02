@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AnimateSelect from "./components/AnimateSelect";
 
-import { Calculator, FileText, Trash2 } from "lucide-react";
+import { Calculator, FileText, Trash2, CheckCircle2, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import PayslipDialog from "./components/PayslipDialog";
@@ -67,6 +68,28 @@ export default function Payroll() {
 	const handleOpenPayslip = (payroll: EmployeePayroll) => {
 		setSelectedPayroll(payroll);
 		setPayslipDialogOpen(true);
+	};
+
+	const handleTogglePaymentStatus = async (payroll: EmployeePayroll) => {
+		const newStatus = payroll.payment_status === "PAID" ? "DRAFT" : "PAID";
+		const newDate = newStatus === "PAID" ? new Date().toISOString().split("T")[0] : null;
+
+		try {
+			await EmployeeApi.SavePayroll({
+				...payroll,
+				payment_status: newStatus,
+				payment_date: newDate,
+			});
+			toast.success(
+				newStatus === "PAID"
+					? `${payroll.employee_name} için maaş ödemesi "ÖDENDİ" olarak işaretlendi.`
+					: `${payroll.employee_name} için maaş ödemesi "ÖDENMEDİ" olarak değiştirildi.`
+			);
+			refetch();
+		} catch (err: any) {
+			const errMsg = typeof err === "string" ? err : err?.message || "Ödeme durumu güncellenirken hata oluştu";
+			toast.error(errMsg);
+		}
 	};
 
 	const handleDelete = async (id: string) => {
@@ -182,33 +205,64 @@ export default function Payroll() {
 									<TableHead>Avans Mahsubu</TableHead>
 									<TableHead>İcra Kesintisi</TableHead>
 									<TableHead>Net Ödenecek</TableHead>
+									<TableHead>Ödeme Durumu</TableHead>
 									<TableHead className="text-right">İşlemler</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{payrolls.map((p) => (
-									<TableRow key={p.id}>
-										<TableCell className="font-semibold">
-											{p.employee_name}
-										</TableCell>
-										<TableCell>
-											{Number(p.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-										</TableCell>
-										<TableCell className="text-red-500 font-medium">
-											-{Number(p.absence_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ ({p.absent_days}g)
-										</TableCell>
-										<TableCell className="text-emerald-600 font-medium">
-											+{Number(p.overtime_pay).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-										</TableCell>
-										<TableCell className="text-amber-600 font-medium">
-											-{Number(p.advance_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-										</TableCell>
-										<TableCell className="text-red-600 font-medium">
-											-{Number(p.garnishment_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-										</TableCell>
-										<TableCell className="font-bold text-primary text-base">
-											{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
-										</TableCell>
+								{payrolls.map((p) => {
+									const isPaid = p.payment_status === "PAID";
+									return (
+										<TableRow key={p.id}>
+											<TableCell className="font-semibold">
+												{p.employee_name}
+											</TableCell>
+											<TableCell>
+												{Number(p.base_salary).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</TableCell>
+											<TableCell className="text-red-500 font-medium">
+												-{Number(p.absence_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺ ({p.absent_days}g)
+											</TableCell>
+											<TableCell className="text-emerald-600 font-medium">
+												+{Number(p.overtime_pay).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</TableCell>
+											<TableCell className="text-amber-600 font-medium">
+												-{Number(p.advance_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</TableCell>
+											<TableCell className="text-red-600 font-medium">
+												-{Number(p.garnishment_deduction).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</TableCell>
+											<TableCell className="font-bold text-primary text-base">
+												{Number(p.net_payable).toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ₺
+											</TableCell>
+											<TableCell>
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													onClick={() => handleTogglePaymentStatus(p)}
+													className={cn(
+														"h-7 px-2.5 rounded-full text-xs font-semibold gap-1.5 transition-colors shadow-none border-none",
+														isPaid
+															? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900"
+															: "bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
+													)}
+													title="Tıklayarak ödeme durumunu değiştirin"
+												>
+													{isPaid ? (
+														<>
+															<CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+															<span>Ödendi</span>
+														</>
+													) : (
+														<>
+															<Clock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+															<span>Ödenmedi</span>
+														</>
+													)}
+												</Button>
+											</TableCell>
+
 										<TableCell className="text-right space-x-1">
 											<Button
 												variant="outline"
@@ -228,8 +282,10 @@ export default function Payroll() {
 											</Button>
 										</TableCell>
 									</TableRow>
-								))}
+									);
+								})}
 							</TableBody>
+
 						</Table>
 					</CardContent>
 				</Card>

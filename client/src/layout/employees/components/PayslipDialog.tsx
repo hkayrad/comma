@@ -34,10 +34,20 @@ export default function PayslipDialog({ open, onOpenChange, payroll, employee }:
 								Dönem: {payroll.period_month}/{payroll.period_year}
 							</p>
 						</div>
-						<div className="text-right text-xs text-muted-foreground">
+						<div className="text-right text-xs text-muted-foreground space-y-1">
 							<div>Düzenlenme Tarihi: {new Date().toLocaleDateString("tr-TR")}</div>
+							<div>
+								<span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+									payroll.payment_status === "PAID"
+										? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+										: "bg-amber-100 text-amber-800 border border-amber-300"
+								}`}>
+									{payroll.payment_status === "PAID" ? "ÖDENDİ" : "ÖDENMEDİ"}
+								</span>
+							</div>
 						</div>
 					</div>
+
 
 					{/* Employee info */}
 					<div className="grid grid-cols-2 gap-4 text-sm bg-muted/40 p-3 rounded">
