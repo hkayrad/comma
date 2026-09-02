@@ -75,8 +75,8 @@ export default function PortalLogin() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-      <div className="w-full max-w-md p-8 space-y-8 bg-card border rounded-xl shadow-lg">
+    <div className="flex flex-col items-center justify-center min-h-dvh p-4 bg-background">
+      <div className="w-full max-w-md p-5 sm:p-8 space-y-6 sm:space-y-8 bg-card border rounded-xl shadow-lg">
         <div className="flex flex-col items-center space-y-4">
           <CommaImage
             src={
@@ -85,12 +85,12 @@ export default function PortalLogin() {
                 : "/logo.webp"
             }
             alt={companyInfo?.name || "Company Logo"}
-            className="w-48 h-32 object-contain bg-transparent"
+            className="w-40 sm:w-48 h-28 sm:h-32 object-contain bg-transparent"
           />
-          <h1 className="text-2xl font-bold text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-center">
             {companyInfo?.name || "Müşteri Portalı"}
           </h1>
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center">
             Hesap ekstrenizi görüntülemek için giriş yapın
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function PortalLogin() {
                   <FormLabel>VKN / TCKN</FormLabel>
                   <FormControl>
                     <InputGroup>
-                      <InputGroupInput placeholder="Vergi No veya TCKN giriniz" {...field} />
+                      <InputGroupInput placeholder="Vergi No veya TCKN giriniz" inputMode="numeric" {...field} />
                       <InputGroupAddon align="inline-start">
                         <User className="text-muted-foreground" />
                       </InputGroupAddon>

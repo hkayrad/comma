@@ -180,103 +180,109 @@ export default function Login() {
   return (
     <>
       <MaintenanceBanner />
-      <div className="grid grid-cols-1 grid-rows-[auto_5fr] h-screen w-screen lg:grid-cols-2 selection:bg-foreground selection:text-background">
-        <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-8 lg:py-0">
+      <div className="grid grid-cols-1 grid-rows-[auto_1fr] min-h-dvh w-full lg:h-screen lg:grid-cols-2 selection:bg-foreground selection:text-background relative">
+        <div className="bg-primary-400 flex justify-center items-center h-fit lg:h-screen py-6 lg:py-0">
           <CommaImage
             src="/logo.webp"
             alt="Comma Logo"
             fetchPriority="high"
             loading="eager"
-            containerClassName="w-64 lg:w-96 bg-transparent"
+            containerClassName="w-44 sm:w-64 lg:w-96 bg-transparent"
             className="saturate-0 brightness-0 invert object-contain"
           />
         </div>
-        <Tooltip disableHoverablePopup>
-          <TooltipTrigger
-            render={(props) => (
-              <Button
-                {...props}
-                nativeButton
-                size="icon"
-                className="absolute bottom-4 right-4"
-                onClick={handleInfo}
-              >
-                <InfoIcon />
-              </Button>
-            )}
-          />
-          <TooltipContent side="left">{t("sidebar.footer.info.label")}</TooltipContent>
-        </Tooltip>
-        <Tooltip disableHoverablePopup>
-          <TooltipTrigger
-            render={(props) => (
-              <Button
-                {...props}
-                nativeButton
-                size="icon"
-                className="absolute bottom-16 right-4"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                {theme === "dark" ? (
-                  <Sun className="text-inherit select-none" />
-                ) : (
-                  <Moon className="text-inherit select-none" />
+
+        {/* Floating utility controls: top right on mobile, bottom right on desktop */}
+        <div className="fixed top-4 right-4 md:top-auto md:bottom-4 md:right-4 z-50 flex flex-row md:flex-col items-center gap-2">
+          {import.meta.env.DEV && (
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <Button
+                    {...props}
+                    nativeButton
+                    size="icon"
+                    onClick={demoLogin}
+                  >
+                    <User />
+                  </Button>
                 )}
-              </Button>
-            )}
-          />
-          <TooltipContent side="left">{t("login.changeTheme")}</TooltipContent>
-        </Tooltip>
-        <Menu>
+              />
+              <TooltipContent side="left">
+                {t("login.demoCredentials")}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          <Menu>
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(props) => (
+                  <MenuTrigger
+                    {...props}
+                    render={(props) => (
+                      <Button {...props} size="icon">
+                        <Globe />
+                      </Button>
+                    )}
+                  />
+                )}
+              />
+              <TooltipContent side="left">
+                {t("login.changeLanguage")}
+              </TooltipContent>
+            </Tooltip>
+            <MenuPanel align="end">
+              {supportedLanguages.map((lang) => (
+                <MenuItem
+                  key={lang.code}
+                  onClick={() => i18n.changeLanguage(lang.code)}
+                >
+                  {lang.flag}
+                  {lang.label}
+                </MenuItem>
+              ))}
+            </MenuPanel>
+          </Menu>
+
           <Tooltip disableHoverablePopup>
             <TooltipTrigger
               render={(props) => (
-                <MenuTrigger
+                <Button
                   {...props}
-                  className="absolute bottom-28 right-4"
-                  render={(props) => (
-                    <Button {...props} size="icon">
-                      <Globe />
-                    </Button>
+                  nativeButton
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <Sun className="text-inherit select-none" />
+                  ) : (
+                    <Moon className="text-inherit select-none" />
                   )}
-                />
+                </Button>
               )}
             />
-            <TooltipContent side="left">
-              {t("login.changeLanguage")}
-            </TooltipContent>
+            <TooltipContent side="left">{t("login.changeTheme")}</TooltipContent>
           </Tooltip>
-          <MenuPanel align="end">
-            {supportedLanguages.map((lang) => (
-              <MenuItem
-                key={lang.code}
-                onClick={() => i18n.changeLanguage(lang.code)}
-              >
-                {lang.flag}
-                {lang.label}
-              </MenuItem>
-            ))}
-          </MenuPanel>
-        </Menu>
-        <Tooltip disableHoverablePopup>
-          <TooltipTrigger
-            render={(props) => (
-              <Button
-                {...props}
-                nativeButton
-                size="icon"
-                className="absolute bottom-40 right-4"
-                onClick={demoLogin}
-              >
-                <User />
-              </Button>
-            )}
-          />
-          <TooltipContent side="left">
-            {t("login.demoCredentials")}
-          </TooltipContent>
-        </Tooltip>
-        <div className="flex flex-col mt-24 lg:mt-0 lg:justify-center items-center h-full">
+
+          <Tooltip disableHoverablePopup>
+            <TooltipTrigger
+              render={(props) => (
+                <Button
+                  {...props}
+                  nativeButton
+                  size="icon"
+                  onClick={handleInfo}
+                >
+                  <InfoIcon />
+                </Button>
+              )}
+            />
+            <TooltipContent side="left">{t("sidebar.footer.info.label")}</TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="flex flex-col justify-center items-center py-6 sm:py-12 px-4 h-full">
           {requires2FA && tempToken ? (
             <TwoFactorVerify
               tempToken={tempToken}
