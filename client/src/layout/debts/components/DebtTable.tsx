@@ -514,67 +514,110 @@ export default function DebtTable(props: Props) {
         id: "actions",
         header: t("debt.table.column.actions"),
         cell: ({ row }) => (
-          <div className="flex gap-2">
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onAddPayment(row.original)}
-                  >
-                    <Wallet />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t(
-                  type === "receivable"
-                    ? "dashboard.addButton.actions.receivable.addPayment"
-                    : "dashboard.addButton.actions.payable.addPayment",
-                )}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(row.original.id!)}
-                  >
-                    <Pencil />
-                  </Button>
-                )}
-              ></TooltipTrigger>
-              <TooltipContent>
-                {t("debt.table.column.actions.edit")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                    onClick={() => confirmDelete(row.original.id!)}
-                  >
-                    <Trash2 />
-                  </Button>
-                )}
-              />
-              <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                {t("debt.table.column.actions.delete")}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <>
+            {/* Desktop: standard inline buttons */}
+            <div className="hidden md:flex gap-1 items-center">
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onAddPayment(row.original)}
+                    >
+                      <Wallet />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t(
+                    type === "receivable"
+                      ? "dashboard.addButton.actions.receivable.addPayment"
+                      : "dashboard.addButton.actions.payable.addPayment",
+                  )}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(row.original.id!)}
+                    >
+                      <Pencil />
+                    </Button>
+                  )}
+                ></TooltipTrigger>
+                <TooltipContent>
+                  {t("debt.table.column.actions.edit")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                      onClick={() => confirmDelete(row.original.id!)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  )}
+                />
+                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                  {t("debt.table.column.actions.delete")}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            {/* Mobile: primary payment action button like on dashboard + edit/delete */}
+            <div className="flex md:hidden items-center justify-between gap-1.5 w-full">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2.5 gap-1.5 text-xs font-medium shrink-0 select-none border-emerald-500/20 hover:bg-emerald-500/5 hover:border-emerald-500/40 text-foreground"
+                  onClick={() => onAddPayment(row.original)}
+                >
+                  <Wallet className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t("vars.payment")}</span>
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
+                  onClick={() => onEdit(row.original.id!)}
+                >
+                  <Pencil className="size-4" />
+                  <span className="sr-only">
+                    {t("debt.table.column.actions.edit")}
+                  </span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                  onClick={() => confirmDelete(row.original.id!)}
+                >
+                  <Trash2 className="size-4" />
+                  <span className="sr-only">
+                    {t("debt.table.column.actions.delete")}
+                  </span>
+                </Button>
+              </div>
+            </div>
+          </>
         ),
       },
     ] as ColumnDef<DebtDto>[]).filter((c) => {
