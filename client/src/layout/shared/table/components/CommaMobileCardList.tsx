@@ -11,6 +11,7 @@ type Props = {
   contextMenuItems?: (row: any) => React.ReactNode;
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
+  type?: "receivable" | "payable";
   hasMore?: boolean;
   onLoadMore?: () => void;
   isLoadingMore?: boolean;
@@ -166,29 +167,41 @@ export default function CommaMobileCardList({
             c.column.id !== primaryTitleCell?.column.id
         );
 
+        // Check row currency
+        const rowCurrency =
+          row.getValue("currency") ||
+          row.original?.currency ||
+          "TRY";
+        const isTRY =
+          rowCurrency === "TRY" ||
+          rowCurrency === "TL" ||
+          rowCurrency === "₺";
+
         // Primary Amount Cell (Priority: total > remaining_debt > amount)
         const primaryAmountCell =
           visibleCells.find((c) => c.column.id === "total") ||
           visibleCells.find((c) => c.column.id === "remaining_debt") ||
           visibleCells.find((c) => c.column.id === "amount");
 
-        // Secondary Amount Cell
+        // Secondary Amount Cell (Never use converted amount_in_try if already in TRY)
         const secondaryAmountCell = visibleCells.find(
           (c) =>
             c.column.id !== primaryAmountCell?.column.id &&
             (c.column.id === "remaining_debt" ||
               c.column.id === "total_debt" ||
               c.column.id === "amount" ||
-              c.column.id === "amount_in_try")
+              (!isTRY && c.column.id === "amount_in_try"))
         );
 
-        // Total in TRY (if foreign currency)
-        const totalInTryCell = visibleCells.find(
-          (c) =>
-            c.column.id === "total_in_try" &&
-            c.column.id !== primaryAmountCell?.column.id &&
-            c.column.id !== secondaryAmountCell?.column.id
-        );
+        // Total in TRY (Only show converted value if original currency is foreign, never for TL)
+        const totalInTryCell = !isTRY
+          ? visibleCells.find(
+              (c) =>
+                c.column.id === "total_in_try" &&
+                c.column.id !== primaryAmountCell?.column.id &&
+                c.column.id !== secondaryAmountCell?.column.id
+            )
+          : null;
 
         // Date cells
         const dueDateCell = visibleCells.find((c) => c.column.id === "due_date");
@@ -225,11 +238,12 @@ export default function CommaMobileCardList({
           "debt_status",
           "status",
           "is_company",
+          "total_in_try",
+          "amount_in_try",
           primaryTitleCell?.column.id,
           secondaryTitleCell?.column.id,
           primaryAmountCell?.column.id,
           secondaryAmountCell?.column.id,
-          totalInTryCell?.column.id,
           dueDateCell?.column.id,
           issueDateCell?.column.id,
           lastPaymentDateCell?.column.id,
