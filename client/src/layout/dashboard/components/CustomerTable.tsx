@@ -822,6 +822,8 @@ export default function CustomerTable(props: Props) {
       data={data}
       columns={CustomerTableColumns}
       searchColumn="name"
+      type={type}
+      translationPrefix="dashboard"
       tags={tags}
       rowCount={rowCount}
       pagination={pagination}

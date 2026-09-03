@@ -694,6 +694,8 @@ export default function DebtTable(props: Props) {
     <CommaTable
       data={data}
       columns={DebtTableColumns}
+      type={type}
+      translationPrefix="debt"
       tags={tags}
       searchColumn="customer_name"
       rowCount={rowCount}

@@ -562,6 +562,8 @@ export default function PaymentTable(props: Props) {
     <CommaTable
       data={data}
       columns={PaymentTableColumns}
+      type={type}
+      translationPrefix="payment"
       searchColumn="customer_name"
       tags={tags}
       rowCount={rowCount}

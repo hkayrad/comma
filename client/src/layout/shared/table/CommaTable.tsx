@@ -74,6 +74,7 @@ type Props = {
   readOnly?: boolean;
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
+  type?: "receivable" | "payable";
   hideHeader?: boolean;
   onBulkDelete?: (selectedRows: any[]) => void;
   enableRowSelection?: boolean;
@@ -102,6 +103,7 @@ export default function CommaTable(props: Props) {
     readOnly,
     isPortal,
     translationPrefix,
+    type,
     hideHeader,
     hasMore,
     onLoadMore,
@@ -285,6 +287,7 @@ export default function CommaTable(props: Props) {
             isPortal={isPortal}
             contextMenuItems={contextMenuItems}
             translationPrefix={translationPrefix}
+            type={type}
             hasMore={isServerSide ? hasMore : (hasMore ?? (table.getRowModel().rows.length < data.length))}
             onLoadMore={isServerSide ? onLoadMore : (onLoadMore ?? (() => {
               setInternalPagination((prev) => ({
