@@ -32,8 +32,8 @@ import {
   User,
   Building2,
   Palette,
-  Globe,
 } from "lucide-react";
+import { TR, US } from "country-flag-icons/react/3x2";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -152,19 +152,27 @@ export default function SidebarUserMenu() {
             <span className="leading-none text-[10px] font-medium">{theme === "dark" ? "Açık" : "Koyu"}</span>
           </Button>
 
-          {/* Language Toggle */}
+          {/* Language Toggle with Flag */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
-              const nextLang = i18n.language === "tr" ? "en" : "tr";
+              const nextLang = i18n.language?.startsWith("tr") ? "en" : "tr";
               i18n.changeLanguage(nextLang);
             }}
             className="flex flex-col items-center justify-center h-12 p-1 gap-1 text-[10px] text-muted-foreground hover:text-foreground rounded-lg"
             title={t("sidebar.footer.account.language")}
           >
-            <Globe className="size-4" />
-            <span className="leading-none text-[10px] uppercase font-bold">{i18n.language}</span>
+            <div className="w-5 h-3.5 overflow-hidden rounded-[2px] inline-flex items-center justify-center border border-border/50 shadow-2xs shrink-0">
+              {i18n.language?.startsWith("tr") ? (
+                <TR className="w-full h-full object-cover" />
+              ) : (
+                <US className="w-full h-full object-cover" />
+              )}
+            </div>
+            <span className="leading-none text-[10px] uppercase font-bold text-foreground">
+              {i18n.language?.startsWith("tr") ? "TR" : "EN"}
+            </span>
           </Button>
 
           {/* Info Dialog */}

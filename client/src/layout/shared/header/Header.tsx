@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/tooltip";
 import ExchangeRates from "./components/ExchangeRates";
 import { Button } from "@/components/ui/button";
-import { SidebarClose, SidebarOpen, Menu } from "lucide-react";
+import { SidebarClose, SidebarOpen } from "lucide-react";
 import { useSidebar } from "@/components/animate-ui/components/radix/sidebar";
 import {
   Breadcrumb,
@@ -89,12 +89,9 @@ export default function Header() {
                 onClick={toggleSidebar}
                 size="icon"
                 variant="ghost"
-                className="size-8 shrink-0"
+                className="hidden md:inline-flex size-8 shrink-0"
               >
-                <span className="md:hidden flex items-center justify-center">
-                  <Menu className="w-5 h-5" />
-                </span>
-                <span className="hidden md:flex items-center justify-center">
+                <span className="flex items-center justify-center">
                   {state === "collapsed" ? <SidebarOpen className="w-4 h-4" /> : <SidebarClose className="w-4 h-4" />}
                 </span>
               </Button>
