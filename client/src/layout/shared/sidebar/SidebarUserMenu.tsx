@@ -33,7 +33,7 @@ import {
   Building2,
   Palette,
 } from "lucide-react";
-import { TR, US } from "country-flag-icons/react/3x2";
+import { TR, GB } from "country-flag-icons/react/3x2";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -167,7 +167,7 @@ export default function SidebarUserMenu() {
               {i18n.language?.startsWith("tr") ? (
                 <TR className="w-full h-full object-cover" />
               ) : (
-                <US className="w-full h-full object-cover" />
+                <GB className="w-full h-full object-cover" />
               )}
             </div>
             <span className="leading-none text-[10px] uppercase font-bold text-foreground">

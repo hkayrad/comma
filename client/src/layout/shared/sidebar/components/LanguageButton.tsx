@@ -7,7 +7,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
 import { supportedLanguages } from "@/lib/supportedLanguages";
-import { TR, US } from "country-flag-icons/react/3x2";
+import { TR, GB } from "country-flag-icons/react/3x2";
 
 export default function LanguageButton() {
   const { t, i18n } = useTranslation();
@@ -17,7 +17,7 @@ export default function LanguageButton() {
     <MenuSubmenu>
       <MenuSubmenuTrigger className="gap-2">
         <span className="w-4 h-3 overflow-hidden rounded-[2px] inline-flex items-center justify-center border border-border/50 shrink-0 shadow-2xs">
-          {isTr ? <TR className="w-full h-full object-cover" /> : <US className="w-full h-full object-cover" />}
+          {isTr ? <TR className="w-full h-full object-cover" /> : <GB className="w-full h-full object-cover" />}
         </span>
         <span className="flex-1 text-left">{t("sidebar.footer.account.language")}</span>
         <span className="text-[11px] font-semibold text-muted-foreground uppercase mr-1">
