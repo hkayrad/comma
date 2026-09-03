@@ -67,14 +67,14 @@ export default function CommaSidebar() {
       <SidebarFooter className="pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-2">
         <SyncStatus />
         {/* Unified Settings */}
-        <SidebarMenu>
+        <SidebarMenu className="gap-1 md:gap-0.5">
           <SidebarMenuItem>
             <Tooltip disableHoverablePopup>
               <TooltipTrigger
                 render={(props) => (
-                  <SidebarMenuButton {...props} onClick={handleSettings} className="h-10 md:h-8">
-                    <Settings />
-                    <span className="select-none">
+                  <SidebarMenuButton {...props} onClick={handleSettings} className="h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3">
+                    <Settings className="size-5 md:size-4 shrink-0" />
+                    <span className="select-none flex-1 truncate">
                       {t("sidebar.footer.account.settings")}
                     </span>
                   </SidebarMenuButton>
@@ -85,43 +85,51 @@ export default function CommaSidebar() {
               </TooltipContent>
             </Tooltip>
           </SidebarMenuItem>
-        </SidebarMenu>
 
-        {/* Notifications button for upcoming due dates */}
-        <Popover>
-          <Tooltip disableHoverablePopup>
-            <TooltipTrigger
-              render={(props) => (
-                <PopoverTrigger
-                  {...props}
-                  render={(popoverProps) => (
-                    <SidebarMenuButton {...popoverProps} className="h-10 md:h-8">
-                      <div className="relative">
-                        <Bell className="h-4 w-4" />
-                        {upcomingPaymentsCount > 0 && (
-                          <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-sidebar" />
-                        )}
-                      </div>
-                      <span className="select-none">
-                        {t("dashboard.upcomingDueDates.title")}
-                      </span>
-                    </SidebarMenuButton>
+          {/* Notifications button for upcoming due dates */}
+          <SidebarMenuItem>
+            <Popover>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <PopoverTrigger
+                      {...props}
+                      render={(popoverProps) => (
+                        <SidebarMenuButton {...popoverProps} className="h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3">
+                          <div className="relative shrink-0">
+                            <Bell className="size-5 md:size-4" />
+                            {upcomingPaymentsCount > 0 && !isMobile && (
+                              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-sidebar" />
+                            )}
+                          </div>
+                          <span className="select-none flex-1 truncate">
+                            {t("dashboard.upcomingDueDates.title")}
+                          </span>
+                          {upcomingPaymentsCount > 0 && isMobile && (
+                            <span className="ml-auto text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20">
+                              {upcomingPaymentsCount}
+                            </span>
+                          )}
+                        </SidebarMenuButton>
+                      )}
+                    />
                   )}
                 />
-              )}
-            />
-            <TooltipContent side="right" hidden={state !== "collapsed"}>
-              {t("dashboard.upcomingDueDates.title")}
-            </TooltipContent>
-          </Tooltip>
-          <PopoverContent
-            side={isMobile ? "top" : "right"}
-            align={isMobile ? "center" : "end"}
-            className="w-[min(20rem,calc(100vw-2rem))] p-0"
-          >
-            <UpcomingDueDates />
-          </PopoverContent>
-        </Popover>
+                <TooltipContent side="right" hidden={state !== "collapsed"}>
+                  {t("dashboard.upcomingDueDates.title")}
+                </TooltipContent>
+              </Tooltip>
+              <PopoverContent
+                side={isMobile ? "top" : "right"}
+                align={isMobile ? "center" : "end"}
+                sideOffset={8}
+                className="w-[min(22rem,calc(100vw-2rem))] p-0 shadow-xl rounded-xl overflow-hidden"
+              >
+                <UpcomingDueDates />
+              </PopoverContent>
+            </Popover>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
         <SidebarSeparator className="mx-0!" />
 

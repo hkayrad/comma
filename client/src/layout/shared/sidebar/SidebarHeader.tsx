@@ -66,8 +66,8 @@ export default function CommaSidebarHeader() {
   }, []);
 
   return (
-    <SidebarHeader className="p-2 border-b md:border-b-0">
-      <div className="flex items-center justify-between w-full h-9">
+    <SidebarHeader className="px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b border-sidebar-border md:border-b-0 md:p-2 md:pt-2">
+      <div className="flex items-center justify-between w-full h-11 md:h-9 gap-2">
         <NavLink
           to="/"
           onClick={(e) => {
@@ -78,7 +78,7 @@ export default function CommaSidebarHeader() {
               e.preventDefault();
             }
           }}
-          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-center flex-1 h-9"
+          className="hover:scale-105 active:scale-100 transition-transform flex items-center justify-start md:justify-center flex-1 h-full min-w-0"
         >
         <AnimatePresence mode="wait">
           {state === "collapsed" ? (
@@ -119,7 +119,7 @@ export default function CommaSidebarHeader() {
           ) : (
             <motion.div
               key="logo"
-              className="h-full w-auto mx-auto"
+              className="h-full w-auto"
               initial={{
                 opacity: 0,
                 x: 0,
@@ -159,9 +159,9 @@ export default function CommaSidebarHeader() {
             variant="ghost"
             size="icon"
             onClick={() => setOpenMobile(false)}
-            className="size-8 shrink-0 text-muted-foreground hover:text-foreground md:hidden"
+            className="size-9 rounded-full shrink-0 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent active:scale-95 transition-all md:hidden"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
             <span className="sr-only">Kapat</span>
           </Button>
         )}

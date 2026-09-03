@@ -48,6 +48,7 @@ import {
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 export default function NonSystemAdminSidebarContent() {
   const location = useLocation();
@@ -228,9 +229,11 @@ export default function NonSystemAdminSidebarContent() {
   return (
     <SidebarContent className="overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       {navList.map((group) => (
-        <SidebarGroup key={group.title}>
-          <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-          <SidebarMenu>
+        <SidebarGroup key={group.title} className="px-2 md:px-0">
+          <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 px-3 py-1.5 select-none">
+            {group.title}
+          </SidebarGroupLabel>
+          <SidebarMenu className="gap-1 md:gap-0.5">
             {group.items.map((item) => {
               const isActive =
                 item.url === "/"
@@ -253,17 +256,21 @@ export default function NonSystemAdminSidebarContent() {
                           render={(props) => (
                             <SidebarMenuButton
                               {...props}
+                              isActive={isActive}
                               tooltip={item.title}
-                              className="group/collapsible-trigger h-10 md:h-8 text-sm font-medium"
+                              className={cn(
+                                "group/collapsible-trigger h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3 transition-colors",
+                                isActive && "bg-sidebar-accent/70 text-sidebar-accent-foreground font-semibold"
+                              )}
                             >
-                              {item.icon && <item.icon />}
-                              <span className="select-none">{item.title}</span>
-                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
+                              {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
+                              <span className="select-none flex-1 text-left truncate">{item.title}</span>
+                              <ChevronRight className="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-open/collapsible:rotate-90 text-muted-foreground" />
                             </SidebarMenuButton>
                           )}
                         />
                         <CollapsiblePanel>
-                          <SidebarMenuSub>
+                          <SidebarMenuSub className="border-l-2 border-sidebar-border/60 mx-4 pl-3 my-1 gap-1">
                             {item.items.map((subItem) => {
                               const isSubActive =
                                 location.pathname === subItem.url;
@@ -277,10 +284,15 @@ export default function NonSystemAdminSidebarContent() {
                                         navigate(subItem.url);
                                       }
                                     }}
-                                    className="cursor-pointer select-none h-9 md:h-7 text-xs sm:text-sm"
+                                    className={cn(
+                                      "cursor-pointer select-none h-10 md:h-7 text-sm md:text-xs rounded-lg px-3 transition-all",
+                                      isSubActive
+                                        ? "bg-primary/10 text-primary font-semibold dark:bg-primary/20"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                                    )}
                                   >
-                                    {subItem.icon && <subItem.icon />}
-                                    <span>{subItem.title}</span>
+                                    {subItem.icon && <subItem.icon className="size-4 shrink-0 mr-2" />}
+                                    <span className="truncate">{subItem.title}</span>
                                   </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>
                               );
@@ -307,10 +319,13 @@ export default function NonSystemAdminSidebarContent() {
                               navigate(item.url);
                             }
                           }}
-                          className="cursor-pointer h-10 md:h-8 text-sm font-medium"
+                          className={cn(
+                            "cursor-pointer h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3 transition-colors",
+                            isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                          )}
                         >
-                          {item.icon && <item.icon />}
-                          <span>{item.title}</span>
+                          {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
+                          <span className="truncate">{item.title}</span>
                         </SidebarMenuButton>
                       )}
                     />

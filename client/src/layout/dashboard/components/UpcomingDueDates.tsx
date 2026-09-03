@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { useUpcomingDueDates, type DueDateItemType } from "@/hooks/use-upcoming-due-dates";
+import { useSidebar } from "@/components/animate-ui/components/radix/sidebar";
 
 export default function UpcomingDueDates() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { setOpenMobile } = useSidebar();
     const [showAll, setShowAll] = useState(false);
 
     const getNavigationPath = (type: DueDateItemType): string => {
@@ -89,7 +91,10 @@ export default function UpcomingDueDates() {
                     {displayedDueDates.map((item) => (
                         <div
                             key={`${item.type}-${item.id}`}
-                            onClick={() => navigate(getNavigationPath(item.type))}
+                            onClick={() => {
+                                setOpenMobile(false);
+                                navigate(getNavigationPath(item.type));
+                            }}
                             className="flex items-center justify-between p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer group"
                         >
                             <div className="flex items-center gap-2 min-w-0">

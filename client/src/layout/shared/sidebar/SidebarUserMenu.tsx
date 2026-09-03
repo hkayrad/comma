@@ -32,7 +32,9 @@ import {
   User,
   Building2,
   Palette,
+  Globe,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -60,7 +62,7 @@ export default function SidebarUserMenu() {
   const { role } = useRole();
   const reloadConnection = useWebSocket((s) => s.reloadConnection);
   const openDialog = useDialog((s) => s.openDialog);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleLogout = useCallback(async () => {
     setOpenMobile(false);
@@ -86,7 +88,7 @@ export default function SidebarUserMenu() {
       content: <InfoDialog />,
       showCloseButton: true,
     });
-  }, [openDialog, t]);
+  }, [openDialog, t, setOpenMobile]);
 
   const handleNavSettings = useCallback(
     (tab?: string) => {
@@ -95,6 +97,103 @@ export default function SidebarUserMenu() {
     },
     [navigate, setOpenMobile],
   );
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col gap-2 pt-1">
+        {/* Mobile User Profile Card */}
+        <div
+          onClick={() => handleNavSettings("hesap")}
+          className="flex items-center gap-3 p-2.5 rounded-xl bg-sidebar-accent/50 border border-sidebar-border hover:bg-sidebar-accent active:scale-[0.98] transition-all cursor-pointer"
+        >
+          <Avatar className="h-10 w-10 rounded-xl shrink-0">
+            <AvatarFallback
+              className={`
+                h-10 w-10 rounded-xl select-none font-semibold text-sm
+                ${RoleBackgrounds[(role ?? 0) as RoleBackgroundType]}
+                ${RoleColors[(role ?? 0) as RoleColorType]}
+              `}
+            >
+              {user?.username?.charAt(0).toUpperCase() || "?"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="grid flex-1 text-left leading-tight min-w-0">
+            <span className="truncate font-semibold text-sm text-foreground">
+              {user?.username}
+            </span>
+            <span className="text-muted-foreground truncate text-xs">
+              {t(`user.role.${UserRole[(role ?? 0) as UserRoleType]}`)}
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavSettings();
+            }}
+          >
+            <User className="size-4" />
+          </Button>
+        </div>
+
+        {/* Mobile Quick Action Buttons Bar */}
+        <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-sidebar-accent/30 border border-sidebar-border/50">
+          {/* Theme Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="flex flex-col items-center justify-center h-12 p-1 gap-1 text-[10px] text-muted-foreground hover:text-foreground rounded-lg"
+            title={theme === "dark" ? t("sidebar.footer.account.theme.light") : t("sidebar.footer.account.theme.dark")}
+          >
+            {theme === "dark" ? <Sun className="size-4 text-amber-500" /> : <Moon className="size-4" />}
+            <span className="leading-none text-[10px] font-medium">{theme === "dark" ? "Açık" : "Koyu"}</span>
+          </Button>
+
+          {/* Language Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              const nextLang = i18n.language === "tr" ? "en" : "tr";
+              i18n.changeLanguage(nextLang);
+            }}
+            className="flex flex-col items-center justify-center h-12 p-1 gap-1 text-[10px] text-muted-foreground hover:text-foreground rounded-lg"
+            title={t("sidebar.footer.account.language")}
+          >
+            <Globe className="size-4" />
+            <span className="leading-none text-[10px] uppercase font-bold">{i18n.language}</span>
+          </Button>
+
+          {/* Info Dialog */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleInfo}
+            className="flex flex-col items-center justify-center h-12 p-1 gap-1 text-[10px] text-muted-foreground hover:text-foreground rounded-lg"
+            title={t("sidebar.footer.info.label")}
+          >
+            <Info className="size-4" />
+            <span className="leading-none text-[10px] font-medium">Bilgi</span>
+          </Button>
+
+          {/* Logout */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="flex flex-col items-center justify-center h-12 p-1 gap-1 text-[10px] text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 rounded-lg"
+            title={t("sidebar.footer.account.logout")}
+          >
+            <LogOut className="size-4" />
+            <span className="leading-none text-[10px] font-medium">{t("sidebar.footer.account.logout")}</span>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarGroup className="p-0!">
