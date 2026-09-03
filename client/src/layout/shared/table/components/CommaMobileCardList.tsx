@@ -183,13 +183,16 @@ export default function CommaMobileCardList({
           visibleCells.find((c) => c.column.id === "remaining_debt") ||
           visibleCells.find((c) => c.column.id === "amount");
 
+        // Amount Cell (explicit amount / tutar)
+        const amountCell = visibleCells.find((c) => c.column.id === "amount");
+
         // Secondary Amount Cell (Never use converted amount_in_try if already in TRY)
         const secondaryAmountCell = visibleCells.find(
           (c) =>
             c.column.id !== primaryAmountCell?.column.id &&
+            c.column.id !== amountCell?.column.id &&
             (c.column.id === "remaining_debt" ||
               c.column.id === "total_debt" ||
-              c.column.id === "amount" ||
               (!isTRY && c.column.id === "amount_in_try"))
         );
 
@@ -221,13 +224,12 @@ export default function CommaMobileCardList({
         const hasDescription =
           typeof descRaw === "string" && descRaw.trim() !== "" && descRaw !== "-";
 
-        // Financial Breakdown cells (VAT, Discount, Withholding, Currency, Exchange Rate)
+        // Financial Breakdown cells (Amount, VAT, Discount, Withholding, Currency, Exchange Rate)
         const breakdownIds = ["amount", "vat", "discount", "withholding", "exchange_rate"];
         const breakdownCells = visibleCells.filter(
           (c) =>
             breakdownIds.includes(c.column.id) &&
-            c.column.id !== primaryAmountCell?.column.id &&
-            c.column.id !== secondaryAmountCell?.column.id
+            c.column.id !== primaryAmountCell?.column.id
         );
 
         // Other detail cells not explicitly placed
@@ -336,6 +338,20 @@ export default function CommaMobileCardList({
                         primaryAmountCell.getContext()
                       )}
                     </div>
+                    {/* Amount (Net Tutar) when primary amount is Total */}
+                    {amountCell && amountCell.column.id !== primaryAmountCell.column.id && (
+                      <div className="text-xs text-muted-foreground font-mono mt-0.5 flex items-center gap-1.5 truncate">
+                        <span className="text-[11px] font-medium text-muted-foreground/80">
+                          {getHeaderText(amountCell)}:
+                        </span>
+                        <span className="font-semibold text-foreground/90">
+                          {flexRender(
+                            amountCell.column.columnDef.cell,
+                            amountCell.getContext()
+                          )}
+                        </span>
+                      </div>
+                    )}
                     {totalInTryCell && (
                       <div className="text-xs text-muted-foreground font-mono mt-0.5 truncate">
                         ≈ {flexRender(totalInTryCell.column.columnDef.cell, totalInTryCell.getContext())}
