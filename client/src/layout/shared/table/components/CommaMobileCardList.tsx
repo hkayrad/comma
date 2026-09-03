@@ -338,20 +338,6 @@ export default function CommaMobileCardList({
                         primaryAmountCell.getContext()
                       )}
                     </div>
-                    {/* Amount (Net Tutar) when primary amount is Total */}
-                    {amountCell && amountCell.column.id !== primaryAmountCell.column.id && (
-                      <div className="text-xs text-muted-foreground font-mono mt-0.5 flex items-center gap-1.5 truncate">
-                        <span className="text-[11px] font-medium text-muted-foreground/80">
-                          {getHeaderText(amountCell)}:
-                        </span>
-                        <span className="font-semibold text-foreground/90">
-                          {flexRender(
-                            amountCell.column.columnDef.cell,
-                            amountCell.getContext()
-                          )}
-                        </span>
-                      </div>
-                    )}
                     {totalInTryCell && (
                       <div className="text-xs text-muted-foreground font-mono mt-0.5 truncate">
                         ≈ {flexRender(totalInTryCell.column.columnDef.cell, totalInTryCell.getContext())}
