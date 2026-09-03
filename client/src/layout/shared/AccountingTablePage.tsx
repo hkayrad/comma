@@ -1,7 +1,7 @@
 import { useLocation } from "react-router";
 import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { useTableState } from "@/hooks/use-table-state";
-import { useQuery } from "@tanstack/react-query";
+import { useResponsiveTableQuery } from "@/hooks/use-responsive-table-query";
 import OverviewCards from "@/layout/shared/OverviewCards";
 import type { ComponentType } from "react";
 
@@ -33,18 +33,21 @@ export default function AccountingTablePage<T>({
     setColumnVisibility,
   } = useTableState({ key: `${entityKey}-${type}` });
 
-  const { data } = useQuery({
-    queryKey: [entityKey, type, pagination, sorting, columnFilters],
-    queryFn: async () => {
+  const {
+    rows,
+    count,
+    hasMore,
+    onLoadMore,
+    isLoadingMore,
+  } = useResponsiveTableQuery({
+    queryKey: [entityKey, type],
+    fetchFn: (pageIndex, pageSize) => {
       const API = getApi(type);
-      return await API.GetAll(
-        pagination.pageIndex,
-        pagination.pageSize,
-        sorting,
-        columnFilters,
-      );
+      return API.GetAll(pageIndex, pageSize, sorting, columnFilters);
     },
-    staleTime: 30000,
+    pagination,
+    sorting,
+    columnFilters,
   });
 
   const onColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (
@@ -59,9 +62,9 @@ export default function AccountingTablePage<T>({
       <OverviewCards type={type} />
       <div className="w-full max-w-full min-w-0">
         <TableComponent
-          data={data?.rows || []}
+          data={rows}
           type={type}
-          rowCount={data?.count || 0}
+          rowCount={count}
           pagination={pagination}
           onPaginationChange={setPagination}
           sorting={sorting}
@@ -70,6 +73,9 @@ export default function AccountingTablePage<T>({
           onColumnFiltersChange={onColumnFiltersChange}
           columnVisibility={columnVisibility}
           onColumnVisibilityChange={setColumnVisibility}
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          isLoadingMore={isLoadingMore}
         />
       </div>
     </div>

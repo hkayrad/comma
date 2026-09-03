@@ -1,18 +1,54 @@
+import { useEffect, useRef } from "react";
 import type { Table } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   table: Table<any>;
   contextMenuItems?: (row: any) => React.ReactNode;
   isPortal?: boolean;
   translationPrefix?: "dashboard" | "debt" | "payment";
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 };
 
-export default function CommaMobileCardList({ table, translationPrefix }: Props) {
+export default function CommaMobileCardList({
+  table,
+  translationPrefix,
+  hasMore,
+  onLoadMore,
+  isLoadingMore,
+}: Props) {
   const { t, i18n } = useTranslation();
   const rows = table.getRowModel().rows;
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasMore || isLoadingMore || !onLoadMore) return;
+
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          onLoadMore();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "300px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore, onLoadMore]);
 
   if (!rows.length) {
     return (
@@ -256,6 +292,43 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
           </div>
         );
       })}
+
+      {/* Infinite Scroll Sentinel & Loader */}
+      {hasMore && (
+        <div
+          ref={sentinelRef}
+          className="flex flex-col items-center justify-center py-6 gap-2 text-sm text-muted-foreground"
+        >
+          {isLoadingMore ? (
+            <div className="flex items-center gap-2 text-primary font-medium">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-xs">
+                {t("table.loadingMore", { defaultValue: "Daha fazla yükleniyor..." })}
+              </span>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onLoadMore}
+              className="text-xs h-8 px-4 rounded-full text-muted-foreground hover:text-foreground"
+            >
+              {t("table.loadMore", { defaultValue: "Daha Fazla Göster" })}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {!hasMore && rows.length > 0 && (
+        <div className="flex items-center justify-center py-4 text-xs text-muted-foreground/60 select-none">
+          <span>
+            {t("table.allLoaded", {
+              count: rows.length,
+              defaultValue: `Tüm kayıtlar gösteriliyor (${rows.length})`,
+            })}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

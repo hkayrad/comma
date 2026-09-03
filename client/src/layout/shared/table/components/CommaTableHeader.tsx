@@ -547,10 +547,12 @@ export default function CommaTableHeader(props: Props) {
           )}
         </div>
 
-        {/* Mobile Pagination */}
-        <div className="flex items-center justify-between pt-1">
-          <CommaTablePagination table={table} />
-        </div>
+        {/* Mobile Pagination (hidden in cards view with infinite scroll) */}
+        {viewMode !== "cards" && (
+          <div className="flex items-center justify-between pt-1">
+            <CommaTablePagination table={table} />
+          </div>
+        )}
       </div>
 
       {/* Desktop Toolbar (>= md) */}

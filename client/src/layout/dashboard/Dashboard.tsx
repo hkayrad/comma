@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import type { ColumnFiltersState, OnChangeFn } from "@tanstack/react-table";
 import { useTableState } from "@/hooks/use-table-state";
 import { useDashboardSettings } from "@/hooks/use-dashboard-settings";
-import { useQuery } from "@tanstack/react-query";
+import { useResponsiveTableQuery } from "@/hooks/use-responsive-table-query";
 
 export default function Dashboard() {
   const [tabValue, setTabValue] = useState<"receivable" | "payable">("receivable");
@@ -36,30 +36,46 @@ export default function Dashboard() {
     setColumnVisibility: setPayableVisibility,
   } = useTableState({ key: "dashboard-payable" });
 
-  const { data: receivableData } = useQuery({
-    queryKey: ["customers", "receivable", receivablePagination, receivableSorting, receivableFilters],
-    queryFn: async () => {
-      return await ReceivableCustomerApi.GetAll(
-        receivablePagination.pageIndex,
-        receivablePagination.pageSize,
+  const {
+    rows: receivableRows,
+    count: receivableCount,
+    hasMore: hasMoreReceivable,
+    onLoadMore: onLoadMoreReceivable,
+    isLoadingMore: isLoadingMoreReceivable,
+  } = useResponsiveTableQuery({
+    queryKey: ["customers", "receivable"],
+    fetchFn: (pageIndex, pageSize) => {
+      return ReceivableCustomerApi.GetAll(
+        pageIndex,
+        pageSize,
         receivableSorting,
         receivableFilters,
       );
     },
-    staleTime: 30000,
+    pagination: receivablePagination,
+    sorting: receivableSorting,
+    columnFilters: receivableFilters,
   });
 
-  const { data: payableData } = useQuery({
-    queryKey: ["customers", "payable", payablePagination, payableSorting, payableFilters],
-    queryFn: async () => {
-      return await PayableCustomerApi.GetAll(
-        payablePagination.pageIndex,
-        payablePagination.pageSize,
+  const {
+    rows: payableRows,
+    count: payableCount,
+    hasMore: hasMorePayable,
+    onLoadMore: onLoadMorePayable,
+    isLoadingMore: isLoadingMorePayable,
+  } = useResponsiveTableQuery({
+    queryKey: ["customers", "payable"],
+    fetchFn: (pageIndex, pageSize) => {
+      return PayableCustomerApi.GetAll(
+        pageIndex,
+        pageSize,
         payableSorting,
         payableFilters,
       );
     },
-    staleTime: 30000,
+    pagination: payablePagination,
+    sorting: payableSorting,
+    columnFilters: payableFilters,
   });
 
   const onReceivableFiltersChange: OnChangeFn<ColumnFiltersState> = (
@@ -120,8 +136,8 @@ export default function Dashboard() {
         <TabsContent value="receivable">
           <CustomerTable
             type="receivable"
-            data={receivableData?.rows || []}
-            rowCount={receivableData?.count || 0}
+            data={receivableRows}
+            rowCount={receivableCount}
             pagination={receivablePagination}
             onPaginationChange={setReceivablePagination}
             sorting={receivableSorting}
@@ -130,13 +146,16 @@ export default function Dashboard() {
             onColumnFiltersChange={onReceivableFiltersChange}
             columnVisibility={receivableVisibility}
             onColumnVisibilityChange={setReceivableVisibility}
+            hasMore={hasMoreReceivable}
+            onLoadMore={onLoadMoreReceivable}
+            isLoadingMore={isLoadingMoreReceivable}
           />
         </TabsContent>
         <TabsContent value="payable">
           <CustomerTable
             type="payable"
-            data={payableData?.rows || []}
-            rowCount={payableData?.count || 0}
+            data={payableRows}
+            rowCount={payableCount}
             pagination={payablePagination}
             onPaginationChange={setPayablePagination}
             sorting={payableSorting}
@@ -145,6 +164,9 @@ export default function Dashboard() {
             onColumnFiltersChange={onPayableFiltersChange}
             columnVisibility={payableVisibility}
             onColumnVisibilityChange={setPayableVisibility}
+            hasMore={hasMorePayable}
+            onLoadMore={onLoadMorePayable}
+            isLoadingMore={isLoadingMorePayable}
           />
         </TabsContent>
       </Tabs>

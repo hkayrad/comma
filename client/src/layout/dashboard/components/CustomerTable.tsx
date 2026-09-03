@@ -60,6 +60,9 @@ type Props = {
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
   columnVisibility?: VisibilityState;
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 };
 
 export default function CustomerTable(props: Props) {
@@ -75,6 +78,9 @@ export default function CustomerTable(props: Props) {
     onColumnFiltersChange,
     columnVisibility,
     onColumnVisibilityChange,
+    hasMore,
+    onLoadMore,
+    isLoadingMore,
   } = props;
 
   const API = type === "payable" ? PayableCustomerApi : ReceivableCustomerApi;
@@ -827,6 +833,9 @@ export default function CustomerTable(props: Props) {
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
       onBulkDelete={handleBulkDelete}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      isLoadingMore={isLoadingMore}
       contextMenuItems={(c) => (
         <>
           <ContextMenuItem onClick={() => onAddDebt(c.id!)}>

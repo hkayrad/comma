@@ -77,6 +77,9 @@ type Props = {
   hideHeader?: boolean;
   onBulkDelete?: (selectedRows: any[]) => void;
   enableRowSelection?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 };
 
 export default function CommaTable(props: Props) {
@@ -100,6 +103,9 @@ export default function CommaTable(props: Props) {
     isPortal,
     translationPrefix,
     hideHeader,
+    hasMore,
+    onLoadMore,
+    isLoadingMore,
   } = props;
 
   const data = useMemo(() => (Array.isArray(rawData) ? rawData : []), [rawData]);
@@ -279,6 +285,14 @@ export default function CommaTable(props: Props) {
             isPortal={isPortal}
             contextMenuItems={contextMenuItems}
             translationPrefix={translationPrefix}
+            hasMore={isServerSide ? hasMore : (hasMore ?? (table.getRowModel().rows.length < data.length))}
+            onLoadMore={isServerSide ? onLoadMore : (onLoadMore ?? (() => {
+              setInternalPagination((prev) => ({
+                ...prev,
+                pageSize: prev.pageSize + 20,
+              }));
+            }))}
+            isLoadingMore={isLoadingMore}
           />
         </div>
       )}

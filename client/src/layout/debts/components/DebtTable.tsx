@@ -53,6 +53,9 @@ type Props = {
   onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
   readOnly?: boolean;
   isPortal?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 };
 
 export default function DebtTable(props: Props) {
@@ -70,6 +73,9 @@ export default function DebtTable(props: Props) {
     onColumnVisibilityChange,
     readOnly,
     isPortal,
+    hasMore,
+    onLoadMore,
+    isLoadingMore,
   } = props;
 
   const queryClient = useQueryClient();
@@ -702,6 +708,9 @@ export default function DebtTable(props: Props) {
       onBulkDelete={handleBulkDelete}
       readOnly={readOnly}
       isPortal={isPortal}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      isLoadingMore={isLoadingMore}
       contextMenuItems={!readOnly ? (c) => (
         <>
           <ContextMenuItem onClick={() => onAddPayment(c)}>
