@@ -1,12 +1,19 @@
 import type { CustomerDto, OverviewViewType } from "@comma/common";
 import { Button } from "@/components/ui/button";
-import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet, Share2 } from "lucide-react";
+import { Info, Paperclip, Pencil, Trash2, CirclePlus, Wallet, Share2, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { copyToClipboard } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import {
@@ -447,150 +454,253 @@ export default function CustomerTable(props: Props) {
         id: "actions",
         header: t("dashboard.table.column.actions"),
         cell: ({ row }: { row: Row<CustomerDto> }) => (
-          <div className="flex gap-2">
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onAddDebt(row.original.id!)}
-                  >
-                    <CirclePlus />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t(
-                  type === "receivable"
-                    ? "dashboard.addButton.actions.receivable.addReceivable"
-                    : "dashboard.addButton.actions.payable.addPayable",
-                )}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onAddPayment(row.original.id!)}
-                  >
-                    <Wallet />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t(
-                  type === "receivable"
-                    ? "dashboard.addButton.actions.receivable.addPayment"
-                    : "dashboard.addButton.actions.payable.addPayment",
-                )}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      navigate(
-                        `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
-                      )
-                    }
-                  >
-                    <Paperclip />
-                  </Button>
-                )}
-              ></TooltipTrigger>
-              <TooltipContent>
-                {t("dashboard.table.column.actions.show_statement")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDetails(row.original.id!)}
-                  >
-                    <Info />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t("dashboard.table.column.actions.show_details")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const portalUrl = `${window.location.origin}/p/${row.original.company_id}`;
-                      copyToClipboard(portalUrl, t);
-                    }}
-                  >
-                    <Share2 />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t("dashboard.table.column.actions.share_portal")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(row.original.id!)}
-                  >
-                    <Pencil />
-                  </Button>
-                )}
-              />
-              <TooltipContent>
-                {t("dashboard.table.column.actions.edit_details")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip disableHoverablePopup>
-              <TooltipTrigger
-                render={(props) => (
-                  <Button
-                    {...props}
-                    nativeButton
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
-                    onClick={() => confirmDelete(row.original.id!)}
-                  >
-                    <Trash2 />
-                  </Button>
-                )}
-              />
-              <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
-                {t("dashboard.table.column.actions.delete")}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          <>
+            {/* Desktop: all 7 icon buttons */}
+            <div className="hidden md:flex gap-1 items-center">
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onAddDebt(row.original.id!)}
+                    >
+                      <CirclePlus />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t(
+                    type === "receivable"
+                      ? "dashboard.addButton.actions.receivable.addReceivable"
+                      : "dashboard.addButton.actions.payable.addPayable",
+                  )}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onAddPayment(row.original.id!)}
+                    >
+                      <Wallet />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t(
+                    type === "receivable"
+                      ? "dashboard.addButton.actions.receivable.addPayment"
+                      : "dashboard.addButton.actions.payable.addPayment",
+                  )}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        navigate(
+                          `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
+                        )
+                      }
+                    >
+                      <Paperclip />
+                    </Button>
+                  )}
+                ></TooltipTrigger>
+                <TooltipContent>
+                  {t("dashboard.table.column.actions.show_statement")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDetails(row.original.id!)}
+                    >
+                      <Info />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t("dashboard.table.column.actions.show_details")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const portalUrl = `${window.location.origin}/p/${row.original.company_id}`;
+                        copyToClipboard(portalUrl, t);
+                      }}
+                    >
+                      <Share2 />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t("dashboard.table.column.actions.share_portal")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(row.original.id!)}
+                    >
+                      <Pencil />
+                    </Button>
+                  )}
+                />
+                <TooltipContent>
+                  {t("dashboard.table.column.actions.edit_details")}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip disableHoverablePopup>
+                <TooltipTrigger
+                  render={(props) => (
+                    <Button
+                      {...props}
+                      nativeButton
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-300"
+                      onClick={() => confirmDelete(row.original.id!)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  )}
+                />
+                <TooltipContent className="bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800 fill-red-100 dark:fill-red-950">
+                  {t("dashboard.table.column.actions.delete")}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            {/* Mobile: 3 primary quick action buttons + dropdown menu for secondary actions */}
+            <div className="flex md:hidden items-center justify-between gap-1.5 w-full">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2.5 gap-1.5 text-xs font-medium shrink-0 select-none border-primary/20 hover:bg-primary/5 hover:border-primary/40"
+                  onClick={() => onAddDebt(row.original.id!)}
+                >
+                  <CirclePlus className="size-3.5 text-primary" />
+                  <span>
+                    {type === "receivable"
+                      ? t("vars.receivable")
+                      : t("vars.debt")}
+                  </span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2.5 gap-1.5 text-xs font-medium shrink-0 select-none border-emerald-500/20 hover:bg-emerald-500/5 hover:border-emerald-500/40 text-foreground"
+                  onClick={() => onAddPayment(row.original.id!)}
+                >
+                  <Wallet className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{t("vars.payment")}</span>
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
+                  onClick={() =>
+                    navigate(
+                      `${type === "receivable" ? "/alacaklar" : "/borclar"}/borc_dokumu/${row.original.id}`,
+                    )
+                  }
+                >
+                  <Paperclip className="size-4" />
+                  <span className="sr-only">
+                    {t("dashboard.table.column.actions.show_statement")}
+                  </span>
+                </Button>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={(props) => (
+                      <Button
+                        {...props}
+                        nativeButton
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 rounded-lg text-muted-foreground hover:text-foreground"
+                      >
+                        <MoreHorizontal className="size-4" />
+                        <span className="sr-only">
+                          {t("vars.more", { defaultValue: "Daha Fazla" })}
+                        </span>
+                      </Button>
+                    )}
+                  />
+                  <DropdownMenuContent align="end" className="w-52 z-50">
+                    <DropdownMenuItem
+                      onClick={() => onDetails(row.original.id!)}
+                      className="cursor-pointer"
+                    >
+                      <Info className="mr-2 size-4 text-muted-foreground" />
+                      <span>{t("dashboard.table.column.actions.show_details")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        const portalUrl = `${window.location.origin}/p/${row.original.company_id}`;
+                        copyToClipboard(portalUrl, t);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Share2 className="mr-2 size-4 text-muted-foreground" />
+                      <span>{t("dashboard.table.column.actions.share_portal")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onEdit(row.original.id!)}
+                      className="cursor-pointer"
+                    >
+                      <Pencil className="mr-2 size-4 text-muted-foreground" />
+                      <span>{t("dashboard.table.column.actions.edit_details")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => confirmDelete(row.original.id!)}
+                      className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400 cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 size-4 text-inherit" />
+                      <span>{t("dashboard.table.column.actions.delete")}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </>
         ),
       },
     ],

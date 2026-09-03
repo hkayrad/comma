@@ -34,6 +34,8 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
         const statusCell = visibleCells.find(
           (c) => c.column.id === "debt_status" || c.column.id === "status"
         );
+        const isCompanyCell = visibleCells.find((c) => c.column.id === "is_company");
+        const remainingDebtCell = visibleCells.find((c) => c.column.id === "remaining_debt");
 
         // Identify primary title cell
         const primaryTitleCell = visibleCells.find(
@@ -48,10 +50,11 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
             c.column.id !== "select" &&
             c.column.id !== "actions" &&
             c.column.id !== "#" &&
-            c.column.id !== "debt_status"
+            c.column.id !== "debt_status" &&
+            c.column.id !== "status"
         );
 
-        // Identify secondary subtitle cell (e.g. invoice_no, phone, description)
+        // Identify secondary subtitle cell (e.g. invoice_no, phone, description, tax_number)
         const secondaryTitleCell = visibleCells.find(
           (c) =>
             (c.column.id === "invoice_no" ||
@@ -67,6 +70,8 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
           "#",
           "debt_status",
           "status",
+          "is_company",
+          "remaining_debt",
           primaryTitleCell?.column.id,
           secondaryTitleCell?.column.id,
         ]);
@@ -79,15 +84,15 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
           <div
             key={row.id}
             className={cn(
-              "bg-card text-card-foreground border rounded-xl p-3.5 shadow-xs flex flex-col gap-2.5 transition-colors",
+              "bg-card text-card-foreground border rounded-xl p-3.5 shadow-xs flex flex-col gap-3 transition-colors",
               isSelected ? "border-primary/50 bg-primary/5" : "border-border"
             )}
           >
-            {/* Top row: Checkbox + Titles + Status + Actions */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {/* Top row: Checkbox + Full Width Title & Subtitle + Status Badge */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
                 {selectCell && (
-                  <div className="shrink-0">
+                  <div className="shrink-0 mt-0.5">
                     {flexRender(
                       selectCell.column.columnDef.cell,
                       selectCell.getContext()
@@ -96,47 +101,62 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
                 )}
                 <div className="min-w-0 flex-1">
                   {primaryTitleCell && (
-                    <div className="font-semibold text-sm truncate text-foreground">
+                    <div className="font-semibold text-sm sm:text-base text-foreground leading-snug break-words line-clamp-2 [&_p]:w-auto [&_p]:max-w-full [&_p]:whitespace-normal [&_p]:break-words">
                       {flexRender(
                         primaryTitleCell.column.columnDef.cell,
                         primaryTitleCell.getContext()
                       )}
                     </div>
                   )}
-                  {secondaryTitleCell && (
-                    <div className="text-xs text-muted-foreground truncate mt-0.5 font-mono">
-                      {flexRender(
-                        secondaryTitleCell.column.columnDef.cell,
-                        secondaryTitleCell.getContext()
-                      )}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    {secondaryTitleCell && (
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {flexRender(
+                          secondaryTitleCell.column.columnDef.cell,
+                          secondaryTitleCell.getContext()
+                        )}
+                      </span>
+                    )}
+                    {isCompanyCell && (
+                      <div className="shrink-0">
+                        {flexRender(
+                          isCompanyCell.column.columnDef.cell,
+                          isCompanyCell.getContext()
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
-                {statusCell && (
-                  <div className="shrink-0">
-                    {flexRender(
-                      statusCell.column.columnDef.cell,
-                      statusCell.getContext()
-                    )}
-                  </div>
-                )}
-                {actionsCell && (
-                  <div className="shrink-0">
-                    {flexRender(
-                      actionsCell.column.columnDef.cell,
-                      actionsCell.getContext()
-                    )}
-                  </div>
-                )}
-              </div>
+              {statusCell && (
+                <div className="shrink-0 self-start mt-0.5">
+                  {flexRender(
+                    statusCell.column.columnDef.cell,
+                    statusCell.getContext()
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* Highlighted Remaining Balance Callout if present */}
+            {remainingDebtCell && (
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 border border-border/40">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t("dashboard.table.column.remaining_debt", { defaultValue: "Kalan Bakiye" })}
+                </span>
+                <div className="font-bold text-sm text-foreground">
+                  {flexRender(
+                    remainingDebtCell.column.columnDef.cell,
+                    remainingDebtCell.getContext()
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Metrics & Details Grid */}
             {detailCells.length > 0 && (
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/50 text-xs">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-1 text-xs">
                 {detailCells.map((cell) => {
                   const header = cell.column.columnDef.header;
                   let headerText = "";
@@ -209,10 +229,10 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
 
                   return (
                     <div key={cell.id} className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium truncate">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold truncate">
                         {headerText}
                       </span>
-                      <div className="font-medium text-foreground truncate">
+                      <div className="font-medium text-foreground truncate text-xs sm:text-sm">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -221,6 +241,16 @@ export default function CommaMobileCardList({ table, translationPrefix }: Props)
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Dedicated Bottom Actions Bar */}
+            {actionsCell && (
+              <div className="flex items-center justify-end pt-2 mt-0.5 border-t border-border/40 w-full">
+                {flexRender(
+                  actionsCell.column.columnDef.cell,
+                  actionsCell.getContext()
+                )}
               </div>
             )}
           </div>

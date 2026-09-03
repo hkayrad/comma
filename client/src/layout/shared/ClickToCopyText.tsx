@@ -15,11 +15,11 @@ export default function ClickToCopyText(props: Props) {
   return (
     <p
       className={`select-none hover:cursor-copy
-                ${column?.id === "name" && "w-36 text-ellipsis overflow-hidden"}
-                ${column?.id === "customer_name" && "w-36 text-ellipsis overflow-hidden"}
-                ${column?.id === "tax_office" && "w-36 text-ellipsis overflow-hidden"}
-                ${column?.id === "description" && "w-36 text-ellipsis overflow-hidden"}
-                ${column?.id === "invoice_number" && "w-36 text-ellipsis overflow-hidden"}
+                ${column?.id === "name" && "max-w-full md:w-36 truncate"}
+                ${column?.id === "customer_name" && "max-w-full md:w-36 truncate"}
+                ${column?.id === "tax_office" && "max-w-full md:w-36 truncate"}
+                ${column?.id === "description" && "max-w-full md:w-36 truncate"}
+                ${column?.id === "invoice_number" && "max-w-full md:w-36 truncate"}
                 ${className}
             `}
       onClick={() => copyToClipboard(value, t)}
