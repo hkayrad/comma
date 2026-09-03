@@ -182,7 +182,7 @@ export default function PaymentTable(props: Props) {
         ),
         cell: ({ row, column }) => (
           <Tooltip disableHoverablePopup>
-            <TooltipTrigger className="text-left flex">
+            <TooltipTrigger className="text-left flex min-w-0 max-w-full overflow-hidden">
               <ClickToCopyText
                 value={row.getValue(column.id) || "-"}
                 column={column}

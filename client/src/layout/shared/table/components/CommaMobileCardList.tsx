@@ -274,10 +274,10 @@ export default function CommaMobileCardList({
             )}
           >
             {/* Top row: Entity Title + Subtitle Badge + Status Badge */}
-            <div className="flex items-start justify-between gap-2.5">
-              <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2.5 min-w-0 w-full overflow-hidden">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 {primaryTitleCell && (
-                  <div className="font-bold text-base text-foreground leading-snug break-words">
+                  <div className="font-bold text-base text-foreground leading-snug truncate max-w-full min-w-0 [&_*]:truncate [&_*]:max-w-full [&_*]:min-w-0 [&_p]:truncate [&_p]:max-w-full [&_button]:truncate [&_button]:max-w-full block">
                     {flexRender(
                       primaryTitleCell.column.columnDef.cell,
                       primaryTitleCell.getContext()
