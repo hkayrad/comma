@@ -225,7 +225,14 @@ export default function CommaMobileCardList({
           typeof descRaw === "string" && descRaw.trim() !== "" && descRaw !== "-";
 
         // Financial Breakdown cells (Amount, VAT, Discount, Withholding, Currency, Exchange Rate)
-        const breakdownIds = ["amount", "vat", "discount", "withholding", "exchange_rate"];
+        const breakdownIds = [
+          "amount",
+          "vat",
+          "discount",
+          "withholding",
+          "currency",
+          "exchange_rate",
+        ];
         const breakdownCells = visibleCells.filter(
           (c) =>
             breakdownIds.includes(c.column.id) &&
@@ -404,9 +411,9 @@ export default function CommaMobileCardList({
               </div>
             )}
 
-            {/* Financial Breakdown (Net Tutar, KDV, İskonto, Tevkifat, Döviz Kuru) */}
+            {/* Financial Breakdown (Net Tutar, KDV, İskonto, Tevkifat, Para Birimi, Kur) */}
             {breakdownCells.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2.5 rounded-lg bg-muted/20 border border-border/30 text-xs">
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 p-2.5 rounded-lg bg-muted/20 border border-border/30 text-xs">
                 {breakdownCells.map((cell) => (
                   <div key={cell.id} className="flex flex-col min-w-0">
                     <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/80 truncate">
