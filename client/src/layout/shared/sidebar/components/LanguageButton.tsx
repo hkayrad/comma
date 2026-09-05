@@ -6,8 +6,7 @@ import {
 } from "@/components/animate-ui/components/base/menu";
 import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
-import { supportedLanguages } from "@/lib/supportedLanguages";
-import { TR, GB } from "country-flag-icons/react/3x2";
+import { supportedLanguages, TR, GB } from "@/lib/supportedLanguages";
 
 export default function LanguageButton() {
   const { t, i18n } = useTranslation();

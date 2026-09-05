@@ -33,7 +33,7 @@ import {
   Building2,
   Palette,
 } from "lucide-react";
-import { TR, GB } from "country-flag-icons/react/3x2";
+import { TR, GB } from "@/lib/supportedLanguages";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
