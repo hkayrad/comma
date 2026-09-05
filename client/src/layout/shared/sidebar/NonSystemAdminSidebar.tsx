@@ -188,9 +188,8 @@ export default function NonSystemAdminSidebarContent() {
                     isActive={isActive}
                     className="group/menu-trigger"
                   >
-                    {item.icon && <item.icon />}
-                    <span className="select-none">{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-open/menu-trigger:rotate-90" />
+                    {item.icon && <item.icon className="size-4 shrink-0" />}
+                    <span className="sr-only">{item.title}</span>
                   </SidebarMenuButton>
                 )}
               ></MenuTrigger>
@@ -229,7 +228,7 @@ export default function NonSystemAdminSidebarContent() {
   return (
     <SidebarContent className="overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       {navList.map((group) => (
-        <SidebarGroup key={group.title} className="px-2 md:px-0">
+        <SidebarGroup key={group.title} className="px-2 md:px-0 group-data-[collapsible=icon]:px-0">
           <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 px-3 py-1.5 select-none">
             {group.title}
           </SidebarGroupLabel>

@@ -64,7 +64,7 @@ export default function CommaSidebar() {
       </SystemAdminOnly>
       {/* END SIDEBAR CONTENT */}
 
-      <SidebarFooter className="pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-2">
+      <SidebarFooter className="pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-2 group-data-[collapsible=icon]:px-0">
         <SyncStatus />
         {/* Unified Settings */}
         <SidebarMenu className="gap-1 md:gap-0.5">

@@ -220,7 +220,7 @@ export default function SidebarUserMenu() {
                           size="lg"
                           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                          <Avatar className="h-8 w-8 rounded-lg">
+                          <Avatar className="h-8 w-8 rounded-lg shrink-0">
                             <AvatarFallback
                               className={`
                                 h-8 w-8 rounded-lg select-none
@@ -231,7 +231,7 @@ export default function SidebarUserMenu() {
                               {user?.username?.charAt(0).toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="grid flex-1 text-left text-sm leading-tight">
+                          <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                             <span className="truncate font-medium select-none">
                               {user?.username}
                             </span>
@@ -241,7 +241,7 @@ export default function SidebarUserMenu() {
                               )}
                             </span>
                           </div>
-                          <EllipsisVertical className="ml-auto size-4" />
+                          <EllipsisVertical className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
                         </SidebarMenuButton>
                       )}
                     />

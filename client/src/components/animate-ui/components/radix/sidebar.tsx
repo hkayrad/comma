@@ -397,7 +397,7 @@ function SidebarHeader({ className, ...props }: SidebarHeaderProps) {
         <div
             data-slot="sidebar-header"
             data-sidebar="header"
-            className={cn("flex flex-col gap-2 p-2", className)}
+            className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:py-2 group-data-[collapsible=icon]:items-center", className)}
             {...props}
         />
     );
@@ -410,7 +410,7 @@ function SidebarFooter({ className, ...props }: SidebarFooterProps) {
         <div
             data-slot="sidebar-footer"
             data-sidebar="footer"
-            className={cn("flex flex-col gap-2 p-2", className)}
+            className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:py-2 group-data-[collapsible=icon]:items-center", className)}
             {...props}
         />
     );
@@ -453,7 +453,7 @@ function SidebarGroup({ className, ...props }: SidebarGroupProps) {
             data-slot="sidebar-group"
             data-sidebar="group"
             className={cn(
-                "relative flex w-full min-w-0 flex-col p-2",
+                "relative flex w-full min-w-0 flex-col p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:items-center",
                 className,
             )}
             {...props}
@@ -536,7 +536,7 @@ function SidebarMenu({ className, ...props }: SidebarMenuProps) {
         <ul
             data-slot="sidebar-menu"
             data-sidebar="menu"
-            className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+            className={cn("flex w-full min-w-0 flex-col gap-1 group-data-[collapsible=icon]:items-center", className)}
             {...props}
         />
     );
@@ -549,7 +549,7 @@ function SidebarMenuItem({ className, ...props }: SidebarMenuItemProps) {
         <li
             data-slot="sidebar-menu-item"
             data-sidebar="menu-item"
-            className={cn("group/menu-item relative", className)}
+            className={cn("group/menu-item relative group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-full", className)}
             {...props}
         />
     );
@@ -572,7 +572,7 @@ const sidebarMenuButtonActiveVariants = cva(
 );
 
 const sidebarMenuButtonVariants = cva(
-    "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] [&:not([data-highlight])]:hover:bg-sidebar-accent [&:not([data-highlight])]:hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground [&:not([data-highlight])]:data-[state=open]:hover:bg-sidebar-accent [&:not([data-highlight])]:data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span]:truncate [&>svg]:size-4 [&>svg]:shrink-0 relative z-20!",
+    "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] [&:not([data-highlight])]:hover:bg-sidebar-accent [&:not([data-highlight])]:hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground [&:not([data-highlight])]:data-[state=open]:hover:bg-sidebar-accent [&:not([data-highlight])]:data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! group-data-[collapsible=icon]:justify-center! group-data-[collapsible=icon]:gap-0! group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:[&>span]:hidden! group-data-[collapsible=icon]:[&_.lucide-chevron-right]:hidden! group-data-[collapsible=icon]:[&_.lucide-ellipsis-vertical]:hidden! [&>span]:truncate [&>svg]:size-4 [&>svg]:shrink-0 relative z-20!",
     {
         variants: {
             variant: {
