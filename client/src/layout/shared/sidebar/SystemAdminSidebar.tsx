@@ -72,7 +72,7 @@ export default function SystemAdminSidebarContent() {
                   <SidebarMenuButton
                     {...props}
                     onClick={handleToggleMaintenance}
-                    className="justify-start! h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3"
+                    className="h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3"
                   >
                     <Construction className="size-5 md:size-4 text-inherit bg-inherit select-none" />
                     <span>{t("sidebar.sysAdmin.actions.maintenanceMode")}</span>
@@ -92,7 +92,7 @@ export default function SystemAdminSidebarContent() {
                   <SidebarMenuButton
                     {...props}
                     onClick={handleGetActiveUsers}
-                    className="justify-start! h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3"
+                    className="h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3"
                   >
                     <UsersRound className="size-5 md:size-4 text-inherit bg-inherit select-none" />
                     <span>{t("sidebar.sysAdmin.actions.activeUsers")}</span>

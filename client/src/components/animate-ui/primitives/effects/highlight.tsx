@@ -370,6 +370,15 @@ type HighlightItemProps<T extends React.ElementType = "div"> =
         forceUpdateBounds?: boolean;
     };
 
+function setRef<T>(ref: any, node: T | null) {
+    if (!ref) return;
+    if (typeof ref === "function") {
+        ref(node);
+    } else if (typeof ref === "object" && "current" in ref) {
+        ref.current = node;
+    }
+}
+
 function HighlightItem<T extends React.ElementType>({
     ref,
     as,
@@ -501,12 +510,21 @@ function HighlightItem<T extends React.ElementType>({
           : {};
 
     if (asChild) {
+        const handleRef = (node: HTMLDivElement | null) => {
+            (localRef as React.MutableRefObject<HTMLDivElement | null>).current =
+                node;
+            setRef(
+                (element as any)?.props?.ref ?? (element as any)?.ref,
+                node,
+            );
+        };
+
         if (mode === "children") {
             return React.cloneElement(
                 element,
                 {
                     key: childValue,
-                    ref: localRef,
+                    ref: handleRef,
                     className: cn("relative", element.props.className),
                     ...getNonOverridingDataAttributes(element, {
                         ...dataAttributes,
@@ -564,7 +582,7 @@ function HighlightItem<T extends React.ElementType>({
         }
 
         return React.cloneElement(element, {
-            ref: localRef,
+            ref: handleRef,
             ...getNonOverridingDataAttributes(element, {
                 ...dataAttributes,
                 "data-slot": "motion-highlight-item",

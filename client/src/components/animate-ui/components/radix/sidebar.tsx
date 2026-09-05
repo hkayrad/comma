@@ -614,6 +614,7 @@ function SidebarMenuButton({
 
     const button = (
         <HighlightItem
+            asChild
             activeClassName={sidebarMenuButtonActiveVariants({ variant })}
         >
             <Comp
@@ -797,7 +798,10 @@ function SidebarMenuSubButton({
     const Comp = asChild ? Slot : "a";
 
     return (
-        <HighlightItem activeClassName="bg-sidebar-accent text-sidebar-accent-foreground rounded-md">
+        <HighlightItem
+            asChild
+            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground rounded-md"
+        >
             <Comp
                 data-slot="sidebar-menu-sub-button"
                 data-sidebar="menu-sub-button"
