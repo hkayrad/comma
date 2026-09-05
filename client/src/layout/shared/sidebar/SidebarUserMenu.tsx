@@ -32,6 +32,7 @@ import {
   User,
   Building2,
   Palette,
+  Download,
 } from "lucide-react";
 import { TR, GB } from "@/lib/supportedLanguages";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,8 @@ import { useDialog } from "@/contexts/dialog";
 import LanguageButton from "./components/LanguageButton";
 import { useTranslation } from "react-i18next";
 import InfoDialog from "./components/InfoDialog";
+import { usePwaInstall } from "@/hooks/use-pwa-install";
+import PwaInstallDialog from "@/components/pwa/PwaInstallDialog";
 
 export default function SidebarUserMenu() {
   const navigate = useNavigate();
@@ -86,6 +89,19 @@ export default function SidebarUserMenu() {
       description: t("dialog.info.description"),
       size: "xl",
       content: <InfoDialog />,
+      showCloseButton: true,
+    });
+  }, [openDialog, t, setOpenMobile]);
+
+  const { isInstalled } = usePwaInstall();
+
+  const handlePwaInstall = useCallback(() => {
+    setOpenMobile(false);
+    openDialog({
+      title: t("pwa.dialog.title", { defaultValue: "Uygulamayı Yükle" }),
+      description: t("pwa.dialog.subtitle", { defaultValue: "Comma Progressive Web App (PWA)" }),
+      size: "md",
+      content: <PwaInstallDialog />,
       showCloseButton: true,
     });
   }, [openDialog, t, setOpenMobile]);
@@ -137,6 +153,22 @@ export default function SidebarUserMenu() {
             <User className="size-4" />
           </Button>
         </div>
+
+        {/* PWA Install Banner */}
+        {!isInstalled && (
+          <button
+            onClick={handlePwaInstall}
+            className="w-full flex items-center justify-between p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/15 active:scale-[0.99] transition-all text-xs font-semibold cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Download className="size-4" />
+              <span>{t("pwa.mobileBanner.title", { defaultValue: "Comma'yı Ana Ekrana Ekle" })}</span>
+            </div>
+            <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-md font-medium">
+              {t("pwa.mobileBanner.action", { defaultValue: "Yükle" })}
+            </span>
+          </button>
+        )}
 
         {/* Mobile Quick Action Buttons Bar */}
         <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-sidebar-accent/30 border border-sidebar-border/50">
@@ -296,6 +328,15 @@ export default function SidebarUserMenu() {
                 </MenuGroup>
 
                 <MenuSeparator />
+
+                <MenuItem onClick={handlePwaInstall}>
+                  <Download className="text-inherit bg-inherit select-none" />
+                  <span>
+                    {isInstalled
+                      ? t("pwa.menu.installed", { defaultValue: "Uygulama Durumu" })
+                      : t("pwa.menu.install", { defaultValue: "Uygulamayı Yükle" })}
+                  </span>
+                </MenuItem>
 
                 <MenuItem onClick={handleInfo}>
                   <Info className="text-inherit bg-inherit select-none" />

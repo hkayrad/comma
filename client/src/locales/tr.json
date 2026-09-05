@@ -953,5 +953,52 @@
     "action": {
       "reload": "Sayfayı Yenile"
     }
+  },
+  "pwa": {
+    "updateAvailable": "Yeni bir sürüm mevcut!",
+    "updateDescription": "Güncellemek ve en son sürümü yüklemek için tıklayın.",
+    "updateAction": "Güncelle",
+    "offlineReady": "Comma çevrimdışı kullanım için hazırlandı.",
+    "network": {
+      "online": "İnternet bağlantısı yeniden sağlandı.",
+      "offline": "İnternet bağlantısı kesildi. Çevrimdışı moddasınız."
+    },
+    "menu": {
+      "install": "Uygulamayı Yükle",
+      "installed": "Uygulama Durumu"
+    },
+    "mobileBanner": {
+      "title": "Comma'yı Ana Ekrana Ekle",
+      "action": "Yükle"
+    },
+    "dialog": {
+      "title": "Uygulamayı Yükle",
+      "subtitle": "Comma Progressive Web App (PWA)",
+      "description": "Muhasebe, Finans ve İK süreçlerinizi cihazınızdan bağımsız ve hızlı yönetin."
+    },
+    "features": {
+      "fast": "Hızlı & Akıcı",
+      "fastDesc": "Tarayıcı çubuğu olmadan tam ekran deneyim",
+      "cache": "Önbellek",
+      "cacheDesc": "Statik dosyalar anında yüklenir",
+      "access": "Kolay Erişim",
+      "accessDesc": "Ana ekran simgesi ve hızlı kısayollar"
+    },
+    "ios": {
+      "title": "iOS (Safari) Kurulum Adımları:"
+    },
+    "installed": "Comma uygulamanız zaten yüklü ve kullanıma hazır.",
+    "installAction": "Uygulamayı Cihazıma Yükle",
+    "installManual": "Tarayıcı Menüsünden Yükleyin",
+    "installHint": "Tarayıcınızın adres çubuğundaki 'Yükle' simgesini de kullanabilirsiniz.",
+    "settings": {
+      "title": "Uygulama & PWA",
+      "status": "Çalışma Modu",
+      "modePwa": "Bağımsız Uygulama (PWA)",
+      "modeBrowser": "Web Tarayıcısı",
+      "description": "Comma'yı masaüstü veya mobil ana ekranınıza ekleyerek çevrimdışı önbellek ve tam ekran uygulama deneyimi elde edin.",
+      "installButton": "Uygulamayı Yükle",
+      "installedButton": "Uygulama Bilgileri & Durum"
+    }
   }
 }

@@ -11,6 +11,8 @@ import { useUser } from "@/stores/useUserStore";
 import { useConfig } from "@/stores/useConfigStore";
 import { useEffect } from "react";
 
+import PwaManager from "@/components/pwa/PwaManager";
+
 export default function Root() {
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
@@ -28,6 +30,7 @@ export default function Root() {
       <WebSocketProvider url={import.meta.env.VITE_WEBSOCKET_URL}>
         <ThemeProvider defaultTheme="light" storageKey="comma-theme">
           <GlobalLoadingIndicator />
+          <PwaManager />
           <DialogProvider>
             <Toaster
               richColors

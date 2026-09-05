@@ -953,5 +953,52 @@
     "action": {
       "reload": "Refresh Page"
     }
+  },
+  "pwa": {
+    "updateAvailable": "New version available!",
+    "updateDescription": "Click to update and load the latest version.",
+    "updateAction": "Update",
+    "offlineReady": "Comma is ready for offline use.",
+    "network": {
+      "online": "Internet connection restored.",
+      "offline": "Internet connection lost. You are in offline mode."
+    },
+    "menu": {
+      "install": "Install App",
+      "installed": "App Status"
+    },
+    "mobileBanner": {
+      "title": "Add Comma to Home Screen",
+      "action": "Install"
+    },
+    "dialog": {
+      "title": "Install Application",
+      "subtitle": "Comma Progressive Web App (PWA)",
+      "description": "Manage your Accounting, Finance, and HR operations directly from your device."
+    },
+    "features": {
+      "fast": "Fast & Smooth",
+      "fastDesc": "Full-screen experience without browser toolbars",
+      "cache": "Offline Cache",
+      "cacheDesc": "Assets load instantly from cache",
+      "access": "Easy Access",
+      "accessDesc": "Home screen icon and quick app shortcuts"
+    },
+    "ios": {
+      "title": "iOS (Safari) Installation Steps:"
+    },
+    "installed": "Comma is already installed and ready to use.",
+    "installAction": "Install App on Device",
+    "installManual": "Install from Browser Menu",
+    "installHint": "You can also use the 'Install' icon in your browser's address bar.",
+    "settings": {
+      "title": "Application & PWA",
+      "status": "Running Mode",
+      "modePwa": "Standalone App (PWA)",
+      "modeBrowser": "Web Browser",
+      "description": "Add Comma to your desktop or mobile home screen for offline caching and a standalone app experience.",
+      "installButton": "Install App",
+      "installedButton": "App Info & Status"
+    }
   }
 }

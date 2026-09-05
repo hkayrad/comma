@@ -3,9 +3,14 @@
   "short_name": "Comma",
   "description": "Comma - Muhasebe ve Finans Yönetimi",
   "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
+  "orientation": "any",
+  "categories": ["business", "finance", "productivity"],
   "icons": [
     {
       "src": "/favicon-16x16.png",
@@ -40,6 +45,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Alacaklar",
+      "short_name": "Alacaklar",
+      "description": "Alacak Bilgileri ve Ödemeler",
+      "url": "/alacaklar",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Borçlar",
+      "short_name": "Borçlar",
+      "description": "Borç Bilgileri ve Ödemeler",
+      "url": "/borclar",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Çalışanlar",
+      "short_name": "Çalışanlar",
+      "description": "Çalışanlar ve Bordro",
+      "url": "/calisanlar",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
