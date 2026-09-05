@@ -1,34 +1,50 @@
 import { useState, useEffect, useCallback } from "react";
 
-interface BeforeInstallPromptEvent extends Event {
+export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-let deferredPrompt: BeforeInstallPromptEvent | null = null;
+declare global {
+  interface Window {
+    __pwaDeferredPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
+let localDeferredPrompt: BeforeInstallPromptEvent | null = null;
+
+const getPrompt = (): BeforeInstallPromptEvent | null => {
+  if (typeof window === "undefined") return null;
+  return window.__pwaDeferredPrompt || localDeferredPrompt || null;
+};
 
 if (typeof window !== "undefined") {
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
-    deferredPrompt = e as BeforeInstallPromptEvent;
+    localDeferredPrompt = e as BeforeInstallPromptEvent;
+    window.__pwaDeferredPrompt = localDeferredPrompt;
     window.dispatchEvent(new CustomEvent("pwa-prompt-available"));
   });
 
   window.addEventListener("appinstalled", () => {
-    deferredPrompt = null;
+    localDeferredPrompt = null;
+    window.__pwaDeferredPrompt = null;
     window.dispatchEvent(new CustomEvent("pwa-app-installed"));
   });
 }
 
 export function usePwaInstall() {
-  const [isInstallable, setIsInstallable] = useState<boolean>(!!deferredPrompt);
+  const [isInstallable, setIsInstallable] = useState<boolean>(() => Boolean(getPrompt()));
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
   const [isIOS, setIsIOS] = useState<boolean>(false);
+  const [isAndroid, setIsAndroid] = useState<boolean>(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   const checkInstalled = useCallback(() => {
     if (typeof window === "undefined") return false;
     return (
       window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: window-controls-overlay)").matches ||
       Boolean((window.navigator as unknown as { standalone?: boolean }).standalone) ||
       document.referrer.includes("android-app://")
     );
@@ -37,18 +53,30 @@ export function usePwaInstall() {
   useEffect(() => {
     setIsInstalled(checkInstalled());
 
-    const userAgent = window.navigator.userAgent.toLowerCase();
+    const ua = window.navigator.userAgent.toLowerCase();
     const isIosDevice =
-      /iphone|ipad|ipod/.test(userAgent) ||
-      (window.navigator.platform === "MacIntel" &&
-        window.navigator.maxTouchPoints > 1);
-    setIsIOS(isIosDevice);
+      /iphone|ipad|ipod/.test(ua) ||
+      (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
+    const isAndroidDevice = /android/.test(ua);
+    const isMobileDevice = isIosDevice || isAndroidDevice || /mobile/.test(ua);
 
-    const onPromptAvailable = () => setIsInstallable(true);
+    setIsIOS(isIosDevice);
+    setIsAndroid(isAndroidDevice);
+    setIsDesktop(!isMobileDevice);
+
+    const onPromptAvailable = () => {
+      setIsInstallable(true);
+    };
+
     const onAppInstalled = () => {
       setIsInstallable(false);
       setIsInstalled(true);
     };
+
+    // Check again in case prompt arrived right before mount
+    if (getPrompt()) {
+      setIsInstallable(true);
+    }
 
     window.addEventListener("pwa-prompt-available", onPromptAvailable);
     window.addEventListener("pwa-app-installed", onAppInstalled);
@@ -67,15 +95,19 @@ export function usePwaInstall() {
   }, [checkInstalled]);
 
   const promptInstall = useCallback(async (): Promise<boolean> => {
-    if (!deferredPrompt) {
+    const prompt = getPrompt();
+    if (!prompt) {
       return false;
     }
     try {
-      await deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
+      await prompt.prompt();
+      const choiceResult = await prompt.userChoice;
+      localDeferredPrompt = null;
+      if (typeof window !== "undefined") {
+        window.__pwaDeferredPrompt = null;
+      }
+      setIsInstallable(false);
       if (choiceResult.outcome === "accepted") {
-        deferredPrompt = null;
-        setIsInstallable(false);
         setIsInstalled(true);
         return true;
       }
@@ -89,6 +121,8 @@ export function usePwaInstall() {
     isInstallable,
     isInstalled,
     isIOS,
+    isAndroid,
+    isDesktop,
     promptInstall,
   };
 }

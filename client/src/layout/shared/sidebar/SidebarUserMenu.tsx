@@ -93,10 +93,19 @@ export default function SidebarUserMenu() {
     });
   }, [openDialog, t, setOpenMobile]);
 
-  const { isInstalled } = usePwaInstall();
+  const { isInstallable, isInstalled, promptInstall } = usePwaInstall();
 
-  const handlePwaInstall = useCallback(() => {
+  const handlePwaInstall = useCallback(async () => {
     setOpenMobile(false);
+    if (isInstallable) {
+      const installed = await promptInstall();
+      if (installed) {
+        toast.success(
+          t("pwa.installedSuccess", { defaultValue: "Comma başarıyla yüklendi!" }),
+        );
+        return;
+      }
+    }
     openDialog({
       title: t("pwa.dialog.title", { defaultValue: "Uygulamayı Yükle" }),
       description: t("pwa.dialog.subtitle", { defaultValue: "Comma Progressive Web App (PWA)" }),
@@ -104,7 +113,7 @@ export default function SidebarUserMenu() {
       content: <PwaInstallDialog />,
       showCloseButton: true,
     });
-  }, [openDialog, t, setOpenMobile]);
+  }, [openDialog, t, setOpenMobile, isInstallable, promptInstall]);
 
   const handleNavSettings = useCallback(
     (tab?: string) => {

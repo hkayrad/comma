@@ -36,6 +36,19 @@
         <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <script>
+            window.__pwaDeferredPrompt = null;
+            window.addEventListener('beforeinstallprompt', function (e) {
+                e.preventDefault();
+                window.__pwaDeferredPrompt = e;
+                window.dispatchEvent(new CustomEvent('pwa-prompt-available'));
+            });
+            window.addEventListener('appinstalled', function () {
+                window.__pwaDeferredPrompt = null;
+                window.dispatchEvent(new CustomEvent('pwa-app-installed'));
+            });
+        </script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
         <title>Comma</title>
     </head>

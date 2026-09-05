@@ -1,19 +1,42 @@
+import { useState } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { Button } from "@/components/ui/button";
-import { Download, CheckCircle2, Share, PlusSquare, Zap, WifiOff, Smartphone } from "lucide-react";
+import {
+  Download,
+  CheckCircle2,
+  Share,
+  PlusSquare,
+  Zap,
+  WifiOff,
+  Smartphone,
+  Monitor,
+  MoreVertical,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useDialog } from "@/contexts/dialog";
+import { toast } from "sonner";
 
 export default function PwaInstallDialog() {
-  const { isInstallable, isInstalled, isIOS, promptInstall } = usePwaInstall();
+  const { isInstallable, isInstalled, isIOS, isDesktop, isAndroid, promptInstall } =
+    usePwaInstall();
   const { closeDialog } = useDialog();
   const { t } = useTranslation();
+  const [attempted, setAttempted] = useState(false);
 
   const handleInstall = async () => {
-    const success = await promptInstall();
-    if (success) {
-      closeDialog();
+    if (isInstallable) {
+      const success = await promptInstall();
+      if (success) {
+        toast.success(
+          t("pwa.installedSuccess", {
+            defaultValue: "Comma başarıyla yüklendi!",
+          }),
+        );
+        closeDialog();
+        return;
+      }
     }
+    setAttempted(true);
   };
 
   return (
@@ -23,7 +46,7 @@ export default function PwaInstallDialog() {
         <img
           src="/pwa-192x192.png"
           alt="Comma"
-          className="size-14 rounded-2xl shadow-md border object-cover"
+          className="size-14 rounded-2xl shadow-md border object-cover shrink-0"
         />
         <div className="flex flex-col min-w-0">
           <h4 className="font-bold text-base text-foreground flex items-center gap-2">
@@ -69,7 +92,7 @@ export default function PwaInstallDialog() {
       {/* Installation Action or Instructions */}
       {isInstalled ? (
         <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-sm font-medium">
-          <CheckCircle2 className="size-5" />
+          <CheckCircle2 className="size-5 shrink-0" />
           <span>{t("pwa.installed", { defaultValue: "Comma uygulamanız zaten yüklü ve kullanıma hazır." })}</span>
         </div>
       ) : isIOS ? (
@@ -98,24 +121,59 @@ export default function PwaInstallDialog() {
           </ol>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <Button
             onClick={handleInstall}
-            disabled={!isInstallable}
-            className="w-full h-11 text-sm font-semibold gap-2 shadow-sm"
+            className="w-full h-11 text-sm font-semibold gap-2 shadow-sm cursor-pointer"
           >
             <Download className="size-4" />
             {isInstallable
               ? t("pwa.installAction", { defaultValue: "Uygulamayı Cihazıma Yükle" })
-              : t("pwa.installManual", { defaultValue: "Tarayıcı Menüsünden Yükleyin" })}
+              : t("pwa.installActionAlt", { defaultValue: "Yükleme Adımlarını Göster" })}
           </Button>
-          {!isInstallable && (
-            <p className="text-[11px] text-center text-muted-foreground">
-              {t(
-                "pwa.installHint",
-                { defaultValue: "Tarayıcınızın adres çubuğundaki 'Yükle' simgesini de kullanabilirsiniz." },
+
+          {/* Fallback browser guides if native prompt isn't directly exposed */}
+          {(!isInstallable || attempted) && (
+            <div className="p-3.5 rounded-xl bg-muted/40 border text-xs space-y-2.5">
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                {isDesktop ? <Monitor className="size-4" /> : <Smartphone className="size-4" />}
+                {isDesktop
+                  ? t("pwa.guide.desktopTitle", { defaultValue: "Masaüstü Tarayıcıda Kurulum:" })
+                  : t("pwa.guide.mobileTitle", { defaultValue: "Mobil Tarayıcıda Kurulum:" })}
+              </span>
+
+              {isDesktop ? (
+                <p className="text-muted-foreground leading-relaxed">
+                  {t(
+                    "pwa.guide.desktopDesc",
+                    {
+                      defaultValue:
+                        "Chrome veya Edge tarayıcınızın adres çubuğunun (URL) sağ tarafında bulunan yükle (⊕ veya ⭳) simgesine tıklayarak Comma'yı anında yükleyebilirsiniz.",
+                    },
+                  )}
+                </p>
+              ) : isAndroid ? (
+                <p className="text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                  <MoreVertical className="size-4 shrink-0 mt-0.5" />
+                  <span>
+                    {t(
+                      "pwa.guide.androidDesc",
+                      {
+                        defaultValue:
+                          "Tarayıcınızın sağ üst köşesindeki üç nokta menüsüne dokunun ve 'Uygulamayı Yükle' veya 'Ana Ekrana Ekle' seçeneğini seçin.",
+                      },
+                    )}
+                  </span>
+                </p>
+              ) : (
+                <p className="text-muted-foreground leading-relaxed">
+                  {t(
+                    "pwa.installHint",
+                    { defaultValue: "Tarayıcınızın adres çubuğundaki veya menüsündeki 'Yükle' seçeneğini kullanabilirsiniz." },
+                  )}
+                </p>
               )}
-            </p>
+            </div>
           )}
         </div>
       )}
