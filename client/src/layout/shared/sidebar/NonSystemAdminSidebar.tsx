@@ -13,7 +13,6 @@ import {
 import {
   Collapsible,
   CollapsiblePanel,
-  CollapsibleTrigger,
 } from "@/components/animate-ui/primitives/base/collapsible";
 import {
   Menu,
@@ -43,16 +42,223 @@ import {
   Receipt,
   Calculator,
   UserCheck,
+  type LucideIcon,
 } from "lucide-react";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-export default function NonSystemAdminSidebarContent() {
+interface NavSubItem {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+}
+
+interface NavItem {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  items?: NavSubItem[];
+}
+
+function NavCollapsibleItem({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: boolean;
+}) {
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+  const [collapsibleOpen, setCollapsibleOpen] = useState(isActive);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isCollapsed = state === "collapsed" && !isMobile;
+
+  useEffect(() => {
+    if (isActive) {
+      setCollapsibleOpen(true);
+    }
+  }, [isActive]);
+
+  return (
+    <Collapsible
+      open={collapsibleOpen}
+      onOpenChange={setCollapsibleOpen}
+      className="group/collapsible"
+      render={(collapsibleProps) => (
+        <SidebarMenuItem {...collapsibleProps}>
+          <Menu
+            open={isCollapsed ? menuOpen : false}
+            onOpenChange={(nextOpen) => {
+              if (isCollapsed) {
+                setMenuOpen(nextOpen);
+              }
+            }}
+          >
+            <Tooltip disableHoverablePopup>
+              <TooltipTrigger
+                render={(tooltipTriggerProps) => (
+                  <MenuTrigger
+                    {...tooltipTriggerProps}
+                    render={(menuTriggerProps) => (
+                      <SidebarMenuButton
+                        {...menuTriggerProps}
+                        isActive={isActive}
+                        aria-haspopup={isCollapsed ? "menu" : undefined}
+                        aria-expanded={isCollapsed ? menuOpen : collapsibleOpen}
+                        onKeyDown={(e) => {
+                          if (isCollapsed) {
+                            menuTriggerProps.onKeyDown?.(e);
+                          }
+                        }}
+                        onClick={(e) => {
+                          if (isCollapsed) {
+                            menuTriggerProps.onClick?.(e);
+                          } else {
+                            setCollapsibleOpen((prev) => !prev);
+                          }
+                        }}
+                        className={cn(
+                          "cursor-pointer h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3",
+                          isActive &&
+                            "bg-sidebar-accent/70 text-sidebar-accent-foreground font-semibold",
+                        )}
+                      >
+                        {item.icon && (
+                          <item.icon className="size-5 md:size-4 shrink-0" />
+                        )}
+                        <span className="select-none flex-1 text-left truncate">
+                          {item.title}
+                        </span>
+                        <ChevronRight
+                          className={cn(
+                            "ml-auto size-4 shrink-0 transition-transform duration-200 text-muted-foreground group-data-[collapsible=icon]:hidden",
+                            collapsibleOpen && "rotate-90",
+                          )}
+                        />
+                      </SidebarMenuButton>
+                    )}
+                  />
+                )}
+              />
+              <TooltipContent side="right" hidden={!isCollapsed}>
+                {item.title}
+              </TooltipContent>
+            </Tooltip>
+
+            <MenuPanel side="right" align="start" sideOffset={4}>
+              <MenuGroup>
+                <MenuGroupLabel className="text-muted-foreground select-none">
+                  {item.title}
+                </MenuGroupLabel>
+                {item.items?.map((subItem) => (
+                  <MenuItem
+                    key={subItem.title}
+                    onClick={() => {
+                      setOpenMobile(false);
+                      setMenuOpen(false);
+                      if (subItem.url !== location.pathname) {
+                        navigate(subItem.url);
+                      }
+                    }}
+                    className="w-full cursor-pointer flex items-center"
+                  >
+                    {subItem.icon && <subItem.icon className="mr-2 h-4 w-4" />}
+                    <span>{subItem.title}</span>
+                  </MenuItem>
+                ))}
+              </MenuGroup>
+            </MenuPanel>
+          </Menu>
+
+          <CollapsiblePanel className="group-data-[collapsible=icon]:hidden">
+            <SidebarMenuSub className="border-l-2 border-sidebar-border/60 mx-4 pl-3 my-1 gap-1">
+              {item.items?.map((subItem) => {
+                const isSubActive = location.pathname === subItem.url;
+                return (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton
+                      isActive={isSubActive}
+                      onClick={() => {
+                        setOpenMobile(false);
+                        if (subItem.url !== location.pathname) {
+                          navigate(subItem.url);
+                        }
+                      }}
+                      className={cn(
+                        "cursor-pointer select-none h-10 md:h-7 text-sm md:text-xs rounded-lg px-3 transition-all",
+                        isSubActive
+                          ? "bg-primary/10 text-primary font-semibold dark:bg-primary/20"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/40",
+                      )}
+                    >
+                      {subItem.icon && (
+                        <subItem.icon className="size-4 shrink-0 mr-2" />
+                      )}
+                      <span className="truncate">{subItem.title}</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                );
+              })}
+            </SidebarMenuSub>
+          </CollapsiblePanel>
+        </SidebarMenuItem>
+      )}
+    />
+  );
+}
+
+function NavSingleItem({
+  item,
+  isActive,
+}: {
+  item: NavItem;
+  isActive: boolean;
+}) {
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  return (
+    <SidebarMenuItem key={item.title}>
+      <Tooltip disableHoverablePopup>
+        <TooltipTrigger
+          render={(props) => (
+            <SidebarMenuButton
+              {...props}
+              isActive={isActive}
+              onClick={() => {
+                setOpenMobile(false);
+                if (item.url !== location.pathname) {
+                  navigate(item.url);
+                }
+              }}
+              className={cn(
+                "cursor-pointer h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3",
+                isActive &&
+                  "bg-sidebar-accent/70 text-sidebar-accent-foreground font-semibold",
+              )}
+            >
+              {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
+              <span className="select-none flex-1 text-left truncate">
+                {item.title}
+              </span>
+            </SidebarMenuButton>
+          )}
+        />
+        <TooltipContent side="right" hidden={state !== "collapsed" || isMobile}>
+          {item.title}
+        </TooltipContent>
+      </Tooltip>
+    </SidebarMenuItem>
+  );
+}
+
+export default function NonSystemAdminSidebarContent() {
+  const location = useLocation();
   const { t } = useTranslation();
 
   const financialItems = useMemo(
@@ -171,61 +377,6 @@ export default function NonSystemAdminSidebarContent() {
     [financialItems, employeeItems, devItems, t],
   );
 
-
-  const { state, setOpenMobile, isMobile } = useSidebar();
-
-  const renderCollapsedItem = (item: any, isActive: boolean) => (
-    <SidebarMenuItem key={item.title}>
-      <Menu>
-        <Tooltip>
-          <TooltipTrigger
-            render={(props) => (
-              <MenuTrigger
-                {...props}
-                render={(props) => (
-                  <SidebarMenuButton
-                    {...props}
-                    isActive={isActive}
-                    className="group/menu-trigger"
-                  >
-                    {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
-                    <span className="select-none truncate">{item.title}</span>
-                    <ChevronRight className="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-open/menu-trigger:rotate-90 text-muted-foreground" />
-                  </SidebarMenuButton>
-                )}
-              ></MenuTrigger>
-            )}
-          />
-          <TooltipContent side="right" hidden={state !== "collapsed"}>
-            {item.title}
-          </TooltipContent>
-        </Tooltip>
-        <MenuPanel side="right" align="start" sideOffset={4}>
-          <MenuGroup>
-            <MenuGroupLabel className="text-muted-foreground select-none">
-              {item.title}
-            </MenuGroupLabel>
-            {item.items.map((subItem: any) => (
-              <MenuItem
-                key={subItem.title}
-                onClick={() => {
-                  setOpenMobile(false);
-                  if (subItem.url !== location.pathname) {
-                    navigate(subItem.url);
-                  }
-                }}
-                className="w-full cursor-pointer flex items-center"
-              >
-                {subItem.icon && <subItem.icon className="mr-2 h-4 w-4" />}
-                <span>{subItem.title}</span>
-              </MenuItem>
-            ))}
-          </MenuGroup>
-        </MenuPanel>
-      </Menu>
-    </SidebarMenuItem>
-  );
-
   return (
     <SidebarContent className="overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500">
       {navList.map((group) => (
@@ -241,99 +392,21 @@ export default function NonSystemAdminSidebarContent() {
                   : location.pathname.startsWith(item.url);
 
               if (item.items && item.items.length > 0) {
-                if (state === "collapsed" && !isMobile) {
-                  return renderCollapsedItem(item, isActive);
-                }
-
                 return (
-                  <Collapsible
+                  <NavCollapsibleItem
                     key={item.title}
-                    defaultOpen={isActive}
-                    className="group/collapsible"
-                    render={(props) => (
-                      <SidebarMenuItem {...props}>
-                        <CollapsibleTrigger
-                          render={(props) => (
-                            <SidebarMenuButton
-                              {...props}
-                              isActive={isActive}
-                              tooltip={item.title}
-                              className={cn(
-                                "group/collapsible-trigger h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3 transition-colors",
-                                isActive && "bg-sidebar-accent/70 text-sidebar-accent-foreground font-semibold"
-                              )}
-                            >
-                              {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
-                              <span className="select-none flex-1 text-left truncate">{item.title}</span>
-                              <ChevronRight className="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-open/collapsible:rotate-90 text-muted-foreground" />
-                            </SidebarMenuButton>
-                          )}
-                        />
-                        <CollapsiblePanel>
-                          <SidebarMenuSub className="border-l-2 border-sidebar-border/60 mx-4 pl-3 my-1 gap-1">
-                            {item.items.map((subItem) => {
-                              const isSubActive =
-                                location.pathname === subItem.url;
-                              return (
-                                <SidebarMenuSubItem key={subItem.title}>
-                                  <SidebarMenuSubButton
-                                    isActive={isSubActive}
-                                    onClick={() => {
-                                      setOpenMobile(false);
-                                      if (subItem.url !== location.pathname) {
-                                        navigate(subItem.url);
-                                      }
-                                    }}
-                                    className={cn(
-                                      "cursor-pointer select-none h-10 md:h-7 text-sm md:text-xs rounded-lg px-3 transition-all",
-                                      isSubActive
-                                        ? "bg-primary/10 text-primary font-semibold dark:bg-primary/20"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                                    )}
-                                  >
-                                    {subItem.icon && <subItem.icon className="size-4 shrink-0 mr-2" />}
-                                    <span className="truncate">{subItem.title}</span>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              );
-                            })}
-                          </SidebarMenuSub>
-                        </CollapsiblePanel>
-                      </SidebarMenuItem>
-                    )}
-                  ></Collapsible>
+                    item={item}
+                    isActive={isActive}
+                  />
                 );
               }
 
               return (
-                <SidebarMenuItem key={item.title}>
-                  <Tooltip>
-                    <TooltipTrigger
-                      render={(props) => (
-                        <SidebarMenuButton
-                          {...props}
-                          isActive={isActive}
-                          onClick={() => {
-                            setOpenMobile(false);
-                            if (item.url !== location.pathname) {
-                              navigate(item.url);
-                            }
-                          }}
-                          className={cn(
-                            "cursor-pointer h-11 md:h-8 text-sm font-medium rounded-xl md:rounded-lg px-3 transition-colors",
-                            isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                          )}
-                        >
-                          {item.icon && <item.icon className="size-5 md:size-4 shrink-0" />}
-                          <span className="truncate">{item.title}</span>
-                        </SidebarMenuButton>
-                      )}
-                    />
-                    <TooltipContent side="right" hidden={state !== "collapsed"}>
-                      {item.title}
-                    </TooltipContent>
-                  </Tooltip>
-                </SidebarMenuItem>
+                <NavSingleItem
+                  key={item.title}
+                  item={item}
+                  isActive={isActive}
+                />
               );
             })}
           </SidebarMenu>
