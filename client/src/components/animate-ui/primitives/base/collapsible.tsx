@@ -73,11 +73,23 @@ function CollapsiblePanel({
             <motion.div
               key="collapsible-panel"
               data-slot="collapsible-panel"
-              initial={{ height: 0, opacity: 0, '--mask-stop': '0%', y: -20 }}
+              initial={false}
               animate={
                 isOpen
-                  ? { height: 'auto', opacity: 1, '--mask-stop': '100%', y: 0 }
-                  : { height: 0, opacity: 0, '--mask-stop': '0%', y: -20 }
+                  ? {
+                      height: 'auto',
+                      opacity: 1,
+                      '--mask-stop': '100%',
+                      y: 0,
+                      visibility: 'visible' as const,
+                    }
+                  : {
+                      height: 0,
+                      opacity: 0,
+                      '--mask-stop': '0%',
+                      y: -20,
+                      transitionEnd: { visibility: 'hidden' },
+                    }
               }
               transition={transition}
               style={{

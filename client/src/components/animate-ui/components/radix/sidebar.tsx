@@ -761,7 +761,6 @@ function SidebarMenuSub({ className, ...props }: SidebarMenuSubProps) {
             data-sidebar="menu-sub"
             className={cn(
                 "border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5",
-                "group-data-[collapsible=icon]:hidden",
                 className,
             )}
             {...props}
@@ -812,7 +811,6 @@ function SidebarMenuSubButton({
                     "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
                     size === "sm" && "text-xs",
                     size === "md" && "text-sm",
-                    "group-data-[collapsible=icon]:hidden",
                     className,
                 )}
                 {...(props as any)}

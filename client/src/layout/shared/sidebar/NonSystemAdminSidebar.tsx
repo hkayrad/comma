@@ -85,8 +85,12 @@ function NavCollapsibleItem({
 
   return (
     <Collapsible
-      open={collapsibleOpen}
-      onOpenChange={setCollapsibleOpen}
+      open={!isCollapsed && collapsibleOpen}
+      onOpenChange={(nextOpen) => {
+        if (!isCollapsed) {
+          setCollapsibleOpen(nextOpen);
+        }
+      }}
       className="group/collapsible"
       render={(collapsibleProps) => (
         <SidebarMenuItem {...collapsibleProps}>
@@ -135,8 +139,8 @@ function NavCollapsibleItem({
                         </span>
                         <ChevronRight
                           className={cn(
-                            "ml-auto size-4 shrink-0 transition-transform duration-200 text-muted-foreground group-data-[collapsible=icon]:hidden",
-                            collapsibleOpen && "rotate-90",
+                            "ml-auto size-4 shrink-0 transition-transform duration-200 text-muted-foreground",
+                            (!isCollapsed && collapsibleOpen) && "rotate-90",
                           )}
                         />
                       </SidebarMenuButton>
@@ -174,7 +178,7 @@ function NavCollapsibleItem({
             </MenuPanel>
           </Menu>
 
-          <CollapsiblePanel className="group-data-[collapsible=icon]:hidden">
+          <CollapsiblePanel keepRendered>
             <SidebarMenuSub className="border-l-2 border-sidebar-border/60 mx-4 pl-3 my-1 gap-1">
               {item.items?.map((subItem) => {
                 const isSubActive = location.pathname === subItem.url;
