@@ -13,11 +13,11 @@ import type {
   CompanyDto
 } from "@comma/common";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
+  Menu,
+  MenuPanel,
+  MenuItem,
+  MenuTrigger
+} from "@/components/animate-ui/components/base/menu";
 import {
   ContextMenuItem
 } from "@/components/ui/context-menu";
@@ -169,8 +169,8 @@ export function StatementRowActions({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
+    <Menu>
+      <MenuTrigger
         render={(props) => (
           <Button
             {...props}
@@ -184,23 +184,23 @@ export function StatementRowActions({
           </Button>
         )}
       />
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleDownload}>
+      <MenuPanel align="end">
+        <MenuItem onClick={handleDownload}>
           <FileDown className="mr-2 h-4 w-4" />
           {t("vars.download")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleEdit}>
+        </MenuItem>
+        <MenuItem onClick={handleEdit}>
           <Pencil className="mr-2 h-4 w-4" />
           {t("vars.edit")}
-        </DropdownMenuItem>
-        <DropdownMenuItem
+        </MenuItem>
+        <MenuItem
           onClick={onConfirmDelete}
           className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
         >
           <Trash2 className="mr-2 h-4 w-4" />
           {t("vars.delete")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </MenuItem>
+      </MenuPanel>
+    </Menu>
   );
 }

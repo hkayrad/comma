@@ -8,12 +8,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+  Menu,
+  MenuPanel,
+  MenuItem,
+  MenuTrigger,
+  MenuSeparator,
+} from "@/components/animate-ui/components/base/menu";
 import { copyToClipboard } from "@/lib/utils";
 import { useNavigate } from "react-router";
 import {
@@ -652,8 +652,8 @@ export default function CustomerTable(props: Props) {
                   </span>
                 </Button>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger
+                <Menu>
+                  <MenuTrigger
                     render={(props) => (
                       <Button
                         {...props}
@@ -669,15 +669,15 @@ export default function CustomerTable(props: Props) {
                       </Button>
                     )}
                   />
-                  <DropdownMenuContent align="end" className="w-52 z-50">
-                    <DropdownMenuItem
+                  <MenuPanel align="end" className="w-52 z-50">
+                    <MenuItem
                       onClick={() => onDetails(row.original.id!)}
                       className="cursor-pointer"
                     >
                       <Info className="mr-2 size-4 text-muted-foreground" />
                       <span>{t("dashboard.table.column.actions.show_details")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </MenuItem>
+                    <MenuItem
                       onClick={() => {
                         const portalUrl = `${window.location.origin}/p/${row.original.company_id}`;
                         copyToClipboard(portalUrl, t);
@@ -686,24 +686,24 @@ export default function CustomerTable(props: Props) {
                     >
                       <Share2 className="mr-2 size-4 text-muted-foreground" />
                       <span>{t("dashboard.table.column.actions.share_portal")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
+                    </MenuItem>
+                    <MenuItem
                       onClick={() => onEdit(row.original.id!)}
                       className="cursor-pointer"
                     >
                       <Pencil className="mr-2 size-4 text-muted-foreground" />
                       <span>{t("dashboard.table.column.actions.edit_details")}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
+                    </MenuItem>
+                    <MenuSeparator />
+                    <MenuItem
                       onClick={() => confirmDelete(row.original.id!)}
                       className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400 cursor-pointer"
                     >
                       <Trash2 className="mr-2 size-4 text-inherit" />
                       <span>{t("dashboard.table.column.actions.delete")}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </MenuItem>
+                  </MenuPanel>
+                </Menu>
               </div>
             </div>
           </>

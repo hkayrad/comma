@@ -330,6 +330,7 @@ export {
   MenuTrigger,
   MenuPortal,
   MenuPanel,
+  MenuPanel as MenuContent,
   MenuGroup,
   MenuGroupLabel,
   MenuItem,
