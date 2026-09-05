@@ -23,20 +23,18 @@ export class AuditLogService {
 		}
 
 		const logModel = await AuditLogRepository.createLog(params, transaction);
-		const plain = typeof logModel.toJSON === "function" ? logModel.toJSON() : (logModel as any);
+		return this.formatLog(logModel);
+	}
 
+	private static formatLog(log: any): AuditLogDto {
+		const plain = typeof log.toJSON === "function" ? log.toJSON() : log;
 		return {
-			id: plain.id,
-			company_id: plain.company_id,
+			...plain,
 			user_id: plain.user_id ?? null,
-			entity_type: plain.entity_type,
-			entity_id: plain.entity_id,
-			action: plain.action,
 			old_values: plain.old_values ?? null,
 			new_values: plain.new_values ?? null,
 			ip_address: plain.ip_address ?? null,
 			user_agent: plain.user_agent ?? null,
-			created_at: plain.created_at,
 		};
 	}
 
@@ -60,22 +58,7 @@ export class AuditLogService {
 		const targetCompanyId = (companyId === "ALL" || companyId === "*") ? undefined : companyId;
 		const result = await AuditLogRepository.findAllWithPagination(targetCompanyId, limitVal, offset, sorting, filters);
 
-		const data: AuditLogDto[] = result.rows.map((log) => {
-			const plain = typeof log.toJSON === "function" ? log.toJSON() : (log as any);
-			return {
-				id: plain.id,
-				company_id: plain.company_id,
-				user_id: plain.user_id ?? null,
-				entity_type: plain.entity_type,
-				entity_id: plain.entity_id,
-				action: plain.action,
-				old_values: plain.old_values ?? null,
-				new_values: plain.new_values ?? null,
-				ip_address: plain.ip_address ?? null,
-				user_agent: plain.user_agent ?? null,
-				created_at: plain.created_at,
-			};
-		});
+		const data: AuditLogDto[] = result.rows.map((log) => this.formatLog(log));
 
 		return {
 			data,
