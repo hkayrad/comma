@@ -28,7 +28,7 @@
     "otpauth": "^9.4.1",
     "qrcode": "^1.5.4",
     "sequelize": "^6.37.8",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.0",
     "swagger-ui-express": "^5.0.1",
     "ws": "^8.18.3",
     "zod": "^4.2.1"
